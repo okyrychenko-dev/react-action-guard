@@ -1,3 +1,5 @@
+import { Middleware, MiddlewareContext } from "../middleware";
+
 /**
  * Configuration for a blocker
  */
@@ -30,6 +32,7 @@ export interface BlockerInfo extends StoredBlocker {
  */
 export interface UIBlockingStoreState {
   activeBlockers: Map<string, StoredBlocker>;
+  middlewares: Map<string, Middleware>;
 }
 
 /**
@@ -40,8 +43,11 @@ export interface UIBlockingStoreActions {
   removeBlocker: (id: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;
   getBlockingInfo: (scope: string) => ReadonlyArray<BlockerInfo>;
-  clearAllBlockers: () => void;
+  clearAllBlockers: VoidFunction;
   clearBlockersForScope: (scope: string) => void;
+  registerMiddleware: (name: string, middleware: Middleware) => void;
+  unregisterMiddleware: (name: string) => void;
+  runMiddlewares: (context: MiddlewareContext) => Promise<void>;
 }
 
 /**

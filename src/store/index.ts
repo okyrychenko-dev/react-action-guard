@@ -7,9 +7,4 @@ export type {
   UIBlockingStoreState,
   UIBlockingStoreActions,
 } from "./uiBlockingStore.types";
-export {
-  ASYNC_ACTION_PRIORITY,
-  DEFAULT_SCOPE,
-  DEFAULT_REASON,
-  DEFAULT_PRIORITY,
-} from "./uiBlockingStore.constants";
+export { ASYNC_ACTION_PRIORITY, DEFAULT_SCOPE, DEFAULT_REASON, DEFAULT_PRIORITY } from "./uiBlockingStore.constants";

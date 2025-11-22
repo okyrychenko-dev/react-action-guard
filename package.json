@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup",
   "main": "./dist/index.js",
@@ -9,10 +9,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
+  "sideEffects": false,
   "files": [
     "dist",
     "README.md",

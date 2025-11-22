@@ -1,12 +1,8 @@
 import type { StateCreator } from "zustand";
-import type {
-  BlockerConfig,
-  BlockerInfo,
-  StoredBlocker,
-  UIBlockingStore,
-} from "./uiBlockingStore.types";
+import type { BlockerConfig, BlockerInfo, StoredBlocker, UIBlockingStore } from "./uiBlockingStore.types";
 import { DEFAULT_SCOPE, DEFAULT_REASON, DEFAULT_PRIORITY } from "./uiBlockingStore.constants";
 import { normalizeScopeToArray } from "./uiBlockingStore.utils";
+import { Middleware, MiddlewareContext } from "../middleware";
 
 /**
  * UI Blocking Store Slice
@@ -14,12 +10,40 @@ import { normalizeScopeToArray } from "./uiBlockingStore.utils";
  * Implements the state and actions for UI blocking management.
  * This slice follows the Zustand slice pattern for better code organization.
  */
-export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (
-  set,
-  get
-) => ({
+export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (set, get) => ({
   // State
   activeBlockers: new Map(),
+  middlewares: new Map(),
+
+  registerMiddleware: (name: string, middleware: Middleware) => {
+    set((state) => {
+      const newMiddlewares = new Map(state.middlewares);
+      newMiddlewares.set(name, middleware);
+      return { middlewares: newMiddlewares };
+    });
+    console.log(`[UIBlocking] Registered middleware: ${name}`);
+  },
+
+  unregisterMiddleware: (name: string) => {
+    set((state) => {
+      const newMiddlewares = new Map(state.middlewares);
+      newMiddlewares.delete(name);
+      return { middlewares: newMiddlewares };
+    });
+    console.log(`[UIBlocking] Unregistered middleware: ${name}`);
+  },
+
+  runMiddlewares: async (context: MiddlewareContext) => {
+    const { middlewares } = get();
+
+    for (const [name, middleware] of middlewares) {
+      try {
+        await middleware(context);
+      } catch (error) {
+        console.error(`[UIBlocking] Middleware "${name}" error:`, error);
+      }
+    }
+  },
 
   // Actions
   /**
@@ -42,6 +66,17 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
       return { activeBlockers: newBlockers };
     });
+
+    void get().runMiddlewares({
+      action: "add",
+      blockerId: id,
+      config: {
+        scope: config.scope,
+        reason: config.reason,
+        priority: config.priority,
+      },
+      timestamp: Date.now(),
+    });
   },
 
   /**
@@ -51,12 +86,24 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *
    */
   removeBlocker: (id: string): void => {
+    const prevBlocker = get().activeBlockers.get(id);
+
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
       newBlockers.delete(id);
 
       return { activeBlockers: newBlockers };
     });
+
+    if (prevBlocker) {
+      void get().runMiddlewares({
+        action: "remove",
+        blockerId: id,
+        config: prevBlocker,
+        timestamp: Date.now(),
+        prevState: prevBlocker,
+      });
+    }
   },
 
   /**
