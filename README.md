@@ -20,16 +20,12 @@ npm install @okyrychenko-dev/react-action-guard zustand
 ## Quick Start
 
 ```jsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
 function MyComponent() {
-  const isBlocked = useIsBlocked('my-scope');
+  const isBlocked = useIsBlocked("my-scope");
 
-  return (
-    <button disabled={isBlocked}>
-      Click me
-    </button>
-  );
+  return <button disabled={isBlocked}>Click me</button>;
 }
 ```
 
@@ -42,6 +38,7 @@ function MyComponent() {
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
 **Parameters:**
+
 - `blockerId: string` - Unique identifier for the blocker
 - `config: BlockerConfig` - Configuration object
   - `scope?: string | string[]` - Scope(s) to block (default: "global")
@@ -53,10 +50,10 @@ Automatically adds a blocker when the component mounts and removes it on unmount
 
 ```jsx
 function MyComponent() {
-  useBlocker('my-blocker', {
-    scope: 'form',
-    reason: 'Form is saving',
-    priority: 10
+  useBlocker("my-blocker", {
+    scope: "form",
+    reason: "Form is saving",
+    priority: 10,
   });
 
   return <div>Content</div>;
@@ -68,6 +65,7 @@ function MyComponent() {
 Checks if a specific scope (or scopes) is currently blocked.
 
 **Parameters:**
+
 - `scope?: string | string[]` - Scope(s) to check (default: "global")
 
 **Returns:** `boolean` - Whether the scope is blocked
@@ -76,13 +74,9 @@ Checks if a specific scope (or scopes) is currently blocked.
 
 ```jsx
 function SubmitButton() {
-  const isFormBlocked = useIsBlocked('form');
+  const isFormBlocked = useIsBlocked("form");
 
-  return (
-    <button disabled={isFormBlocked}>
-      Submit
-    </button>
-  );
+  return <button disabled={isFormBlocked}>Submit</button>;
 }
 ```
 
@@ -91,6 +85,7 @@ function SubmitButton() {
 Wraps an async function with automatic blocking/unblocking.
 
 **Parameters:**
+
 - `actionId: string` - Identifier for the action
 - `scope?: string | string[]` - Scope(s) to block during execution
 
@@ -100,7 +95,7 @@ Wraps an async function with automatic blocking/unblocking.
 
 ```jsx
 function MyComponent() {
-  const executeWithBlocking = useAsyncAction('save-data', 'form');
+  const executeWithBlocking = useAsyncAction("save-data", "form");
 
   const handleSave = async () => {
     await executeWithBlocking(async () => {
@@ -119,6 +114,7 @@ function MyComponent() {
 Direct access to the Zustand store for advanced use cases.
 
 **Methods:**
+
 - `addBlocker(id, config)` - Manually add a blocker
 - `removeBlocker(id)` - Manually remove a blocker
 - `isBlocked(scope)` - Check if scope is blocked
@@ -129,21 +125,21 @@ Direct access to the Zustand store for advanced use cases.
 **Example:**
 
 ```jsx
-import { useUIBlockingStore } from '@okyrychenko-dev/react-action-guard';
+import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 
 function AdvancedComponent() {
   const { addBlocker, removeBlocker } = useUIBlockingStore();
 
   const startBlocking = () => {
-    addBlocker('custom-blocker', {
-      scope: ['form', 'navigation'],
-      reason: 'Critical operation in progress',
-      priority: 100
+    addBlocker("custom-blocker", {
+      scope: ["form", "navigation"],
+      reason: "Critical operation in progress",
+      priority: 100,
     });
   };
 
   const stopBlocking = () => {
-    removeBlocker('custom-blocker');
+    removeBlocker("custom-blocker");
   };
 
   return (
@@ -160,11 +156,7 @@ function AdvancedComponent() {
 The package is written in TypeScript and includes full type definitions.
 
 ```typescript
-import type {
-  BlockerConfig,
-  BlockerInfo,
-  UIBlockingState
-} from '@okyrychenko-dev/react-action-guard';
+import type { BlockerConfig, BlockerInfo, UIBlockingState } from "@okyrychenko-dev/react-action-guard";
 ```
 
 ## Use Cases
@@ -175,10 +167,14 @@ import type {
 function DataLoader() {
   const [isLoading, setIsLoading] = useState(false);
 
-  useBlocker('data-loader', {
-    scope: 'content',
-    reason: 'Loading data'
-  }, isLoading);
+  useBlocker(
+    "data-loader",
+    {
+      scope: "content",
+      reason: "Loading data",
+    },
+    isLoading
+  );
 
   // ... rest of component
 }
@@ -188,8 +184,8 @@ function DataLoader() {
 
 ```jsx
 function UserForm() {
-  const executeWithBlocking = useAsyncAction('submit-form', 'form');
-  const isBlocked = useIsBlocked('form');
+  const executeWithBlocking = useAsyncAction("submit-form", "form");
+  const isBlocked = useIsBlocked("form");
 
   const handleSubmit = async (data) => {
     await executeWithBlocking(async () => {
@@ -210,7 +206,7 @@ function UserForm() {
 
 ```jsx
 function App() {
-  const isGloballyBlocked = useIsBlocked('global');
+  const isGloballyBlocked = useIsBlocked("global");
 
   return (
     <div>
@@ -239,4 +235,4 @@ npm run dev
 
 ## License
 
-MIT © Oleksandr Kyrychenko
+MIT © Olexii Kyrychenko
