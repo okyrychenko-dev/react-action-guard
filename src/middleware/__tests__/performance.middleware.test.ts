@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { createPerformanceMiddleware } from "../performanceMiddleware";
 import type { MiddlewareContext } from "../middleware.types";
+import { act } from "@testing-library/react";
 
 describe("createPerformanceMiddleware", () => {
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
@@ -34,7 +35,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext);
 
-    vi.advanceTimersByTime(1500);
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",
@@ -64,7 +67,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext);
 
-    vi.advanceTimersByTime(2000);
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",
@@ -96,7 +101,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext);
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",
@@ -126,7 +133,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext);
 
-    vi.advanceTimersByTime(2500);
+    act(() => {
+      vi.advanceTimersByTime(2500);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",
@@ -151,7 +160,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext2);
 
-    vi.advanceTimersByTime(3500);
+    act(() => {
+      vi.advanceTimersByTime(3500);
+    });
 
     const removeContext2: MiddlewareContext = {
       action: "remove",
@@ -180,7 +191,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(blocker1Add);
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     const blocker2Add: MiddlewareContext = {
       action: "add",
@@ -191,7 +204,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(blocker2Add);
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const blocker1Remove: MiddlewareContext = {
       action: "remove",
@@ -203,7 +218,9 @@ describe("createPerformanceMiddleware", () => {
 
     expect(onSlowBlock).toHaveBeenCalledWith("blocker-1", expect.closeTo(1500, 50));
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     const blocker2Remove: MiddlewareContext = {
       action: "remove",
@@ -250,7 +267,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext);
 
-    vi.advanceTimersByTime(1500);
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",
@@ -272,7 +291,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(addContext2);
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
 
     const removeContext2: MiddlewareContext = {
       action: "remove",
@@ -344,7 +365,9 @@ describe("createPerformanceMiddleware", () => {
     void middleware1(addContext);
     void middleware2(addContext);
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const removeContext: MiddlewareContext = {
       action: "remove",

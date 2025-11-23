@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useScheduledBlocker } from "../useScheduledBlocker";
 import { useUIBlockingStore } from "../../store";
 
@@ -33,7 +33,9 @@ describe("useScheduledBlocker", () => {
     const { isBlocked: isBlockedBefore } = useUIBlockingStore.getState();
     expect(isBlockedBefore("test")).toBe(false);
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(true);
@@ -56,12 +58,16 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     let isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
-    vi.advanceTimersByTime(2000);
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
     isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
@@ -83,7 +89,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(true);
@@ -104,7 +112,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(true);
@@ -124,12 +134,16 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     let isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
-    vi.advanceTimersByTime(2000);
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
     isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
@@ -193,7 +207,9 @@ describe("useScheduledBlocker", () => {
 
     unmount();
 
-    vi.advanceTimersByTime(3000);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
 
     expect(onScheduleStart).not.toHaveBeenCalled();
     expect(onScheduleEnd).not.toHaveBeenCalled();
@@ -216,7 +232,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("scope1")).toBe(true);
@@ -238,7 +256,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { getBlockingInfo } = useUIBlockingStore.getState();
     const info = getBlockingInfo("test");
@@ -261,14 +281,18 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     unmount();
 
-    vi.advanceTimersByTime(2000);
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
     expect(onScheduleEnd).not.toHaveBeenCalled();
   });
@@ -286,13 +310,17 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     let isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     // Should remain blocked indefinitely
-    vi.advanceTimersByTime(10000);
+    act(() => {
+      vi.advanceTimersByTime(10000);
+    });
 
     isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
@@ -313,13 +341,17 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     let isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     // Should unblock after duration (2000ms), not end time (4000ms)
-    vi.advanceTimersByTime(2000);
+    act(() => {
+      vi.advanceTimersByTime(2000);
+    });
 
     isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
@@ -339,7 +371,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     let isBlocked = useUIBlockingStore.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
@@ -364,7 +398,9 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { getBlockingInfo } = useUIBlockingStore.getState();
     const info = getBlockingInfo("test");

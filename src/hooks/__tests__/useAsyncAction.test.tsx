@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useAsyncAction } from "../useAsyncAction";
 import { useUIBlockingStore, ASYNC_ACTION_PRIORITY } from "../../store";
+import { actAsync } from "./test.utils";
 
 describe("useAsyncAction", () => {
   beforeEach(() => {
@@ -26,15 +27,16 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise = result.current(asyncFn);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
 
-    await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      await waitFor(() => {
+        const { isBlocked } = useUIBlockingStore.getState();
+        expect(isBlocked("test-scope")).toBe(true);
+      });
 
-      expect(isBlocked("test-scope")).toBe(true);
+      return promise;
     });
-
-    await promise;
 
     const { isBlocked } = useUIBlockingStore.getState();
 
@@ -48,7 +50,10 @@ describe("useAsyncAction", () => {
       throw new Error("Test error");
     });
 
-    await expect(result.current(asyncFn)).rejects.toThrow("Test error");
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
+      await expect(promise).rejects.toThrow("Test error");
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
 
@@ -60,7 +65,7 @@ describe("useAsyncAction", () => {
 
     const asyncFn = vi.fn(async (): Promise<string> => "test-result");
 
-    const resultValue = await result.current(asyncFn);
+    const resultValue = await actAsync(async () => result.current(asyncFn));
 
     expect(resultValue).toBe("test-result");
   });
@@ -75,14 +80,16 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise = result.current(asyncFn);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
 
-    await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
-      expect(isBlocked()).toBe(true);
+      await waitFor(() => {
+        const { isBlocked } = useUIBlockingStore.getState();
+        expect(isBlocked()).toBe(true);
+      });
+
+      return promise;
     });
-
-    await promise;
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked()).toBe(false);
@@ -98,15 +105,17 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise = result.current(asyncFn);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
 
-    await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
-      expect(isBlocked("scope1")).toBe(true);
-      expect(isBlocked("scope2")).toBe(true);
+      await waitFor(() => {
+        const { isBlocked } = useUIBlockingStore.getState();
+        expect(isBlocked("scope1")).toBe(true);
+        expect(isBlocked("scope2")).toBe(true);
+      });
+
+      return promise;
     });
-
-    await promise;
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("scope1")).toBe(false);
@@ -123,16 +132,18 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise = result.current(asyncFn);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
 
-    await waitFor(() => {
-      const { getBlockingInfo } = useUIBlockingStore.getState();
-      const info = getBlockingInfo("test-scope");
-      expect(info.length).toBeGreaterThan(0);
-      expect(info[0]?.priority).toBe(ASYNC_ACTION_PRIORITY);
+      await waitFor(() => {
+        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const info = getBlockingInfo("test-scope");
+        expect(info.length).toBeGreaterThan(0);
+        expect(info[0]?.priority).toBe(ASYNC_ACTION_PRIORITY);
+      });
+
+      return promise;
     });
-
-    await promise;
   });
 
   it("should include action id in blocker reason", async () => {
@@ -145,16 +156,18 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise = result.current(asyncFn);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
 
-    await waitFor(() => {
-      const { getBlockingInfo } = useUIBlockingStore.getState();
-      const info = getBlockingInfo("test-scope");
-      expect(info.length).toBeGreaterThan(0);
-      expect(info[0]?.reason).toContain("fetch-user");
+      await waitFor(() => {
+        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const info = getBlockingInfo("test-scope");
+        expect(info.length).toBeGreaterThan(0);
+        expect(info[0]?.reason).toContain("fetch-user");
+      });
+
+      return promise;
     });
-
-    await promise;
   });
 
   it("should create unique blocker ids for each execution", async () => {
@@ -173,18 +186,20 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const promise1 = result.current(asyncFn1);
-    await new Promise((resolve) => setTimeout(resolve, 10));
-    const promise2 = result.current(asyncFn2);
+    await actAsync(async () => {
+      const promise1 = result.current(asyncFn1);
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      const promise2 = result.current(asyncFn2);
 
-    await waitFor(() => {
-      const { getBlockingInfo } = useUIBlockingStore.getState();
-      const info = getBlockingInfo("test-scope");
-      expect(info.length).toBe(2);
-      expect(info[0]?.id).not.toBe(info[1]?.id);
+      await waitFor(() => {
+        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const info = getBlockingInfo("test-scope");
+        expect(info.length).toBe(2);
+        expect(info[0]?.id).not.toBe(info[1]?.id);
+      });
+
+      return Promise.all([promise1, promise2]);
     });
-
-    await Promise.all([promise1, promise2]);
   });
 
   it("should handle concurrent executions", async () => {
@@ -203,10 +218,7 @@ describe("useAsyncAction", () => {
     const asyncFn1 = createAsyncFn(1, 100);
     const asyncFn2 = createAsyncFn(2, 50);
 
-    const promise1 = result.current(asyncFn1);
-    const promise2 = result.current(asyncFn2);
-
-    const results = await Promise.all([promise1, promise2]);
+    const results = await actAsync(async () => Promise.all([result.current(asyncFn1), result.current(asyncFn2)]));
 
     expect(results).toEqual([1, 2]);
 
@@ -225,7 +237,7 @@ describe("useAsyncAction", () => {
 
     const asyncFn = vi.fn(async (): Promise<TestResult> => ({ id: 1, name: "test" }));
 
-    const returnedValue = await result.current(asyncFn);
+    const returnedValue = await actAsync(async () => result.current(asyncFn));
 
     expect(returnedValue).toEqual({ id: 1, name: "test" });
     expect(returnedValue.id).toBe(1);
@@ -237,7 +249,7 @@ describe("useAsyncAction", () => {
 
     const asyncFn = vi.fn(async (): Promise<string> => "result");
 
-    await result.current(asyncFn);
+    await actAsync(async () => result.current(asyncFn));
 
     expect(asyncFn).toHaveBeenCalledTimes(1);
   });
@@ -249,7 +261,7 @@ describe("useAsyncAction", () => {
       // Do nothing
     });
 
-    const returnedValue = await result.current(asyncFn);
+    const returnedValue = await actAsync(async () => result.current(asyncFn));
 
     expect(returnedValue).toBeUndefined();
   });
@@ -262,7 +274,10 @@ describe("useAsyncAction", () => {
       throw error;
     });
 
-    await expect(result.current(asyncFn)).rejects.toThrow(error);
+    await actAsync(async () => {
+      const promise = result.current(asyncFn);
+      await expect(promise).rejects.toThrow(error);
+    });
 
     // Should be unblocked after error
     const { isBlocked } = useUIBlockingStore.getState();

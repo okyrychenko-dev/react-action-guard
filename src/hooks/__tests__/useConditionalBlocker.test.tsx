@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
-import { renderHook } from "@testing-library/react";
+import { act, renderHook } from "@testing-library/react";
 import { useConditionalBlocker } from "../useConditionalBlocker";
 import { useUIBlockingStore } from "../../store";
 
@@ -55,7 +55,10 @@ describe("useConditionalBlocker", () => {
     expect(isBlockedInitial("test")).toBe(false);
 
     rerender({ state: false });
-    vi.advanceTimersByTime(1000);
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(true);
@@ -73,10 +76,16 @@ describe("useConditionalBlocker", () => {
 
     expect(conditionFn).toHaveBeenCalledTimes(1);
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
     expect(conditionFn).toHaveBeenCalledTimes(2);
 
-    vi.advanceTimersByTime(1000);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
     expect(conditionFn).toHaveBeenCalledTimes(3);
   });
 
@@ -93,10 +102,16 @@ describe("useConditionalBlocker", () => {
 
     expect(conditionFn).toHaveBeenCalledTimes(1);
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
     expect(conditionFn).toHaveBeenCalledTimes(2);
 
-    vi.advanceTimersByTime(500);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
     expect(conditionFn).toHaveBeenCalledTimes(3);
   });
 
@@ -115,7 +130,10 @@ describe("useConditionalBlocker", () => {
     expect(isBlockedInitial("test")).toBe(false);
 
     shouldBlock = true;
-    vi.advanceTimersByTime(100);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(true);
@@ -136,7 +154,10 @@ describe("useConditionalBlocker", () => {
     expect(isBlockedInitial("test")).toBe(true);
 
     shouldBlock = false;
-    vi.advanceTimersByTime(100);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
 
     const { isBlocked } = useUIBlockingStore.getState();
     expect(isBlocked("test")).toBe(false);
@@ -216,7 +237,9 @@ describe("useConditionalBlocker", () => {
     const { getBlockingInfo: getInfoInitial } = useUIBlockingStore.getState();
     expect(getInfoInitial("test")).toHaveLength(1);
 
-    vi.advanceTimersByTime(100);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
 
     const { getBlockingInfo } = useUIBlockingStore.getState();
     expect(getBlockingInfo("test")).toHaveLength(1);

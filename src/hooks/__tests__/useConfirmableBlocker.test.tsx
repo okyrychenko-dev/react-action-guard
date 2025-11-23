@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useConfirmableBlocker } from "../useConfirmableBlocker";
 import { useUIBlockingStore } from "../../store";
+import { actAsync } from "./test.utils";
 
 describe("useConfirmableBlocker", () => {
   beforeEach(() => {
@@ -57,8 +58,10 @@ describe("useConfirmableBlocker", () => {
       })
     );
 
-    result.current.execute();
-    await result.current.onConfirm();
+    await actAsync(async () => {
+      result.current.execute();
+      return result.current.onConfirm();
+    });
 
     await waitFor(() => {
       expect(result.current.isExecuting).toBe(false);
@@ -113,8 +116,10 @@ describe("useConfirmableBlocker", () => {
       })
     );
 
-    result.current.execute();
-    await result.current.onConfirm();
+    await actAsync(async () => {
+      result.current.execute();
+      return result.current.onConfirm();
+    });
 
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
@@ -131,8 +136,10 @@ describe("useConfirmableBlocker", () => {
       })
     );
 
-    result.current.execute();
-    result.current.onCancel();
+    act(() => {
+      result.current.execute();
+      result.current.onCancel();
+    });
 
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
@@ -151,8 +158,8 @@ describe("useConfirmableBlocker", () => {
     });
     expect(result.current.isDialogOpen).toBe(true);
 
-    await act(async () => {
-      await result.current.onConfirm();
+    await actAsync(async () => {
+      return result.current.onConfirm();
     });
 
     await waitFor(() => {
@@ -185,7 +192,7 @@ describe("useConfirmableBlocker", () => {
     const onConfirm = vi.fn(
       async (): Promise<void> =>
         new Promise((resolve) => {
-          setTimeout(resolve, 50);
+          setTimeout(resolve, 100);
         })
     );
 
@@ -211,11 +218,11 @@ describe("useConfirmableBlocker", () => {
       expect(result.current.isExecuting).toBe(true);
     });
 
-    await act(async () => {
-      await promise;
-    });
+    await actAsync(async () => promise);
 
-    expect(result.current.isExecuting).toBe(false);
+    await waitFor(() => {
+      expect(result.current.isExecuting).toBe(false);
+    });
   });
 
   it("should handle errors in onConfirm", async () => {
@@ -232,9 +239,13 @@ describe("useConfirmableBlocker", () => {
       })
     );
 
-    result.current.execute();
+    act(() => {
+      result.current.execute();
+    });
 
-    await expect(result.current.onConfirm()).rejects.toThrow(error);
+    await actAsync(async () => {
+      await expect(result.current.onConfirm()).rejects.toThrow(error);
+    });
 
     await waitFor(() => {
       expect(result.current.isExecuting).toBe(false);
@@ -294,8 +305,8 @@ describe("useConfirmableBlocker", () => {
     const { isBlocked: isBlockedDuring } = useUIBlockingStore.getState();
     expect(isBlockedDuring("test")).toBe(true);
 
-    await act(async () => {
-      await result.current.onConfirm();
+    await actAsync(async () => {
+      return result.current.onConfirm();
     });
 
     await waitFor(() => {

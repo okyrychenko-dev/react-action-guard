@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { useIsBlocked } from "../useIsBlocked";
 import { useUIBlockingStore } from "../../store";
 
@@ -17,7 +17,9 @@ describe("useIsBlocked", () => {
 
   it("should return true when global blocker exists", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "global" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "global" });
+    });
 
     const { result } = renderHook(() => useIsBlocked());
 
@@ -26,7 +28,9 @@ describe("useIsBlocked", () => {
 
   it("should return true for specific scope when blocker exists", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "test-scope" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
@@ -35,7 +39,9 @@ describe("useIsBlocked", () => {
 
   it("should return false for scope without blocker", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "scope1" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "scope1" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("scope2"));
 
@@ -44,7 +50,9 @@ describe("useIsBlocked", () => {
 
   it("should return true when checking multiple scopes and one is blocked", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "scope1" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "scope1" });
+    });
 
     const { result } = renderHook(() => useIsBlocked(["scope1", "scope2"]));
 
@@ -53,7 +61,9 @@ describe("useIsBlocked", () => {
 
   it("should return false when checking multiple scopes and none are blocked", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "scope1" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "scope1" });
+    });
 
     const { result } = renderHook(() => useIsBlocked(["scope2", "scope3"]));
 
@@ -62,7 +72,9 @@ describe("useIsBlocked", () => {
 
   it("should return true for any scope when global blocker exists", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("global-blocker", { scope: "global" });
+    act(() => {
+      addBlocker("global-blocker", { scope: "global" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("any-scope"));
 
@@ -75,7 +87,9 @@ describe("useIsBlocked", () => {
     expect(result.current).toBe(false);
 
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "test-scope" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "test-scope" });
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(true);
@@ -84,13 +98,17 @@ describe("useIsBlocked", () => {
 
   it("should re-render when blocker is removed", async () => {
     const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "test-scope" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
     expect(result.current).toBe(true);
 
-    removeBlocker("test-blocker");
+    act(() => {
+      removeBlocker("test-blocker");
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(false);
@@ -99,13 +117,17 @@ describe("useIsBlocked", () => {
 
   it("should re-render when all blockers are cleared", async () => {
     const { addBlocker, clearAllBlockers } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "test-scope" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
     expect(result.current).toBe(true);
 
-    clearAllBlockers();
+    act(() => {
+      clearAllBlockers();
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(false);
@@ -114,13 +136,17 @@ describe("useIsBlocked", () => {
 
   it("should re-render when scope blockers are cleared", async () => {
     const { addBlocker, clearBlockersForScope } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "test-scope" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
     expect(result.current).toBe(true);
 
-    clearBlockersForScope("test-scope");
+    act(() => {
+      clearBlockersForScope("test-scope");
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(false);
@@ -129,7 +155,9 @@ describe("useIsBlocked", () => {
 
   it("should handle array scope from blocker", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: ["scope1", "scope2"] });
+    act(() => {
+      addBlocker("test-blocker", { scope: ["scope1", "scope2"] });
+    });
 
     const { result: result1 } = renderHook(() => useIsBlocked("scope1"));
     const { result: result2 } = renderHook(() => useIsBlocked("scope2"));
@@ -142,8 +170,10 @@ describe("useIsBlocked", () => {
 
   it("should work with multiple blockers for same scope", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("blocker1", { scope: "test-scope" });
-    addBlocker("blocker2", { scope: "test-scope" });
+    act(() => {
+      addBlocker("blocker1", { scope: "test-scope" });
+      addBlocker("blocker2", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
@@ -152,14 +182,18 @@ describe("useIsBlocked", () => {
 
   it("should remain blocked if one of multiple blockers is removed", async () => {
     const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
-    addBlocker("blocker1", { scope: "test-scope" });
-    addBlocker("blocker2", { scope: "test-scope" });
+    act(() => {
+      addBlocker("blocker1", { scope: "test-scope" });
+      addBlocker("blocker2", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
     expect(result.current).toBe(true);
 
-    removeBlocker("blocker1");
+    act(() => {
+      removeBlocker("blocker1");
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(true);
@@ -168,20 +202,26 @@ describe("useIsBlocked", () => {
 
   it("should unblock only when all blockers are removed", async () => {
     const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
-    addBlocker("blocker1", { scope: "test-scope" });
-    addBlocker("blocker2", { scope: "test-scope" });
+    act(() => {
+      addBlocker("blocker1", { scope: "test-scope" });
+      addBlocker("blocker2", { scope: "test-scope" });
+    });
 
     const { result } = renderHook(() => useIsBlocked("test-scope"));
 
     expect(result.current).toBe(true);
 
-    removeBlocker("blocker1");
+    act(() => {
+      removeBlocker("blocker1");
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(true);
     });
 
-    removeBlocker("blocker2");
+    act(() => {
+      removeBlocker("blocker2");
+    });
 
     await waitFor(() => {
       expect(result.current).toBe(false);
@@ -190,8 +230,10 @@ describe("useIsBlocked", () => {
 
   it("should handle changing scope prop", async () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("blocker1", { scope: "scope1" });
-    addBlocker("blocker2", { scope: "scope2" });
+    act(() => {
+      addBlocker("blocker1", { scope: "scope1" });
+      addBlocker("blocker2", { scope: "scope2" });
+    });
 
     const { result, rerender } = renderHook(({ scope }: { scope: string }) => useIsBlocked(scope), {
       initialProps: { scope: "scope1" },
@@ -214,7 +256,9 @@ describe("useIsBlocked", () => {
 
   it("should handle empty string scope", () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("test-blocker", { scope: "" });
+    act(() => {
+      addBlocker("test-blocker", { scope: "" });
+    });
 
     const { result } = renderHook(() => useIsBlocked(""));
 
@@ -223,7 +267,9 @@ describe("useIsBlocked", () => {
 
   it("should not re-render unnecessarily", async () => {
     const { addBlocker } = useUIBlockingStore.getState();
-    addBlocker("blocker1", { scope: "scope1" });
+    act(() => {
+      addBlocker("blocker1", { scope: "scope1" });
+    });
 
     let renderCount = 0;
     const { result } = renderHook(() => {
@@ -234,7 +280,9 @@ describe("useIsBlocked", () => {
     expect(result.current).toBe(false);
     const initialRenderCount = renderCount;
 
-    addBlocker("blocker2", { scope: "scope1" });
+    act(() => {
+      addBlocker("blocker2", { scope: "scope1" });
+    });
 
     await new Promise((resolve) => setTimeout(resolve, 50));
 
@@ -244,9 +292,11 @@ describe("useIsBlocked", () => {
   it("should handle complex blocking scenarios", async () => {
     const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
 
-    addBlocker("global", { scope: "global" });
-    addBlocker("scope1", { scope: "scope1" });
-    addBlocker("multi", { scope: ["scope2", "scope3"] });
+    act(() => {
+      addBlocker("global", { scope: "global" });
+      addBlocker("scope1", { scope: "scope1" });
+      addBlocker("multi", { scope: ["scope2", "scope3"] });
+    });
 
     const { result: resultGlobal } = renderHook(() => useIsBlocked());
     const { result: result1 } = renderHook(() => useIsBlocked("scope1"));
@@ -260,7 +310,9 @@ describe("useIsBlocked", () => {
     expect(result3.current).toBe(true);
     expect(result4.current).toBe(true);
 
-    removeBlocker("global");
+    act(() => {
+      removeBlocker("global");
+    });
 
     await waitFor(() => {
       expect(resultGlobal.current).toBe(false);

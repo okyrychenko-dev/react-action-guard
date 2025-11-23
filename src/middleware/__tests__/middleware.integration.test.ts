@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { renderHook, waitFor } from "@testing-library/react";
+import { renderHook, waitFor, act } from "@testing-library/react";
 import { useUIBlockingStore } from "../../store";
 import { useBlocker } from "../../hooks/useBlocker";
 import type { Middleware, MiddlewareContext } from "../middleware.types";
@@ -157,7 +157,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("middleware1", middleware1);
     registerMiddleware("middleware2", middleware2);
 
-    renderHook(() =>
+    const { unmount } = renderHook(() =>
       useBlocker("test-blocker-1", {
         scope: "test",
         reason: "Test reason",
@@ -169,18 +169,27 @@ describe("Middleware Integration", () => {
       expect(middleware2).toHaveBeenCalledTimes(1);
     });
 
+    act(() => {
+      unmount();
+    });
+
+    middleware1.mockClear();
+    middleware2.mockClear();
+
     unregisterMiddleware("middleware1");
 
-    renderHook(() =>
-      useBlocker("test-blocker-2", {
-        scope: "test",
-        reason: "Test reason",
-      })
-    );
+    act(() => {
+      renderHook(() =>
+        useBlocker("test-blocker-2", {
+          scope: "test",
+          reason: "Test reason",
+        })
+      );
+    });
 
     await waitFor(() => {
-      expect(middleware1).toHaveBeenCalledTimes(1); // Still 1
-      expect(middleware2).toHaveBeenCalledTimes(2); // Now 2
+      expect(middleware1).toHaveBeenCalledTimes(0); // Not called
+      expect(middleware2).toHaveBeenCalledTimes(1); // Called once
     });
   });
 
@@ -236,7 +245,7 @@ describe("Middleware Integration", () => {
 
     registerMiddleware("my-middleware", middleware1);
 
-    renderHook(() =>
+    const { unmount } = renderHook(() =>
       useBlocker("test-blocker-1", {
         scope: "test",
         reason: "Test reason",
@@ -246,17 +255,26 @@ describe("Middleware Integration", () => {
     expect(middleware1).toHaveBeenCalledTimes(1);
     expect(middleware2).not.toHaveBeenCalled();
 
+    act(() => {
+      unmount();
+    });
+
+    middleware1.mockClear();
+    middleware2.mockClear();
+
     // Re-register with same name
     registerMiddleware("my-middleware", middleware2);
 
-    renderHook(() =>
-      useBlocker("test-blocker-2", {
-        scope: "test",
-        reason: "Test reason",
-      })
-    );
+    act(() => {
+      renderHook(() =>
+        useBlocker("test-blocker-2", {
+          scope: "test",
+          reason: "Test reason",
+        })
+      );
+    });
 
-    expect(middleware1).toHaveBeenCalledTimes(1); // Still 1
+    expect(middleware1).toHaveBeenCalledTimes(0); // Not called
     expect(middleware2).toHaveBeenCalledTimes(1); // Now called
   });
 
