@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useConditionalBlocker } from "../useConditionalBlocker";
-import { useUIBlockingStore } from "../../store";
+import { useConditionalBlocker } from "..";
+import { useUIBlockingStore } from "../../../store";
 
 describe("useConditionalBlocker", () => {
   beforeEach(() => {

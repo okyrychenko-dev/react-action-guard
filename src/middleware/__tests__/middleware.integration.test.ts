@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
 import { useUIBlockingStore } from "../../store";
-import { useBlocker } from "../../hooks/useBlocker";
+import { useBlocker } from "../../hooks";
 import type { Middleware, MiddlewareContext } from "../middleware.types";
 
 describe("Middleware Integration", () => {

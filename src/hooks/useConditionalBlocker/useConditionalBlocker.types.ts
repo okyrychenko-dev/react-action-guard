@@ -1,4 +1,4 @@
-import type { BlockerConfig } from "../store";
+import type { BlockerConfig } from "../../store";
 
 /**
  * Configuration for conditional blocker hook.

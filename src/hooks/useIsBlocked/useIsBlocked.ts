@@ -1,4 +1,4 @@
-import { useUIBlockingStore } from "../store";
+import { useUIBlockingStore } from "../../store";
 
 /**
  * Hook to check if a scope is currently blocked

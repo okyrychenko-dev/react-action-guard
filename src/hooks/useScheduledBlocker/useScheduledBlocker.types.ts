@@ -1,4 +1,4 @@
-import type { BlockerConfig } from "../store";
+import type { BlockerConfig } from "../../store";
 
 /**
  * Schedule configuration for time-based blocking.

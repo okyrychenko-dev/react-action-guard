@@ -1,4 +1,7 @@
-export type AnalyticsEventData = Record<string, string | number | ReadonlyArray<string> | undefined>;
+export type AnalyticsEventData = Record<
+  string,
+  string | number | ReadonlyArray<string> | undefined
+>;
 
 export type AnalyticsProvider = "ga" | "mixpanel" | "amplitude";
 

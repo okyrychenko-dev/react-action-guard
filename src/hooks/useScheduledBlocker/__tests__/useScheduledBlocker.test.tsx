@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useScheduledBlocker } from "../useScheduledBlocker";
-import { useUIBlockingStore } from "../../store";
+import { useUIBlockingStore } from "../../../store";
 
 describe("useScheduledBlocker", () => {
   beforeEach(() => {

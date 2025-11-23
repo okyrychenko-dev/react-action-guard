@@ -22,7 +22,9 @@ const handleRemoveAction = (
   blockStartTimes.delete(context.blockerId);
 
   if (duration >= slowBlockThreshold) {
-    console.warn(`[UIBlocking] Slow block detected: "${context.blockerId}" took ${duration.toString()}ms`);
+    console.warn(
+      `[UIBlocking] Slow block detected: "${context.blockerId}" took ${duration.toString()}ms`
+    );
 
     onSlowBlock?.(context.blockerId, duration);
   }

@@ -8,7 +8,11 @@ import {
 } from "./analyticsMiddleware.utils";
 import { Middleware, MiddlewareContext } from "./middleware.types";
 
-const trackEvent = (config: AnalyticsConfig, context: MiddlewareContext, eventData: AnalyticsEventData): void => {
+const trackEvent = (
+  config: AnalyticsConfig,
+  context: MiddlewareContext,
+  eventData: AnalyticsEventData
+): void => {
   if ("provider" in config) {
     switch (config.provider) {
       case "ga":

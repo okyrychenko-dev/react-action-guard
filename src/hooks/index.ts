@@ -5,10 +5,10 @@ export { useConditionalBlocker } from "./useConditionalBlocker";
 export { useConfirmableBlocker } from "./useConfirmableBlocker";
 export { useScheduledBlocker } from "./useScheduledBlocker";
 
-export type { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
+export type { ConditionalBlockerConfig } from "./useConditionalBlocker";
 export type {
   ConfirmableBlockerConfig,
   UseConfirmableBlockerReturn,
   ConfirmDialogConfig,
-} from "./useConfirmableBlocker.types";
-export type { ScheduledBlockerConfig, BlockingSchedule } from "./useScheduledBlocker.types";
+} from "./useConfirmableBlocker";
+export type { ScheduledBlockerConfig, BlockingSchedule } from "./useScheduledBlocker";

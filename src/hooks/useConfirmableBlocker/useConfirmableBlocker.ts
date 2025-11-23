@@ -1,6 +1,9 @@
 import { useState, useCallback } from "react";
-import { useBlocker } from "./useBlocker";
-import { ConfirmableBlockerConfig, UseConfirmableBlockerReturn } from "./useConfirmableBlocker.types";
+import {
+  ConfirmableBlockerConfig,
+  UseConfirmableBlockerReturn,
+} from "./useConfirmableBlocker.types";
+import { useBlocker } from "../useBlocker";
 
 /**
  * Hook for creating a confirmable action with blocking UI

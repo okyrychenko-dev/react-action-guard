@@ -1,8 +1,8 @@
 import { useEffect, useRef, useCallback } from "react";
-import { useUIBlockingStore } from "../store";
+import { useUIBlockingStore } from "../../store";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
-import { useConfigRef } from "./useConfigRef";
-import { createBlockerConfig } from "./useBlocker.utils";
+import { useConfigRef } from "../useConfigRef";
+import { createBlockerConfig } from "../useBlocker";
 import {
   parseDate,
   isValidTimestamp,

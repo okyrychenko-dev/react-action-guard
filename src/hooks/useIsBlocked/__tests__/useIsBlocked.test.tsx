@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
-import { useIsBlocked } from "../useIsBlocked";
-import { useUIBlockingStore } from "../../store";
+import { useIsBlocked } from "..";
+import { useUIBlockingStore } from "../../../store";
 
 describe("useIsBlocked", () => {
   beforeEach(() => {

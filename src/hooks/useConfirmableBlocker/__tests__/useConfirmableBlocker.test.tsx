@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor, act } from "@testing-library/react";
+import { useUIBlockingStore } from "../../../store";
+import { actAsync } from "../../__tests__/test.utils";
 import { useConfirmableBlocker } from "../useConfirmableBlocker";
-import { useUIBlockingStore } from "../../store";
-import { actAsync } from "./test.utils";
 
 describe("useConfirmableBlocker", () => {
   beforeEach(() => {

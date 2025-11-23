@@ -1,5 +1,10 @@
 import type { StateCreator } from "zustand";
-import type { BlockerConfig, BlockerInfo, StoredBlocker, UIBlockingStore } from "./uiBlockingStore.types";
+import type {
+  BlockerConfig,
+  BlockerInfo,
+  StoredBlocker,
+  UIBlockingStore,
+} from "./uiBlockingStore.types";
 import { DEFAULT_SCOPE, DEFAULT_REASON, DEFAULT_PRIORITY } from "./uiBlockingStore.constants";
 import { normalizeScopeToArray } from "./uiBlockingStore.utils";
 import { Middleware, MiddlewareContext } from "../middleware";
@@ -10,7 +15,10 @@ import { Middleware, MiddlewareContext } from "../middleware";
  * Implements the state and actions for UI blocking management.
  * This slice follows the Zustand slice pattern for better code organization.
  */
-export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (set, get) => ({
+export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (
+  set,
+  get
+) => ({
   // State
   activeBlockers: new Map(),
   middlewares: new Map(),

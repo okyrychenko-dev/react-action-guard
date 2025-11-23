@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
 import { useAsyncAction } from "../useAsyncAction";
-import { useUIBlockingStore, ASYNC_ACTION_PRIORITY } from "../../store";
-import { actAsync } from "./test.utils";
+import { useUIBlockingStore, ASYNC_ACTION_PRIORITY } from "../../../store";
+import { actAsync } from "../../__tests__/test.utils";
 
 describe("useAsyncAction", () => {
   beforeEach(() => {
@@ -218,7 +218,9 @@ describe("useAsyncAction", () => {
     const asyncFn1 = createAsyncFn(1, 100);
     const asyncFn2 = createAsyncFn(2, 50);
 
-    const results = await actAsync(async () => Promise.all([result.current(asyncFn1), result.current(asyncFn2)]));
+    const results = await actAsync(async () =>
+      Promise.all([result.current(asyncFn1), result.current(asyncFn2)])
+    );
 
     expect(results).toEqual([1, 2]);
 

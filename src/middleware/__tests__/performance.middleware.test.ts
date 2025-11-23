@@ -79,7 +79,9 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(removeContext);
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith('[UIBlocking] Slow block detected: "slow-blocker" took 2000ms');
+    expect(consoleWarnSpy).toHaveBeenCalledWith(
+      '[UIBlocking] Slow block detected: "slow-blocker" took 2000ms'
+    );
   });
 
   it("should not warn for fast blocks", () => {

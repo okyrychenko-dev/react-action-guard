@@ -1,4 +1,4 @@
-import { BlockerConfig } from "../store";
+import { BlockerConfig } from "../../store";
 
 /**
  * Creates a blocker configuration object from partial config.
