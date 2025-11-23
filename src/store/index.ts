@@ -1,15 +1,15 @@
+export {
+  ASYNC_ACTION_PRIORITY,
+  DEFAULT_PRIORITY,
+  DEFAULT_REASON,
+  DEFAULT_SCOPE,
+} from "./uiBlockingStore.constants";
 export { useUIBlockingStore } from "./uiBlockingStore.store";
 export type {
   BlockerConfig,
-  StoredBlocker,
   BlockerInfo,
+  StoredBlocker,
   UIBlockingStore,
-  UIBlockingStoreState,
   UIBlockingStoreActions,
+  UIBlockingStoreState,
 } from "./uiBlockingStore.types";
-export {
-  ASYNC_ACTION_PRIORITY,
-  DEFAULT_SCOPE,
-  DEFAULT_REASON,
-  DEFAULT_PRIORITY,
-} from "./uiBlockingStore.constants";

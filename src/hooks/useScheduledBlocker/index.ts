@@ -1,2 +1,2 @@
 export { useScheduledBlocker } from "./useScheduledBlocker";
-export type { ScheduledBlockerConfig, BlockingSchedule } from "./useScheduledBlocker.types";
+export type { BlockingSchedule, ScheduledBlockerConfig } from "./useScheduledBlocker.types";

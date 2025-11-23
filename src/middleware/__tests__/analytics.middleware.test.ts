@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { BlockerConfig } from "../../store";
 import { createAnalyticsMiddleware } from "../analyticsMiddleware";
 import type { MiddlewareContext } from "../middleware.types";
-import { BlockerConfig } from "../../store";
 
 describe("createAnalyticsMiddleware", () => {
   describe("Google Analytics", () => {

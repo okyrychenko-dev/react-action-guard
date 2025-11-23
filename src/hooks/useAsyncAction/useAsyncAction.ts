@@ -1,6 +1,5 @@
 import { useCallback } from "react";
-import { useUIBlockingStore } from "../../store";
-import { ASYNC_ACTION_PRIORITY } from "../../store";
+import { ASYNC_ACTION_PRIORITY, useUIBlockingStore } from "../../store";
 
 /**
  * Hook to wrap async functions with automatic blocking/unblocking

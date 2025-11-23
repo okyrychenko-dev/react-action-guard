@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useAsyncAction } from "../useAsyncAction";
-import { useUIBlockingStore, ASYNC_ACTION_PRIORITY } from "../../../store";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { ASYNC_ACTION_PRIORITY, useUIBlockingStore } from "../../../store";
 import { actAsync } from "../../__tests__/test.utils";
+import { useAsyncAction } from "../useAsyncAction";
 
 describe("useAsyncAction", () => {
   beforeEach(() => {

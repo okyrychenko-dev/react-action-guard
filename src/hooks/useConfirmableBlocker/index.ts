@@ -1,6 +1,6 @@
 export { useConfirmableBlocker } from "./useConfirmableBlocker";
 export type {
   ConfirmableBlockerConfig,
-  UseConfirmableBlockerReturn,
   ConfirmDialogConfig,
+  UseConfirmableBlockerReturn,
 } from "./useConfirmableBlocker.types";

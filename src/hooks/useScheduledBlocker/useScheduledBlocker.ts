@@ -1,16 +1,16 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useUIBlockingStore } from "../../store";
-import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
-import { useConfigRef } from "../useConfigRef";
 import { createBlockerConfig } from "../useBlocker";
+import { useConfigRef } from "../useConfigRef";
+import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
 import {
-  parseDate,
-  isValidTimestamp,
-  calculateEndTime,
-  isSafeTimeout,
-  isInBlockingPeriod,
-  isScheduleInPast,
   MAX_TIMEOUT_MS,
+  calculateEndTime,
+  isInBlockingPeriod,
+  isSafeTimeout,
+  isScheduleInPast,
+  isValidTimestamp,
+  parseDate,
 } from "./useScheduledBlocker.utils";
 
 /**

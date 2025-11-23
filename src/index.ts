@@ -1,21 +1,21 @@
 // Core hooks
 export {
-  useBlocker,
-  useIsBlocked,
   useAsyncAction,
+  useBlocker,
   useConditionalBlocker,
   useConfirmableBlocker,
+  useIsBlocked,
   useScheduledBlocker,
 } from "./hooks";
 
 // Hook types
 export type {
+  BlockingSchedule,
   ConditionalBlockerConfig,
   ConfirmableBlockerConfig,
-  UseConfirmableBlockerReturn,
   ConfirmDialogConfig,
   ScheduledBlockerConfig,
-  BlockingSchedule,
+  UseConfirmableBlockerReturn,
 } from "./hooks";
 
 // Store
@@ -27,24 +27,24 @@ export type {
   BlockerInfo,
   StoredBlocker,
   UIBlockingStore,
-  UIBlockingStoreState,
   UIBlockingStoreActions,
+  UIBlockingStoreState,
 } from "./store";
 
 // Middleware
 export {
-  loggerMiddleware,
+  type AmplitudeConfig,
+  type AnalyticsConfig,
+  type AnalyticsEventData,
+  type AnalyticsProvider,
+  type BlockingAction,
   createAnalyticsMiddleware,
   createPerformanceMiddleware,
+  type CustomAnalyticsConfig,
+  type GoogleAnalyticsConfig,
+  loggerMiddleware,
   type Middleware,
   type MiddlewareContext,
-  type BlockingAction,
-  type AnalyticsConfig,
-  type AnalyticsProvider,
-  type AnalyticsEventData,
-  type GoogleAnalyticsConfig,
   type MixpanelConfig,
-  type AmplitudeConfig,
-  type CustomAnalyticsConfig,
   type PerformanceConfig,
 } from "./middleware";

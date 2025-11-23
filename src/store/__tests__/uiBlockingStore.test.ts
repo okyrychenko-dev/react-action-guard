@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
+import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
 import { useUIBlockingStore } from "../uiBlockingStore.store";
-import { DEFAULT_SCOPE, DEFAULT_REASON, DEFAULT_PRIORITY } from "../uiBlockingStore.constants";
 
 describe("uiBlockingStore", () => {
   beforeEach(() => {

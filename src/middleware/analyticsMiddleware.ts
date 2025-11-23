@@ -1,10 +1,10 @@
 import { AnalyticsConfig, AnalyticsEventData } from "./analyticsMiddleware.types";
 import {
   buildEventData,
-  trackGoogleAnalytics,
-  trackMixpanel,
   trackAmplitude,
   trackCustom,
+  trackGoogleAnalytics,
+  trackMixpanel,
 } from "./analyticsMiddleware.utils";
 import { Middleware, MiddlewareContext } from "./middleware.types";
 

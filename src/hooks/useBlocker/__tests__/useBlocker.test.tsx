@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach } from "vitest";
 import { renderHook, waitFor } from "@testing-library/react";
-import { useBlocker } from "../useBlocker";
+import { beforeEach, describe, expect, it } from "vitest";
 import { useUIBlockingStore } from "../../../store";
+import { useBlocker } from "../useBlocker";
 import type { BlockerConfig } from "../../../store";
 
 describe("useBlocker", () => {

@@ -1,13 +1,13 @@
-import type { StateCreator } from "zustand";
+import { Middleware, MiddlewareContext } from "../middleware";
+import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
+import { normalizeScopeToArray } from "./uiBlockingStore.utils";
 import type {
   BlockerConfig,
   BlockerInfo,
   StoredBlocker,
   UIBlockingStore,
 } from "./uiBlockingStore.types";
-import { DEFAULT_SCOPE, DEFAULT_REASON, DEFAULT_PRIORITY } from "./uiBlockingStore.constants";
-import { normalizeScopeToArray } from "./uiBlockingStore.utils";
-import { Middleware, MiddlewareContext } from "../middleware";
+import type { StateCreator } from "zustand";
 
 /**
  * UI Blocking Store Slice

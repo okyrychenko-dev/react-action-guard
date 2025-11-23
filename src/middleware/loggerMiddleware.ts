@@ -1,4 +1,4 @@
-import { getActionEmoji, formatLogData } from "./loggerMiddleware.utils";
+import { formatLogData, getActionEmoji } from "./loggerMiddleware.utils";
 import { Middleware } from "./middleware.types";
 
 const LOG_PREFIX = "[UIBlocking]";

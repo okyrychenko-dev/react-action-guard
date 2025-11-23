@@ -1,4 +1,4 @@
-import { useRef, useEffect, RefObject } from "react";
+import { RefObject, useEffect, useRef } from "react";
 
 /**
  * Keeps a ref updated with the latest config value.

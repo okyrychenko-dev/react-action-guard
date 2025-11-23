@@ -2,6 +2,7 @@ import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import prettier from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
 
 export default [
   eslint.configs.recommended,
@@ -18,9 +19,39 @@ export default [
   {
     plugins: {
       "react-hooks": reactHooks,
+      import: importPlugin,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+
+      "import/order": [
+        "error",
+        {
+          groups: [
+            "builtin",
+            "external",
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type",
+          ],
+          "newlines-between": "never",
+          alphabetize: {
+            order: "asc",
+            caseInsensitive: true,
+          },
+        },
+      ],
+      "sort-imports": [
+        "error",
+        {
+          ignoreDeclarationSort: true, // строки сортирует import/order
+          ignoreMemberSort: false, // а внутри {} сортируем
+          allowSeparatedGroups: true,
+        },
+      ],
 
       // TypeScript strict rules
       "@typescript-eslint/no-explicit-any": "error",
@@ -66,7 +97,13 @@ export default [
     ignores: ["dist/**", "node_modules/**", "*.config.*", "samples/**"],
   },
   {
-    files: ["**/__tests__/**/*.ts", "**/__tests__/**/*.tsx", "**/*.test.ts", "**/*.test.tsx", "src/test/**"],
+    files: [
+      "**/__tests__/**/*.ts",
+      "**/__tests__/**/*.tsx",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "src/test/**",
+    ],
     rules: {
       "@typescript-eslint/no-confusing-void-expression": "off",
       "@typescript-eslint/require-await": "off",

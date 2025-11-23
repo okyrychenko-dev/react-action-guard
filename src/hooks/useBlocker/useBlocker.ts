@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useUIBlockingStore, type BlockerConfig } from "../../store";
+import { type BlockerConfig, useUIBlockingStore } from "../../store";
 
 /**
  * Hook to automatically add and remove a blocker based on component lifecycle

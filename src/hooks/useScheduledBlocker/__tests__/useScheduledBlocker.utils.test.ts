@@ -1,12 +1,12 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import {
-  parseDate,
-  isValidTimestamp,
-  calculateEndTime,
-  isSafeTimeout,
-  isInBlockingPeriod,
-  isScheduleInPast,
   MAX_TIMEOUT_MS,
+  calculateEndTime,
+  isInBlockingPeriod,
+  isSafeTimeout,
+  isScheduleInPast,
+  isValidTimestamp,
+  parseDate,
 } from "../useScheduledBlocker.utils";
 import type { BlockingSchedule } from "../useScheduledBlocker.types";
 

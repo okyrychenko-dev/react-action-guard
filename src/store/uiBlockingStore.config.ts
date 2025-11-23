@@ -1,5 +1,5 @@
-import type { DevtoolsOptions } from "zustand/middleware";
 import { DEVTOOLS_NAME } from "./uiBlockingStore.constants";
+import type { DevtoolsOptions } from "zustand/middleware";
 
 /**
  * DevTools configuration for UI Blocking Store

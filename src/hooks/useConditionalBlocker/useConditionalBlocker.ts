@@ -1,8 +1,8 @@
-import { useRef, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { useUIBlockingStore } from "../../store";
-import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
-import { useConfigRef } from "../useConfigRef";
 import { createBlockerConfig } from "../useBlocker";
+import { useConfigRef } from "../useConfigRef";
+import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
 
 /**
  * Hook for conditional blocking based on a condition function.

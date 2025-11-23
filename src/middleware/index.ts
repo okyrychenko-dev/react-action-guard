@@ -1,14 +1,14 @@
-export { loggerMiddleware } from "./loggerMiddleware";
 export { createAnalyticsMiddleware } from "./analyticsMiddleware";
 export type {
+  AmplitudeConfig,
   AnalyticsConfig,
-  AnalyticsProvider,
   AnalyticsEventData,
+  AnalyticsProvider,
+  CustomAnalyticsConfig,
   GoogleAnalyticsConfig,
   MixpanelConfig,
-  AmplitudeConfig,
-  CustomAnalyticsConfig,
 } from "./analyticsMiddleware.types";
+export { loggerMiddleware } from "./loggerMiddleware";
+export type { BlockingAction, Middleware, MiddlewareContext } from "./middleware.types";
 export { createPerformanceMiddleware } from "./performanceMiddleware";
 export type { PerformanceConfig } from "./performanceMiddleware.types";
-export type { Middleware, BlockingAction, MiddlewareContext } from "./middleware.types";

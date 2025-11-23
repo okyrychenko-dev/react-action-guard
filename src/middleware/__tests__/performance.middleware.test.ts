@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { act } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createPerformanceMiddleware } from "../performanceMiddleware";
 import type { MiddlewareContext } from "../middleware.types";
-import { act } from "@testing-library/react";
 
 describe("createPerformanceMiddleware", () => {
   let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
