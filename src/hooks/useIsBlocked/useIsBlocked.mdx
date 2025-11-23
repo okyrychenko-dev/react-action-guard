@@ -1,0 +1,740 @@
+import { Meta, Canvas, Controls } from "@storybook/addon-docs/blocks";
+import * as UseIsBlockedStories from "./useIsBlocked.stories";
+
+<Meta of={UseIsBlockedStories} />
+
+# useIsBlocked
+
+Check if UI is currently blocked for specific scope(s) or globally. This is the primary hook for determining whether UI elements should be disabled or hidden.
+
+## Overview
+
+`useIsBlocked` provides reactive boolean state that automatically updates when blockers are added or removed:
+
+- **Scope-specific** checking - check if a particular scope is blocked
+- **Multi-scope** checking - check if any of multiple scopes are blocked
+- **Global** checking - check if the global scope is blocked
+- **Any scope** checking - check if any blocker exists
+- **Reactive** - automatically re-renders when blocking state changes
+
+This hook is essential for connecting blocking state to your UI components.
+
+## API Reference
+
+### Signature
+
+```typescript
+useIsBlocked(scope?: string | string[]): boolean
+```
+
+### Parameters
+
+| Parameter | Type                 | Required | Default     | Description                                       |
+| --------- | -------------------- | -------- | ----------- | ------------------------------------------------- |
+| `scope`   | `string \| string[]` | ❌       | `undefined` | Scope(s) to check. If omitted, checks all scopes. |
+
+### Return Value
+
+Returns `boolean`:
+
+- `true` - UI is blocked for the specified scope(s)
+- `false` - UI is not blocked
+
+### Blocking Logic
+
+The hook returns `true` if:
+
+1. **With scope parameter**: Any blocker exists with matching scope OR global scope
+2. **Without scope parameter**: Any blocker exists in any scope
+3. **With array of scopes**: Any blocker exists with any of the specified scopes OR global scope
+
+## Basic Usage
+
+<Canvas of={UseIsBlockedStories.Basic} />
+
+```tsx
+import { useIsBlocked, useBlocker } from "@okyrychenko-dev/react-action-guard";
+
+function SaveButton() {
+  const [isSaving, setIsSaving] = useState(false);
+  const isBlocked = useIsBlocked("form");
+
+  useBlocker("save-blocker", { scope: "form", reason: "Saving..." }, isSaving);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    await api.save(formData);
+    setIsSaving(false);
+  };
+
+  return (
+    <button onClick={handleSave} disabled={isBlocked}>
+      {isBlocked ? "Saving..." : "Save"}
+    </button>
+  );
+}
+```
+
+## Examples
+
+### Custom Scope
+
+<Canvas of={UseIsBlockedStories.CustomScope} />
+
+Check a specific custom scope:
+
+```tsx
+function PaymentForm() {
+  const isBlocked = useIsBlocked("payment-scope");
+
+  return (
+    <form>
+      <CreditCardInput disabled={isBlocked} />
+      <button type="submit" disabled={isBlocked}>
+        {isBlocked ? "Processing..." : "Pay Now"}
+      </button>
+    </form>
+  );
+}
+```
+
+### Form Validation Scope
+
+<Canvas of={UseIsBlockedStories.FormScope} />
+
+Use for form validation blocking:
+
+```tsx
+function ValidatedForm() {
+  const isBlocked = useIsBlocked("form-validation");
+  const [formData, setFormData] = useState({});
+
+  // Validation blocker is set up elsewhere
+  useConditionalBlocker("validator", {
+    scope: "form-validation",
+    condition: () => !isFormValid(formData),
+    checkInterval: 500,
+  });
+
+  return (
+    <form>
+      <FormFields data={formData} onChange={setFormData} />
+      <button type="submit" disabled={isBlocked}>
+        Submit
+      </button>
+    </form>
+  );
+}
+```
+
+### Multiple Scopes
+
+Check if any of multiple scopes are blocked:
+
+```tsx
+function MultiScopeComponent() {
+  // Blocked if either 'api' or 'network' scope is blocked
+  const isBlocked = useIsBlocked(["api", "network"]);
+
+  return <button disabled={isBlocked}>Fetch Data</button>;
+}
+```
+
+### Global Scope Only
+
+Check only the global scope:
+
+```tsx
+function GlobalBlockingIndicator() {
+  const isGloballyBlocked = useIsBlocked("global");
+
+  if (isGloballyBlocked) {
+    return (
+      <div className="global-overlay">
+        <Spinner />
+        <p>System busy, please wait...</p>
+      </div>
+    );
+  }
+
+  return null;
+}
+```
+
+### Any Scope
+
+Check if any blocker exists in any scope:
+
+```tsx
+function AppStatusIndicator() {
+  const isAnyBlocked = useIsBlocked(); // No scope parameter
+
+  return (
+    <StatusBar>
+      {isAnyBlocked ? <span>⚠️ Some features are currently blocked</span> : <span>✅ All systems operational</span>}
+    </StatusBar>
+  );
+}
+```
+
+## Advanced Patterns
+
+### Conditional Rendering
+
+```tsx
+function ConditionalContent() {
+  const isBlocked = useIsBlocked("content");
+
+  if (isBlocked) {
+    return (
+      <div className="blocked-state">
+        <Skeleton />
+        <p>Loading content...</p>
+      </div>
+    );
+  }
+
+  return <MainContent />;
+}
+```
+
+### Disabled State Management
+
+```tsx
+function FormWithMultipleElements() {
+  const isFormBlocked = useIsBlocked("form");
+  const isSaveBlocked = useIsBlocked("save");
+  const isValidationBlocked = useIsBlocked("validation");
+
+  // Combine multiple blocking states
+  const submitDisabled = isFormBlocked || isSaveBlocked || isValidationBlocked;
+
+  return (
+    <form>
+      <input disabled={isFormBlocked} placeholder="Name" />
+      <input disabled={isFormBlocked} placeholder="Email" />
+      <button type="button" disabled={isSaveBlocked}>
+        Save Draft
+      </button>
+      <button type="submit" disabled={submitDisabled}>
+        Submit
+      </button>
+    </form>
+  );
+}
+```
+
+### Visual Feedback
+
+```tsx
+function ButtonWithVisualFeedback() {
+  const isBlocked = useIsBlocked("action");
+
+  return (
+    <button
+      disabled={isBlocked}
+      className={isBlocked ? "button-loading" : "button-normal"}
+      style={{
+        opacity: isBlocked ? 0.6 : 1,
+        cursor: isBlocked ? "not-allowed" : "pointer",
+      }}
+    >
+      {isBlocked && <Spinner size="small" />}
+      {isBlocked ? "Processing..." : "Process"}
+    </button>
+  );
+}
+```
+
+### Scope Hierarchy
+
+```tsx
+function NestedScopes() {
+  const isAppBlocked = useIsBlocked("app");
+  const isFeatureBlocked = useIsBlocked("feature");
+  const isSubfeatureBlocked = useIsBlocked("subfeature");
+
+  // App level - blocks everything
+  if (isAppBlocked) {
+    return <MaintenanceMode />;
+  }
+
+  // Feature level - blocks feature and subfeatures
+  if (isFeatureBlocked) {
+    return <FeatureDisabled />;
+  }
+
+  // Subfeature level - blocks only this subfeature
+  if (isSubfeatureBlocked) {
+    return <SubfeatureLoading />;
+  }
+
+  return <ActiveSubfeature />;
+}
+```
+
+### Dynamic Scope Checking
+
+```tsx
+function DynamicScopeChecker({ scopeName }: { scopeName: string }) {
+  const isBlocked = useIsBlocked(scopeName);
+
+  return (
+    <div>
+      <h3>Scope: {scopeName}</h3>
+      <StatusIndicator active={!isBlocked} />
+      <ActionButton scope={scopeName} disabled={isBlocked} />
+    </div>
+  );
+}
+
+function ScopeList() {
+  const scopes = ["payments", "exports", "admin", "api"];
+
+  return (
+    <div>
+      {scopes.map((scope) => (
+        <DynamicScopeChecker key={scope} scopeName={scope} />
+      ))}
+    </div>
+  );
+}
+```
+
+### With Loading States
+
+```tsx
+function DataFetcher() {
+  const [data, setData] = useState(null);
+  const isFetching = useIsBlocked("data-fetch");
+
+  const fetchData = useAsyncAction("fetch", "data-fetch");
+
+  useEffect(() => {
+    fetchData(async () => {
+      const result = await api.getData();
+      setData(result);
+    });
+  }, []);
+
+  if (isFetching) {
+    return <LoadingSpinner />;
+  }
+
+  if (!data) {
+    return <EmptyState />;
+  }
+
+  return <DataDisplay data={data} />;
+}
+```
+
+### Modal Dialog Control
+
+```tsx
+function DeleteConfirmation({ itemId }: { itemId: string }) {
+  const { execute, isDialogOpen } = useConfirmableBlocker("delete", {
+    scope: "delete-modal",
+    confirmMessage: "Delete this item?",
+    onConfirm: async () => {
+      await api.delete(itemId);
+    },
+  });
+
+  const isBlocked = useIsBlocked("delete-modal");
+
+  return (
+    <>
+      <button onClick={execute} disabled={isBlocked}>
+        Delete
+      </button>
+
+      {/* Block background interactions when dialog is open */}
+      <div className={isBlocked ? "overlay-active" : ""}>
+        <MainContent disabled={isBlocked} />
+      </div>
+
+      {isDialogOpen && <ConfirmDialog />}
+    </>
+  );
+}
+```
+
+### Form Section Control
+
+```tsx
+function MultiSectionForm() {
+  const isSection1Blocked = useIsBlocked("section1");
+  const isSection2Blocked = useIsBlocked("section2");
+  const isSection3Blocked = useIsBlocked("section3");
+
+  return (
+    <form>
+      <fieldset disabled={isSection1Blocked}>
+        <legend>Section 1</legend>
+        <Section1Fields />
+      </fieldset>
+
+      <fieldset disabled={isSection2Blocked}>
+        <legend>Section 2</legend>
+        <Section2Fields />
+      </fieldset>
+
+      <fieldset disabled={isSection3Blocked}>
+        <legend>Section 3</legend>
+        <Section3Fields />
+      </fieldset>
+
+      <button type="submit" disabled={isSection1Blocked || isSection2Blocked || isSection3Blocked}>
+        Submit All
+      </button>
+    </form>
+  );
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use specific scopes instead of global when possible
+- Provide visual feedback when elements are blocked
+- Combine with appropriate blocker hooks (useBlocker, useAsyncAction, etc.)
+- Use meaningful scope names that reflect functionality
+- Check blocking state before performing actions
+- Use disabled attribute for form elements
+
+### ❌ Don't
+
+- Don't rely on blocking state for security (it's UI-only)
+- Don't check too many scopes unnecessarily
+- Don't forget to provide user feedback when blocked
+- Don't nest useIsBlocked calls in render loops
+- Don't use blocking as a replacement for proper loading states
+
+## When to Use
+
+Use `useIsBlocked` when you need to:
+
+- ✅ **Disable buttons** during async operations
+- ✅ **Show loading states** based on blocking
+- ✅ **Control form interactions** during validation
+- ✅ **Render conditionally** based on blocking state
+- ✅ **Provide visual feedback** for blocked UI
+- ✅ **Coordinate multiple components** with shared scope
+
+## TypeScript
+
+Full TypeScript support with type-safe return value:
+
+```typescript
+// Single scope
+const isBlocked: boolean = useIsBlocked('my-scope');
+
+// Multiple scopes
+const isBlocked: boolean = useIsBlocked(['scope1', 'scope2']);
+
+// All scopes
+const isAnyBlocked: boolean = useIsBlocked();
+
+// With type assertion for dynamic scopes
+const scopeName: string = getScopeName();
+const isBlocked: boolean = useIsBlocked(scopeName);
+
+// In component props
+interface ButtonProps {
+  scope?: string | string[];
+}
+
+function SmartButton({ scope }: ButtonProps) {
+  const isBlocked: boolean = useIsBlocked(scope);
+  return <button disabled={isBlocked}>Action</button>;
+}
+```
+
+## Performance
+
+- **Highly optimized**: Uses Zustand selector for efficient updates
+- **Minimal re-renders**: Only updates when blocking state actually changes
+- **Efficient scope checking**: O(1) lookup for scope matching
+- **No polling**: Event-driven updates via store subscription
+
+### Performance Tips
+
+```tsx
+// ✅ Good: Single subscription
+function OptimizedComponent() {
+  const isBlocked = useIsBlocked("scope");
+
+  return (
+    <div>
+      <Button disabled={isBlocked} />
+      <Input disabled={isBlocked} />
+    </div>
+  );
+}
+
+// ❌ Bad: Multiple subscriptions (unnecessary)
+function UnoptimizedComponent() {
+  const isButtonBlocked = useIsBlocked("scope");
+  const isInputBlocked = useIsBlocked("scope");
+
+  return (
+    <div>
+      <Button disabled={isButtonBlocked} />
+      <Input disabled={isInputBlocked} />
+    </div>
+  );
+}
+```
+
+## How It Works
+
+Under the hood, `useIsBlocked`:
+
+1. Subscribes to the Zustand blocking store
+2. Uses a selector to check active blockers
+3. Returns true if any blocker matches the criteria:
+   - For specific scope: blocker.scope === scope OR blocker.scope === 'global'
+   - For array of scopes: blocker.scope in scopes OR blocker.scope === 'global'
+   - For no scope: any blocker exists
+4. Automatically re-renders component when blocking state changes
+
+```typescript
+// Simplified implementation
+export const useIsBlocked = (scope?: string | string[]): boolean => {
+  return useUIBlockingStore((state) => {
+    const blockers = Array.from(state.activeBlockers.values());
+
+    if (!scope) {
+      // Check if any blocker exists
+      return blockers.length > 0;
+    }
+
+    if (Array.isArray(scope)) {
+      // Check if any of the specified scopes are blocked
+      return blockers.some((blocker) => scope.includes(blocker.scope as string) || blocker.scope === "global");
+    }
+
+    // Check specific scope
+    return blockers.some((blocker) => blocker.scope === scope || blocker.scope === "global");
+  });
+};
+```
+
+## Scope Resolution Rules
+
+### Global Scope Behavior
+
+The `global` scope is special:
+
+- Blocks ALL other scopes
+- Always checked regardless of specified scope
+- Highest priority blocking
+
+```tsx
+// Global blocker active
+useBlocker("maintenance", { scope: "global" }, true);
+
+// All these return true
+useIsBlocked("form"); // true (global blocks everything)
+useIsBlocked("api"); // true (global blocks everything)
+useIsBlocked("global"); // true (explicitly global)
+useIsBlocked(); // true (any blocker exists)
+```
+
+### Multiple Scope Matching
+
+```tsx
+// These blockers are active
+useBlocker("b1", { scope: "api" }, true);
+useBlocker("b2", { scope: "network" }, true);
+
+// Scope checking
+useIsBlocked("api"); // true (api blocker active)
+useIsBlocked("network"); // true (network blocker active)
+useIsBlocked("database"); // false (no blocker)
+useIsBlocked(["api", "database"]); // true (api is blocked)
+useIsBlocked(["database", "cache"]); // false (neither blocked)
+```
+
+### Scope Inheritance
+
+```tsx
+// Global blocker takes precedence
+useBlocker("global", { scope: "global" }, true);
+useBlocker("specific", { scope: "form" }, false);
+
+useIsBlocked("form"); // true (global blocker active)
+```
+
+## Troubleshooting
+
+### Hook returns wrong value
+
+- Check that blockers are properly registered
+- Verify scope names match exactly (case-sensitive)
+- Check if global blocker is active
+- Use DebugPanel to inspect active blockers
+
+### Component not re-rendering
+
+- Ensure you're using the hook, not checking store directly
+- Verify component is mounted when blocker changes
+- Check for React Strict Mode double-mounting issues
+- Confirm Zustand store is properly initialized
+
+### Performance issues
+
+- Reduce number of useIsBlocked calls per component
+- Use memoization for expensive render logic
+- Check for unnecessary component re-renders
+- Profile with React DevTools
+
+### Scope confusion
+
+- Use consistent naming convention for scopes
+- Document scope hierarchy in your app
+- Consider using TypeScript enums for scope names
+- Use DebugPanel to visualize active scopes
+
+## Interactive Demo
+
+<Canvas of={UseIsBlockedStories.Basic} />
+
+<Controls of={UseIsBlockedStories.Basic} />
+
+## Related Hooks
+
+- [`useBlocker`](/?path=/docs/hooks-useblocker--docs) - Create and control blockers
+- [`useAsyncAction`](/?path=/docs/hooks-useasyncaction--docs) - Automatic blocking for async operations
+- [`useConfirmableBlocker`](/?path=/docs/hooks-useconfirmableblocker--docs) - Confirmable actions with blocking
+- [`useScheduledBlocker`](/?path=/docs/hooks-usescheduledblocker--docs) - Time-based blocking
+- [`useConditionalBlocker`](/?path=/docs/hooks-useConditionalblocker--docs) - Condition-based blocking
+
+## Real-World Examples
+
+### Complete Form Example
+
+```tsx
+function CompleteFormExample() {
+  const [formData, setFormData] = useState({ name: "", email: "" });
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Validation blocker
+  useConditionalBlocker("validation", {
+    scope: "form",
+    reason: "Validation failed",
+    condition: () => {
+      return !formData.name || !formData.email.includes("@");
+    },
+    checkInterval: 500,
+  });
+
+  // Save operation blocker
+  useBlocker("saving", { scope: "form", reason: "Saving..." }, isSaving);
+
+  const isBlocked = useIsBlocked("form");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      await api.saveForm(formData);
+      toast.success("Saved!");
+    } catch (error) {
+      toast.error("Save failed");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input
+        value={formData.name}
+        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+        disabled={isBlocked}
+        placeholder="Name"
+      />
+      <input
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        disabled={isBlocked}
+        placeholder="Email"
+      />
+      <button type="submit" disabled={isBlocked}>
+        {isSaving ? "Saving..." : isBlocked ? "Fix errors" : "Save"}
+      </button>
+    </form>
+  );
+}
+```
+
+### Navigation Guard
+
+```tsx
+function NavigationGuard({ children }: { children: React.ReactNode }) {
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const isNavigationBlocked = useIsBlocked("navigation");
+
+  useBlocker(
+    "nav-guard",
+    {
+      scope: "navigation",
+      reason: "Unsaved changes",
+      priority: 100,
+    },
+    hasUnsavedChanges
+  );
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isNavigationBlocked) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isNavigationBlocked]);
+
+  return (
+    <>
+      {isNavigationBlocked && <Banner type="warning">You have unsaved changes. Please save before leaving.</Banner>}
+      {children}
+    </>
+  );
+}
+```
+
+### Feature Flag Integration
+
+```tsx
+function FeatureWithBlockingStates() {
+  const { isFeatureEnabled } = useFeatureFlags();
+  const { hasPermission } = useAuth();
+  const isOnline = useOnlineStatus();
+
+  useConditionalBlocker("feature-access", {
+    scope: "premium-feature",
+    reason: "Feature not available",
+    condition: () => {
+      if (!isFeatureEnabled("premium-features")) return true;
+      if (!hasPermission("premium")) return true;
+      if (!isOnline) return true;
+      return false;
+    },
+    checkInterval: 1000,
+  });
+
+  const isBlocked = useIsBlocked("premium-feature");
+
+  if (isBlocked) {
+    return <FeatureUnavailable />;
+  }
+
+  return <PremiumFeature />;
+}
+```

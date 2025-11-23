@@ -1,0 +1,668 @@
+import { Meta, Canvas, Controls } from "@storybook/addon-docs/blocks";
+import * as UseConditionalBlockerStories from "./useConditionalBlocker.stories";
+
+<Meta of={UseConditionalBlockerStories} />
+
+# useConditionalBlocker
+
+Automatically block UI based on dynamic conditions. Perfect for validation rules, resource limits, permission checks, or any scenario where blocking depends on runtime state.
+
+## Overview
+
+`useConditionalBlocker` continuously evaluates a condition and automatically manages blocking:
+
+- **Monitors** a condition function at regular intervals
+- **Activates** blocking when condition becomes true
+- **Deactivates** when condition becomes false
+- **Reactive** to any state changes in your condition
+
+This enables declarative, condition-based UI blocking without manual state management.
+
+## API Reference
+
+### Signature
+
+```typescript
+useConditionalBlocker(
+  blockerId: string,
+  config: ConditionalBlockerConfig
+): void
+```
+
+### Parameters
+
+| Parameter   | Type                       | Required | Description                                          |
+| ----------- | -------------------------- | -------- | ---------------------------------------------------- |
+| `blockerId` | `string`                   | ✅       | Unique identifier for this blocker                   |
+| `config`    | `ConditionalBlockerConfig` | ✅       | Configuration including condition and check interval |
+
+### ConditionalBlockerConfig
+
+```typescript
+interface ConditionalBlockerConfig extends BlockerConfig {
+  condition: (state?: any) => boolean; // Condition to evaluate
+  checkInterval?: number; // Check frequency in ms (default: 1000)
+  state?: any; // Optional state to pass to condition
+}
+```
+
+### Return Value
+
+This hook returns `void` - it manages blocking automatically based on the condition.
+
+## Basic Usage
+
+<Canvas of={UseConditionalBlockerStories.Basic} />
+
+```tsx
+import { useConditionalBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+
+function FormWithValidation() {
+  const [formData, setFormData] = useState({ email: "", age: 0 });
+  const isBlocked = useIsBlocked("form");
+
+  useConditionalBlocker("validation", {
+    scope: "form",
+    reason: "Form validation failed",
+    condition: () => {
+      // Block if email is invalid or age is below 18
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
+      const ageValid = formData.age >= 18;
+      return !emailValid || !ageValid;
+    },
+    checkInterval: 500, // Check every 500ms
+  });
+
+  return (
+    <form>
+      <input
+        type="email"
+        value={formData.email}
+        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+      />
+      <input
+        type="number"
+        value={formData.age}
+        onChange={(e) => setFormData({ ...formData, age: Number(e.target.value) })}
+      />
+      <button type="submit" disabled={isBlocked}>
+        Submit
+      </button>
+    </form>
+  );
+}
+```
+
+## Examples
+
+### Threshold-Based Blocking
+
+<Canvas of={UseConditionalBlockerStories.Basic} />
+
+Block when a value exceeds a threshold:
+
+```tsx
+function ResourceMonitor({ threshold = 80 }) {
+  const [cpuUsage, setCpuUsage] = useState(0);
+
+  useConditionalBlocker("cpu-limit", {
+    scope: "app",
+    reason: `CPU usage exceeds ${threshold}%`,
+    condition: () => cpuUsage > threshold,
+    checkInterval: 2000, // Check every 2 seconds
+  });
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const usage = await fetchCPUUsage();
+      setCpuUsage(usage);
+    }, 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div>
+      CPU Usage: {cpuUsage}%
+      {cpuUsage > threshold && (
+        <Alert>System resources are limited. Some features are disabled.</Alert>
+      )}
+    </div>
+  );
+}
+```
+
+### Fast Check Interval
+
+<Canvas of={UseConditionalBlockerStories.FastCheck} />
+
+Frequent checks for responsive blocking:
+
+```tsx
+useConditionalBlocker("fast-validation", {
+  scope: "input",
+  reason: "Invalid input detected",
+  condition: () => inputValue.length < 3,
+  checkInterval: 100, // Check every 100ms for immediate feedback
+});
+```
+
+### Slow Check Interval
+
+<Canvas of={UseConditionalBlockerStories.SlowCheck} />
+
+Less frequent checks for performance:
+
+```tsx
+useConditionalBlocker("api-quota", {
+  scope: "api",
+  reason: "API quota exceeded",
+  condition: () => apiCallCount > apiQuota,
+  checkInterval: 5000, // Check every 5 seconds
+});
+```
+
+### Always Blocked
+
+Condition that always evaluates to true:
+
+```tsx
+useConditionalBlocker("maintenance", {
+  scope: "app",
+  reason: "System under maintenance",
+  condition: () => true, // Always block
+  checkInterval: 10000,
+});
+```
+
+## Advanced Patterns
+
+### Multi-Field Validation
+
+```tsx
+function ComplexForm() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    age: 0,
+    agreedToTerms: false,
+  });
+
+  const isBlocked = useIsBlocked("complex-form");
+
+  useConditionalBlocker("form-validation", {
+    scope: "complex-form",
+    reason: "Please complete all required fields correctly",
+    condition: () => {
+      // Username validation
+      if (formData.username.length < 3) return true;
+
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) return true;
+
+      // Password validation
+      if (formData.password.length < 8) return true;
+      if (formData.password !== formData.confirmPassword) return true;
+
+      // Age validation
+      if (formData.age < 18) return true;
+
+      // Terms validation
+      if (!formData.agreedToTerms) return true;
+
+      return false; // All validations passed
+    },
+    checkInterval: 300,
+  });
+
+  return (
+    <form>
+      <FormFields data={formData} onChange={setFormData} />
+      <button type="submit" disabled={isBlocked}>
+        {isBlocked ? "Please complete the form" : "Submit"}
+      </button>
+    </form>
+  );
+}
+```
+
+### Resource-Based Blocking
+
+```tsx
+function MemoryMonitor() {
+  const [memoryUsage, setMemoryUsage] = useState(0);
+  const [diskSpace, setDiskSpace] = useState(100);
+
+  useConditionalBlocker("resource-limits", {
+    scope: "uploads",
+    reason: "Insufficient system resources",
+    condition: () => {
+      const memoryExceeded = memoryUsage > 90; // 90% memory
+      const diskFull = diskSpace < 10; // Less than 10% disk space
+      return memoryExceeded || diskFull;
+    },
+    checkInterval: 3000,
+    priority: 80, // High priority
+  });
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const [mem, disk] = await Promise.all([fetchMemoryUsage(), fetchDiskSpace()]);
+      setMemoryUsage(mem);
+      setDiskSpace(disk);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return <ResourceDashboard memory={memoryUsage} disk={diskSpace} />;
+}
+```
+
+### Permission-Based Blocking
+
+```tsx
+function ProtectedFeature() {
+  const { user, permissions } = useAuth();
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useConditionalBlocker("access-control", {
+    scope: "protected-feature",
+    reason: "Access denied",
+    condition: () => {
+      // Block if user doesn't have required permission
+      if (!permissions.includes("feature:write")) return true;
+
+      // Block if offline
+      if (!isOnline) return true;
+
+      // Block if trial expired
+      if (user.trialExpired) return true;
+
+      return false;
+    },
+    checkInterval: 1000,
+  });
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+
+    return () => {
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  return <FeatureUI />;
+}
+```
+
+### With State Parameter
+
+```tsx
+interface ValidationState {
+  minLength: number;
+  maxLength: number;
+  required: boolean;
+}
+
+function DynamicValidation() {
+  const [value, setValue] = useState("");
+  const [rules, setRules] = useState<ValidationState>({
+    minLength: 5,
+    maxLength: 20,
+    required: true,
+  });
+
+  useConditionalBlocker("dynamic-validation", {
+    scope: "input",
+    reason: "Validation rules not met",
+    condition: (state: ValidationState) => {
+      if (state.required && value.length === 0) return true;
+      if (value.length < state.minLength) return true;
+      if (value.length > state.maxLength) return true;
+      return false;
+    },
+    state: rules, // Pass rules as state
+    checkInterval: 200,
+  });
+
+  return (
+    <div>
+      <input value={value} onChange={(e) => setValue(e.target.value)} placeholder="Enter text" />
+      <ValidationRules rules={rules} onChange={setRules} />
+    </div>
+  );
+}
+```
+
+### Async Condition Check
+
+```tsx
+function ApiQuotaChecker() {
+  const [quotaExceeded, setQuotaExceeded] = useState(false);
+
+  useEffect(() => {
+    const checkQuota = async () => {
+      try {
+        const response = await fetch("/api/quota-status");
+        const { exceeded } = await response.json();
+        setQuotaExceeded(exceeded);
+      } catch (error) {
+        console.error("Quota check failed:", error);
+      }
+    };
+
+    // Initial check
+    checkQuota();
+
+    // Set up polling
+    const interval = setInterval(checkQuota, 10000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useConditionalBlocker("api-quota", {
+    scope: "api-calls",
+    reason: "API quota exceeded. Please upgrade your plan.",
+    condition: () => quotaExceeded,
+    checkInterval: 1000,
+  });
+
+  return <ApiFeature />;
+}
+```
+
+### Dependent Conditions
+
+```tsx
+function MultiStageValidation() {
+  const [step, setStep] = useState(1);
+  const [step1Valid, setStep1Valid] = useState(false);
+  const [step2Valid, setStep2Valid] = useState(false);
+
+  // Block step 2 if step 1 not valid
+  useConditionalBlocker("step2-blocker", {
+    scope: "step2",
+    reason: "Complete step 1 first",
+    condition: () => step === 2 && !step1Valid,
+    checkInterval: 500,
+  });
+
+  // Block step 3 if step 2 not valid
+  useConditionalBlocker("step3-blocker", {
+    scope: "step3",
+    reason: "Complete step 2 first",
+    condition: () => step === 3 && !step2Valid,
+    checkInterval: 500,
+  });
+
+  return <Wizard step={step} onStepChange={setStep} validations={{ step1Valid, step2Valid }} />;
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use appropriate checkInterval for your use case (don't over-poll)
+- Keep condition functions pure and side-effect free
+- Provide clear, actionable reason messages
+- Use state parameter for complex condition logic
+- Combine with useIsBlocked for UI feedback
+- Test edge cases in your conditions
+
+### ❌ Don't
+
+- Don't perform expensive operations in condition functions
+- Don't modify state inside condition functions
+- Don't use extremely short intervals (< 100ms) without good reason
+- Don't forget to handle errors in async state updates
+- Don't create circular dependencies in conditions
+- Don't block based on rapidly changing values without debouncing
+
+## When to Use
+
+Choose `useConditionalBlocker` when you need:
+
+- ✅ **Form validation** (real-time input validation)
+- ✅ **Resource monitoring** (CPU, memory, disk limits)
+- ✅ **Permission checks** (role-based access control)
+- ✅ **Quota enforcement** (API limits, rate limiting)
+- ✅ **Business rules** (complex domain logic)
+- ✅ **State-dependent blocking** (conditional features)
+
+Consider alternatives when you need:
+
+- ❌ **Manual control** → Use `useBlocker`
+- ❌ **Time-based blocking** → Use `useScheduledBlocker`
+- ❌ **User confirmation** → Use `useConfirmableBlocker`
+- ❌ **Async operations** → Use `useAsyncAction`
+
+## TypeScript
+
+Full TypeScript support with generic state typing:
+
+```typescript
+interface FormState {
+  email: string;
+  age: number;
+  agreed: boolean;
+}
+
+const validationCondition = (state: FormState): boolean => {
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(state.email);
+  const ageValid = state.age >= 18;
+  return !(emailValid && ageValid && state.agreed);
+};
+
+useConditionalBlocker("typed-validation", {
+  scope: "form",
+  reason: "Please complete all fields correctly",
+  condition: validationCondition,
+  state: formState,
+  checkInterval: 500,
+});
+```
+
+## Performance
+
+- **Efficient polling**: Only runs condition check at specified intervals
+- **Automatic cleanup**: Clears interval on unmount
+- **Memoization friendly**: Condition function can be memoized
+- **Minimal overhead**: Only updates when condition result changes
+
+### Performance Tips
+
+```tsx
+// ✅ Good: Memoized condition
+const condition = useCallback(() => {
+  return expensiveValidation(formData);
+}, [formData]);
+
+useConditionalBlocker("optimized", {
+  scope: "form",
+  condition,
+  checkInterval: 1000,
+});
+
+// ❌ Bad: New function every render
+useConditionalBlocker("not-optimized", {
+  scope: "form",
+  condition: () => expensiveValidation(formData), // Recreated every render
+  checkInterval: 1000,
+});
+```
+
+## How It Works
+
+Under the hood, `useConditionalBlocker`:
+
+1. Sets up an interval timer based on checkInterval
+2. Evaluates the condition function at each interval
+3. Compares result to previous evaluation
+4. Adds blocker if condition becomes true
+5. Removes blocker if condition becomes false
+6. Cleans up interval on unmount
+
+```typescript
+// Simplified implementation
+useEffect(() => {
+  let previousResult = false;
+
+  const checkCondition = () => {
+    const result = condition(state);
+
+    if (result !== previousResult) {
+      if (result) {
+        addBlocker(blockerId, config);
+      } else {
+        removeBlocker(blockerId);
+      }
+      previousResult = result;
+    }
+  };
+
+  // Initial check
+  checkCondition();
+
+  // Set up interval
+  const intervalId = setInterval(checkCondition, checkInterval || 1000);
+
+  return () => {
+    clearInterval(intervalId);
+    removeBlocker(blockerId);
+  };
+}, [blockerId, condition, state, checkInterval]);
+```
+
+## Troubleshooting
+
+### Condition not evaluating
+
+- Check that checkInterval is reasonable (not too long)
+- Verify condition function doesn't throw errors
+- Ensure component remains mounted
+- Check browser console for errors
+
+### Blocking is delayed
+
+- Reduce checkInterval for faster response
+- Verify condition function is fast
+- Check if state updates are delayed
+
+### Performance issues
+
+- Increase checkInterval to reduce checks
+- Optimize condition function logic
+- Use memoization for expensive conditions
+- Profile condition execution time
+
+### Condition evaluates incorrectly
+
+- Log condition results for debugging
+- Verify state parameter is passed correctly
+- Check for stale closure issues
+- Test condition function in isolation
+
+## Interactive Demo
+
+<Canvas of={UseConditionalBlockerStories.Basic} />
+
+<Controls of={UseConditionalBlockerStories.Basic} />
+
+## Related Hooks
+
+- [`useBlocker`](/?path=/docs/hooks-useblocker--docs) - Manual blocking control
+- [`useScheduledBlocker`](/?path=/docs/hooks-usescheduledblocker--docs) - Time-based blocking
+- [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check blocking state
+
+## Real-World Examples
+
+### Password Strength Validator
+
+```tsx
+function PasswordField() {
+  const [password, setPassword] = useState("");
+  const [strength, setStrength] = useState(0);
+  const isBlocked = useIsBlocked("password");
+
+  useEffect(() => {
+    // Calculate password strength
+    let score = 0;
+    if (password.length >= 8) score++;
+    if (/[A-Z]/.test(password)) score++;
+    if (/[a-z]/.test(password)) score++;
+    if (/[0-9]/.test(password)) score++;
+    if (/[^A-Za-z0-9]/.test(password)) score++;
+    setStrength(score);
+  }, [password]);
+
+  useConditionalBlocker("password-strength", {
+    scope: "password",
+    reason: "Password is too weak",
+    condition: () => strength < 3, // Require at least 3/5 strength
+    checkInterval: 300,
+  });
+
+  return (
+    <div>
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter password"
+      />
+      <PasswordStrengthMeter strength={strength} />
+      {isBlocked && <ErrorMessage>Password must be stronger (score: {strength}/5)</ErrorMessage>}
+    </div>
+  );
+}
+```
+
+### File Upload Size Limiter
+
+```tsx
+function FileUploader() {
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const MAX_SIZE = 10 * 1024 * 1024; // 10MB
+  const MAX_TOTAL = 50 * 1024 * 1024; // 50MB total
+
+  const isBlocked = useIsBlocked("upload");
+
+  useConditionalBlocker("file-size-limit", {
+    scope: "upload",
+    reason: "File size limit exceeded",
+    condition: () => {
+      const totalSize = selectedFiles.reduce((sum, file) => sum + file.size, 0);
+      const hasOversizedFile = selectedFiles.some((file) => file.size > MAX_SIZE);
+      return hasOversizedFile || totalSize > MAX_TOTAL;
+    },
+    checkInterval: 500,
+  });
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setSelectedFiles(Array.from(e.target.files));
+    }
+  };
+
+  const totalSize = selectedFiles.reduce((sum, f) => sum + f.size, 0);
+
+  return (
+    <div>
+      <input type="file" multiple onChange={handleFileSelect} />
+      <div>Total: {(totalSize / 1024 / 1024).toFixed(2)} MB / 50 MB</div>
+      <button disabled={isBlocked || selectedFiles.length === 0}>Upload Files</button>
+      {isBlocked && (
+        <Alert type="error">Files exceed size limits. Max 10MB per file, 50MB total.</Alert>
+      )}
+    </div>
+  );
+}
+```

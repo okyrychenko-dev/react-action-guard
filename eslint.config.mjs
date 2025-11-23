@@ -1,5 +1,7 @@
+import storybook from "eslint-plugin-storybook";
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
+import react from "eslint-plugin-react";
 import reactHooks from "eslint-plugin-react-hooks";
 import prettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
@@ -18,6 +20,7 @@ export default [
   },
   {
     plugins: {
+      react,
       "react-hooks": reactHooks,
       import: importPlugin,
     },
@@ -82,6 +85,16 @@ export default [
       ],
       "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
 
+      // React rules
+      "react/jsx-curly-brace-presence": [
+        "error",
+        {
+          props: "never",
+          children: "never",
+          propElementValues: "never",
+        },
+      ],
+
       // React Hooks rules
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
@@ -111,5 +124,12 @@ export default [
       "@typescript-eslint/no-invalid-void-type": "off",
     },
   },
+  {
+    files: ["src/middleware/**/*.ts", "src/store/**/*.ts"],
+    rules: {
+      "no-console": "off",
+    },
+  },
   prettier,
+  ...storybook.configs["flat/recommended"],
 ];

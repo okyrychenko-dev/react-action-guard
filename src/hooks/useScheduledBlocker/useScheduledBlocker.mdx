@@ -1,0 +1,641 @@
+import { Meta, Canvas, Controls } from "@storybook/addon-docs/blocks";
+import * as UseScheduledBlockerStories from "./useScheduledBlocker.stories";
+
+<Meta of={UseScheduledBlockerStories} />
+
+# useScheduledBlocker
+
+Schedule UI blocking for specific time periods. Perfect for maintenance windows, scheduled updates, time-limited features, or any operation that needs to block UI at predetermined times.
+
+## Overview
+
+`useScheduledBlocker` automatically manages blocking based on time:
+
+1. **Waits** until the scheduled start time
+2. **Activates** blocking for the specified duration
+3. **Deactivates** automatically when the duration expires
+4. **Notifies** via callbacks when schedule starts/ends
+
+This ensures predictable, time-based UI blocking without manual timer management.
+
+## API Reference
+
+### Signature
+
+```typescript
+useScheduledBlocker(
+  blockerId: string,
+  config: ScheduledBlockerConfig
+): void
+```
+
+### Parameters
+
+| Parameter   | Type                     | Required | Description                                    |
+| ----------- | ------------------------ | -------- | ---------------------------------------------- |
+| `blockerId` | `string`                 | ✅       | Unique identifier for this blocker             |
+| `config`    | `ScheduledBlockerConfig` | ✅       | Configuration including schedule and callbacks |
+
+### ScheduledBlockerConfig
+
+```typescript
+interface ScheduledBlockerConfig extends BlockerConfig {
+  schedule: BlockingSchedule;
+  onScheduleStart?: () => void; // Called when blocking starts
+  onScheduleEnd?: () => void; // Called when blocking ends
+}
+
+interface BlockingSchedule {
+  start: Date | number; // When to start blocking
+  end?: Date | number; // When to end (optional if duration provided)
+  duration?: number; // Duration in ms (optional if end provided)
+}
+```
+
+### Schedule Configuration
+
+You can specify the schedule in two ways:
+
+**Option 1: Start + Duration**
+
+```typescript
+schedule: {
+  start: new Date('2024-01-15T02:00:00Z'),
+  duration: 3600000  // 1 hour in ms
+}
+```
+
+**Option 2: Start + End**
+
+```typescript
+schedule: {
+  start: new Date('2024-01-15T02:00:00Z'),
+  end: new Date('2024-01-15T03:00:00Z')
+}
+```
+
+## Basic Usage
+
+<Canvas of={UseScheduledBlockerStories.Basic} />
+
+```tsx
+import { useScheduledBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+
+function MaintenanceMode() {
+  const isBlocked = useIsBlocked("app");
+
+  useScheduledBlocker("maintenance", {
+    scope: "app",
+    reason: "Scheduled maintenance in progress",
+    schedule: {
+      start: new Date("2024-01-15T02:00:00Z"),
+      duration: 3600000, // 1 hour
+    },
+    onScheduleStart: () => {
+      console.log("Maintenance started");
+      showNotification("System is under maintenance");
+    },
+    onScheduleEnd: () => {
+      console.log("Maintenance completed");
+      showNotification("System is back online");
+    },
+  });
+
+  if (isBlocked) {
+    return <MaintenanceBanner />;
+  }
+
+  return <App />;
+}
+```
+
+## Examples
+
+### Short Delay
+
+<Canvas of={UseScheduledBlockerStories.ShortDelay} />
+
+Quick demonstration with minimal wait time:
+
+```tsx
+useScheduledBlocker("quick-maintenance", {
+  scope: "app",
+  reason: "Quick update",
+  schedule: {
+    start: Date.now() + 2000, // Start in 2 seconds
+    duration: 3000, // Last 3 seconds
+  },
+});
+```
+
+### Long Duration
+
+<Canvas of={UseScheduledBlockerStories.LongDuration} />
+
+Extended maintenance window:
+
+```tsx
+useScheduledBlocker("extended-maintenance", {
+  scope: "app",
+  reason: "Extended maintenance window",
+  schedule: {
+    start: Date.now() + 2000,
+    duration: 10000, // 10 seconds
+  },
+  onScheduleStart: () => {
+    analytics.track("maintenance_started");
+  },
+  onScheduleEnd: () => {
+    analytics.track("maintenance_completed");
+  },
+});
+```
+
+### Immediate Start
+
+<Canvas of={UseScheduledBlockerStories.ImmediateStart} />
+
+Start blocking immediately:
+
+```tsx
+useScheduledBlocker("immediate-block", {
+  scope: "app",
+  reason: "Immediate blocking",
+  schedule: {
+    start: Date.now(), // Start now
+    duration: 5000, // 5 seconds
+  },
+});
+```
+
+### Update Window
+
+<Canvas of={UseScheduledBlockerStories.UpdateWindow} />
+
+System update with custom messaging:
+
+```tsx
+useScheduledBlocker("system-update", {
+  scope: "app",
+  reason: "System update in progress - please wait",
+  schedule: {
+    start: Date.now() + 3000,
+    duration: 8000,
+  },
+});
+```
+
+## Advanced Patterns
+
+### Daily Maintenance Window
+
+```tsx
+function DailyMaintenance() {
+  const [nextMaintenance, setNextMaintenance] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Calculate next 2 AM
+    const now = new Date();
+    const next2AM = new Date(now);
+    next2AM.setHours(2, 0, 0, 0);
+
+    if (next2AM <= now) {
+      next2AM.setDate(next2AM.getDate() + 1);
+    }
+
+    setNextMaintenance(next2AM);
+  }, []);
+
+  useScheduledBlocker("daily-maintenance", {
+    scope: "app",
+    reason: "Daily maintenance in progress",
+    schedule: {
+      start: nextMaintenance || Date.now(),
+      duration: 1800000, // 30 minutes
+    },
+    onScheduleEnd: () => {
+      // Schedule next maintenance
+      const tomorrow2AM = new Date(nextMaintenance!);
+      tomorrow2AM.setDate(tomorrow2AM.getDate() + 1);
+      setNextMaintenance(tomorrow2AM);
+    },
+  });
+
+  return <App />;
+}
+```
+
+### Countdown Timer
+
+```tsx
+function MaintenanceCountdown() {
+  const [scheduledTime, setScheduledTime] = useState<Date>(
+    new Date(Date.now() + 300000) // 5 minutes
+  );
+  const [countdown, setCountdown] = useState<number>(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const diff = scheduledTime.getTime() - Date.now();
+      setCountdown(diff > 0 ? Math.ceil(diff / 1000) : 0);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [scheduledTime]);
+
+  useScheduledBlocker("maintenance-with-countdown", {
+    scope: "app",
+    reason: "Scheduled maintenance",
+    schedule: {
+      start: scheduledTime,
+      duration: 600000, // 10 minutes
+    },
+  });
+
+  if (countdown > 0) {
+    return (
+      <Banner>
+        Maintenance starts in {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, "0")}
+      </Banner>
+    );
+  }
+
+  return null;
+}
+```
+
+### Multiple Scheduled Windows
+
+```tsx
+function MultipleMaintenanceWindows() {
+  const windows = [
+    { start: new Date("2024-01-15T02:00:00Z"), duration: 3600000 },
+    { start: new Date("2024-01-16T02:00:00Z"), duration: 3600000 },
+    { start: new Date("2024-01-17T02:00:00Z"), duration: 3600000 },
+  ];
+
+  return (
+    <>
+      {windows.map((window, index) => (
+        <ScheduledWindow key={index} blockerId={`maintenance-${index}`} schedule={window} />
+      ))}
+    </>
+  );
+}
+
+function ScheduledWindow({ blockerId, schedule }) {
+  useScheduledBlocker(blockerId, {
+    scope: "app",
+    reason: "Scheduled maintenance",
+    schedule,
+    onScheduleStart: () => {
+      console.log(`Window ${blockerId} started`);
+    },
+  });
+
+  return null;
+}
+```
+
+### Backend-Driven Schedule
+
+```tsx
+function BackendScheduledMaintenance() {
+  const [schedule, setSchedule] = useState<BlockingSchedule | null>(null);
+
+  useEffect(() => {
+    // Fetch schedule from backend
+    fetch("/api/maintenance-schedule")
+      .then((res) => res.json())
+      .then((data) => {
+        setSchedule({
+          start: new Date(data.startTime),
+          end: new Date(data.endTime),
+        });
+      });
+  }, []);
+
+  useScheduledBlocker("backend-maintenance", {
+    scope: "app",
+    reason: "Scheduled system maintenance",
+    schedule: schedule || { start: Date.now(), duration: 0 },
+    onScheduleStart: () => {
+      showNotification({
+        title: "Maintenance Started",
+        message: "System is temporarily unavailable",
+      });
+    },
+    onScheduleEnd: () => {
+      showNotification({
+        title: "Maintenance Complete",
+        message: "System is back online",
+      });
+      // Refresh app data
+      queryClient.invalidateQueries();
+    },
+  });
+
+  return <App />;
+}
+```
+
+### With User Notification
+
+```tsx
+function MaintenanceWithNotification() {
+  const [isNotified, setIsNotified] = useState(false);
+  const scheduledTime = new Date(Date.now() + 300000); // 5 minutes
+
+  useEffect(() => {
+    // Notify user 1 minute before
+    const notifyTime = scheduledTime.getTime() - 60000;
+    const timeout = setTimeout(() => {
+      if (!isNotified) {
+        showNotification({
+          title: "Upcoming Maintenance",
+          message: "System will be unavailable in 1 minute",
+        });
+        setIsNotified(true);
+      }
+    }, notifyTime - Date.now());
+
+    return () => clearTimeout(timeout);
+  }, [scheduledTime, isNotified]);
+
+  useScheduledBlocker("notified-maintenance", {
+    scope: "app",
+    reason: "Scheduled maintenance in progress",
+    schedule: {
+      start: scheduledTime,
+      duration: 600000, // 10 minutes
+    },
+    onScheduleStart: () => {
+      showNotification({
+        title: "Maintenance in Progress",
+        message: "System is currently unavailable",
+        persistent: true,
+      });
+    },
+    onScheduleEnd: () => {
+      dismissAllNotifications();
+      showNotification({
+        title: "System Online",
+        message: "Maintenance completed successfully",
+      });
+    },
+  });
+
+  return <App />;
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use clear, informative reason messages
+- Provide user notifications before blocking starts
+- Use callbacks to track maintenance events
+- Calculate schedules based on user's timezone
+- Store schedules in a centralized configuration
+- Test with shorter durations in development
+- Provide countdown timers for user awareness
+
+### ❌ Don't
+
+- Don't schedule overlapping maintenance windows without coordination
+- Don't forget to handle timezone conversions
+- Don't use extremely long durations without checkpoints
+- Don't schedule maintenance during peak usage hours
+- Don't forget to notify users before blocking
+- Don't hardcode maintenance times in components
+
+## When to Use
+
+Choose `useScheduledBlocker` when you need:
+
+- ✅ **Maintenance windows** (scheduled system updates)
+- ✅ **Time-limited features** (early access periods, trials)
+- ✅ **Scheduled deployments** (zero-downtime releases)
+- ✅ **Timed restrictions** (office hours only, rate limiting)
+- ✅ **Automated blocking** (time-based access control)
+
+Consider alternatives when you need:
+
+- ❌ **Manual control** → Use `useBlocker`
+- ❌ **Async operations** → Use `useAsyncAction`
+- ❌ **User confirmation** → Use `useConfirmableBlocker`
+- ❌ **Dynamic conditions** → Use `useConditionalBlocker`
+
+## TypeScript
+
+Full TypeScript support:
+
+```typescript
+import { BlockingSchedule, ScheduledBlockerConfig } from "@okyrychenko-dev/react-action-guard";
+
+const schedule: BlockingSchedule = {
+  start: new Date("2024-01-15T02:00:00Z"),
+  duration: 3600000,
+};
+
+const config: ScheduledBlockerConfig = {
+  scope: "app",
+  reason: "Scheduled maintenance",
+  priority: 100,
+  schedule,
+  onScheduleStart: (): void => {
+    console.log("Started");
+  },
+  onScheduleEnd: (): void => {
+    console.log("Ended");
+  },
+};
+
+useScheduledBlocker("maintenance", config);
+```
+
+## Performance
+
+- **Efficient timers**: Uses single setTimeout for each schedule
+- **Automatic cleanup**: Clears timers on unmount
+- **No polling**: Event-driven architecture
+- **Minimal re-renders**: Only updates when schedule changes
+
+## How It Works
+
+Under the hood, `useScheduledBlocker`:
+
+1. Calculates time until start
+2. Sets up setTimeout to activate blocker
+3. When start time reached, adds blocker and calls onScheduleStart
+4. Sets up setTimeout for end time (start + duration)
+5. When end time reached, removes blocker and calls onScheduleEnd
+6. Cleans up all timers on unmount
+
+```typescript
+// Simplified implementation
+useEffect(() => {
+  const now = Date.now();
+  const startTime = typeof schedule.start === "number" ? schedule.start : schedule.start.getTime();
+
+  const timeUntilStart = startTime - now;
+
+  if (timeUntilStart <= 0) {
+    // Already started
+    addBlocker(blockerId, config);
+    onScheduleStart?.();
+  } else {
+    // Schedule start
+    const startTimer = setTimeout(() => {
+      addBlocker(blockerId, config);
+      onScheduleStart?.();
+    }, timeUntilStart);
+  }
+
+  // Schedule end
+  const duration = schedule.duration || (schedule.end ? schedule.end.getTime() - startTime : 0);
+
+  const endTimer = setTimeout(() => {
+    removeBlocker(blockerId);
+    onScheduleEnd?.();
+  }, timeUntilStart + duration);
+
+  return () => {
+    clearTimeout(startTimer);
+    clearTimeout(endTimer);
+  };
+}, [blockerId, schedule]);
+```
+
+## Troubleshooting
+
+### Schedule doesn't activate
+
+- Verify the start time is in the future
+- Check that duration/end time is valid
+- Ensure the component remains mounted
+- Verify timezone handling
+
+### Schedule activates immediately
+
+- Check if start time has already passed
+- Verify Date object creation
+- Check timezone conversions
+
+### Callbacks not firing
+
+- Ensure callbacks are defined in config
+- Check if component unmounts before schedule ends
+- Verify no errors in callback functions
+
+### Timer not cleaning up
+
+- Verify component lifecycle
+- Check for multiple instances with same blockerId
+- Ensure proper useEffect dependencies
+
+## Interactive Demo
+
+<Canvas of={UseScheduledBlockerStories.Basic} />
+
+<Controls of={UseScheduledBlockerStories.Basic} />
+
+## Related Hooks
+
+- [`useBlocker`](/?path=/docs/hooks-useblocker--docs) - Manual blocking control
+- [`useConditionalBlocker`](/?path=/docs/hooks-useConditionalblocker--docs) - Condition-based blocking
+- [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check blocking state
+
+## Real-World Examples
+
+### Maintenance Banner
+
+```tsx
+function MaintenanceBanner() {
+  const [schedule, setSchedule] = useState<Date | null>(null);
+  const [isActive, setIsActive] = useState(false);
+  const isBlocked = useIsBlocked("app");
+
+  useEffect(() => {
+    const nextMaintenance = new Date(Date.now() + 3600000); // 1 hour
+    setSchedule(nextMaintenance);
+  }, []);
+
+  useScheduledBlocker("maintenance", {
+    scope: "app",
+    reason: "Scheduled maintenance",
+    schedule: {
+      start: schedule || Date.now(),
+      duration: 1800000, // 30 minutes
+    },
+    onScheduleStart: () => setIsActive(true),
+    onScheduleEnd: () => setIsActive(false),
+  });
+
+  if (!schedule) return null;
+
+  return (
+    <div
+      style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: isActive ? "#dc3545" : "#ffc107",
+        color: "white",
+        padding: "12px",
+        textAlign: "center",
+        zIndex: 9999,
+      }}
+    >
+      {isActive ? (
+        <>🔧 System Under Maintenance - Please Wait</>
+      ) : (
+        <>⚠️ Scheduled maintenance at {schedule.toLocaleTimeString()}</>
+      )}
+    </div>
+  );
+}
+```
+
+### Deployment Window
+
+```tsx
+function DeploymentWindow() {
+  const [deploymentSchedule, setDeploymentSchedule] = useState<Date | null>(null);
+
+  useEffect(() => {
+    // Fetch from deployment API
+    fetch("/api/next-deployment")
+      .then((res) => res.json())
+      .then((data) => {
+        setDeploymentSchedule(new Date(data.scheduledTime));
+      });
+  }, []);
+
+  useScheduledBlocker("deployment", {
+    scope: "app",
+    reason: "New version being deployed",
+    priority: 100, // High priority
+    schedule: {
+      start: deploymentSchedule || Date.now(),
+      duration: 120000, // 2 minutes
+    },
+    onScheduleStart: () => {
+      showModal({
+        title: "Deployment in Progress",
+        message: "Please wait while we upgrade the system...",
+        closeable: false,
+      });
+    },
+    onScheduleEnd: () => {
+      closeModal();
+      // Force reload to get new version
+      window.location.reload();
+    },
+  });
+
+  return <App />;
+}
+```

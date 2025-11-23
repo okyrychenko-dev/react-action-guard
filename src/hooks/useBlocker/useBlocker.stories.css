@@ -1,0 +1,17 @@
+/* Toggle button specific styles */
+.toggleButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+}
+
+.toggleButtonActive {
+  background-color: #dc3545;
+}
+
+.toggleButtonInactive {
+  background-color: #28a745;
+}

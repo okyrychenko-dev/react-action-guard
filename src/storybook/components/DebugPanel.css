@@ -1,0 +1,48 @@
+.container {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid var(--color-border, #e0e0e0);
+  border-radius: 8px;
+  background-color: var(--color-surface, #f8f9fa);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+}
+
+.title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text, #1a1a1a);
+}
+
+.stat {
+  margin-bottom: 8px;
+  color: var(--color-text-secondary, #666);
+}
+
+.blocker {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: var(--color-background, #fff);
+  border-radius: 4px;
+  border: 1px solid var(--color-border-light, #ddd);
+}
+
+.field {
+  margin-bottom: 4px;
+}
+
+.label {
+  font-weight: 600;
+  margin-right: 6px;
+  color: var(--color-text, #1a1a1a);
+}
+
+.value {
+  color: var(--color-text-secondary, #666);
+}
+
+.empty {
+  color: var(--color-text-muted, #999);
+  font-style: italic;
+}

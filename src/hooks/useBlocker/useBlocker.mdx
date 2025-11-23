@@ -1,0 +1,317 @@
+import { Meta, Canvas, Controls, Story } from "@storybook/addon-docs/blocks";
+import * as UseBlockerStories from "./useBlocker.stories";
+
+<Meta of={UseBlockerStories} />
+
+# useBlocker
+
+The foundation hook for manual UI blocking control. `useBlocker` gives you full control over when to block UI interactions.
+
+## Overview
+
+`useBlocker` creates a blocker that is active only when the `isActive` parameter is `true`. This makes it perfect for scenarios where you need manual control over blocking state, such as:
+
+- Toggle-based blocking (e.g., maintenance mode switches)
+- Parent component state-driven blocking
+- Complex conditional logic handled outside the hook
+
+## API Reference
+
+### Signature
+
+```typescript
+useBlocker(
+  blockerId: string,
+  config: BlockerConfig,
+  isActive: boolean
+): void
+```
+
+### Parameters
+
+| Parameter   | Type            | Required | Description                                                                |
+| ----------- | --------------- | -------- | -------------------------------------------------------------------------- |
+| `blockerId` | `string`        | ✅       | Unique identifier for this blocker. Must be unique across the application. |
+| `config`    | `BlockerConfig` | ✅       | Configuration object defining scope, reason, and priority.                 |
+| `isActive`  | `boolean`       | ✅       | Controls whether the blocker is currently active.                          |
+
+### BlockerConfig
+
+```typescript
+interface BlockerConfig {
+  /** Scope of the blocker. Can be 'global' or any custom scope name(s) */
+  scope: string | ReadonlyArray<string>;
+
+  /** Human-readable reason for blocking (optional) */
+  reason?: string;
+
+  /** Priority level (0-100, default: 50). Higher priority takes precedence */
+  priority?: number;
+}
+```
+
+## Basic Usage
+
+### Simple Toggle
+
+<Canvas of={UseBlockerStories.Basic} />
+
+```tsx
+import { useBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import { useState } from "react";
+
+function MaintenanceToggle() {
+  const [isActive, setIsActive] = useState(false);
+  const isBlocked = useIsBlocked("app");
+
+  useBlocker(
+    "maintenance-mode",
+    {
+      scope: "app",
+      reason: "Maintenance mode is active",
+      priority: 80,
+    },
+    isActive
+  );
+
+  return (
+    <div>
+      <button onClick={() => setIsActive(!isActive)}>
+        {isActive ? "Disable" : "Enable"} Maintenance Mode
+      </button>
+
+      <input disabled={isBlocked} placeholder="App features" />
+      <button disabled={isBlocked}>Save</button>
+    </div>
+  );
+}
+```
+
+## Examples
+
+### Global Scope
+
+Block the entire application UI:
+
+<Canvas of={UseBlockerStories.GlobalScope} />
+
+```tsx
+useBlocker(
+  "global-maintenance",
+  {
+    scope: "global",
+    reason: "System-wide maintenance",
+    priority: 90,
+  },
+  isMaintenanceActive
+);
+```
+
+### High Priority Blocker
+
+<Canvas of={UseBlockerStories.HighPriority} />
+
+When multiple blockers are active for the same scope, the one with the highest priority takes precedence:
+
+```tsx
+// Low priority blocker
+useBlocker("background-sync", { scope: "app", priority: 20 }, true);
+
+// High priority blocker - its reason will be shown
+useBlocker("critical-update", { scope: "app", priority: 90 }, true);
+```
+
+### Initially Active
+
+<Canvas of={UseBlockerStories.InitiallyActive} />
+
+Start with the blocker already active:
+
+```tsx
+function App() {
+  const [isBlocked, setIsBlocked] = useState(true); // Start blocked
+
+  useBlocker("initial-load", { scope: "app" }, isBlocked);
+
+  useEffect(() => {
+    // Unblock after initialization
+    initializeApp().then(() => setIsBlocked(false));
+  }, []);
+
+  return <YourApp />;
+}
+```
+
+## Advanced Patterns
+
+### Multiple Scopes
+
+Block several scopes with a single blocker:
+
+```tsx
+useBlocker(
+  "multi-scope-block",
+  {
+    scope: ["form", "navigation", "settings"],
+    reason: "Processing critical operation",
+  },
+  isProcessing
+);
+```
+
+### Dynamic Scope
+
+Change the scope based on application state:
+
+```tsx
+function DynamicBlocker() {
+  const [currentSection, setCurrentSection] = useState("form");
+  const [isBlocking, setIsBlocking] = useState(false);
+
+  useBlocker(
+    "section-blocker",
+    {
+      scope: currentSection,
+      reason: `Blocking ${currentSection} section`,
+    },
+    isBlocking
+  );
+
+  return (
+    <div>
+      <select onChange={(e) => setCurrentSection(e.target.value)}>
+        <option value="form">Form</option>
+        <option value="table">Table</option>
+        <option value="settings">Settings</option>
+      </select>
+      <button onClick={() => setIsBlocking(!isBlocking)}>Toggle Block</button>
+    </div>
+  );
+}
+```
+
+### Controlled by Parent State
+
+Perfect for when blocking logic is managed by a parent component:
+
+```tsx
+function ParentComponent() {
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleProcess = async () => {
+    setIsProcessing(true);
+    try {
+      await processData();
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  return (
+    <div>
+      <ChildFormComponent isBlocking={isProcessing} />
+      <button onClick={handleProcess}>Process</button>
+    </div>
+  );
+}
+
+function ChildFormComponent({ isBlocking }: { isBlocking: boolean }) {
+  useBlocker("form-processing", { scope: "form" }, isBlocking);
+
+  return <FormFields />;
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use unique `blockerId` values across your application
+- Provide meaningful `reason` strings for better debugging
+- Use appropriate priority levels (0-100) to control precedence
+- Combine with `useIsBlocked` to disable UI elements
+- Clean up automatically - the hook handles unmounting
+
+### ❌ Don't
+
+- Don't use the same `blockerId` for different blockers
+- Don't change `blockerId` dynamically (use a constant value)
+- Don't set extremely high priority (>95) unless critical
+- Don't forget to wrap the isActive logic properly
+
+## When to Use
+
+Choose `useBlocker` when you need:
+
+- ✅ **Manual control** over blocking activation/deactivation
+- ✅ **Toggle-based blocking** (switches, checkboxes)
+- ✅ **Parent state-driven blocking** (prop-based)
+- ✅ **Simple boolean logic** for blocking conditions
+
+Consider alternatives when you need:
+
+- ❌ **Async operation wrapping** → Use `useAsyncAction`
+- ❌ **Confirmation dialogs** → Use `useConfirmableBlocker`
+- ❌ **Time-based scheduling** → Use `useScheduledBlocker`
+- ❌ **Complex conditions** → Use `useConditionalBlocker`
+
+## TypeScript
+
+Full TypeScript support with type inference:
+
+```typescript
+import type { BlockerConfig } from "@okyrychenko-dev/react-action-guard";
+
+const config: BlockerConfig = {
+  scope: "payment", // Type-safe scope names
+  reason: "Payment processing",
+  priority: 75,
+};
+
+useBlocker("payment-blocker", config, isProcessing);
+```
+
+## Performance
+
+- **Minimal re-renders**: Only updates when `isActive` changes
+- **Efficient cleanup**: Automatically removes blocker on unmount
+- **Lightweight**: No subscriptions or polling
+- **Zustand-powered**: Optimized state management
+
+## Troubleshooting
+
+### Blocker not activating
+
+Check that:
+
+1. `isActive` parameter is actually `true`
+2. `blockerId` is unique and not conflicting
+3. You're using `useIsBlocked` with the correct scope
+
+### UI not unblocking
+
+Verify that:
+
+1. `isActive` parameter is changing to `false`
+2. No other blockers are active for the same scope
+3. Component hasn't unmounted unexpectedly
+
+### Priority not working
+
+Remember:
+
+1. Higher priority number = higher precedence
+2. Priority only matters when multiple blockers are active
+3. Check the DebugPanel to see all active blockers
+
+## Interactive Demo
+
+<Canvas of={UseBlockerStories.Basic} />
+
+<Controls of={UseBlockerStories.Basic} />
+
+## Related Hooks
+
+- [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check if a scope is blocked
+- [`useAsyncAction`](/?path=/docs/hooks-useasyncaction--docs) - Wrap async operations with blocking
+- [`useConditionalBlocker`](/?path=/docs/hooks-useconditionalbocker--docs) - Block based on conditions

@@ -1,0 +1,26 @@
+/* Unique styles specific to useScheduledBlocker */
+.statusTitle {
+  display: block;
+}
+
+.statusSubtitle {
+  font-size: 14px;
+  color: #666666;
+}
+
+.scheduleInfo {
+  margin-bottom: 20px;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+.scheduleTitle {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+}
+
+.scheduleDetails {
+  font-size: 12px;
+  color: #666666;
+}

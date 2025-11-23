@@ -1,0 +1,116 @@
+/* Root Container */
+.root {
+  padding: 20px;
+  max-width: 1200px;
+}
+
+/* Status Cards */
+.statusCard {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+}
+
+.statusCardBlocked {
+  background-color: #fff3cd;
+  border-color: #ffc107;
+}
+
+.statusCardReady {
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.statusIcon {
+  font-size: 24px;
+}
+
+/* Affected Elements Section */
+.affectedTitle {
+  margin-top: 32px;
+}
+
+.affectedDescription {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.affectedRow {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+/* Button Styles */
+.primaryButton {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.primaryButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primaryButtonEnabled {
+  opacity: 1;
+}
+
+.secondaryButton {
+  padding: 8px 16px;
+  background-color: #6c757d;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.secondaryButton:hover:not(:disabled) {
+  background-color: #545b62;
+}
+
+.secondaryButtonDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Input Styles */
+.input {
+  padding: 8px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: opacity 0.2s;
+}
+
+.inputDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #e9ecef;
+}
+
+/* Status Display */
+.status {
+  margin-bottom: 16px;
+}

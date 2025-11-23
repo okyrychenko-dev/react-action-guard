@@ -1,0 +1,66 @@
+/* Status card specific styles */
+.statusTitle {
+  display: block;
+}
+
+.statusSubtitle {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Slider card styles */
+.sliderCard {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.sliderLabel {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.sliderInput {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+}
+
+.sliderScaleRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.thresholdTextExceeded {
+  color: #dc3545;
+}
+
+.thresholdTextSafe {
+  color: #28a745;
+}
+
+.conditionInfo {
+  margin-top: 12px;
+  padding: 12px;
+  background-color: #ffffff;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.conditionStatus {
+  font-weight: 600;
+}
+
+.conditionStatusBlocked {
+  color: #dc3545;
+}
+
+.conditionStatusAllowed {
+  color: #28a745;
+}

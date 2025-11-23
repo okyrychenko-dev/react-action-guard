@@ -1,0 +1,365 @@
+import { Meta, Canvas, Controls } from "@storybook/addon-docs/blocks";
+import * as UseConfirmableBlockerStories from "./useConfirmableBlocker.stories";
+
+<Meta of={UseConfirmableBlockerStories} />
+
+# useConfirmableBlocker
+
+Create actions that require user confirmation before execution. Perfect for destructive operations like deletes, irreversible changes, or critical actions.
+
+## Overview
+
+`useConfirmableBlocker` provides a two-step confirmation pattern:
+
+1. **Dialog Phase** - Shows confirmation dialog, blocks UI
+2. **Execution Phase** - Runs async operation, blocks UI during execution
+
+This ensures users can't accidentally trigger destructive actions and provides clear feedback during async operations.
+
+## API Reference
+
+### Signature
+
+```typescript
+useConfirmableBlocker(
+  blockerId: string,
+  config: ConfirmableBlockerConfig
+): UseConfirmableBlockerReturn
+```
+
+### Parameters
+
+| Parameter   | Type                       | Required | Description                                    |
+| ----------- | -------------------------- | -------- | ---------------------------------------------- |
+| `blockerId` | `string`                   | ✅       | Unique identifier for this blocker             |
+| `config`    | `ConfirmableBlockerConfig` | ✅       | Configuration including callbacks and messages |
+
+### ConfirmableBlockerConfig
+
+```typescript
+interface ConfirmableBlockerConfig extends BlockerConfig {
+  confirmMessage: string; // Message in confirmation dialog
+  confirmTitle?: string; // Dialog title (default: "Confirm Action")
+  confirmButtonText?: string; // Confirm button text (default: "Confirm")
+  cancelButtonText?: string; // Cancel button text (default: "Cancel")
+  onConfirm: () => void | Promise<void>; // Action to execute when confirmed
+  onCancel?: () => void; // Optional callback when cancelled
+}
+```
+
+### Return Value
+
+```typescript
+interface UseConfirmableBlockerReturn {
+  execute: () => void; // Opens confirmation dialog
+  isDialogOpen: boolean; // Dialog visibility state
+  isExecuting: boolean; // Async operation in progress
+  confirmConfig: {
+    // Pre-filled dialog configuration
+    title: string;
+    message: string;
+    confirmText: string;
+    cancelText: string;
+  };
+  onConfirm: () => Promise<void>; // Confirm handler
+  onCancel: () => void; // Cancel handler
+}
+```
+
+## Basic Usage
+
+<Canvas of={UseConfirmableBlockerStories.Basic} />
+
+```tsx
+import { useConfirmableBlocker } from "@okyrychenko-dev/react-action-guard";
+
+function DeleteButton({ itemId }) {
+  const { execute, isDialogOpen, confirmConfig, onConfirm, onCancel } = useConfirmableBlocker("delete-item", {
+    scope: "items",
+    confirmMessage: "Are you sure you want to delete this item?",
+    onConfirm: async () => {
+      await api.deleteItem(itemId);
+      toast.success("Item deleted");
+    },
+  });
+
+  return (
+    <>
+      <button onClick={execute}>Delete</button>
+
+      {isDialogOpen && (
+        <ConfirmDialog
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
+    </>
+  );
+}
+```
+
+## Examples
+
+### Custom Labels
+
+<Canvas of={UseConfirmableBlockerStories.CustomLabels} />
+
+```tsx
+useConfirmableBlocker("save-changes", {
+  scope: "editor",
+  confirmMessage: "Do you want to save these changes?",
+  confirmTitle: "Save Changes",
+  confirmButtonText: "Yes, Save",
+  cancelButtonText: "No, Discard",
+  onConfirm: async () => {
+    await api.save(editorContent);
+  },
+});
+```
+
+### Long Operation
+
+<Canvas of={UseConfirmableBlockerStories.LongOperation} />
+
+```tsx
+const { execute, isExecuting } = useConfirmableBlocker("export-data", {
+  scope: "app",
+  confirmMessage: "Export all data? This may take a while.",
+  confirmTitle: "Export Data",
+  onConfirm: async () => {
+    const blob = await api.exportAll();
+    downloadFile(blob);
+  },
+});
+
+// Show loading overlay
+{
+  isExecuting && <LoadingOverlay message="Exporting..." />;
+}
+```
+
+### Error Handling
+
+<Canvas of={UseConfirmableBlockerStories.WithError} />
+
+```tsx
+const { execute, onConfirm } = useConfirmableBlocker("risky-action", {
+  scope: "app",
+  confirmMessage: "This action cannot be undone. Continue?",
+  onConfirm: async () => {
+    const result = await api.performRiskyAction();
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+  },
+});
+
+// In your confirm button handler
+const handleConfirm = async () => {
+  try {
+    await onConfirm();
+    toast.success("Success!");
+  } catch (error) {
+    toast.error(`Failed: ${error.message}`);
+  }
+};
+```
+
+## Advanced Patterns
+
+### With Form Validation
+
+```tsx
+function SaveWithValidation() {
+  const [formData, setFormData] = useState({});
+  const [errors, setErrors] = useState({});
+
+  const { execute, isDialogOpen, confirmConfig, onConfirm, onCancel } = useConfirmableBlocker("save-form", {
+    scope: "form",
+    confirmMessage: "Save these changes?",
+    onConfirm: async () => {
+      // Validate before save
+      const validationErrors = validate(formData);
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        throw new Error("Validation failed");
+      }
+
+      await api.save(formData);
+    },
+  });
+
+  return (
+    <form>
+      <FormFields data={formData} errors={errors} onChange={setFormData} />
+      <button type="button" onClick={execute}>
+        Save
+      </button>
+
+      {isDialogOpen && <ConfirmDialog {...confirmConfig} onConfirm={onConfirm} onCancel={onCancel} />}
+    </form>
+  );
+}
+```
+
+### Conditional Confirmation
+
+```tsx
+function SmartSaveButton({ hasUnsavedChanges }) {
+  const { execute } = useConfirmableBlocker("save", {
+    scope: "editor",
+    confirmMessage: "You have unsaved changes. Save now?",
+    onConfirm: async () => {
+      await api.save(content);
+    },
+  });
+
+  const handleSave = () => {
+    if (hasUnsavedChanges) {
+      execute(); // Show confirmation
+    } else {
+      toast.info("No changes to save");
+    }
+  };
+
+  return <button onClick={handleSave}>Save</button>;
+}
+```
+
+### Cancel Callback
+
+```tsx
+useConfirmableBlocker("delete-account", {
+  scope: "account",
+  confirmMessage: "Delete your account permanently?",
+  onConfirm: async () => {
+    await api.deleteAccount();
+    logout();
+  },
+  onCancel: () => {
+    analytics.track("account_deletion_cancelled");
+    toast.info("Account deletion cancelled");
+  },
+});
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use clear, specific confirmation messages
+- Provide context about what will happen
+- Use appropriate button labels (e.g., "Delete" not "Confirm" for deletions)
+- Handle errors in onConfirm
+- Show loading state during execution
+- Use onCancel for analytics or cleanup
+
+### ❌ Don't
+
+- Don't use for non-destructive actions (use `useAsyncAction` instead)
+- Don't show technical error messages in confirmation dialog
+- Don't nest confirmable blockers
+- Don't forget to handle the dialog UI in your component
+
+## When to Use
+
+Choose `useConfirmableBlocker` when you need:
+
+- ✅ **Destructive operations** (delete, remove, clear)
+- ✅ **Irreversible actions** (publish, submit, finalize)
+- ✅ **Critical changes** (role changes, permissions)
+- ✅ **User confirmation** before async operations
+
+Consider alternatives when you need:
+
+- ❌ **Simple async operations** → Use `useAsyncAction`
+- ❌ **Non-destructive actions** → Use `useAsyncAction`
+- ❌ **Multiple confirmations** → Chain multiple confirmable blockers
+
+## TypeScript
+
+Full TypeScript support:
+
+```typescript
+const { execute, isDialogOpen, isExecuting, confirmConfig, onConfirm, onCancel } = useConfirmableBlocker("delete", {
+  scope: "items",
+  confirmMessage: "Delete this item?",
+  onConfirm: async (): Promise<void> => {
+    await api.delete(id);
+  },
+  onCancel: (): void => {
+    console.log("Cancelled");
+  },
+});
+```
+
+## UI Integration
+
+### With Custom Dialog Component
+
+```tsx
+function MyComponent() {
+  const confirmable = useConfirmableBlocker("action", {
+    scope: "app",
+    confirmMessage: "Are you sure?",
+    onConfirm: async () => {
+      await performAction();
+    },
+  });
+
+  return (
+    <>
+      <ActionButton onClick={confirmable.execute} />
+
+      <Dialog open={confirmable.isDialogOpen} title={confirmable.confirmConfig.title}>
+        <p>{confirmable.confirmConfig.message}</p>
+        <DialogActions>
+          <Button onClick={confirmable.onCancel}>{confirmable.confirmConfig.cancelText}</Button>
+          <Button onClick={confirmable.onConfirm} color="error">
+            {confirmable.confirmConfig.confirmText}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {confirmable.isExecuting && <LoadingOverlay />}
+    </>
+  );
+}
+```
+
+## Performance
+
+- **Lightweight**: Only blocks UI during dialog and execution
+- **Efficient**: No polling or intervals
+- **Clean**: Automatic cleanup on unmount
+
+## Troubleshooting
+
+### Dialog doesn't show
+
+- Check that you're rendering the dialog when `isDialogOpen === true`
+- Verify `execute()` is being called
+
+### UI stays blocked after cancel
+
+- Make sure to call `onCancel()` from your dialog
+- Check that the dialog component properly closes
+
+### Async errors not handled
+
+- Wrap `onConfirm()` call in try-catch
+- Add error boundaries for unexpected errors
+
+## Interactive Demo
+
+<Canvas of={UseConfirmableBlockerStories.Basic} />
+
+<Controls of={UseConfirmableBlockerStories.Basic} />
+
+## Related Hooks
+
+- [`useAsyncAction`](/?path=/docs/hooks-useasyncaction--docs) - For non-destructive async operations
+- [`useBlocker`](/?path=/docs/hooks-useblocker--docs) - For manual blocking control
+- [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check blocking state

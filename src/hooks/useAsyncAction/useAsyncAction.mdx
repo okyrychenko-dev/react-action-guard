@@ -1,0 +1,468 @@
+import { Meta, Canvas, Controls } from "@storybook/addon-docs/blocks";
+import * as UseAsyncActionStories from "./useAsyncAction.stories";
+
+<Meta of={UseAsyncActionStories} />
+
+# useAsyncAction
+
+Automatically wrap async operations with UI blocking. `useAsyncAction` is the go-to hook for API calls, data fetching, and any asynchronous operation that should block user interactions.
+
+## Overview
+
+`useAsyncAction` returns a function that wraps your async operations with automatic blocking:
+
+- **Blocks** the UI when the operation starts
+- **Unblocks** when the operation completes (success or error)
+- **Preserves** return values and error handling
+- **Type-safe** with full TypeScript support
+
+Perfect for API calls, form submissions, data fetching, and any async operation that requires blocking UI interactions.
+
+## API Reference
+
+### Signature
+
+```typescript
+useAsyncAction<T = unknown>(
+  actionId: string,
+  scope?: string | ReadonlyArray<string>
+): (asyncFn: () => Promise<T>) => Promise<T>
+```
+
+### Parameters
+
+| Parameter  | Type                 | Required | Default    | Description                                                       |
+| ---------- | -------------------- | -------- | ---------- | ----------------------------------------------------------------- |
+| `actionId` | `string`             | ✅       | -          | Unique identifier for this action. Used in blocker ID generation. |
+| `scope`    | `string \| string[]` | ❌       | `'global'` | Scope(s) to block during execution.                               |
+
+### Return Value
+
+Returns a function that:
+
+- Takes an async function as parameter
+- Returns a Promise with the same type
+- Automatically blocks/unblocks UI
+- Preserves errors and return values
+
+## Basic Usage
+
+### Simple API Call
+
+<Canvas of={UseAsyncActionStories.Basic} />
+
+```tsx
+import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+
+function SaveButton() {
+  const isBlocked = useIsBlocked("form");
+  const saveWithBlocking = useAsyncAction("save-form", "form");
+
+  const handleSave = async () => {
+    await saveWithBlocking(async () => {
+      const response = await api.save(formData);
+      toast.success("Saved successfully!");
+      return response;
+    });
+  };
+
+  return (
+    <button onClick={handleSave} disabled={isBlocked}>
+      {isBlocked ? "Saving..." : "Save"}
+    </button>
+  );
+}
+```
+
+## Examples
+
+### Fast Operation
+
+<Canvas of={UseAsyncActionStories.FastOperation} />
+
+Quick operations (< 1s) with minimal delay:
+
+```tsx
+const quickSave = useAsyncAction("quick-save", "form");
+
+await quickSave(async () => {
+  await api.quickUpdate(data);
+});
+```
+
+### Long Operation
+
+<Canvas of={UseAsyncActionStories.LongOperation} />
+
+Long-running operations with proper feedback:
+
+```tsx
+const exportData = useAsyncAction("export-data", "app");
+
+await exportData(async () => {
+  // This may take a while
+  const blob = await api.exportLargeDataset();
+  downloadFile(blob);
+});
+```
+
+### Error Handling
+
+<Canvas of={UseAsyncActionStories.WithError} />
+
+Errors are automatically propagated and UI is unblocked:
+
+```tsx
+const deleteItem = useAsyncAction("delete-item", "items");
+
+try {
+  await deleteItem(async () => {
+    await api.delete(itemId);
+  });
+  toast.success("Deleted!");
+} catch (error) {
+  toast.error(`Failed: ${error.message}`);
+  // UI is automatically unblocked even on error
+}
+```
+
+### Global Scope
+
+<Canvas of={UseAsyncActionStories.GlobalScope} />
+
+Block the entire application during critical operations:
+
+```tsx
+const performCriticalUpdate = useAsyncAction("system-update", "global");
+
+await performCriticalUpdate(async () => {
+  await api.updateSystem();
+});
+```
+
+## Advanced Patterns
+
+### Returning Values
+
+The wrapped function preserves return types:
+
+```tsx
+const fetchUser = useAsyncAction<User>("fetch-user", "data");
+
+const user = await fetchUser(async () => {
+  const response = await api.getUser(userId);
+  return response.data; // Type: User
+});
+
+console.log(user.name); // TypeScript knows this is User
+```
+
+### Multiple Scopes
+
+Block multiple parts of the UI:
+
+```tsx
+const saveAll = useAsyncAction("save-all", ["form", "sidebar", "navigation"]);
+
+await saveAll(async () => {
+  await Promise.all([api.saveForm(formData), api.saveSidebar(sidebarData)]);
+});
+```
+
+### Nested Actions
+
+Actions can be nested, but each maintains its own blocking scope:
+
+```tsx
+const outerAction = useAsyncAction("outer", "outer-scope");
+const innerAction = useAsyncAction("inner", "inner-scope");
+
+await outerAction(async () => {
+  const step1 = await api.step1();
+
+  await innerAction(async () => {
+    await api.step2(step1);
+  });
+
+  return api.step3();
+});
+```
+
+### Sequential Operations
+
+Chain multiple async actions:
+
+```tsx
+const validate = useAsyncAction("validate", "form");
+const save = useAsyncAction("save", "form");
+const notify = useAsyncAction("notify", "notifications");
+
+const handleSubmit = async () => {
+  await validate(async () => {
+    const isValid = await api.validate(formData);
+    if (!isValid) throw new Error("Validation failed");
+  });
+
+  const result = await save(async () => {
+    return api.save(formData);
+  });
+
+  await notify(async () => {
+    await api.sendNotification(result.id);
+  });
+};
+```
+
+### With Loading States
+
+Combine with `useIsBlocked` for rich UI feedback:
+
+```tsx
+function DataTable() {
+  const isLoading = useIsBlocked("table");
+  const fetchData = useAsyncAction("fetch-table-data", "table");
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetchData(async () => {
+      const result = await api.fetchTableData();
+      setData(result);
+    });
+  }, []);
+
+  if (isLoading) return <Skeleton />;
+  if (!data.length) return <EmptyState />;
+
+  return <Table data={data} />;
+}
+```
+
+### Optimistic Updates
+
+Implement optimistic UI updates:
+
+```tsx
+function TodoItem({ todo }) {
+  const [optimisticCompleted, setOptimisticCompleted] = useState(todo.completed);
+  const toggleTodo = useAsyncAction("toggle-todo", "todos");
+
+  const handleToggle = async () => {
+    const newValue = !optimisticCompleted;
+
+    // Optimistic update
+    setOptimisticCompleted(newValue);
+
+    try {
+      await toggleTodo(async () => {
+        await api.updateTodo(todo.id, { completed: newValue });
+      });
+    } catch (error) {
+      // Rollback on error
+      setOptimisticCompleted(!newValue);
+      toast.error("Failed to update");
+    }
+  };
+
+  return <Checkbox checked={optimisticCompleted} onChange={handleToggle} />;
+}
+```
+
+## Best Practices
+
+### ✅ Do
+
+- Use descriptive `actionId` values for debugging
+- Always catch and handle errors appropriately
+- Combine with `useIsBlocked` for UI feedback
+- Use specific scopes instead of `global` when possible
+- Provide user feedback (toasts, messages) after completion
+
+### ❌ Don't
+
+- Don't use the same `actionId` for different operations
+- Don't forget error handling - errors still need to be caught
+- Don't block unnecessarily - use appropriate scopes
+- Don't nest actions in the same scope (creates confusing UX)
+
+## When to Use
+
+Choose `useAsyncAction` when you need:
+
+- ✅ **API calls** with automatic UI blocking
+- ✅ **Form submissions** that take time
+- ✅ **Data fetching** operations
+- ✅ **File uploads/downloads**
+- ✅ **Any async operation** that should block UI
+
+Consider alternatives when you need:
+
+- ❌ **User confirmation** → Use `useConfirmableBlocker`
+- ❌ **Manual control** → Use `useBlocker`
+- ❌ **Scheduled operations** → Use `useScheduledBlocker`
+- ❌ **Condition-based blocking** → Use `useConditionalBlocker`
+
+## TypeScript
+
+Full TypeScript support with generic type parameters:
+
+```typescript
+// Typed return value
+const fetchUser = useAsyncAction<User>("fetch-user", "api");
+const user = await fetchUser(async () => {
+  return await api.getUser(id);
+});
+// user is typed as User
+
+// Void operations
+const deleteItem = useAsyncAction<void>("delete", "items");
+await deleteItem(async () => {
+  await api.delete(id);
+});
+
+// Complex types
+interface SaveResult {
+  id: string;
+  timestamp: number;
+}
+
+const save = useAsyncAction<SaveResult>("save", "form");
+const result = await save(async () => {
+  return await api.save(data);
+});
+console.log(result.id); // TypeScript knows the shape
+```
+
+## Performance
+
+- **Minimal overhead**: Only adds/removes blocker around your async function
+- **No polling**: Uses event-based blocking state
+- **Efficient cleanup**: Automatically cleans up on unmount
+- **Concurrent-safe**: Multiple actions can run simultaneously with different scopes
+
+## How It Works
+
+Under the hood, `useAsyncAction`:
+
+1. Generates a unique blocker ID from `actionId` + timestamp
+2. Adds a blocker with high priority (`ASYNC_ACTION_PRIORITY`)
+3. Executes your async function
+4. Removes the blocker when done (success or error)
+5. Propagates the return value or error
+
+```typescript
+// Simplified implementation
+const executeWithBlocking = async (asyncFn) => {
+  const uniqueBlockerId = `${actionId}-${Date.now()}`;
+
+  try {
+    addBlocker(uniqueBlockerId, {
+      scope,
+      reason: `Running ${actionId}`,
+      priority: ASYNC_ACTION_PRIORITY,
+    });
+
+    return await asyncFn();
+  } finally {
+    removeBlocker(uniqueBlockerId);
+  }
+};
+```
+
+## Troubleshooting
+
+### UI Not Blocking
+
+Check that:
+
+1. The scope matches the one used in `useIsBlocked`
+2. The async function is actually being called
+3. You're using the wrapper function, not calling directly
+
+### UI Stays Blocked
+
+This usually means an error occurred. Make sure to:
+
+1. Wrap in try-catch to handle errors
+2. Check the browser console for uncaught errors
+3. Verify the async operation completes
+
+### Type Issues
+
+For TypeScript users:
+
+1. Specify the generic type parameter: `useAsyncAction<YourType>(...)`
+2. Ensure your async function returns the correct type
+3. Use `void` for operations that don't return values
+
+## Interactive Demo
+
+<Canvas of={UseAsyncActionStories.Basic} />
+
+<Controls of={UseAsyncActionStories.Basic} />
+
+## Related Hooks
+
+- [`useBlocker`](/?path=/docs/hooks-useblocker--docs) - Manual blocking control
+- [`useConfirmableBlocker`](/?path=/docs/hooks-useconfirmableblocker--docs) - Actions with confirmation
+- [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check blocking state
+
+## Real-World Examples
+
+### Form Submission
+
+```tsx
+function ContactForm() {
+  const [formData, setFormData] = useState({});
+  const isSubmitting = useIsBlocked("contact-form");
+  const submit = useAsyncAction("submit-contact", "contact-form");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      await submit(async () => {
+        await api.submitContact(formData);
+      });
+
+      toast.success("Message sent!");
+      setFormData({});
+    } catch (error) {
+      toast.error("Failed to send message");
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input disabled={isSubmitting} onChange={(e) => setFormData({ ...formData, email: e.target.value })} />
+      <button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? "Sending..." : "Send"}
+      </button>
+    </form>
+  );
+}
+```
+
+### Data Refresh
+
+```tsx
+function RefreshButton() {
+  const isRefreshing = useIsBlocked("data-refresh");
+  const refresh = useAsyncAction("refresh-data", "data-refresh");
+  const queryClient = useQueryClient();
+
+  const handleRefresh = async () => {
+    await refresh(async () => {
+      await queryClient.invalidateQueries();
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+
+    toast.success("Data refreshed!");
+  };
+
+  return (
+    <button onClick={handleRefresh} disabled={isRefreshing}>
+      {isRefreshing ? "🔄 Refreshing..." : "🔄 Refresh"}
+    </button>
+  );
+}
+```
