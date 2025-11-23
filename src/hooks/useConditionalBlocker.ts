@@ -34,11 +34,10 @@ export const useConditionalBlocker = <TState = unknown>(
 
     if (shouldBlock) {
       addBlocker(blockerId, createBlockerConfig(currentConfig));
-      isBlockedRef.current = true;
     } else {
       removeBlocker(blockerId);
-      isBlockedRef.current = false;
     }
+    isBlockedRef.current = shouldBlock;
   }, [blockerId, addBlocker, removeBlocker, configRef]);
 
   useEffect(() => {

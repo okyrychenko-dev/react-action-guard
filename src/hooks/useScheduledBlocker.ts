@@ -3,6 +3,15 @@ import { useUIBlockingStore } from "../store";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
 import { useConfigRef } from "./useConfigRef";
 import { createBlockerConfig } from "./useBlocker.utils";
+import {
+  parseDate,
+  isValidTimestamp,
+  calculateEndTime,
+  isSafeTimeout,
+  isInBlockingPeriod,
+  isScheduleInPast,
+  MAX_TIMEOUT_MS,
+} from "./useScheduledBlocker.utils";
 
 /**
  * Hook for scheduling UI blocking for a specific time period.
@@ -36,50 +45,59 @@ export const useScheduledBlocker = (blockerId: string, config: ScheduledBlockerC
 
   useEffect(() => {
     const currentConfig = configRef.current;
-    const startTime = new Date(currentConfig.schedule.start).getTime();
+    const startTime = parseDate(currentConfig.schedule.start);
     const now = Date.now();
 
-    let endTime: number | undefined;
-    if (currentConfig.schedule.duration) {
-      endTime = startTime + currentConfig.schedule.duration;
-    } else if (currentConfig.schedule.end) {
-      endTime = new Date(currentConfig.schedule.end).getTime();
+    // Validate start time
+    if (!isValidTimestamp(startTime)) {
+      console.error(`[UIBlocking] Invalid start time for blocker "${blockerId}"`);
+      return;
     }
 
-    const scheduleEnd = (end: number): void => {
-      const remainingTime = end - Date.now();
+    const scheduleEnd = (): void => {
+      const endTime = calculateEndTime(currentConfig.schedule, startTime);
+      if (!endTime) {
+        return;
+      }
+
+      const remainingTime = endTime - Date.now();
       if (remainingTime > 0) {
         timeoutsRef.current.end = setTimeout(() => {
-          removeBlocker(blockerId);
           configRef.current.onScheduleEnd?.();
+          removeBlocker(blockerId);
         }, remainingTime);
       }
     };
 
+    const startBlocking = (): void => {
+      const cfg = configRef.current;
+      addBlocker(blockerId, createBlockerConfig(cfg));
+      cfg.onScheduleStart?.();
+      scheduleEnd();
+    };
+
     // If start time hasn't arrived yet
     if (startTime > now) {
-      timeoutsRef.current.start = setTimeout(() => {
-        const cfg = configRef.current;
-        addBlocker(blockerId, createBlockerConfig(cfg));
-        cfg.onScheduleStart?.();
+      const delay = startTime - now;
 
-        if (endTime) {
-          scheduleEnd(endTime);
-        }
-      }, startTime - now);
+      if (!isSafeTimeout(delay)) {
+        console.warn(
+          `[UIBlocking] Schedule delay exceeds maximum timeout (${MAX_TIMEOUT_MS.toString()}ms) for blocker "${blockerId}"`
+        );
+        return;
+      }
+
+      timeoutsRef.current.start = setTimeout(startBlocking, delay);
     }
-    // If already in blocking period
-    else if (endTime && endTime > now) {
-      addBlocker(blockerId, createBlockerConfig(currentConfig));
-      currentConfig.onScheduleStart?.();
-      scheduleEnd(endTime);
-    }
-    // If schedule without end/duration
-    else if (!endTime && startTime <= now) {
-      addBlocker(blockerId, createBlockerConfig(currentConfig));
-      currentConfig.onScheduleStart?.();
-    } else {
-      console.warn(`[UIBlocking] Schedule is in the past for blocker "${blockerId}"`);
+    // If already in blocking period or should start immediately
+    else {
+      const endTime = calculateEndTime(currentConfig.schedule, startTime);
+
+      if (isInBlockingPeriod(startTime, endTime, now)) {
+        startBlocking();
+      } else if (isScheduleInPast(startTime, endTime, now)) {
+        console.warn(`[UIBlocking] Schedule is in the past for blocker "${blockerId}"`);
+      }
     }
 
     return (): void => {
