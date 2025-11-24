@@ -1,5 +1,9 @@
 # @okyrychenko-dev/react-action-guard
 
+[![npm version](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)
+[![npm downloads](https://img.shields.io/npm/dm/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 > Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup
 
 ## Features
@@ -34,6 +38,16 @@ function MyComponent() {
 
   return <button disabled={isBlocked}>Click me</button>;
 }
+```
+
+## Documentation
+
+📚 **[Interactive Storybook Documentation](https://your-storybook-url.com)** - Explore live examples and detailed guides for all hooks
+
+To run Storybook locally:
+
+```bash
+npm run storybook
 ```
 
 ## API Reference
@@ -676,25 +690,7 @@ Contributions are welcome! Please ensure:
 
 ## Changelog
 
-### v0.2.0
-
-- Added middleware system (analytics, logging, performance)
-- Added advanced hooks:
-  - `useConfirmableBlocker` - blockers with user confirmation
-  - `useScheduledBlocker` - time-based blocking for maintenance windows
-  - `useConditionalBlocker` - dynamic blocking based on conditions
-- Added `updateBlocker` method to store
-- Improved TypeScript types with discriminated unions
-- Added tree-shaking support
-- Added support for Amplitude analytics provider
-- Performance improvements and code refactoring
-
-### v0.1.0
-
-- Initial release
-- Basic blocking system with priorities and scopes
-- `useBlocker`, `useIsBlocked`, `useAsyncAction` hooks
-- Zustand-based state management
+See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each version.
 
 ## License
 
