@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "type": "module",
   "description": "Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup",
   "main": "./dist/index.js",
