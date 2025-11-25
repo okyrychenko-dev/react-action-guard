@@ -19,7 +19,7 @@ export type {
 } from "./hooks";
 
 // Store
-export { useUIBlockingStore } from "./store";
+export { useUIBlockingStore, uiBlockingStoreApi } from "./store";
 
 // Store types
 export type {
