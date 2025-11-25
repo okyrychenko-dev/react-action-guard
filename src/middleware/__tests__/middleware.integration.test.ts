@@ -1,14 +1,14 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useBlocker } from "../../hooks";
-import { useUIBlockingStore } from "../../store";
+import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import type { Middleware, MiddlewareContext } from "../middleware.types";
 
 describe("Middleware Integration", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
     // Clear all middleware
-    const state = useUIBlockingStore.getState();
+    const state = uiBlockingStoreApi.getState();
     state.middlewares.forEach((_, name) => {
       state.unregisterMiddleware(name);
     });
@@ -20,7 +20,7 @@ describe("Middleware Integration", () => {
       middlewareFn(context);
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
@@ -48,7 +48,7 @@ describe("Middleware Integration", () => {
       middlewareFn(context);
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("test-middleware", middleware);
 
     const { unmount } = renderHook(() =>
@@ -85,7 +85,7 @@ describe("Middleware Integration", () => {
       callOrder.push("middleware3");
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("middleware1", middleware1);
     registerMiddleware("middleware2", middleware2);
     registerMiddleware("middleware3", middleware3);
@@ -108,7 +108,7 @@ describe("Middleware Integration", () => {
       await new Promise((resolve) => setTimeout(resolve, 100));
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("async-middleware", asyncMiddleware);
 
     renderHook(() =>
@@ -119,7 +119,7 @@ describe("Middleware Integration", () => {
     );
 
     await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      const { isBlocked } = uiBlockingStoreApi.getState();
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -131,7 +131,7 @@ describe("Middleware Integration", () => {
 
     const successMiddleware = vi.fn();
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("error-middleware", errorMiddleware);
     registerMiddleware("success-middleware", successMiddleware);
 
@@ -152,7 +152,7 @@ describe("Middleware Integration", () => {
     const middleware1 = vi.fn();
     const middleware2 = vi.fn();
 
-    const { registerMiddleware, unregisterMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
 
     registerMiddleware("middleware1", middleware1);
     registerMiddleware("middleware2", middleware2);
@@ -200,7 +200,7 @@ describe("Middleware Integration", () => {
       capturedContext = context;
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
@@ -233,7 +233,7 @@ describe("Middleware Integration", () => {
       )
     ).not.toThrow();
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -241,7 +241,7 @@ describe("Middleware Integration", () => {
     const middleware1 = vi.fn();
     const middleware2 = vi.fn();
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
 
     registerMiddleware("my-middleware", middleware1);
 
@@ -289,7 +289,7 @@ describe("Middleware Integration", () => {
       log.push(`[ANALYTICS] ${context.action} - ${context.blockerId}`);
     };
 
-    const { registerMiddleware } = useUIBlockingStore.getState();
+    const { registerMiddleware } = uiBlockingStoreApi.getState();
     registerMiddleware("logging", loggingMiddleware);
     registerMiddleware("analytics", analyticsMiddleware);
 

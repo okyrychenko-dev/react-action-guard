@@ -1,12 +1,12 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useUIBlockingStore } from "../../../store";
+import { uiBlockingStoreApi } from "../../../store";
 import { actAsync } from "../../__tests__/test.utils";
 import { useConfirmableBlocker } from "../useConfirmableBlocker";
 
 describe("useConfirmableBlocker", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
   it("should not block initially", () => {
@@ -18,7 +18,7 @@ describe("useConfirmableBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -38,7 +38,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     expect(result.current.isDialogOpen).toBe(true);
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -265,7 +265,7 @@ describe("useConfirmableBlocker", () => {
       result.current.execute();
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.reason).toBe("Delete this item?");
   });
@@ -284,7 +284,7 @@ describe("useConfirmableBlocker", () => {
       result.current.execute();
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.reason).toBe("Deleting item");
   });
@@ -302,7 +302,7 @@ describe("useConfirmableBlocker", () => {
       result.current.execute();
     });
 
-    const { isBlocked: isBlockedDuring } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedDuring } = uiBlockingStoreApi.getState();
     expect(isBlockedDuring("test")).toBe(true);
 
     await actAsync(async () => {
@@ -310,7 +310,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      const { isBlocked } = uiBlockingStoreApi.getState();
       expect(isBlocked("test")).toBe(false);
     });
   });
@@ -328,14 +328,14 @@ describe("useConfirmableBlocker", () => {
       result.current.execute();
     });
 
-    const { isBlocked: isBlockedDuring } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedDuring } = uiBlockingStoreApi.getState();
     expect(isBlockedDuring("test")).toBe(true);
 
     act(() => {
       result.current.onCancel();
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(false);
   });
 });

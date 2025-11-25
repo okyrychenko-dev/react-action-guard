@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { ASYNC_ACTION_PRIORITY, useUIBlockingStore } from "../../../store";
+import { ASYNC_ACTION_PRIORITY, uiBlockingStoreApi } from "../../../store";
 import { actAsync } from "../../__tests__/test.utils";
 import { useAsyncAction } from "../useAsyncAction";
 
 describe("useAsyncAction", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
   it("should return a function", () => {
@@ -31,14 +31,14 @@ describe("useAsyncAction", () => {
       const promise = result.current(asyncFn);
 
       await waitFor(() => {
-        const { isBlocked } = useUIBlockingStore.getState();
+        const { isBlocked } = uiBlockingStoreApi.getState();
         expect(isBlocked("test-scope")).toBe(true);
       });
 
       return promise;
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test-scope")).toBe(false);
   });
@@ -55,7 +55,7 @@ describe("useAsyncAction", () => {
       await expect(promise).rejects.toThrow("Test error");
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test-scope")).toBe(false);
   });
@@ -84,14 +84,14 @@ describe("useAsyncAction", () => {
       const promise = result.current(asyncFn);
 
       await waitFor(() => {
-        const { isBlocked } = useUIBlockingStore.getState();
+        const { isBlocked } = uiBlockingStoreApi.getState();
         expect(isBlocked()).toBe(true);
       });
 
       return promise;
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked()).toBe(false);
   });
 
@@ -109,7 +109,7 @@ describe("useAsyncAction", () => {
       const promise = result.current(asyncFn);
 
       await waitFor(() => {
-        const { isBlocked } = useUIBlockingStore.getState();
+        const { isBlocked } = uiBlockingStoreApi.getState();
         expect(isBlocked("scope1")).toBe(true);
         expect(isBlocked("scope2")).toBe(true);
       });
@@ -117,7 +117,7 @@ describe("useAsyncAction", () => {
       return promise;
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("scope1")).toBe(false);
     expect(isBlocked("scope2")).toBe(false);
   });
@@ -136,7 +136,7 @@ describe("useAsyncAction", () => {
       const promise = result.current(asyncFn);
 
       await waitFor(() => {
-        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
         expect(info.length).toBeGreaterThan(0);
         expect(info[0]?.priority).toBe(ASYNC_ACTION_PRIORITY);
@@ -160,7 +160,7 @@ describe("useAsyncAction", () => {
       const promise = result.current(asyncFn);
 
       await waitFor(() => {
-        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
         expect(info.length).toBeGreaterThan(0);
         expect(info[0]?.reason).toContain("fetch-user");
@@ -192,7 +192,7 @@ describe("useAsyncAction", () => {
       const promise2 = result.current(asyncFn2);
 
       await waitFor(() => {
-        const { getBlockingInfo } = useUIBlockingStore.getState();
+        const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
         expect(info.length).toBe(2);
         expect(info[0]?.id).not.toBe(info[1]?.id);
@@ -225,7 +225,7 @@ describe("useAsyncAction", () => {
     expect(results).toEqual([1, 2]);
 
     // All should be unblocked
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test-scope")).toBe(false);
   });
 
@@ -282,7 +282,7 @@ describe("useAsyncAction", () => {
     });
 
     // Should be unblocked after error
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test-scope")).toBe(false);
   });
 

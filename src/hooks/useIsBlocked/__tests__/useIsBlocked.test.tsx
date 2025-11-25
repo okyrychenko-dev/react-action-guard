@@ -1,12 +1,12 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { useIsBlocked } from "..";
-import { useUIBlockingStore } from "../../../store";
+import { uiBlockingStoreApi } from "../../../store";
 
 describe("useIsBlocked", () => {
   beforeEach(() => {
     // Clear the store before each test
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
   it("should return false when no blockers exist", () => {
@@ -16,7 +16,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return true when global blocker exists", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "global" });
     });
@@ -27,7 +27,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return true for specific scope when blocker exists", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "test-scope" });
     });
@@ -38,7 +38,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return false for scope without blocker", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "scope1" });
     });
@@ -49,7 +49,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return true when checking multiple scopes and one is blocked", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "scope1" });
     });
@@ -60,7 +60,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return false when checking multiple scopes and none are blocked", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "scope1" });
     });
@@ -71,7 +71,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should return true for any scope when global blocker exists", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("global-blocker", { scope: "global" });
     });
@@ -86,7 +86,7 @@ describe("useIsBlocked", () => {
 
     expect(result.current).toBe(false);
 
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "test-scope" });
     });
@@ -97,7 +97,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should re-render when blocker is removed", async () => {
-    const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
+    const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "test-scope" });
     });
@@ -116,7 +116,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should re-render when all blockers are cleared", async () => {
-    const { addBlocker, clearAllBlockers } = useUIBlockingStore.getState();
+    const { addBlocker, clearAllBlockers } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "test-scope" });
     });
@@ -135,7 +135,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should re-render when scope blockers are cleared", async () => {
-    const { addBlocker, clearBlockersForScope } = useUIBlockingStore.getState();
+    const { addBlocker, clearBlockersForScope } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "test-scope" });
     });
@@ -154,7 +154,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should handle array scope from blocker", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: ["scope1", "scope2"] });
     });
@@ -169,7 +169,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should work with multiple blockers for same scope", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("blocker1", { scope: "test-scope" });
       addBlocker("blocker2", { scope: "test-scope" });
@@ -181,7 +181,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should remain blocked if one of multiple blockers is removed", async () => {
-    const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
+    const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("blocker1", { scope: "test-scope" });
       addBlocker("blocker2", { scope: "test-scope" });
@@ -201,7 +201,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should unblock only when all blockers are removed", async () => {
-    const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
+    const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("blocker1", { scope: "test-scope" });
       addBlocker("blocker2", { scope: "test-scope" });
@@ -229,7 +229,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should handle changing scope prop", async () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("blocker1", { scope: "scope1" });
       addBlocker("blocker2", { scope: "scope2" });
@@ -255,7 +255,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should handle empty string scope", () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("test-blocker", { scope: "" });
     });
@@ -266,7 +266,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should not re-render unnecessarily", async () => {
-    const { addBlocker } = useUIBlockingStore.getState();
+    const { addBlocker } = uiBlockingStoreApi.getState();
     act(() => {
       addBlocker("blocker1", { scope: "scope1" });
     });
@@ -290,7 +290,7 @@ describe("useIsBlocked", () => {
   });
 
   it("should handle complex blocking scenarios", async () => {
-    const { addBlocker, removeBlocker } = useUIBlockingStore.getState();
+    const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
 
     act(() => {
       addBlocker("global", { scope: "global" });

@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useUIBlockingStore } from "../../../store";
+import { uiBlockingStoreApi } from "../../../store";
 import { useScheduledBlocker } from "../useScheduledBlocker";
 
 describe("useScheduledBlocker", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
     vi.useFakeTimers();
   });
 
@@ -30,14 +30,14 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    const { isBlocked: isBlockedBefore } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
     expect(isBlockedBefore("test")).toBe(false);
 
     act(() => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
     expect(onScheduleStart).toHaveBeenCalledTimes(1);
   });
@@ -62,14 +62,14 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    let isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     act(() => {
       vi.advanceTimersByTime(2000);
     });
 
-    isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
     expect(onScheduleEnd).toHaveBeenCalledTimes(1);
   });
@@ -93,7 +93,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -116,7 +116,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -138,14 +138,14 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    let isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     act(() => {
       vi.advanceTimersByTime(2000);
     });
 
-    isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
   });
 
@@ -163,7 +163,7 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -214,7 +214,7 @@ describe("useScheduledBlocker", () => {
     expect(onScheduleStart).not.toHaveBeenCalled();
     expect(onScheduleEnd).not.toHaveBeenCalled();
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -236,7 +236,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("scope1")).toBe(true);
     expect(isBlocked("scope2")).toBe(true);
   });
@@ -260,7 +260,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.priority).toBe(100);
   });
@@ -285,7 +285,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    const isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     unmount();
@@ -314,7 +314,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    let isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     // Should remain blocked indefinitely
@@ -322,7 +322,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(10000);
     });
 
-    isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
   });
 
@@ -345,7 +345,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    let isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     // Should unblock after duration (2000ms), not end time (4000ms)
@@ -353,7 +353,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(2000);
     });
 
-    isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
   });
 
@@ -375,12 +375,12 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    let isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(true);
 
     unmount();
 
-    isBlocked = useUIBlockingStore.getState().isBlocked("test");
+    isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
     expect(isBlocked).toBe(false);
   });
 
@@ -402,7 +402,7 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.reason).toBe("System maintenance window");
   });

@@ -13,7 +13,10 @@ import { type BlockerConfig, useUIBlockingStore } from "../../store";
  *
  */
 export const useBlocker = (blockerId: string, config: BlockerConfig, isActive = true): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore();
+  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
 
   useEffect(() => {
     if (!isActive || !blockerId) {

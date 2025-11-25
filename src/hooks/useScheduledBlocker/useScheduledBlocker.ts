@@ -25,7 +25,10 @@ import {
  *
  */
 export const useScheduledBlocker = (blockerId: string, config: ScheduledBlockerConfig): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore();
+  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
   const timeoutsRef = useRef<{
     start?: ReturnType<typeof setTimeout>;
     end?: ReturnType<typeof setTimeout>;

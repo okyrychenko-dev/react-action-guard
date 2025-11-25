@@ -17,7 +17,10 @@ export const useAsyncAction = <T = unknown>(
   actionId: string,
   scope?: string | ReadonlyArray<string>
 ): ((asyncFn: () => Promise<T>) => Promise<T>) => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore();
+  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
 
   const executeWithBlocking = useCallback(
     async (asyncFn: () => Promise<T>): Promise<T> => {

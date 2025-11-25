@@ -4,7 +4,7 @@ export {
   DEFAULT_REASON,
   DEFAULT_SCOPE,
 } from "./uiBlockingStore.constants";
-export { useUIBlockingStore } from "./uiBlockingStore.store";
+export { useUIBlockingStore, uiBlockingStoreApi } from "./uiBlockingStore.store";
 export type {
   BlockerConfig,
   BlockerInfo,

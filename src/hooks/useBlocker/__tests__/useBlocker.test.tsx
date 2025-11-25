@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { useUIBlockingStore } from "../../../store";
+import { uiBlockingStoreApi } from "../../../store";
 import { useBlocker } from "../useBlocker";
 import type { BlockerConfig } from "../../../store";
 
 describe("useBlocker", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
   it("should add blocker when component mounts", () => {
@@ -17,7 +17,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(true);
   });
@@ -30,13 +30,13 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { isBlocked: isBlockedBefore } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
 
     expect(isBlockedBefore("test")).toBe(true);
 
     unmount();
 
-    const { isBlocked: isBlockedAfter } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedAfter } = uiBlockingStoreApi.getState();
 
     expect(isBlockedAfter("test")).toBe(false);
   });
@@ -49,7 +49,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config, false);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(false);
   });
@@ -65,14 +65,14 @@ describe("useBlocker", () => {
       { initialProps: { active: false } }
     );
 
-    const { isBlocked: isBlockedInitial } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedInitial } = uiBlockingStoreApi.getState();
 
     expect(isBlockedInitial("test")).toBe(false);
 
     rerender({ active: true });
 
     await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      const { isBlocked } = uiBlockingStoreApi.getState();
 
       expect(isBlocked("test")).toBe(true);
     });
@@ -89,14 +89,14 @@ describe("useBlocker", () => {
       { initialProps: { active: true } }
     );
 
-    const { isBlocked: isBlockedInitial } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedInitial } = uiBlockingStoreApi.getState();
 
     expect(isBlockedInitial("test")).toBe(true);
 
     rerender({ active: false });
 
     await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      const { isBlocked } = uiBlockingStoreApi.getState();
 
       expect(isBlocked("test")).toBe(false);
     });
@@ -112,7 +112,7 @@ describe("useBlocker", () => {
       { initialProps: { id: "blocker-1" } }
     );
 
-    const { getBlockingInfo: getInfoInitial } = useUIBlockingStore.getState();
+    const { getBlockingInfo: getInfoInitial } = uiBlockingStoreApi.getState();
     const infoInitial = getInfoInitial("test");
 
     expect(infoInitial).toHaveLength(1);
@@ -121,7 +121,7 @@ describe("useBlocker", () => {
     rerender({ id: "blocker-2" });
 
     await waitFor(() => {
-      const { getBlockingInfo } = useUIBlockingStore.getState();
+      const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
       expect(info).toHaveLength(1);
@@ -136,7 +136,7 @@ describe("useBlocker", () => {
       useBlocker("", config);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(false);
   });
@@ -149,7 +149,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked()).toBe(true);
   });
@@ -162,7 +162,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("scope1")).toBe(true);
     expect(isBlocked("scope2")).toBe(true);
@@ -176,7 +176,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
 
     expect(info[0]?.priority).toBe(100);
@@ -190,7 +190,7 @@ describe("useBlocker", () => {
       useBlocker(blockerId, config);
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
 
     expect(info[0]?.reason).toBe("Custom reason");
@@ -207,7 +207,7 @@ describe("useBlocker", () => {
       useBlocker("blocker-2", config2);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("scope1")).toBe(true);
     expect(isBlocked("scope2")).toBe(true);
@@ -224,13 +224,13 @@ describe("useBlocker", () => {
       useBlocker("blocker-2", config2);
     });
 
-    const { isBlocked: isBlockedBefore } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
 
     expect(isBlockedBefore("test")).toBe(true);
 
     unmount();
 
-    const { isBlocked: isBlockedAfter } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedAfter } = uiBlockingStoreApi.getState();
 
     expect(isBlockedAfter("test")).toBe(true); // blocker-1 still exists
   });
@@ -254,7 +254,7 @@ describe("useBlocker", () => {
     });
 
     await waitFor(() => {
-      const { isBlocked } = useUIBlockingStore.getState();
+      const { isBlocked } = uiBlockingStoreApi.getState();
 
       expect(isBlocked("test")).toBe(true);
     });

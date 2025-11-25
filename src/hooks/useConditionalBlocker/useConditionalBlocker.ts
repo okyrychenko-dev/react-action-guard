@@ -18,7 +18,10 @@ export const useConditionalBlocker = <TState = unknown>(
   blockerId: string,
   config: ConditionalBlockerConfig<TState>
 ): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore();
+  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isBlockedRef = useRef(false);
   const configRef = useConfigRef(config);

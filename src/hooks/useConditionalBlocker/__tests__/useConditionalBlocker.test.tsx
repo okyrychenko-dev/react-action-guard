@@ -1,11 +1,11 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useConditionalBlocker } from "..";
-import { useUIBlockingStore } from "../../../store";
+import { uiBlockingStoreApi } from "../../../store";
 
 describe("useConditionalBlocker", () => {
   beforeEach(() => {
-    useUIBlockingStore.getState().clearAllBlockers();
+    uiBlockingStoreApi.getState().clearAllBlockers();
     vi.useFakeTimers();
   });
 
@@ -22,7 +22,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -35,7 +35,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -51,7 +51,7 @@ describe("useConditionalBlocker", () => {
       { initialProps: { state: true } }
     );
 
-    const { isBlocked: isBlockedInitial } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedInitial } = uiBlockingStoreApi.getState();
     expect(isBlockedInitial("test")).toBe(false);
 
     rerender({ state: false });
@@ -60,7 +60,7 @@ describe("useConditionalBlocker", () => {
       vi.advanceTimersByTime(1000);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -126,7 +126,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked: isBlockedInitial } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedInitial } = uiBlockingStoreApi.getState();
     expect(isBlockedInitial("test")).toBe(false);
 
     shouldBlock = true;
@@ -135,7 +135,7 @@ describe("useConditionalBlocker", () => {
       vi.advanceTimersByTime(100);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -150,7 +150,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked: isBlockedInitial } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedInitial } = uiBlockingStoreApi.getState();
     expect(isBlockedInitial("test")).toBe(true);
 
     shouldBlock = false;
@@ -159,7 +159,7 @@ describe("useConditionalBlocker", () => {
       vi.advanceTimersByTime(100);
     });
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -172,12 +172,12 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked: isBlockedBefore } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
     expect(isBlockedBefore("test")).toBe(true);
 
     unmount();
 
-    const { isBlocked: isBlockedAfter } = useUIBlockingStore.getState();
+    const { isBlocked: isBlockedAfter } = uiBlockingStoreApi.getState();
     expect(isBlockedAfter("test")).toBe(false);
   });
 
@@ -190,7 +190,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("scope1")).toBe(true);
     expect(isBlocked("scope2")).toBe(true);
   });
@@ -205,7 +205,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.reason).toBe("Network offline");
   });
@@ -220,7 +220,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
     expect(info[0]?.priority).toBe(100);
   });
@@ -234,14 +234,14 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { getBlockingInfo: getInfoInitial } = useUIBlockingStore.getState();
+    const { getBlockingInfo: getInfoInitial } = uiBlockingStoreApi.getState();
     expect(getInfoInitial("test")).toHaveLength(1);
 
     act(() => {
       vi.advanceTimersByTime(100);
     });
 
-    const { getBlockingInfo } = useUIBlockingStore.getState();
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
     expect(getBlockingInfo("test")).toHaveLength(1);
   });
 
@@ -262,7 +262,7 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    const { isBlocked } = useUIBlockingStore.getState();
+    const { isBlocked } = uiBlockingStoreApi.getState();
     expect(isBlocked("test")).toBe(true);
   });
 });
