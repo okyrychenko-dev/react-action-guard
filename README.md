@@ -26,7 +26,16 @@
 
 ```bash
 npm install @okyrychenko-dev/react-action-guard zustand
+# or
+yarn add @okyrychenko-dev/react-action-guard zustand
+# or
+pnpm add @okyrychenko-dev/react-action-guard zustand
 ```
+
+This package requires the following peer dependencies:
+
+- [React](https://react.dev/) ^17.0.0 || ^18.0.0
+- [Zustand](https://zustand-demo.pmnd.rs/) - State management library
 
 ## Quick Start
 
