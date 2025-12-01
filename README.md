@@ -110,6 +110,43 @@ function SubmitButton() {
 }
 ```
 
+#### `useBlockingInfo(scope)`
+
+Gets detailed information about all active blockers for a specific scope.
+
+**Parameters:**
+
+- `scope?: string` - Scope to get blocking information for (default: "global")
+
+**Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information objects, sorted by priority (highest first)
+
+**BlockerInfo:**
+
+- `id: string` - Unique identifier of the blocker
+- `reason?: string` - Reason for blocking
+- `priority: number` - Priority level (0-100)
+- `scope: string | string[]` - Scope(s) being blocked
+- `timestamp: number` - When the blocker was added
+
+**Example:**
+
+```jsx
+function CheckoutButton() {
+  const blockers = useBlockingInfo("checkout");
+
+  if (blockers.length > 0) {
+    const topBlocker = blockers[0]; // Highest priority blocker
+    return (
+      <Tooltip content={`Blocked: ${topBlocker.reason}`}>
+        <Button disabled>Checkout ({blockers.length} blockers)</Button>
+      </Tooltip>
+    );
+  }
+
+  return <Button>Checkout</Button>;
+}
+```
+
 #### `useAsyncAction(actionId, scope)`
 
 Wraps an async function with automatic blocking/unblocking.
@@ -332,20 +369,20 @@ The library includes a powerful middleware system that allows you to hook into b
 Track blocker events with your analytics provider (Google Analytics, Mixpanel, Amplitude, or custom).
 
 ```jsx
-import { configureMiddleware, analyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
+import { configureMiddleware, createAnalyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
 
 // Google Analytics
-configureMiddleware([analyticsMiddleware({ provider: "ga" })]);
+configureMiddleware([createAnalyticsMiddleware({ provider: "ga" })]);
 
 // Mixpanel
-configureMiddleware([analyticsMiddleware({ provider: "mixpanel" })]);
+configureMiddleware([createAnalyticsMiddleware({ provider: "mixpanel" })]);
 
 // Amplitude
-configureMiddleware([analyticsMiddleware({ provider: "amplitude" })]);
+configureMiddleware([createAnalyticsMiddleware({ provider: "amplitude" })]);
 
 // Custom analytics
 configureMiddleware([
-  analyticsMiddleware({
+  createAnalyticsMiddleware({
     track: (event, data) => {
       myAnalytics.track(event, data);
     },
@@ -368,10 +405,10 @@ configureMiddleware([loggerMiddleware]);
 Monitor blocker performance and detect slow operations.
 
 ```jsx
-import { configureMiddleware, performanceMiddleware } from "@okyrychenko-dev/react-action-guard";
+import { configureMiddleware, createPerformanceMiddleware } from "@okyrychenko-dev/react-action-guard";
 
 configureMiddleware([
-  performanceMiddleware({
+  createPerformanceMiddleware({
     onSlowBlock: (blockerId, duration) => {
       console.warn(`Blocker ${blockerId} was active for ${duration}ms`);
     },
@@ -409,15 +446,15 @@ You can combine multiple middleware for comprehensive monitoring:
 ```jsx
 import {
   configureMiddleware,
-  analyticsMiddleware,
+  createAnalyticsMiddleware,
   loggerMiddleware,
-  performanceMiddleware,
+  createPerformanceMiddleware,
 } from "@okyrychenko-dev/react-action-guard";
 
 configureMiddleware([
   loggerMiddleware,
-  analyticsMiddleware({ provider: "ga" }),
-  performanceMiddleware({
+  createAnalyticsMiddleware({ provider: "ga" }),
+  createPerformanceMiddleware({
     slowBlockThreshold: 3000,
     onSlowBlock: (blockerId, duration) => {
       // Send to error tracking service
@@ -438,7 +475,7 @@ The library is fully tree-shakeable. Import only the features you need to keep y
 import { useBlocker } from "@okyrychenko-dev/react-action-guard";
 
 // Middleware is not included unless you import it
-import { configureMiddleware, analyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
+import { configureMiddleware, createAnalyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
 ```
 
 The package is configured with `"sideEffects": false`, allowing modern bundlers (Webpack, Rollup, Vite) to eliminate unused code automatically.

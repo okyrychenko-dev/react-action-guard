@@ -8,6 +8,7 @@ export type {
   GoogleAnalyticsConfig,
   MixpanelConfig,
 } from "./analyticsMiddleware.types";
+export { configureMiddleware } from "./configureMiddleware";
 export { loggerMiddleware } from "./loggerMiddleware";
 export type { BlockingAction, Middleware, MiddlewareContext } from "./middleware.types";
 export { createPerformanceMiddleware } from "./performanceMiddleware";

@@ -2,6 +2,7 @@
 export {
   useAsyncAction,
   useBlocker,
+  useBlockingInfo,
   useConditionalBlocker,
   useConfirmableBlocker,
   useIsBlocked,
@@ -38,6 +39,7 @@ export {
   type AnalyticsEventData,
   type AnalyticsProvider,
   type BlockingAction,
+  configureMiddleware,
   createAnalyticsMiddleware,
   createPerformanceMiddleware,
   type CustomAnalyticsConfig,

@@ -114,3 +114,68 @@
 .status {
   margin-bottom: 16px;
 }
+
+/* Common Story Elements */
+.description {
+  color: #666666;
+  font-size: 14px;
+  margin-bottom: 20px;
+}
+
+/* Control Panel */
+.controlPanel {
+  padding: 16px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.controlTitle {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+}
+
+.controlList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.controlLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* Info Box */
+.infoBox {
+  padding: 12px;
+  background-color: #e7f3ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 13px;
+}
+
+.infoTitle {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.infoList {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.infoList li {
+  margin-bottom: 6px;
+}
+
+.infoList code {
+  background: #dbeafe;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: "Monaco", "Courier New", monospace;
+  font-size: 13px;
+}
