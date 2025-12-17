@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useUIBlockingStore } from "../../store";
+import { useResolvedStoreWithSelector } from "../../context";
 import { createBlockerConfig } from "../useBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
@@ -20,12 +20,14 @@ import {
  * Supports start/end times as Date objects, ISO strings, or timestamps.
  * If both duration and end are provided, duration takes precedence.
  *
+ * Supports both global store and context store (via UIBlockingProvider).
+ *
  * @param blockerId - Unique identifier for this blocker
  * @param config - Configuration including schedule and callbacks
  *
  */
 export const useScheduledBlocker = (blockerId: string, config: ScheduledBlockerConfig): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));

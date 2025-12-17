@@ -11,13 +11,15 @@
 - Priority-based blocking system
 - Scoped blocking (global, specific areas, or multiple scopes)
 - Automatic cleanup on unmount
+- **Timeout mechanism** - auto-remove blockers after specified time
+- **Provider pattern** - isolated stores for SSR, testing, and micro-frontends
 - Advanced hooks for different use cases:
   - Confirmable blockers with custom dialogs
   - Scheduled blocking for maintenance windows
   - Conditional blocking based on application state
-  - Async action wrapping
+  - Async action wrapping with timeout support
 - Advanced middleware system for analytics, logging, and performance monitoring
-- TypeScript support with full type safety
+- TypeScript support with full type safety (including optional type-safe scopes)
 - Built on Zustand for efficient state management
 - Tree-shakeable - import only what you need
 - Hooks-based API
@@ -34,8 +36,8 @@ pnpm add @okyrychenko-dev/react-action-guard zustand
 
 This package requires the following peer dependencies:
 
-- [React](https://react.dev/) ^17.0.0 || ^18.0.0
-- [Zustand](https://zustand-demo.pmnd.rs/) - State management library
+- [React](https://react.dev/) ^17.0.0 || ^18.0.0 || ^19.0.0
+- [Zustand](https://zustand-demo.pmnd.rs/) ^4.5.7 || ^5.0.0 - State management library
 
 ## Quick Start
 
@@ -74,6 +76,8 @@ Automatically adds a blocker when the component mounts and removes it on unmount
   - `scope?: string | string[]` - Scope(s) to block (default: "global")
   - `reason?: string` - Reason for blocking (for debugging)
   - `priority?: number` - Priority level (higher = more important)
+  - `timeout?: number` - Auto-remove after N milliseconds
+  - `onTimeout?: (blockerId: string) => void` - Callback when auto-removed
 - `isActive?: boolean` - Whether the blocker is active (default: true)
 
 **Example:**
@@ -87,6 +91,33 @@ function MyComponent() {
   });
 
   return <div>Content</div>;
+}
+
+// With timeout - auto-removes after 30 seconds
+function SaveButton() {
+  const [isSaving, setIsSaving] = useState(false);
+
+  useBlocker("save-operation", {
+    scope: "form",
+    reason: "Saving...",
+    timeout: 30000,
+    onTimeout: (id) => {
+      console.warn(`Operation ${id} timed out`);
+      showNotification("Operation timed out");
+      setIsSaving(false);
+    },
+  }, isSaving);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveData();
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return <button onClick={handleSave} disabled={isSaving}>Save</button>;
 }
 ```
 
@@ -147,7 +178,7 @@ function CheckoutButton() {
 }
 ```
 
-#### `useAsyncAction(actionId, scope)`
+#### `useAsyncAction(actionId, scope, options)`
 
 Wraps an async function with automatic blocking/unblocking.
 
@@ -155,6 +186,9 @@ Wraps an async function with automatic blocking/unblocking.
 
 - `actionId: string` - Identifier for the action
 - `scope?: string | string[]` - Scope(s) to block during execution
+- `options?: UseAsyncActionOptions` - Optional configuration
+  - `timeout?: number` - Auto-remove blocker after N milliseconds
+  - `onTimeout?: (blockerId: string) => void` - Callback when timed out
 
 **Returns:** `(asyncFn: () => Promise<T>) => Promise<T>` - Function wrapper
 
@@ -171,6 +205,23 @@ function MyComponent() {
   };
 
   return <button onClick={handleSave}>Save</button>;
+}
+
+// With timeout - prevents infinite blocking if operation hangs
+function ApiComponent() {
+  const execute = useAsyncAction("api-call", "global", {
+    timeout: 60000, // 1 minute timeout
+    onTimeout: (id) => {
+      showError("Request timed out. Please try again.");
+    },
+  });
+
+  const fetchData = () => execute(async () => {
+    const response = await fetch("/api/data");
+    return response.json();
+  });
+
+  return <button onClick={fetchData}>Fetch Data</button>;
 }
 ```
 
@@ -196,7 +247,7 @@ Creates a blocker that requires user confirmation before being removed.
 **Example:**
 
 ```jsx
-function UnsavedChangesGuard() {
+function UnsavedChangesGuard({ hasUnsavedChanges, discardChanges }) {
   const { isBlocking, requestRemoval } = useConfirmableBlocker(
     "unsaved-changes",
     {
@@ -306,6 +357,56 @@ function NetworkStatusBlocker() {
 }
 ```
 
+### Provider (Optional)
+
+#### `UIBlockingProvider`
+
+Provides an isolated store instance for SSR, testing, or micro-frontends. Without the provider, hooks use a global store.
+
+**Props:**
+
+- `children: ReactNode` - Child components
+- `enableDevtools?: boolean` - Enable Redux DevTools (default: true in development)
+- `devtoolsName?: string` - Name for DevTools (default: "UIBlocking")
+- `middlewares?: Middleware[]` - Initial middlewares to register
+
+**Example:**
+
+```jsx
+import { UIBlockingProvider } from "@okyrychenko-dev/react-action-guard";
+
+// SSR - each request gets isolated state
+function App() {
+  return (
+    <UIBlockingProvider>
+      <MyApp />
+    </UIBlockingProvider>
+  );
+}
+
+// Testing - isolated state per test, no cleanup needed
+function renderWithProvider(ui) {
+  return render(
+    <UIBlockingProvider>{ui}</UIBlockingProvider>
+  );
+}
+
+// Micro-frontends - each app has its own blocking state
+function MicroFrontend() {
+  return (
+    <UIBlockingProvider devtoolsName="MicroApp-Blocking">
+      <MicroApp />
+    </UIBlockingProvider>
+  );
+}
+```
+
+#### Context Hooks
+
+- `useUIBlockingContext()` - Get store from context (throws if outside provider)
+- `useIsInsideUIBlockingProvider()` - Check if inside a provider
+- `useUIBlockingStoreFromContext(selector)` - Select state from context store
+
 ### Store
 
 #### `useUIBlockingStore`
@@ -369,7 +470,10 @@ The library includes a powerful middleware system that allows you to hook into b
 Track blocker events with your analytics provider (Google Analytics, Mixpanel, Amplitude, or custom).
 
 ```jsx
-import { configureMiddleware, createAnalyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
+import {
+  configureMiddleware,
+  createAnalyticsMiddleware,
+} from "@okyrychenko-dev/react-action-guard";
 
 // Google Analytics
 configureMiddleware([createAnalyticsMiddleware({ provider: "ga" })]);
@@ -405,7 +509,10 @@ configureMiddleware([loggerMiddleware]);
 Monitor blocker performance and detect slow operations.
 
 ```jsx
-import { configureMiddleware, createPerformanceMiddleware } from "@okyrychenko-dev/react-action-guard";
+import {
+  configureMiddleware,
+  createPerformanceMiddleware,
+} from "@okyrychenko-dev/react-action-guard";
 
 configureMiddleware([
   createPerformanceMiddleware({
@@ -475,7 +582,10 @@ The library is fully tree-shakeable. Import only the features you need to keep y
 import { useBlocker } from "@okyrychenko-dev/react-action-guard";
 
 // Middleware is not included unless you import it
-import { configureMiddleware, createAnalyticsMiddleware } from "@okyrychenko-dev/react-action-guard";
+import {
+  configureMiddleware,
+  createAnalyticsMiddleware,
+} from "@okyrychenko-dev/react-action-guard";
 ```
 
 The package is configured with `"sideEffects": false`, allowing modern bundlers (Webpack, Rollup, Vite) to eliminate unused code automatically.
@@ -740,4 +850,4 @@ See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each versio
 
 ## License
 
-MIT © Olexii Kyrychenko
+MIT © Oleksii Kyrychenko

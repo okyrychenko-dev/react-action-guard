@@ -8,6 +8,10 @@ export interface BlockerConfig {
   reason?: string;
   priority?: number;
   timestamp?: number;
+  /** Automatically remove the blocker after N milliseconds */
+  timeout?: number;
+  /** Callback invoked when the blocker is automatically removed due to timeout */
+  onTimeout?: (blockerId: string) => void;
 }
 
 /**
@@ -18,6 +22,12 @@ export interface StoredBlocker {
   reason: string;
   priority: number;
   timestamp: number;
+  /** Timeout duration in milliseconds (if set) */
+  timeout?: number;
+  /** Internal timeout ID for cleanup */
+  timeoutId?: ReturnType<typeof setTimeout>;
+  /** Callback invoked when the blocker is automatically removed due to timeout */
+  onTimeout?: (blockerId: string) => void;
 }
 
 /**

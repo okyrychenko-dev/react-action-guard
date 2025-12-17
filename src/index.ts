@@ -16,6 +16,7 @@ export type {
   ConfirmableBlockerConfig,
   ConfirmDialogConfig,
   ScheduledBlockerConfig,
+  UseAsyncActionOptions,
   UseConfirmableBlockerReturn,
 } from "./hooks";
 
@@ -50,3 +51,16 @@ export {
   type MixpanelConfig,
   type PerformanceConfig,
 } from "./middleware";
+
+// Type-safe scope utilities
+export { createTypedHooks, type TypedHooks } from "./createTypedHooks";
+export type { BlockerConfigTyped, DefaultScopes, ScopeValue } from "./types";
+
+// Context / Provider
+export {
+  UIBlockingProvider,
+  useIsInsideUIBlockingProvider,
+  useUIBlockingContext,
+  useUIBlockingStoreFromContext,
+} from "./context";
+export type { UIBlockingProviderProps } from "./context";

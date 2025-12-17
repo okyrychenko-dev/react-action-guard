@@ -1,4 +1,5 @@
 export { useAsyncAction } from "./useAsyncAction";
+export type { UseAsyncActionOptions } from "./useAsyncAction";
 export { useBlocker } from "./useBlocker";
 export { useBlockingInfo } from "./useBlockingInfo";
 export type { ConditionalBlockerConfig } from "./useConditionalBlocker";

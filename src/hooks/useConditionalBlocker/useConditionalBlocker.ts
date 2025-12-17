@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useUIBlockingStore } from "../../store";
+import { useResolvedStoreWithSelector } from "../../context";
 import { createBlockerConfig } from "../useBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
@@ -10,6 +10,8 @@ import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
  * Periodically checks a condition and blocks/unblocks based on the result.
  * The condition is evaluated at the specified interval (default 1000ms).
  *
+ * Supports both global store and context store (via UIBlockingProvider).
+ *
  * @param blockerId - Unique identifier for this blocker
  * @param config - Configuration including condition function and check interval
  *
@@ -18,7 +20,7 @@ export const useConditionalBlocker = <TState = unknown>(
   blockerId: string,
   config: ConditionalBlockerConfig<TState>
 ): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));

@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0]
+
+### Added
+
+- ⏱️ **Timeout mechanism** - auto-remove blockers after specified time
+  - New `timeout` option in `BlockerConfig` to auto-remove blockers
+  - New `onTimeout` callback when blocker is auto-removed
+  - New `"timeout"` action type in middleware
+  - Works with `useBlocker`, `useAsyncAction`, and all other hooks
+- 🏠 **Provider pattern** - isolated stores for SSR, testing, and micro-frontends
+  - New `UIBlockingProvider` component for isolated store instances
+  - New `useUIBlockingContext` hook to access context store
+  - New `useIsInsideUIBlockingProvider` hook to check if inside provider
+  - New `useUIBlockingStoreFromContext` hook for context store with selector
+  - All hooks now support both global and context stores automatically
+
+### Changed
+
+- ⬆️ Updated peer dependencies to support React 19
+  - React: `^17.0.0 || ^18.0.0 || ^19.0.0`
+  - Zustand: `^4.5.7 || ^5.0.0`
+- 🔧 All hooks now use `useResolvedStore` / `useResolvedStoreWithSelector` for Provider support
+
 ## [0.3.3] - 2025-12-01
 
 ### Added

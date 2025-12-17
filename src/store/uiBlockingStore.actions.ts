@@ -62,6 +62,41 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *
    */
   addBlocker: (id: string, config: BlockerConfig = {}): void => {
+    // Clear existing timeout if blocker is being overwritten
+    const existingBlocker = get().activeBlockers.get(id);
+    if (existingBlocker?.timeoutId) {
+      clearTimeout(existingBlocker.timeoutId);
+    }
+
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    // Set up timeout if specified
+    if (config.timeout && config.timeout > 0) {
+      timeoutId = setTimeout(() => {
+        // Check if blocker still exists
+        if (get().activeBlockers.has(id)) {
+          // Call onTimeout callback before removing
+          config.onTimeout?.(id);
+
+          // Run timeout middleware
+          void get().runMiddlewares({
+            action: "timeout",
+            blockerId: id,
+            config: {
+              scope: config.scope,
+              reason: config.reason,
+              priority: config.priority,
+              timeout: config.timeout,
+            },
+            timestamp: Date.now(),
+          });
+
+          // Remove the blocker (this will also run "remove" middleware)
+          get().removeBlocker(id);
+        }
+      }, config.timeout);
+    }
+
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
       const storedBlocker: StoredBlocker = {
@@ -69,6 +104,9 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
         reason: config.reason ?? DEFAULT_REASON,
         priority: config.priority ?? DEFAULT_PRIORITY,
         timestamp: config.timestamp ?? Date.now(),
+        timeout: config.timeout,
+        timeoutId,
+        onTimeout: config.onTimeout,
       };
       newBlockers.set(id, storedBlocker);
 
@@ -82,6 +120,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
         scope: config.scope,
         reason: config.reason,
         priority: config.priority,
+        timeout: config.timeout,
       },
       timestamp: Date.now(),
     });
@@ -95,6 +134,11 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    */
   removeBlocker: (id: string): void => {
     const prevBlocker = get().activeBlockers.get(id);
+
+    // Clear timeout if it exists
+    if (prevBlocker?.timeoutId) {
+      clearTimeout(prevBlocker.timeoutId);
+    }
 
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
@@ -168,6 +212,14 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    * Clear all blockers from the store
    */
   clearAllBlockers: (): void => {
+    // Clear all timeouts before clearing blockers
+    const { activeBlockers } = get();
+    for (const [, blocker] of activeBlockers) {
+      if (blocker.timeoutId) {
+        clearTimeout(blocker.timeoutId);
+      }
+    }
+
     set({ activeBlockers: new Map() });
   },
 
@@ -178,6 +230,15 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *
    */
   clearBlockersForScope: (scope: string): void => {
+    // Clear timeouts for blockers that will be removed
+    const { activeBlockers } = get();
+    for (const [, blocker] of activeBlockers) {
+      const blockerScopes = normalizeScopeToArray(blocker.scope);
+      if (blockerScopes.includes(scope) && blocker.timeoutId) {
+        clearTimeout(blocker.timeoutId);
+      }
+    }
+
     set((state) => {
       const newBlockers = new Map();
 

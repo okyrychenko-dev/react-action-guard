@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { type BlockerConfig, useUIBlockingStore } from "../../store";
+import { useResolvedStoreWithSelector } from "../../context";
+import type { BlockerConfig } from "../../store";
 
 /**
  * Hook to automatically add and remove a blocker based on component lifecycle
@@ -7,13 +8,15 @@ import { type BlockerConfig, useUIBlockingStore } from "../../store";
  * Automatically adds a blocker when the component mounts (or when activated)
  * and removes it when the component unmounts (or when deactivated).
  *
+ * Supports both global store and context store (via UIBlockingProvider).
+ *
  * @param blockerId - Unique identifier for the blocker
  * @param config - Blocker configuration (scope, reason, priority)
  * @param isActive - Whether the blocker is currently active (default: true)
  *
  */
 export const useBlocker = (blockerId: string, config: BlockerConfig, isActive = true): void => {
-  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));
