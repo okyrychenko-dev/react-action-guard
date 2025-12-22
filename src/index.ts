@@ -21,7 +21,8 @@ export type {
 } from "./hooks";
 
 // Store
-export { useUIBlockingStore, uiBlockingStoreApi } from "./store";
+export { useUIBlockingStore, uiBlockingStoreApi, createShallowStore } from "./store";
+export type { ShallowStoreBindings } from "./store";
 
 // Store types
 export type {

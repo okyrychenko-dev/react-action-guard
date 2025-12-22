@@ -1,5 +1,13 @@
 import { StateCreator, StoreApi, StoreMutators, createStore, useStore } from "zustand";
-import { useShallow } from "zustand/shallow";
+import { useShallow } from "zustand/react/shallow";
+
+export interface ShallowStoreBindings<StoreState> {
+  useStore: {
+    (): StoreState;
+    <T>(selector: (state: StoreState) => T): T;
+  };
+  useStoreApi: StoreApi<StoreState>;
+}
 
 /**
  * Creates a Zustand store with automatic shallow comparison for all selectors
@@ -7,6 +15,10 @@ import { useShallow } from "zustand/shallow";
  * This utility wraps the standard Zustand store creation and automatically applies
  * `useShallow` to all selectors, preventing unnecessary re-renders when selected
  * values haven't changed (shallow equality).
+ *
+ * Supports two usage patterns:
+ * - `useStore()` - Returns the entire store state
+ * - `useStore(selector)` - Returns the result of the selector function
  *
  * @template StoreState - The type of the store state
  * @template TMutators - Array of middleware mutators (e.g., devtools, persist)
@@ -21,15 +33,17 @@ export function createShallowStore<
   TMutators extends Array<[keyof StoreMutators<StoreState, StoreState>, unknown]> = [],
 >(
   storeCreator: StateCreator<StoreState, [], TMutators, StoreState>
-): {
-  useStore: <T>(selector: (state: StoreState) => T) => T;
-  useStoreApi: StoreApi<StoreState>;
-} {
+): ShallowStoreBindings<StoreState> {
   const storeApi: StoreApi<StoreState> = createStore<StoreState, TMutators>(storeCreator);
 
-  const useScopedStore = <T>(selector: (state: StoreState) => T): T => {
-    return useStore(storeApi, useShallow(selector));
-  };
+  function useScopedStore(): StoreState;
+  function useScopedStore<T>(selector: (state: StoreState) => T): T;
+  function useScopedStore<T>(selector?: (state: StoreState) => T): T | StoreState {
+    const actualSelector = (state: StoreState): T | StoreState =>
+      selector ? selector(state) : state;
+
+    return useStore(storeApi, useShallow(actualSelector));
+  }
 
   return { useStore: useScopedStore, useStoreApi: storeApi };
 }

@@ -1,7 +1,7 @@
+import { createShallowStore } from "@okyrychenko-dev/react-zustand-toolkit";
 import { devtools } from "zustand/middleware";
 import { createUIBlockingActions } from "./uiBlockingStore.actions";
 import { devtoolsConfig } from "./uiBlockingStore.config";
-import { createShallowStore } from "./uiBlockingStore.utils";
 import type { UIBlockingStore } from "./uiBlockingStore.types";
 
 /**

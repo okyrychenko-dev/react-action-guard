@@ -53,7 +53,7 @@ function MyComponent() {
 
 ## Documentation
 
-📚 **[Interactive Storybook Documentation](https://your-storybook-url.com)** - Explore live examples and detailed guides for all hooks
+📚 **Interactive Storybook Documentation** - Run locally to explore live examples and detailed guides for all hooks
 
 To run Storybook locally:
 
@@ -225,49 +225,66 @@ function ApiComponent() {
 }
 ```
 
-#### `useConfirmableBlocker(blockerId, config, options)`
+#### `useConfirmableBlocker(blockerId, config)`
 
-Creates a blocker that requires user confirmation before being removed.
+Creates a confirmable action with UI blocking while the dialog is open or the action is running.
 
 **Parameters:**
 
 - `blockerId: string` - Unique identifier for the blocker
-- `config: BlockerConfig` - Configuration object
-- `options: ConfirmableBlockerOptions`
-  - `enabled?: boolean` - Whether the blocker is active (default: true)
-  - `confirmMessage?: string` - Message to show in confirmation dialog
-  - `onConfirm?: () => void | Promise<void>` - Callback when user confirms
+- `config: ConfirmableBlockerConfig` - Configuration object
+  - `confirmMessage: string` - Message to show in confirmation dialog
+  - `confirmTitle?: string` - Dialog title (default: "Confirm Action")
+  - `confirmButtonText?: string` - Confirm button label (default: "Confirm")
+  - `cancelButtonText?: string` - Cancel button label (default: "Cancel")
+  - `onConfirm: () => void | Promise<void>` - Callback when user confirms
+  - `onCancel?: () => void` - Callback when user cancels
+  - Plus all `BlockerConfig` properties (scope, reason, priority, timeout)
 
 **Returns:**
 
-- `isBlocking: boolean` - Whether the blocker is currently active
-- `cancel: () => void` - Manually remove the blocker without confirmation
-- `requestRemoval: () => Promise<boolean>` - Request removal with confirmation
+- `execute: () => void` - Opens the confirmation dialog
+- `isDialogOpen: boolean` - Whether the dialog is open
+- `isExecuting: boolean` - Whether the confirm action is running
+- `confirmConfig: { title, message, confirmText, cancelText }` - UI-ready dialog config
+- `onConfirm: () => Promise<void>` - Confirm handler to wire to your dialog
+- `onCancel: () => void` - Cancel handler to wire to your dialog
 
 **Example:**
 
 ```jsx
-function UnsavedChangesGuard({ hasUnsavedChanges, discardChanges }) {
-  const { isBlocking, requestRemoval } = useConfirmableBlocker(
-    "unsaved-changes",
-    {
-      scope: "navigation",
-      reason: "Unsaved changes",
+function UnsavedChangesGuard({ discardChanges }) {
+  const {
+    execute,
+    isDialogOpen,
+    isExecuting,
+    confirmConfig,
+    onConfirm,
+    onCancel,
+  } = useConfirmableBlocker("unsaved-changes", {
+    scope: "navigation",
+    reason: "Unsaved changes",
+    confirmMessage: "You have unsaved changes. Are you sure you want to leave?",
+    onConfirm: async () => {
+      await discardChanges();
     },
-    {
-      enabled: hasUnsavedChanges,
-      confirmMessage: "You have unsaved changes. Are you sure you want to leave?",
-      onConfirm: async () => {
-        await discardChanges();
-      },
-    }
-  );
+  });
 
   return (
-    <div>
-      {isBlocking && <UnsavedIndicator />}
-      <button onClick={requestRemoval}>Leave</button>
-    </div>
+    <>
+      <button onClick={execute}>Leave</button>
+      {isDialogOpen && (
+        <ConfirmDialog
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          confirmText={confirmConfig.confirmText}
+          cancelText={confirmConfig.cancelText}
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
+      {isExecuting && <LoadingOverlay message="Processing..." />}
+    </>
   );
 }
 ```
@@ -411,17 +428,18 @@ function MicroFrontend() {
 
 #### `useUIBlockingStore`
 
-Direct access to the Zustand store for advanced use cases.
+Direct access to the Zustand store for advanced use cases (requires a selector).
 
 **Methods:**
 
-- `addBlocker(id, config)` - Manually add a blocker
+- `addBlocker(id, config)` - Manually add a blocker (re-adding with the same ID replaces config)
 - `removeBlocker(id)` - Manually remove a blocker
-- `updateBlocker(id, config)` - Update an existing blocker
 - `isBlocked(scope)` - Check if scope is blocked
 - `getBlockingInfo(scope)` - Get detailed blocking information
 - `clearAllBlockers()` - Remove all blockers
 - `clearBlockersForScope(scope)` - Remove blockers for specific scope
+- `registerMiddleware(name, middleware)` - Register middleware manually
+- `unregisterMiddleware(name)` - Unregister middleware manually
 
 **Example:**
 
@@ -429,7 +447,10 @@ Direct access to the Zustand store for advanced use cases.
 import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 
 function AdvancedComponent() {
-  const { addBlocker, removeBlocker, updateBlocker } = useUIBlockingStore();
+  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
 
   const startBlocking = () => {
     addBlocker("custom-blocker", {
@@ -440,7 +461,10 @@ function AdvancedComponent() {
   };
 
   const updatePriority = () => {
-    updateBlocker("custom-blocker", {
+    // Re-add with the same ID to update the config
+    addBlocker("custom-blocker", {
+      scope: ["form", "navigation"],
+      reason: "Critical operation in progress",
       priority: 200,
     });
   };
@@ -458,6 +482,26 @@ function AdvancedComponent() {
   );
 }
 ```
+
+For non-hook contexts (tests, utilities, event handlers), use `uiBlockingStoreApi`:
+
+```jsx
+import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+
+uiBlockingStoreApi.getState().addBlocker("server-call", {
+  scope: "global",
+  reason: "Server call running",
+});
+```
+
+### Store Toolkit Helpers
+
+Advanced store helpers are re-exported from the internal toolkit for custom setups:
+
+- `createShallowStore`
+- `createStoreToolkit`
+- `createStoreProvider`
+- `createResolvedStoreHooks`
 
 ## Middleware System
 
@@ -523,6 +567,10 @@ configureMiddleware([
   }),
 ]);
 ```
+
+Note: `configureMiddleware` registers middleware on the global store. If you use `UIBlockingProvider`, register middleware via the provider's `middlewares` prop instead.
+
+Note: Middleware action types include `update` and `cancel`, but the store currently emits `add`, `remove`, and `timeout`.
 
 ### Custom Middleware
 
@@ -599,21 +647,46 @@ import type {
   // Core types
   BlockerConfig,
   BlockerInfo,
-  UIBlockingState,
+  UIBlockingStore,
+  UIBlockingStoreState,
 
   // Hook types
-  ConfirmableBlockerOptions,
+  ConfirmableBlockerConfig,
+  ConfirmDialogConfig,
+  UseConfirmableBlockerReturn,
   ScheduledBlockerConfig,
   ConditionalBlockerConfig,
   BlockingSchedule,
+  UseAsyncActionOptions,
 
   // Middleware types
   Middleware,
   MiddlewareContext,
   AnalyticsConfig,
   AnalyticsProvider,
-  PerformanceMiddlewareConfig,
+  PerformanceConfig,
+
+  // Type-safe scopes
+  BlockerConfigTyped,
+  DefaultScopes,
+  ScopeValue,
 } from "@okyrychenko-dev/react-action-guard";
+```
+
+## Type-Safe Scopes
+
+Create typed versions of the hooks to prevent scope typos at compile time:
+
+```typescript
+import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
+
+type AppScopes = "global" | "form" | "navigation" | "checkout";
+
+const { useBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } =
+  createTypedHooks<AppScopes>();
+
+useBlocker("save", { scope: "form" }); // OK
+useBlocker("save", { scope: "typo" }); // Type error
 ```
 
 ## Use Cases
@@ -670,22 +743,22 @@ function FormWithUnsavedWarning() {
   const [formData, setFormData] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
 
-  const { requestRemoval } = useConfirmableBlocker(
-    "unsaved-form",
-    {
-      scope: "navigation",
-      reason: "Unsaved form data",
-      priority: 100,
+  const {
+    execute,
+    isDialogOpen,
+    confirmConfig,
+    onConfirm,
+    onCancel,
+  } = useConfirmableBlocker("unsaved-form", {
+    scope: "navigation",
+    reason: "Unsaved form data",
+    priority: 100,
+    confirmMessage: "You have unsaved changes. Discard them?",
+    onConfirm: () => {
+      setFormData({});
+      setHasChanges(false);
     },
-    {
-      enabled: hasChanges,
-      confirmMessage: "You have unsaved changes. Discard them?",
-      onConfirm: () => {
-        setFormData({});
-        setHasChanges(false);
-      },
-    }
-  );
+  });
 
   return (
     <form>
@@ -695,7 +768,17 @@ function FormWithUnsavedWarning() {
           setHasChanges(true);
         }}
       />
-      <button onClick={requestRemoval}>Cancel</button>
+      <button type="button" onClick={execute}>Cancel</button>
+      {isDialogOpen && (
+        <ConfirmDialog
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          confirmText={confirmConfig.confirmText}
+          cancelText={confirmConfig.cancelText}
+          onConfirm={onConfirm}
+          onCancel={onCancel}
+        />
+      )}
     </form>
   );
 }

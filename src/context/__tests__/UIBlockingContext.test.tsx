@@ -41,7 +41,7 @@ describe("UIBlockingProvider", () => {
 
       expect(() => {
         renderHook(() => useUIBlockingContext());
-      }).toThrow("useUIBlockingContext must be used within UIBlockingProvider");
+      }).toThrow("useUIBlockingContext must be used within a UIBlockingProvider");
 
       consoleSpy.mockRestore();
     });
@@ -157,8 +157,8 @@ describe("UIBlockingProvider", () => {
       const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       expect(() => {
-        renderHook(() => useUIBlockingStoreFromContext((state) => state.activeBlockers));
-      }).toThrow("useUIBlockingContext must be used within UIBlockingProvider");
+        renderHook(() => useUIBlockingStoreFromContext((state) => state.isBlocked("test")));
+      }).toThrow("useUIBlockingContext must be used within a UIBlockingProvider");
 
       consoleSpy.mockRestore();
     });
@@ -215,11 +215,14 @@ describe("UIBlockingProvider", () => {
     it("should accept middlewares option", () => {
       const middleware = vi.fn();
 
-      render(
+      const { getByTestId } = render(
         <UIBlockingProvider middlewares={[middleware]}>
           <TestBlockerComponent />
         </UIBlockingProvider>
       );
+
+      // Wait for component to render and blocker to be registered
+      expect(getByTestId("blocker-test")).toBeInTheDocument();
 
       // Middleware should have been called when blocker was added
       expect(middleware).toHaveBeenCalled();
@@ -257,5 +260,5 @@ describe("UIBlockingProvider", () => {
 // Helper component for middleware test
 function TestBlockerComponent() {
   useBlocker("test-blocker", { scope: "test", reason: "Test" });
-  return <div>Test</div>;
+  return <div data-testid="blocker-test">Test</div>;
 }

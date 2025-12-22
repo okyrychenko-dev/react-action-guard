@@ -1,15 +1,16 @@
-import { useContext } from "react";
 import { type StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { uiBlockingStoreApi } from "../store/uiBlockingStore.store";
-import { UIBlockingContext } from "./UIBlockingContext.internal";
+import { useOptionalContext } from "./UIBlockingContext";
 import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
 /**
- * Internal context export for useResolvedStore
- * Re-exported to avoid circular dependencies
+ * Hook to get the optional context store (returns null if not inside provider)
+ * @internal
  */
-export { UIBlockingContext } from "./UIBlockingContext.internal";
+function useOptionalContextStore(): StoreApi<UIBlockingStore> | null {
+  return useOptionalContext();
+}
 
 /**
  * Hook that resolves to either the context store or global store
@@ -23,7 +24,7 @@ export { UIBlockingContext } from "./UIBlockingContext.internal";
  * @returns The resolved store API
  */
 export function useResolvedStore(): StoreApi<UIBlockingStore> {
-  const contextStore = useContext(UIBlockingContext);
+  const contextStore = useOptionalContextStore();
   // Return context store if inside Provider, otherwise global store
   return contextStore ?? uiBlockingStoreApi;
 }

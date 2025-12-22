@@ -64,6 +64,7 @@
     "zustand": "^4.5.7 || ^5.0.0"
   },
   "dependencies": {
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.1.1",
     "immer": "^10.0.0"
   },
   "devDependencies": {
