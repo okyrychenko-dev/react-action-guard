@@ -16,7 +16,7 @@ export interface BlockerConfigTyped<TScope extends string> {
   scope?: ScopeValue<TScope>;
   /** Human-readable reason for blocking */
   reason?: string;
-  /** Priority level (higher priority blockers take precedence) */
+  /** Priority level (higher priority blockers take precedence, minimum value is 0) */
   priority?: number;
   /** Timestamp when the blocker was created */
   timestamp?: number;

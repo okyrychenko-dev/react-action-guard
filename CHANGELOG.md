@@ -5,6 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [0.6.0] - 2024-12-24
+
+### Added
+
+- 🧩 **New `updateBlocker` function** to update blocker metadata dynamically
+  - Update scope, reason, and priority of existing blockers
+  - Restart timeout by providing a new `timeout` value
+  - Clear timeout by setting `timeout: 0`
+  - If `timeout` is not changed, the timer continues as before (backward compatible)
+- 🎯 **Middleware events for clear operations**:
+  - `clearAllBlockers()` now emits `"clear"` middleware event with `count` field
+  - `clearBlockersForScope()` now emits `"clear_scope"` middleware event with `scope` and `count` fields
+- 📊 **Extended `MiddlewareContext` type**:
+  - New optional `scope?: string` field for `clear_scope` action
+  - New optional `count?: number` field for `clear` and `clear_scope` actions
+- 🧹 **Logger middleware enhancements**:
+  - Support for `"clear"` action → 🧹 emoji
+  - Support for `"clear_scope"` action → 🎯 emoji
+- ✅ **Priority validation**: Negative priority values are automatically normalized to 0
+  - Ensures consistent priority sorting behavior
+  - Prevents unexpected behavior with negative priorities
+  - Documented in TypeScript types and README
+- 📚 **Documentation improvements**:
+  - Added "Clearing Blockers on Navigation" use case
+  - Added "Managing Session Timeouts with Dynamic Updates" use case
+  - Added interactive Storybook stories for new features
+- 🧪 **Test coverage**: Added 7 new tests for priority validation and clear operations
+
+### Changed
+
+- 🧹 **Internal**: Refactored store actions to reduce code duplication
+  - Added `normalizePriority()` helper function for consistent priority handling
+  - Added `createMiddlewareContext()` factory for middleware event creation
+
+### Removed
+
+- 🧹 Removed debug `console.log` statements from `registerMiddleware` and `unregisterMiddleware`
+  - Use logger middleware for observability instead
+
 ## [0.5.0]
 
 ### Added
@@ -176,14 +217,15 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
   - `useBlocker` - Manual blocking control with priorities
   - `useUIBlockingStore` - Direct store access
 - Scope-based blocking system (global, custom scopes, multiple scopes)
-- Priority-based blocker management (0-100 scale)
+- Priority-based blocker management (higher values = higher priority)
 - Middleware system for extensibility
 - Built-in logger middleware
 - TypeScript support with full type definitions
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.3.3...v0.4.0
 [0.3.3]: https://github.com/okyrychenko/react-action-guard/compare/v0.3.2...v0.3.3

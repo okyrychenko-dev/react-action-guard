@@ -154,10 +154,12 @@ Gets detailed information about all active blockers for a specific scope.
 **BlockerInfo:**
 
 - `id: string` - Unique identifier of the blocker
-- `reason?: string` - Reason for blocking
-- `priority: number` - Priority level (0-100)
+- `reason: string` - Reason for blocking (defaults to "Unknown")
+- `priority: number` - Priority level (higher = higher priority, minimum value is 0)
 - `scope: string | string[]` - Scope(s) being blocked
-- `timestamp: number` - When the blocker was added
+- `timestamp: number` - When the blocker was added (milliseconds since epoch)
+- `timeout?: number` - Optional timeout duration in milliseconds
+- `onTimeout?: (blockerId: string) => void` - Optional callback when timeout expires
 
 **Example:**
 
@@ -433,13 +435,20 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 **Methods:**
 
 - `addBlocker(id, config)` - Manually add a blocker (re-adding with the same ID replaces config)
+- `updateBlocker(id, config)` - Update blocker metadata (timeout restarts if new `timeout` value provided)
 - `removeBlocker(id)` - Manually remove a blocker
 - `isBlocked(scope)` - Check if scope is blocked
 - `getBlockingInfo(scope)` - Get detailed blocking information
-- `clearAllBlockers()` - Remove all blockers
-- `clearBlockersForScope(scope)` - Remove blockers for specific scope
+- `clearAllBlockers()` - Remove all blockers (emits `"clear"` middleware event)
+- `clearBlockersForScope(scope)` - Remove blockers for specific scope (emits `"clear_scope"` middleware event)
 - `registerMiddleware(name, middleware)` - Register middleware manually
 - `unregisterMiddleware(name)` - Unregister middleware manually
+
+**Note about `updateBlocker` and timeouts:**
+- If you pass a **new** `timeout` value, the timer will be **restarted**
+- If you **don't** pass `timeout`, the existing timer continues unchanged
+- Set `timeout: 0` to **clear** an existing timeout
+- `addBlocker` always resets/creates a new timeout timer when called with the same ID
 
 **Example:**
 
@@ -447,8 +456,9 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 
 function AdvancedComponent() {
-  const { addBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+  const { addBlocker, updateBlocker, removeBlocker } = useUIBlockingStore((state) => ({
     addBlocker: state.addBlocker,
+    updateBlocker: state.updateBlocker,
     removeBlocker: state.removeBlocker,
   }));
 
@@ -461,12 +471,13 @@ function AdvancedComponent() {
   };
 
   const updatePriority = () => {
-    // Re-add with the same ID to update the config
-    addBlocker("custom-blocker", {
-      scope: ["form", "navigation"],
-      reason: "Critical operation in progress",
-      priority: 200,
-    });
+    // Update metadata - timeout continues if not changed
+    updateBlocker("custom-blocker", { priority: 200 });
+  };
+
+  const extendTimeout = () => {
+    // Update timeout - timer restarts with new value
+    updateBlocker("custom-blocker", { timeout: 60000 });
   };
 
   const stopBlocking = () => {
@@ -506,6 +517,30 @@ Advanced store helpers are re-exported from the internal toolkit for custom setu
 ## Middleware System
 
 The library includes a powerful middleware system that allows you to hook into blocker lifecycle events for analytics, logging, and performance monitoring.
+
+### Middleware Actions
+
+Middleware receives events for the following actions:
+
+- `"add"` - Blocker was added
+- `"update"` - Blocker metadata was updated
+- `"remove"` - Blocker was removed
+- `"timeout"` - Blocker was auto-removed due to timeout
+- `"clear"` - All blockers were cleared (includes `count` field)
+- `"clear_scope"` - Blockers for specific scope were cleared (includes `scope` and `count` fields)
+
+**MiddlewareContext type:**
+```typescript
+{
+  action: "add" | "update" | "remove" | "timeout" | "clear" | "clear_scope";
+  blockerId: string;
+  config?: BlockerConfig;
+  timestamp: number;
+  prevState?: BlockerConfig;  // Available for "update" and "remove"
+  scope?: string;             // Available for "clear_scope"
+  count?: number;             // Available for "clear" and "clear_scope"
+}
+```
 
 ### Built-in Middleware
 
@@ -570,8 +605,6 @@ configureMiddleware([
 
 Note: `configureMiddleware` registers middleware on the global store. If you use `UIBlockingProvider`, register middleware via the provider's `middlewares` prop instead.
 
-Note: Middleware action types include `update` and `cancel`, but the store currently emits `add`, `remove`, and `timeout`.
-
 ### Custom Middleware
 
 Create your own middleware to handle blocker events:
@@ -580,14 +613,20 @@ Create your own middleware to handle blocker events:
 import { configureMiddleware } from "@okyrychenko-dev/react-action-guard";
 
 const myCustomMiddleware = (context) => {
-  const { action, blockerId, config, timestamp } = context;
+  const { action, blockerId, config, timestamp, scope, count } = context;
 
   if (action === "add") {
     console.log(`Blocker added: ${blockerId}`, config);
-  } else if (action === "remove") {
-    console.log(`Blocker removed: ${blockerId}`);
   } else if (action === "update") {
     console.log(`Blocker updated: ${blockerId}`, config);
+  } else if (action === "remove") {
+    console.log(`Blocker removed: ${blockerId}`);
+  } else if (action === "timeout") {
+    console.log(`Blocker timed out: ${blockerId}`);
+  } else if (action === "clear") {
+    console.log(`All blockers cleared (${count} total)`);
+  } else if (action === "clear_scope") {
+    console.log(`Cleared ${count} blocker(s) for scope: ${scope}`);
   }
 };
 
@@ -882,6 +921,97 @@ function StorageQuotaGuard() {
         Storage used: {storageUsed} / {STORAGE_LIMIT} bytes
       </p>
       <UploadButton />
+    </div>
+  );
+}
+```
+
+### Clearing Blockers on Navigation
+
+Clear blockers when navigating away or on specific events:
+
+```jsx
+import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+import { useEffect } from "react";
+
+function CheckoutPage() {
+  const { clearBlockersForScope, clearAllBlockers } = useUIBlockingStore(
+    (state) => ({
+      clearBlockersForScope: state.clearBlockersForScope,
+      clearAllBlockers: state.clearAllBlockers,
+    })
+  );
+
+  // Clear checkout-specific blockers when leaving the page
+  useEffect(() => {
+    return () => {
+      // Clean up checkout blockers on unmount
+      clearBlockersForScope("checkout");
+    };
+  }, [clearBlockersForScope]);
+
+  const handleCancelOrder = () => {
+    // Clear all blockers when user explicitly cancels
+    clearAllBlockers();
+    navigate("/");
+  };
+
+  return (
+    <div>
+      <CheckoutForm />
+      <button onClick={handleCancelOrder}>Cancel Order</button>
+    </div>
+  );
+}
+```
+
+### Managing Session Timeouts with Dynamic Updates
+
+Extend or update blocker timeouts dynamically:
+
+```jsx
+import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+
+function SessionManager() {
+  const { addBlocker, updateBlocker, removeBlocker } = useUIBlockingStore(
+    (state) => ({
+      addBlocker: state.addBlocker,
+      updateBlocker: state.updateBlocker,
+      removeBlocker: state.removeBlocker,
+    })
+  );
+
+  const startSession = () => {
+    addBlocker("session-timeout", {
+      scope: "global",
+      reason: "Session expiring soon",
+      priority: 50,
+      timeout: 300000, // 5 minutes
+      onTimeout: () => {
+        logout();
+        showNotification("Session expired");
+      },
+    });
+  };
+
+  const extendSession = () => {
+    // Extend timeout - timer restarts with new value
+    updateBlocker("session-timeout", {
+      timeout: 600000, // 10 minutes
+      reason: "Session extended",
+    });
+  };
+
+  const endSession = () => {
+    removeBlocker("session-timeout");
+    logout();
+  };
+
+  return (
+    <div>
+      <button onClick={startSession}>Start Session</button>
+      <button onClick={extendSession}>Extend Session</button>
+      <button onClick={endSession}>Logout</button>
     </div>
   );
 }

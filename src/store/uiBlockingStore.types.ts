@@ -6,6 +6,7 @@ import { Middleware, MiddlewareContext } from "../middleware";
 export interface BlockerConfig {
   scope?: string | ReadonlyArray<string>;
   reason?: string;
+  /** Priority level (negative values are normalized to 0) */
   priority?: number;
   timestamp?: number;
   /** Automatically remove the blocker after N milliseconds */
@@ -50,6 +51,7 @@ export interface UIBlockingStoreState {
  */
 export interface UIBlockingStoreActions {
   addBlocker: (id: string, config?: BlockerConfig) => void;
+  updateBlocker: (id: string, config?: Partial<BlockerConfig>) => void;
   removeBlocker: (id: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;
   getBlockingInfo: (scope: string) => ReadonlyArray<BlockerInfo>;

@@ -325,14 +325,6 @@ describe("createPerformanceMiddleware", () => {
 
     void middleware(updateContext);
 
-    const cancelContext: MiddlewareContext = {
-      action: "cancel",
-      blockerId: "test-blocker",
-      timestamp: Date.now(),
-    };
-
-    void middleware(cancelContext);
-
     const timeoutContext: MiddlewareContext = {
       action: "timeout",
       blockerId: "test-blocker",

@@ -93,7 +93,7 @@ const meta: Meta<typeof BlockerDemo> = {
     },
     priority: {
       control: "number",
-      description: "Priority level (0-100, higher = more important)",
+      description: "Priority level (higher = more important, no upper limit)",
       table: {
         type: { summary: "number" },
         defaultValue: { summary: "50" },

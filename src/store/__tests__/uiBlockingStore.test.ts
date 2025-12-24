@@ -65,6 +65,75 @@ describe("uiBlockingStore", () => {
       const info = getBlockingInfo("test");
       expect(info).toHaveLength(2);
     });
+
+    it("should normalize negative priority to 0", () => {
+      const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("negative-priority", { scope: "test", priority: -100 });
+
+      const info = getBlockingInfo("test");
+      expect(info[0]?.priority).toBe(0);
+    });
+
+    it("should keep positive priority unchanged", () => {
+      const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("positive-priority", { scope: "test", priority: 250 });
+
+      const info = getBlockingInfo("test");
+      expect(info[0]?.priority).toBe(250);
+    });
+
+    it("should normalize priority 0 to 0", () => {
+      const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("zero-priority", { scope: "test", priority: 0 });
+
+      const info = getBlockingInfo("test");
+      expect(info[0]?.priority).toBe(0);
+    });
+  });
+
+  describe("updateBlocker", () => {
+    it("should update blocker metadata", () => {
+      const { addBlocker, updateBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", { scope: "test", reason: "Initial", priority: 10 });
+      updateBlocker("test-blocker", { reason: "Updated", priority: 50 });
+
+      const info = getBlockingInfo("test");
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Updated");
+      expect(info[0]?.priority).toBe(50);
+    });
+
+    it("should add blocker when it does not exist", () => {
+      const { updateBlocker, isBlocked } = uiBlockingStoreApi.getState();
+
+      updateBlocker("new-blocker", { scope: "test" });
+
+      expect(isBlocked("test")).toBe(true);
+    });
+
+    it("should normalize negative priority to 0 on update", () => {
+      const { addBlocker, updateBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", { scope: "test", priority: 50 });
+      updateBlocker("test-blocker", { priority: -200 });
+
+      const info = getBlockingInfo("test");
+      expect(info[0]?.priority).toBe(0);
+    });
+
+    it("should keep positive priority unchanged on update", () => {
+      const { addBlocker, updateBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", { scope: "test", priority: 10 });
+      updateBlocker("test-blocker", { priority: 300 });
+
+      const info = getBlockingInfo("test");
+      expect(info[0]?.priority).toBe(300);
+    });
   });
 
   describe("removeBlocker", () => {
@@ -369,6 +438,55 @@ describe("uiBlockingStore", () => {
       vi.advanceTimersByTime(500);
 
       expect(isBlocked("test")).toBe(true);
+    });
+
+    it("should not reset timeout when updating blocker metadata without timeout", () => {
+      const { addBlocker, updateBlocker, isBlocked } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", { scope: "test", timeout: 1000, onTimeout });
+
+      vi.advanceTimersByTime(500);
+      updateBlocker("timeout-blocker", { reason: "Still blocking" });
+
+      vi.advanceTimersByTime(600);
+
+      expect(isBlocked("test")).toBe(false);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+    });
+
+    it("should restart timeout when updateBlocker changes timeout value", () => {
+      const { addBlocker, updateBlocker, isBlocked } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", { scope: "test", timeout: 1000, onTimeout });
+
+      vi.advanceTimersByTime(500);
+      // Update with new timeout - should restart the timer
+      updateBlocker("timeout-blocker", { timeout: 2000 });
+
+      // Original timeout would have expired, but timer was restarted
+      vi.advanceTimersByTime(600);
+      expect(isBlocked("test")).toBe(true);
+
+      // New timeout expires after 2000ms from update
+      vi.advanceTimersByTime(1500);
+      expect(isBlocked("test")).toBe(false);
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+    });
+
+    it("should clear timeout when updateBlocker sets timeout to 0", () => {
+      const { addBlocker, updateBlocker, isBlocked } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", { scope: "test", timeout: 1000, onTimeout });
+
+      updateBlocker("timeout-blocker", { timeout: 0 });
+
+      vi.advanceTimersByTime(2000);
+
+      expect(isBlocked("test")).toBe(true);
+      expect(onTimeout).not.toHaveBeenCalled();
     });
 
     it("should call onTimeout callback when blocker times out", () => {

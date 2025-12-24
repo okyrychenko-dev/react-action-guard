@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useResolvedStoreWithSelector } from "../../context";
 import { ASYNC_ACTION_PRIORITY } from "../../store";
 
@@ -37,9 +37,13 @@ export const useAsyncAction = <T = unknown>(
     removeBlocker: state.removeBlocker,
   }));
 
+  // Use counter instead of Date.now() to guarantee unique IDs even for rapid calls
+  const counterRef = useRef(0);
+
   const executeWithBlocking = useCallback(
     async (asyncFn: () => Promise<T>): Promise<T> => {
-      const blockerId = `${actionId}-${Date.now().toString()}`;
+      counterRef.current += 1;
+      const blockerId = `${actionId}-${String(counterRef.current)}`;
 
       try {
         addBlocker(blockerId, {

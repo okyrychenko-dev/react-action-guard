@@ -4,14 +4,16 @@ export const getActionEmoji = (action: string): string => {
   switch (action) {
     case "add":
       return "➕";
-    case "remove":
-      return "➖";
     case "update":
       return "🔄";
-    case "cancel":
-      return "❌";
+    case "remove":
+      return "➖";
     case "timeout":
       return "⏱️";
+    case "clear":
+      return "🧹";
+    case "clear_scope":
+      return "🎯";
     default:
       return "❓";
   }
@@ -39,12 +41,32 @@ const extractConfigDetails = (config?: MiddlewareBlockerConfig): Record<string, 
 export const formatLogData = (context: MiddlewareContext): Record<string, unknown> => {
   const configDetails = extractConfigDetails(context.config);
 
-  if (context.prevState) {
-    return {
-      config: configDetails,
-      prevState: extractConfigDetails(context.prevState),
-    };
+  const logData: Record<string, unknown> = {};
+
+  // Add scope for clear_scope action
+  if (context.scope !== undefined) {
+    logData.scope = context.scope;
   }
 
-  return configDetails;
+  // Add count for clear actions
+  if (context.count !== undefined) {
+    logData.count = context.count;
+  }
+
+  // Add config details
+  if (Object.keys(configDetails).length > 0) {
+    logData.config = configDetails;
+  }
+
+  // Add previous state if present
+  if (context.prevState) {
+    logData.prevState = extractConfigDetails(context.prevState);
+  }
+
+  // Return config details directly if no special fields
+  if (Object.keys(logData).length === 0) {
+    return configDetails;
+  }
+
+  return Object.keys(logData).length === 1 && logData.config ? configDetails : logData;
 };

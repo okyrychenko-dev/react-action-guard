@@ -1,6 +1,6 @@
 import { BlockerConfig } from "../store";
 
-export type BlockingAction = "add" | "remove" | "update" | "cancel" | "timeout";
+export type BlockingAction = "add" | "update" | "remove" | "timeout" | "clear" | "clear_scope";
 
 export type MiddlewareBlockerConfig = BlockerConfig;
 
@@ -10,6 +10,8 @@ export interface MiddlewareContext {
   config?: MiddlewareBlockerConfig;
   timestamp: number;
   prevState?: MiddlewareBlockerConfig;
+  scope?: string;
+  count?: number;
 }
 
 export type Middleware = (context: MiddlewareContext) => void | Promise<void>;

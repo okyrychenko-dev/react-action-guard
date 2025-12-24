@@ -45,7 +45,7 @@ interface BlockerConfig {
   /** Human-readable reason for blocking (optional) */
   reason?: string;
 
-  /** Priority level (0-100, default: 50). Higher priority takes precedence */
+  /** Priority level (default: 0). Higher priority takes precedence */
   priority?: number;
 }
 ```
@@ -228,7 +228,7 @@ function ChildFormComponent({ isBlocking }: { isBlocking: boolean }) {
 
 - Use unique `blockerId` values across your application
 - Provide meaningful `reason` strings for better debugging
-- Use appropriate priority levels (0-100) to control precedence
+- Use appropriate priority levels to control precedence (higher = more important)
 - Combine with `useIsBlocked` to disable UI elements
 - Clean up automatically - the hook handles unmounting
 
@@ -236,7 +236,7 @@ function ChildFormComponent({ isBlocking }: { isBlocking: boolean }) {
 
 - Don't use the same `blockerId` for different blockers
 - Don't change `blockerId` dynamically (use a constant value)
-- Don't set extremely high priority (>95) unless critical
+- Don't set unnecessarily high priority values unless truly critical
 - Don't forget to wrap the isActive logic properly
 
 ## When to Use

@@ -73,23 +73,6 @@ describe("loggerMiddleware", () => {
     );
   });
 
-  it("should log cancel action", () => {
-    const context: MiddlewareContext = {
-      action: "cancel",
-      blockerId: "test-blocker",
-      timestamp: Date.now(),
-    };
-
-    void loggerMiddleware(context);
-
-    expect(consoleLogSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[UIBlocking]"),
-      expect.stringContaining("❌"),
-      expect.stringContaining("test-blocker"),
-      expect.anything()
-    );
-  });
-
   it("should log timeout action", () => {
     const context: MiddlewareContext = {
       action: "timeout",

@@ -301,13 +301,7 @@ describe("createAnalyticsMiddleware", () => {
       const trackMock = vi.fn();
       const middleware = createAnalyticsMiddleware({ track: trackMock });
 
-      const actions: Array<MiddlewareContext["action"]> = [
-        "add",
-        "remove",
-        "update",
-        "cancel",
-        "timeout",
-      ];
+      const actions: Array<MiddlewareContext["action"]> = ["add", "update", "remove", "timeout"];
 
       actions.forEach((action) => {
         const context: MiddlewareContext = {
@@ -319,11 +313,10 @@ describe("createAnalyticsMiddleware", () => {
         void middleware(context);
       });
 
-      expect(trackMock).toHaveBeenCalledTimes(5);
+      expect(trackMock).toHaveBeenCalledTimes(4);
       expect(trackMock).toHaveBeenCalledWith("ui_blocking_add", expect.anything());
-      expect(trackMock).toHaveBeenCalledWith("ui_blocking_remove", expect.anything());
       expect(trackMock).toHaveBeenCalledWith("ui_blocking_update", expect.anything());
-      expect(trackMock).toHaveBeenCalledWith("ui_blocking_cancel", expect.anything());
+      expect(trackMock).toHaveBeenCalledWith("ui_blocking_remove", expect.anything());
       expect(trackMock).toHaveBeenCalledWith("ui_blocking_timeout", expect.anything());
     });
 
