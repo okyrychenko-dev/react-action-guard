@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2024-12-28
+
+### Documentation
+
+- 📚 **Comprehensive JSDoc documentation** (~90 examples across all hooks and middleware)
+  - All hooks: `useBlocker`, `useIsBlocked`, `useBlockingInfo`, `useAsyncAction`, `useConfirmableBlocker`, `useScheduledBlocker`, `useConditionalBlocker`
+  - All middleware: logger, analytics, performance, configuration
+  - Context/Provider hooks with isolated store examples
+- 🎯 **Examples demonstrate react-action-guard concepts**:
+  - Scope-based isolation and coordination
+  - `useIsBlocked`/`useBlockingInfo` patterns in separate components
+  - Multi-component coordination without prop drilling
+  - Priority-based blocking resolution
+  - Real-world use cases (forms, navigation, async operations)
+- 🔧 **Fixed JSDoc formatting** (removed literal `\n` escape sequences for cleaner TypeDoc generation)
+
 ## [0.6.0] - 2024-12-24
 
 ### Added
@@ -224,7 +240,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.3.3...v0.4.0
@@ -233,6 +250,6 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 [0.3.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.2...v0.2.3
-[0.2.2]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.1...v0.2.2
+[0.2.2]: https://github.com/okyrycheno/react-action-guard/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/okyrychenko/react-action-guard/releases/tag/v0.1.0
