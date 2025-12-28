@@ -721,9 +721,15 @@ function FeatureWithBlockingStates() {
     scope: "premium-feature",
     reason: "Feature not available",
     condition: () => {
-      if (!isFeatureEnabled("premium-features")) return true;
-      if (!hasPermission("premium")) return true;
-      if (!isOnline) return true;
+      if (!isFeatureEnabled("premium-features")) {
+        return true;
+      }
+      if (!hasPermission("premium")) {
+        return true;
+      }
+      if (!isOnline) {
+        return true;
+      }
       return false;
     },
     checkInterval: 1000,

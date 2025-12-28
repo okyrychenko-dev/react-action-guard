@@ -230,8 +230,13 @@ function DataTable() {
     });
   }, []);
 
-  if (isLoading) return <Skeleton />;
-  if (!data.length) return <EmptyState />;
+  if (isLoading) {
+    return <Skeleton />;
+  }
+
+  if (!data.length) {
+    return <EmptyState />;
+  }
 
   return <Table data={data} />;
 }

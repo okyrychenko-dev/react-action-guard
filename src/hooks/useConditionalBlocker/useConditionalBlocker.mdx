@@ -196,21 +196,33 @@ function ComplexForm() {
     reason: "Please complete all required fields correctly",
     condition: () => {
       // Username validation
-      if (formData.username.length < 3) return true;
+      if (formData.username.length < 3) {
+        return true;
+      }
 
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(formData.email)) return true;
+      if (!emailRegex.test(formData.email)) {
+        return true;
+      }
 
       // Password validation
-      if (formData.password.length < 8) return true;
-      if (formData.password !== formData.confirmPassword) return true;
+      if (formData.password.length < 8) {
+        return true;
+      }
+      if (formData.password !== formData.confirmPassword) {
+        return true;
+      }
 
       // Age validation
-      if (formData.age < 18) return true;
+      if (formData.age < 18) {
+        return true;
+      }
 
       // Terms validation
-      if (!formData.agreedToTerms) return true;
+      if (!formData.agreedToTerms) {
+        return true;
+      }
 
       return false; // All validations passed
     },
@@ -273,13 +285,19 @@ function ProtectedFeature() {
     reason: "Access denied",
     condition: () => {
       // Block if user doesn't have required permission
-      if (!permissions.includes("feature:write")) return true;
+      if (!permissions.includes("feature:write")) {
+        return true;
+      }
 
       // Block if offline
-      if (!isOnline) return true;
+      if (!isOnline) {
+        return true;
+      }
 
       // Block if trial expired
-      if (user.trialExpired) return true;
+      if (user.trialExpired) {
+        return true;
+      }
 
       return false;
     },
@@ -324,9 +342,15 @@ function DynamicValidation() {
     scope: "input",
     reason: "Validation rules not met",
     condition: (state: ValidationState) => {
-      if (state.required && value.length === 0) return true;
-      if (value.length < state.minLength) return true;
-      if (value.length > state.maxLength) return true;
+      if (state.required && value.length === 0) {
+        return true;
+      }
+      if (value.length < state.minLength) {
+        return true;
+      }
+      if (value.length > state.maxLength) {
+        return true;
+      }
       return false;
     },
     state: rules, // Pass rules as state
