@@ -36,8 +36,8 @@ pnpm add @okyrychenko-dev/react-action-guard zustand
 
 This package requires the following peer dependencies:
 
-- [React](https://react.dev/) ^17.0.0 || ^18.0.0 || ^19.0.0
-- [Zustand](https://zustand-demo.pmnd.rs/) ^4.5.7 || ^5.0.0 - State management library
+- [React](https://react.dev/) ^18.0.0 || ^19.0.0
+- [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
 
 ## Quick Start
 

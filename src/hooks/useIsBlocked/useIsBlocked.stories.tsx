@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useState } from "react";
+import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
 import { useBlocker } from "../useBlocker";
 import { useIsBlocked } from "./useIsBlocked";
@@ -11,7 +11,9 @@ interface IsBlockedDemoProps {
   scope?: string;
 }
 
-const IsBlockedDemo = ({ scope = "demo-scope" }: IsBlockedDemoProps): JSX.Element => {
+function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
+  const { scope = "demo-scope" } = props;
+
   const [blocker1Active, setBlocker1Active] = useState(false);
   const [blocker2Active, setBlocker2Active] = useState(false);
   const [blocker3Active, setBlocker3Active] = useState(false);
@@ -170,7 +172,7 @@ const IsBlockedDemo = ({ scope = "demo-scope" }: IsBlockedDemoProps): JSX.Elemen
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof IsBlockedDemo> = {
   title: "Hooks/useIsBlocked",

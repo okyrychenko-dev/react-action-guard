@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { AffectedElements, DebugPanel, StoryContainer } from "../../storybook/components";
 import { useIsBlocked } from "../useIsBlocked";
 import { useScheduledBlocker } from "./useScheduledBlocker";
@@ -15,13 +15,15 @@ interface ScheduledBlockerDemoProps {
   durationSeconds?: number;
 }
 
-const ScheduledBlockerDemo = ({
-  blockerId = "scheduled-maintenance",
-  scope = "scheduled-scope",
-  reason = "Scheduled maintenance in progress",
-  delaySeconds = 3,
-  durationSeconds = 5,
-}: ScheduledBlockerDemoProps): JSX.Element => {
+function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
+  const {
+    blockerId = "scheduled-maintenance",
+    scope = "scheduled-scope",
+    reason = "Scheduled maintenance in progress",
+    delaySeconds = 3,
+    durationSeconds = 5,
+  } = props;
+
   const [baseTime] = useState(() => Date.now());
   const scheduledTime = baseTime + delaySeconds * 1000;
   const [countdown, setCountdown] = useState<number>(0);
@@ -109,7 +111,7 @@ const ScheduledBlockerDemo = ({
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof ScheduledBlockerDemo> = {
   title: "Hooks/useScheduledBlocker",

@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useState } from "react";
+import { ReactElement, useState } from "react";
 import {
   DebugPanel,
   StatusDisplay,
@@ -24,16 +24,18 @@ interface ConfirmableBlockerDemoProps {
   shouldFail?: boolean;
 }
 
-const ConfirmableBlockerDemo = ({
-  blockerId = "delete-action",
-  scope = "confirmable-scope",
-  confirmMessage = "Are you sure you want to delete this item?",
-  confirmTitle = "Confirm Delete",
-  confirmButtonText = "Delete",
-  cancelButtonText = "Cancel",
-  delayMs = 1500,
-  shouldFail = false,
-}: ConfirmableBlockerDemoProps): JSX.Element => {
+function ConfirmableBlockerDemo(props: ConfirmableBlockerDemoProps): ReactElement {
+  const {
+    blockerId = "delete-action",
+    scope = "confirmable-scope",
+    confirmMessage = "Are you sure you want to delete this item?",
+    confirmTitle = "Confirm Delete",
+    confirmButtonText = "Delete",
+    cancelButtonText = "Cancel",
+    delayMs = 1500,
+    shouldFail = false,
+  } = props;
+
   const [message, setMessage] = useState<string>("");
   const isBlocked = useIsBlocked(scope);
 
@@ -121,7 +123,7 @@ const ConfirmableBlockerDemo = ({
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof ConfirmableBlockerDemo> = {
   title: "Hooks/useConfirmableBlocker",

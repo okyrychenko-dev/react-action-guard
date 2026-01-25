@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useState } from "react";
+import { ReactElement, useState } from "react";
 import {
   AffectedElements,
   DebugPanel,
@@ -19,13 +19,15 @@ interface BlockerDemoProps {
   initialActive?: boolean;
 }
 
-const BlockerDemo = ({
-  blockerId = "demo-blocker",
-  scope = "demo-scope",
-  reason = "Demo blocking in progress",
-  priority = 20,
-  initialActive = false,
-}: BlockerDemoProps): JSX.Element => {
+function BlockerDemo(props: BlockerDemoProps): ReactElement {
+  const {
+    blockerId = "demo-blocker",
+    scope = "demo-scope",
+    reason = "Demo blocking in progress",
+    priority = 20,
+    initialActive = false,
+  } = props;
+
   const [isActive, setIsActive] = useState(initialActive);
   const isBlocked = useIsBlocked(scope);
 
@@ -51,7 +53,7 @@ const BlockerDemo = ({
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof BlockerDemo> = {
   title: "Hooks/useBlocker",

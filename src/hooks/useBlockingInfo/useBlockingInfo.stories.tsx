@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useState } from "react";
+import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
 import { useBlocker } from "../useBlocker";
 import { useBlockingInfo } from "./useBlockingInfo";
@@ -11,7 +11,9 @@ interface BlockingInfoDemoProps {
   scope?: string;
 }
 
-const BlockingInfoDemo = ({ scope = "checkout" }: BlockingInfoDemoProps): JSX.Element => {
+function BlockingInfoDemo(props: BlockingInfoDemoProps): ReactElement {
+  const { scope = "checkout" } = props;
+
   const [blocker1Active, setBlocker1Active] = useState(false);
   const [blocker2Active, setBlocker2Active] = useState(false);
   const [blocker3Active, setBlocker3Active] = useState(false);
@@ -215,7 +217,7 @@ const BlockingInfoDemo = ({ scope = "checkout" }: BlockingInfoDemoProps): JSX.El
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof BlockingInfoDemo> = {
   title: "Hooks/useBlockingInfo",

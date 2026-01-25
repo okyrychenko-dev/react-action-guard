@@ -1,34 +1,33 @@
 import { formatLogData, getActionEmoji } from "./loggerMiddleware.utils";
-import { Middleware } from "./middleware.types";
-
+import { MiddlewareContext } from "./middleware.types";
 
 const LOG_PREFIX = "[UIBlocking]";
 
 /**
  * Built-in middleware for logging all blocking actions to the console.
- * 
+ *
  * Logs every blocker action (add, remove, update, timeout, clear) with emoji
  * indicators and formatted data. Useful for debugging blocking behavior during
  * development. Automatically disabled in production builds for performance.
- * 
+ *
  * Output format: `[UIBlocking] 🔒 blocker-id {scope: "form", reason: "..."}`
- * 
+ *
  * Emoji indicators:
  * - 🔒 Add
  * - 🔓 Remove
  * - 🔄 Update
  * - ⏰ Timeout
  * - 🧹 Clear/ClearScope
- * 
+ *
  * @example
  * Register logger middleware
  * ```ts
  * import { configureMiddleware, loggerMiddleware } from '@okyrychenko-dev/react-action-guard';
- * 
+ *
  * // Enable logging for all blocking actions
  * configureMiddleware([loggerMiddleware]);
  * ```
- * 
+ *
  * @example
  * Console output examples
  * ```
@@ -37,7 +36,7 @@ const LOG_PREFIX = "[UIBlocking]";
  * [UIBlocking] 🔓 save-form {reason: "Saving..."}
  * [UIBlocking] ⏰ api-timeout {timeout: 30000}
  * ```
- * 
+ *
  * @example
  * Production check pattern
  * ```ts
@@ -48,17 +47,17 @@ const LOG_PREFIX = "[UIBlocking]";
  * }
  * configureMiddleware(middlewares);
  * ```
- * 
+ *
  * @see {@link configureMiddleware} for registering middleware
  * @see {@link Middleware} for middleware function signature
  * @see {@link MiddlewareContext} for available context data
- * 
+ *
  * @public
  * @since 0.6.0
  */
-export const loggerMiddleware: Middleware = (context) => {
+export function loggerMiddleware(context: MiddlewareContext): void {
   const emoji = getActionEmoji(context.action);
   const logData = formatLogData(context);
 
   console.log(LOG_PREFIX, emoji, context.blockerId, logData);
-};
+}

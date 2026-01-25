@@ -1,52 +1,19 @@
-import { JSX } from "react";
-import { type StoredBlocker, useUIBlockingStore } from "../../store";
+import { ReactElement } from "react";
+import { useUIBlockingStore } from "../../store";
 import "./DebugPanel.css";
+import BlockerItem, { BlockerEntry } from "./BlockerItem";
 
 interface DebugPanelProps {
   title?: string;
   showEmpty?: boolean;
 }
 
-interface BlockerEntry {
-  id: string;
-  blocker: StoredBlocker;
-}
+function DebugPanel(props: DebugPanelProps): ReactElement {
+  const { title = "🔍 Debug Panel", showEmpty = true } = props;
 
-const formatScope = (scope: string | ReadonlyArray<string>): string => {
-  return Array.isArray(scope) ? scope.join(", ") : (scope as string);
-};
-
-const BlockerItem = ({ id, blocker }: BlockerEntry): JSX.Element => (
-  <div className="blocker">
-    <div className="field">
-      <span className="label">ID:</span>
-      <span className="value">{id}</span>
-    </div>
-    <div className="field">
-      <span className="label">Scope:</span>
-      <span className="value">{formatScope(blocker.scope)}</span>
-    </div>
-    <div className="field">
-      <span className="label">Reason:</span>
-      <span className="value">{blocker.reason}</span>
-    </div>
-    <div className="field">
-      <span className="label">Priority:</span>
-      <span className="value">{blocker.priority}</span>
-    </div>
-  </div>
-);
-
-export const DebugPanel = ({
-  title = "🔍 Debug Panel",
-  showEmpty = true,
-}: DebugPanelProps): JSX.Element => {
   const activeBlockers = useUIBlockingStore((state) => state.activeBlockers);
   const blockerEntries: Array<BlockerEntry> = Array.from(activeBlockers.entries()).map(
-    ([id, blocker]): BlockerEntry => ({
-      id,
-      blocker,
-    })
+    ([id, blocker]): BlockerEntry => ({ id, blocker })
   );
 
   return (
@@ -68,4 +35,6 @@ export const DebugPanel = ({
       )}
     </div>
   );
-};
+}
+
+export default DebugPanel;

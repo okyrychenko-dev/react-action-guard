@@ -502,7 +502,7 @@ Under the hood, `useIsBlocked`:
 
 ```typescript
 // Simplified implementation
-export const useIsBlocked = (scope?: string | string[]): boolean => {
+export function useIsBlocked(scope?: string | string[]): boolean {
   return useUIBlockingStore((state) => {
     const blockers = Array.from(state.activeBlockers.values());
 
@@ -519,7 +519,7 @@ export const useIsBlocked = (scope?: string | string[]): boolean => {
     // Check specific scope
     return blockers.some((blocker) => blocker.scope === scope || blocker.scope === "global");
   });
-};
+}
 ```
 
 ## Scope Resolution Rules

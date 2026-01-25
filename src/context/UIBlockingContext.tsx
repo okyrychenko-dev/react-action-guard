@@ -7,11 +7,11 @@ import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
 /**
  * Props for the {@link UIBlockingProvider} component.
- * 
+ *
  * Configures an isolated UI blocking store instance for a subtree of your app.
  * Useful for SSR, testing, micro-frontends, or any scenario where you need
  * independent blocking state.
- * 
+ *
  * @public
  * @since 0.6.0
  */
@@ -39,31 +39,31 @@ const {
 
 /**
  * Provider component for isolated UI blocking state management.
- * 
+ *
  * Creates an independent store instance for a subtree of your application.
  * Each provider has its own isolated blocking state, separate from the global
  * store and other provider instances.
- * 
+ *
  * **Use cases:**
  * - Server-Side Rendering (SSR) - Avoid state sharing between requests
  * - Testing - Isolated state for each test
  * - Micro-frontends - Independent blocking state per micro-app
  * - Modals/Dialogs - Scoped blocking within a dialog
- * 
+ *
  * Uses `createStoreProvider` from `@okyrychenko-dev/react-zustand-toolkit` with
  * built-in DevTools support and middleware registration.
- * 
+ *
  * @param props - Provider configuration
  * @param props.children - React children to wrap with the provider
  * @param props.enableDevtools - Enable Redux DevTools integration. Defaults to true in development, false in production.
  * @param props.devtoolsName - Name displayed in Redux DevTools. Defaults to "UIBlocking".
  * @param props.middlewares - Array of middleware functions to register on store creation
- * 
+ *
  * @example
  * Basic SSR setup
  * ```tsx
  * import { UIBlockingProvider } from '@okyrychenko-dev/react-action-guard';
- * 
+ *
  * function App() {
  *   return (
  *     <UIBlockingProvider>
@@ -72,12 +72,12 @@ const {
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * With middleware and custom DevTools name
  * ```tsx
  * import { UIBlockingProvider, loggerMiddleware } from '@okyrychenko-dev/react-action-guard';
- * 
+ *
  * function App() {
  *   return (
  *     <UIBlockingProvider
@@ -90,7 +90,7 @@ const {
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * Multiple providers for micro-frontends
  * ```tsx
@@ -100,7 +100,7 @@ const {
  *       <UIBlockingProvider devtoolsName="MicroApp1">
  *         <MicroApp1 />
  *       </UIBlockingProvider>
- *       
+ *
  *       <UIBlockingProvider devtoolsName="MicroApp2">
  *         <MicroApp2 />
  *       </UIBlockingProvider>
@@ -108,14 +108,14 @@ const {
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * Testing with isolated state
  * ```tsx
  * // In your test file
  * import { render } from '@testing-library/react';
  * import { UIBlockingProvider } from '@okyrychenko-dev/react-action-guard';
- * 
+ *
  * test('blocker behavior', () => {
  *   render(
  *     <UIBlockingProvider enableDevtools={false}>
@@ -125,11 +125,11 @@ const {
  *   // Each test gets isolated state
  * });
  * ```
- * 
+ *
  * @see {@link useUIBlockingContext} to access the store from context
  * @see {@link useIsInsideUIBlockingProvider} to check if inside a provider
  * @see {@link UIBlockingProviderProps} for prop details
- * 
+ *
  * @public
  * @since 0.6.0
  */
@@ -156,7 +156,6 @@ export function UIBlockingProvider({
     </BaseUIBlockingProvider>
   );
 }
-
 
 /**
  * Hook to access the store API from {@link UIBlockingProvider} context.

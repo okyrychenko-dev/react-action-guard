@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX } from "react";
+import { ReactElement } from "react";
 import {
   AffectedElements,
   DebugPanel,
@@ -20,12 +20,14 @@ interface AsyncActionDemoProps {
   shouldFail?: boolean;
 }
 
-const AsyncActionDemo = ({
-  actionId = "save-data",
-  scope = "async-scope",
-  delayMs = 2000,
-  shouldFail = false,
-}: AsyncActionDemoProps): JSX.Element => {
+function AsyncActionDemo(props: AsyncActionDemoProps): ReactElement {
+  const {
+    actionId = "save-data",
+    scope = "async-scope",
+    delayMs = 2000,
+    shouldFail = false,
+  } = props;
+
   const isBlocked = useIsBlocked(scope);
 
   const executeWithBlocking = useAsyncAction(actionId, scope);
@@ -63,7 +65,7 @@ const AsyncActionDemo = ({
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof AsyncActionDemo> = {
   title: "Hooks/useAsyncAction",

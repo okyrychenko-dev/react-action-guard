@@ -1,6 +1,6 @@
 import { MiddlewareBlockerConfig, MiddlewareContext } from "./middleware.types";
 
-export const getActionEmoji = (action: string): string => {
+export function getActionEmoji(action: string): string {
   switch (action) {
     case "add":
       return "➕";
@@ -17,9 +17,9 @@ export const getActionEmoji = (action: string): string => {
     default:
       return "❓";
   }
-};
+}
 
-const extractConfigDetails = (config?: MiddlewareBlockerConfig): Record<string, unknown> => {
+function extractConfigDetails(config?: MiddlewareBlockerConfig): Record<string, unknown> {
   if (!config) {
     return {};
   }
@@ -36,9 +36,9 @@ const extractConfigDetails = (config?: MiddlewareBlockerConfig): Record<string, 
   }
 
   return details;
-};
+}
 
-export const formatLogData = (context: MiddlewareContext): Record<string, unknown> => {
+export function formatLogData(context: MiddlewareContext): Record<string, unknown> {
   const configDetails = extractConfigDetails(context.config);
 
   const logData: Record<string, unknown> = {};
@@ -69,4 +69,4 @@ export const formatLogData = (context: MiddlewareContext): Record<string, unknow
   }
 
   return Object.keys(logData).length === 1 && logData.config ? configDetails : logData;
-};
+}

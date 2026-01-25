@@ -1,13 +1,6 @@
 import { StateCreator, StoreApi, StoreMutators, createStore, useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-
-export interface ShallowStoreBindings<StoreState> {
-  useStore: {
-    (): StoreState;
-    <T>(selector: (state: StoreState) => T): T;
-  };
-  useStoreApi: StoreApi<StoreState>;
-}
+import { ShallowStoreBindings } from "./uiBlockingStore.types";
 
 /**
  * Creates a Zustand store with automatic shallow comparison for all selectors

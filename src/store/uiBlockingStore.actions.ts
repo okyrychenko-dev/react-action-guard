@@ -12,25 +12,27 @@ import type { StateCreator } from "zustand";
 /**
  * Normalize priority value to ensure it's non-negative
  */
-const normalizePriority = (priority?: number, fallback: number = DEFAULT_PRIORITY): number => {
+function normalizePriority(priority?: number, fallback: number = DEFAULT_PRIORITY): number {
   return priority !== undefined ? Math.max(0, priority) : fallback;
-};
+}
 
 /**
  * Create middleware context object
  */
-const createMiddlewareContext = (
+function createMiddlewareContext(
   action: BlockingAction,
   blockerId: string,
   config?: Partial<BlockerConfig>,
   prevState?: Partial<StoredBlocker>
-): MiddlewareContext => ({
-  action,
-  blockerId,
-  config,
-  timestamp: Date.now(),
-  ...(prevState && { prevState }),
-});
+): MiddlewareContext {
+  return {
+    action,
+    blockerId,
+    config,
+    timestamp: Date.now(),
+    ...(prevState && { prevState }),
+  };
+}
 
 /**
  * UI Blocking Store Slice
@@ -77,14 +79,14 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
   // Actions
   /**
    * Adds a new blocker or overwrites an existing one.
-   * 
+   *
    * If a blocker with the same ID already exists, it will be replaced and any
    * existing timeout will be cleared. The blocker is active immediately after
    * being added. Triggers middleware with 'add' action.
-   * 
+   *
    * @param id - Unique identifier for the blocker. Must be unique within the store.
    * @param config - Blocker configuration. All fields are optional with defaults applied.
-   * 
+   *
    * @example
    * Basic usage
    * ```ts
@@ -94,7 +96,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   priority: 70
    * });
    * ```
-   * 
+   *
    * @example
    * With timeout
    * ```ts
@@ -105,7 +107,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   onTimeout: (id) => console.warn(`${id} timed out`)
    * });
    * ```
-   * 
+   *
    * @see {@link removeBlocker} to remove a blocker
    * @see {@link updateBlocker} to update an existing blocker
    */
@@ -170,13 +172,13 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Updates an existing blocker or creates it if it doesn't exist.
-   * 
+   *
    * Merges the provided configuration with existing blocker data. If the timeout
    * is changed, the timeout timer is restarted. Triggers middleware with 'update' action.
-   * 
+   *
    * @param id - Identifier of the blocker to update
    * @param config - Partial configuration to merge with existing blocker data
-   * 
+   *
    * @example
    * Update blocker reason
    * ```ts
@@ -184,7 +186,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   reason: 'Saving additional data...'
    * });
    * ```
-   * 
+   *
    * @example
    * Extend timeout
    * ```ts
@@ -192,7 +194,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   timeout: 60000 // Extend to 60 seconds
    * });
    * ```
-   * 
+   *
    * @see {@link addBlocker} to create a new blocker
    */
   updateBlocker: (id: string, config: Partial<BlockerConfig> = {}): void => {
@@ -284,12 +286,12 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Removes a blocker from the store.
-   * 
+   *
    * Clears any associated timeout and triggers middleware with 'remove' action.
    * Safe to call even if the blocker doesn't exist (no-op in that case).
-   * 
+   *
    * @param id - Identifier of the blocker to remove
-   * 
+   *
    * @example
    * ```ts
    * // Add and remove a blocker
@@ -297,7 +299,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    * // ... later
    * store.getState().removeBlocker('temp');
    * ```
-   * 
+   *
    * @see {@link addBlocker} to add a blocker
    * @see {@link clearAllBlockers} to remove all blockers at once
    */
@@ -323,28 +325,28 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Checks if one or more scopes are currently blocked.
-   * 
+   *
    * Returns true if ANY blocker affects the specified scope(s). Global scope
    * blockers will cause this to return true for any scope check.
-   * 
+   *
    * @param scope - Scope(s) to check. Defaults to "global" if not specified.
    *                Can be a single scope string or array of scopes.
    * @returns true if any of the specified scopes are currently blocked
-   * 
+   *
    * @example
    * Single scope check
    * ```ts
    * const isFormBlocked = store.getState().isBlocked('form');
    * console.log(isFormBlocked); // true or false
    * ```
-   * 
+   *
    * @example
    * Multiple scopes check
    * ```ts
    * const isBlocked = store.getState().isBlocked(['form', 'navigation']);
    * // Returns true if either 'form' OR 'navigation' has active blockers
    * ```
-   * 
+   *
    * @see {@link getBlockingInfo} for detailed blocker information
    */
   isBlocked: (scope: string | ReadonlyArray<string> = DEFAULT_SCOPE): boolean => {
@@ -370,14 +372,14 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Gets detailed information about all blockers affecting a specific scope.
-   * 
+   *
    * Returns an array of blocker objects sorted by priority (highest first).
    * Includes global blockers and scope-specific blockers. Each blocker object
    * contains id, reason, priority, scope, timestamp, and timeout information.
-   * 
+   *
    * @param scope - Scope to get blocking information for
    * @returns Array of {@link BlockerInfo} objects, sorted by priority descending
-   * 
+   *
    * @example
    * Display blocker details
    * ```ts
@@ -387,7 +389,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   console.log(`Priority: ${blocker.priority}`);
    * });
    * ```
-   * 
+   *
    * @example
    * Get highest priority blocker
    * ```ts
@@ -397,7 +399,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    *   console.log(`Top blocker: ${topBlocker.reason}`);
    * }
    * ```
-   * 
+   *
    * @see {@link isBlocked} for a simple boolean check
    * @see {@link BlockerInfo} for the structure of returned objects
    */
@@ -418,16 +420,16 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Removes all active blockers from the store.
-   * 
+   *
    * Clears all timeouts and triggers middleware with 'clear' action.
    * Useful for resetting the blocking state.
-   * 
+   *
    * @example
    * ```ts
    * // Clear all blockers on logout
    * store.getState().clearAllBlockers();
    * ```
-   * 
+   *
    * @see {@link clearBlockersForScope} to clear blockers for a specific scope
    */
   clearAllBlockers: (): void => {
@@ -456,26 +458,26 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
   /**
    * Removes all blockers that affect a specific scope.
-   * 
+   *
    * Clears timeouts for removed blockers and triggers middleware with
    * 'clear_scope' action. Global scope blockers are NOT cleared by this method.
-   * 
+   *
    * @param scope - Scope to clear blockers for
-   * 
+   *
    * @example
    * Clear form blockers
    * ```ts
    * // Clear all blockers affecting 'form' scope
    * store.getState().clearBlockersForScope('form');
    * ```
-   * 
+   *
    * @example
    * Clear on navigation
    * ```ts
    * // Clear navigation blockers when user navigates away
    * store.getState().clearBlockersForScope('navigation');
    * ```
-   * 
+   *
    * @see {@link clearAllBlockers} to clear all blockers
    */
   clearBlockersForScope: (scope: string): void => {

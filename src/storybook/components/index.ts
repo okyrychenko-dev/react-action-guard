@@ -1,5 +1,5 @@
-export { AffectedElements } from "./AffectedElements";
-export { DebugPanel } from "./DebugPanel";
-export { StatusDisplay } from "./StatusDisplay";
-export { StoryContainer } from "./StoryContainer";
+export { default as AffectedElements } from "./AffectedElements";
+export { default as DebugPanel } from "./DebugPanel";
+export { default as StatusDisplay } from "./StatusDisplay";
+export { default as StoryContainer } from "./StoryContainer";
 export { formatErrorMessage, simulateAsyncOperation } from "./storyHelpers";

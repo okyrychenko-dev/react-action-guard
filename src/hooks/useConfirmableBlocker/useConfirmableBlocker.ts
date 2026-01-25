@@ -7,18 +7,18 @@ import {
 
 /**
  * Creates a blocker that requires user confirmation before executing an action.
- * 
+ *
  * Manages a confirmation dialog and blocking state for actions that need user approval.
  * The blocker is active during both the confirmation dialog display and action execution.
- * 
+ *
  * Workflow:
  * 1. Call `execute()` to show confirmation dialog (blocker activated)
  * 2. User confirms → `onConfirm` callback runs (blocker remains active)
  * 3. Action completes → blocker removed
  * 4. User cancels → blocker removed, optional `onCancel` callback runs
- * 
+ *
  * Works with both the global store and isolated provider instances (via UIBlockingProvider).
- * 
+ *
  * @param blockerId - Unique identifier for this confirmable blocker
  * @param config - Configuration for the confirmable action
  * @param config.confirmMessage - Message to display in the confirmation dialog
@@ -30,7 +30,7 @@ import {
  * @param config.scope - Scope(s) to block during confirmation and execution
  * @param config.reason - Optional custom blocking reason (defaults to confirmMessage)
  * @param config.priority - Optional blocker priority (0-100)
- * 
+ *
  * @returns Object containing:
  * - `execute`: Function to trigger the confirmation dialog
  * - `isDialogOpen`: Boolean indicating if confirmation dialog is visible
@@ -38,7 +38,7 @@ import {
  * - `confirmConfig`: Dialog configuration (title, message, button texts)
  * - `onConfirm`: Function to call when user confirms
  * - `onCancel`: Function to call when user cancels
- * 
+ *
  * @example
  * Delete confirmation with custom dialog
  * ```tsx
@@ -58,13 +58,13 @@ import {
  *       console.log('Delete cancelled');
  *     }
  *   });
- *   
+ *
  *   return (
  *     <>
  *       <button onClick={confirmableDelete.execute}>
  *         Delete
  *       </button>
- *       
+ *
  *       {confirmableDelete.isDialogOpen && (
  *         <ConfirmDialog
  *           {...confirmableDelete.confirmConfig}
@@ -77,7 +77,7 @@ import {
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * Simple confirmation with default dialog
  * ```tsx
@@ -90,11 +90,11 @@ import {
  *       navigate('/login');
  *     }
  *   });
- *   
+ *
  *   return (
  *     <>
  *       <button onClick={confirmLogout.execute}>Logout</button>
- *       
+ *
  *       {confirmLogout.isDialogOpen && (
  *         <Dialog
  *           title={confirmLogout.confirmConfig.title}
@@ -107,7 +107,7 @@ import {
  *   );
  * }
  * ```
- * 
+ *
  * @example
  * With loading state during execution
  * ```tsx
@@ -119,9 +119,9 @@ import {
  *       await saveAllChanges();
  *     }
  *   });
- *   
+ *
  *   return (
- *     <button 
+ *     <button
  *       onClick={confirmSave.execute}
  *       disabled={confirmSave.isExecuting}
  *     >
@@ -130,18 +130,18 @@ import {
  *   );
  * }
  * ```
- * 
+ *
  * @see {@link useBlocker} for simple blocking without confirmation
  * @see {@link ConfirmableBlockerConfig} for configuration options
  * @see {@link UseConfirmableBlockerReturn} for return value structure
- * 
+ *
  * @public
  * @since 0.6.0
  */
-export const useConfirmableBlocker = (
+export function useConfirmableBlocker(
   blockerId: string,
   config: ConfirmableBlockerConfig
-): UseConfirmableBlockerReturn => {
+): UseConfirmableBlockerReturn {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
 
@@ -190,4 +190,4 @@ export const useConfirmableBlocker = (
     onConfirm,
     onCancel,
   };
-};
+}

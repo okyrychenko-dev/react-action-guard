@@ -21,7 +21,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.stringContaining("[UIBlocking]"),
@@ -38,7 +38,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.stringContaining("[UIBlocking]"),
@@ -63,7 +63,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.stringContaining("[UIBlocking]"),
@@ -80,7 +80,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.stringContaining("[UIBlocking]"),
@@ -102,7 +102,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     expect(consoleLogSpy).toHaveBeenCalledWith(
       expect.anything(),
@@ -131,7 +131,7 @@ describe("loggerMiddleware", () => {
       timestamp: Date.now(),
     };
 
-    void loggerMiddleware(context);
+    loggerMiddleware(context);
 
     const result: Partial<MiddlewareContext> = {
       config: {

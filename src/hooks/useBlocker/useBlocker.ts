@@ -4,12 +4,12 @@ import type { BlockerConfig } from "../../store";
 
 /**
  * Automatically manages a UI blocker based on component lifecycle.
- * 
+ *
  * Creates a blocker that is automatically added when the condition is true
  * and removed when the component unmounts or condition becomes false.
  * Supports scoped blocking, priorities, timeouts, and works with both
  * global store and isolated provider instances.
- * 
+ *
  * @param blockerId - Unique identifier for this blocker. Must be unique within the scope.
  * @param config - Configuration object for the blocker
  * @param config.scope - Scope(s) to block. Can be a single scope string (e.g., "form", "navigation")
@@ -22,13 +22,13 @@ import type { BlockerConfig } from "../../store";
  * @param config.onTimeout - Callback function invoked when the blocker times out
  * @param isActive - When true, blocker is active; when false, blocker is removed.
  *                   Defaults to true. Use this for conditional blocking.
- * 
+ *
  * @example
  * Basic form submission blocking
  * ```tsx
  * function MyForm() {
  *   const [isSubmitting, setIsSubmitting] = useState(false);
- *   
+ *
  *   useBlocker('form-submit', {
  *     scope: 'form',
  *     reason: 'Submitting form...',
@@ -39,11 +39,11 @@ import type { BlockerConfig } from "../../store";
  *       setIsSubmitting(false);
  *     }
  *   }, isSubmitting);
- *   
+ *
  *   return <form onSubmit={handleSubmit}>...</form>;
  * }
  * ```
- * 
+ *
  * @example
  * Multiple scopes with high priority
  * ```tsx
@@ -53,32 +53,32 @@ import type { BlockerConfig } from "../../store";
  *   priority: 90,
  * }, isSaving);
  * ```
- * 
+ *
  * @example
  * Conditional blocking based on unsaved changes
  * ```tsx
  * function Editor() {
  *   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
- *   
+ *
  *   useBlocker('unsaved-changes', {
  *     scope: 'navigation',
  *     reason: 'You have unsaved changes',
  *     priority: 80,
  *   }, hasUnsavedChanges);
- *   
+ *
  *   return <div>...</div>;
  * }
  * ```
- * 
+ *
  * @see {@link useIsBlocked} to check if a scope is currently blocked
  * @see {@link useBlockingInfo} to get detailed blocker information
  * @see {@link useAsyncAction} for async operation wrapping with automatic blocking
  * @see {@link useConfirmableBlocker} for blockers that require user confirmation
- * 
+ *
  * @public
  * @since 0.6.0
  */
-export const useBlocker = (blockerId: string, config: BlockerConfig, isActive = true): void => {
+export function useBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
   const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
@@ -96,4 +96,4 @@ export const useBlocker = (blockerId: string, config: BlockerConfig, isActive = 
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockerId, isActive, addBlocker, removeBlocker]);
-};
+}

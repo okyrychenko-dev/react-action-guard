@@ -1,0 +1,100 @@
+/* Scope Synchronization Story Styles */
+
+.hero {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 24px;
+  border-radius: 12px;
+  color: white;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.hero h3 {
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  color: white;
+}
+
+.hero p {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  opacity: 0.95;
+}
+
+.code-example {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 16px;
+  border-radius: 8px;
+  text-align: left;
+}
+
+.code-example code {
+  display: block;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', monospace;
+  font-size: 13px;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.code-example code:last-child {
+  margin-bottom: 0;
+}
+
+.sync-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+
+.sync-card {
+  padding: 20px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s;
+}
+
+.sync-card-blocked {
+  border-color: #f44336;
+  background: #ffebee;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.sync-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+}
+
+.sync-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.sync-status {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.sync-card:not(.sync-card-blocked) .sync-status {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.sync-card-blocked .sync-status {
+  background: #ffcdd2;
+  color: #c62828;
+}
+
+.sync-desc {
+  font-size: 13px;
+  color: #666;
+  margin: 8px 0 0 0;
+}

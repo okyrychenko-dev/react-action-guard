@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-01-25
+
+### Breaking Changes
+
+- ⚠️ **Updated minimum peer dependency versions**:
+  - React: `^18.0.0 || ^19.0.0` (removed React 17 support)
+  - Zustand: `^5.0.0` (removed Zustand 4.x support)
+
+### Added
+
+- 🧩 **New Storybook components** for enhanced interactive documentation:
+  - `BlockerItem` - Reusable component for displaying blocker details
+  - `ConfirmDialog` - Confirmation dialog component with customizable styling
+  - `ScopeSync` - CSS styles for multi-component scope coordination examples
+
+### Changed
+
+- ♻️ **Code quality improvements**:
+  - Converted all `export const` function declarations to `export function` for consistency
+  - Standardized component props destructuring pattern in story files
+  - Migrated from `JSX` to `ReactElement` type imports for better type clarity
+  - Converted utility arrow functions to function declarations (`normalizePriority`, `createMiddlewareContext`)
+- 🏗️ **Type organization**: Moved `ShallowStoreBindings` interface to `uiBlockingStore.types.ts` for better structure
+- 🔧 **ESLint configuration**: Added `curly: ["error", "all"]` rule to enforce explicit block statements
+- 🎨 **Documentation**: Updated code samples in MDX files to reflect function declaration syntax
+- 📦 **Dependencies**: Updated `@okyrychenko-dev/react-zustand-toolkit` to `^0.2.0`
+
+### Fixed
+
+- 📝 Cleaned up trailing whitespace in JSDoc comments across all files
+
 ## [0.6.1] - 2024-12-28
 
 ### Documentation
@@ -97,8 +128,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - ⬆️ Updated peer dependencies to support React 19
-  - React: `^17.0.0 || ^18.0.0 || ^19.0.0`
-  - Zustand: `^4.5.7 || ^5.0.0`
+  - React: `^18.0.0 || ^19.0.0`
+  - Zustand: `^5.0.0`
 - 🔧 All hooks now use `useResolvedStore` / `useResolvedStoreWithSelector` for Provider support
 
 ## [0.3.3] - 2025-12-01
@@ -240,7 +271,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.4.0...v0.5.0

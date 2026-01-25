@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { JSX, useState } from "react";
+import { ReactElement, useState } from "react";
 import { AffectedElements, DebugPanel, StoryContainer } from "../../storybook/components";
 import { useIsBlocked } from "../useIsBlocked";
 import { useConditionalBlocker } from "./useConditionalBlocker";
@@ -15,13 +15,15 @@ interface ConditionalBlockerDemoProps {
   checkIntervalMs?: number;
 }
 
-const ConditionalBlockerDemo = ({
-  blockerId = "condition-blocker",
-  scope = "conditional-scope",
-  reason = "Value exceeds threshold",
-  threshold = 50,
-  checkIntervalMs = 1000,
-}: ConditionalBlockerDemoProps): JSX.Element => {
+function ConditionalBlockerDemo(props: ConditionalBlockerDemoProps): ReactElement {
+  const {
+    blockerId = "condition-blocker",
+    scope = "conditional-scope",
+    reason = "Value exceeds threshold",
+    threshold = 50,
+    checkIntervalMs = 1000,
+  } = props;
+
   const [value, setValue] = useState(0);
   const isBlocked = useIsBlocked(scope);
 
@@ -103,7 +105,7 @@ const ConditionalBlockerDemo = ({
       <DebugPanel />
     </StoryContainer>
   );
-};
+}
 
 const meta: Meta<typeof ConditionalBlockerDemo> = {
   title: "Hooks/useConditionalBlocker",
