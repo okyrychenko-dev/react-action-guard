@@ -1,5 +1,5 @@
 import { clsx } from "clsx";
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useMemo, useState } from "react";
 import { AffectedElements, DebugPanel, StoryContainer } from "../../storybook/components";
 import { useIsBlocked } from "../useIsBlocked";
 import { useScheduledBlocker } from "./useScheduledBlocker";
@@ -24,13 +24,24 @@ function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
     durationSeconds = 5,
   } = props;
 
-  const [baseTime] = useState(() => Date.now());
-  const scheduledTime = baseTime + delaySeconds * 1000;
+  const [baseTime, setBaseTime] = useState(() => Date.now());
+  const scheduledTime = useMemo(() => {
+    return baseTime + delaySeconds * 1000;
+  }, [baseTime, delaySeconds]);
+  const storyBlockerId = useMemo(() => {
+    return `${blockerId}-${baseTime.toString()}-${delaySeconds.toString()}-${durationSeconds.toString()}`;
+  }, [blockerId, baseTime, delaySeconds, durationSeconds]);
   const [countdown, setCountdown] = useState<number>(0);
   const [scheduleStarted, setScheduleStarted] = useState(false);
   const [scheduleEnded, setScheduleEnded] = useState(false);
 
   const isBlocked = useIsBlocked(scope);
+
+  useEffect(() => {
+    setBaseTime(Date.now());
+    setScheduleStarted(false);
+    setScheduleEnded(false);
+  }, [blockerId, delaySeconds, durationSeconds, reason, scope]);
 
   useEffect(() => {
     if (!scheduledTime) {
@@ -53,7 +64,7 @@ function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
     };
   }, [scheduledTime]);
 
-  useScheduledBlocker(blockerId, {
+  useScheduledBlocker(storyBlockerId, {
     scope,
     reason,
     schedule: {

@@ -21,7 +21,7 @@ function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
   // Check different scopes
   const isBlockedDemo = useIsBlocked(scope);
   const isBlockedGlobal = useIsBlocked("global");
-  const isBlockedAny = useIsBlocked();
+  const isBlockedScopeOrGlobal = useIsBlocked([scope, "global"]);
 
   // Individual blockers
   useBlocker("blocker-1", { scope, reason: "Blocker 1 active" }, blocker1Active);
@@ -107,14 +107,19 @@ function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
           </div>
         </div>
 
-        <div className={clsx("statusCard", isBlockedAny ? "statusCardBlocked" : "statusCardReady")}>
+        <div
+          className={clsx(
+            "statusCard",
+            isBlockedScopeOrGlobal ? "statusCardBlocked" : "statusCardReady"
+          )}
+        >
           <div className="statusRow">
-            <span className="statusIcon">{isBlockedAny ? "🔒" : "✅"}</span>
+            <span className="statusIcon">{isBlockedScopeOrGlobal ? "🔒" : "✅"}</span>
             <div>
-              <code className="statusCode">useIsBlocked()</code>
+              <code className="statusCode">useIsBlocked([scope, &quot;global&quot;])</code>
               <div className="statusState">
-                <strong>{isBlockedAny ? "BLOCKED" : "NOT BLOCKED"}</strong>
-                <span className="statusStateNote">(any scope)</span>
+                <strong>{isBlockedScopeOrGlobal ? "BLOCKED" : "NOT BLOCKED"}</strong>
+                <span className="statusStateNote">(multi-scope check)</span>
               </div>
             </div>
           </div>
@@ -134,7 +139,11 @@ function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
             active
           </li>
           <li>
-            <code>useIsBlocked()</code> - Returns true if ANY blocker is active (any scope)
+            <code>useIsBlocked()</code> - Defaults to <code>&quot;global&quot;</code> scope
+          </li>
+          <li>
+            <code>useIsBlocked([scope, &quot;global&quot;])</code> -
+            Returns true when either scope is blocked
           </li>
         </ul>
       </div>
@@ -191,7 +200,7 @@ const meta: Meta<typeof IsBlockedDemo> = {
   argTypes: {
     scope: {
       control: "text",
-      description: "Scope to check. If omitted, checks all scopes.",
+      description: "Scope to check. If omitted, checks global scope.",
       table: {
         type: { summary: "string | string[] | undefined" },
         defaultValue: { summary: "demo-scope" },

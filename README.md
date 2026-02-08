@@ -65,7 +65,7 @@ npm run storybook
 
 ### Hooks
 
-#### `useBlocker(blockerId, config, isActive)`
+#### `useBlocker(blockerId, config, isActive?)`
 
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
@@ -79,6 +79,8 @@ Automatically adds a blocker when the component mounts and removes it on unmount
   - `timeout?: number` - Auto-remove after N milliseconds
   - `onTimeout?: (blockerId: string) => void` - Callback when auto-removed
 - `isActive?: boolean` - Whether the blocker is active (default: true)
+
+When `isActive` is `true`, changing `config` updates the existing blocker via `updateBlocker` without requiring unmount/remount.
 
 **Example:**
 
@@ -604,6 +606,9 @@ configureMiddleware([
 ```
 
 Note: `configureMiddleware` registers middleware on the global store. If you use `UIBlockingProvider`, register middleware via the provider's `middlewares` prop instead.
+Each `configureMiddleware(...)` call replaces previously configured global middlewares (`middleware-*`) and keeps provider-level middlewares untouched.
+
+Analytics middleware is SSR-safe: in non-browser environments it becomes a no-op for `ga`, `mixpanel`, and `amplitude` providers.
 
 ### Custom Middleware
 

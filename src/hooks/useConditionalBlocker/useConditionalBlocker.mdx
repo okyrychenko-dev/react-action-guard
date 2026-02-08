@@ -39,10 +39,11 @@ useConditionalBlocker(
 ### ConditionalBlockerConfig
 
 ```typescript
-interface ConditionalBlockerConfig extends BlockerConfig {
-  condition: (state?: any) => boolean; // Condition to evaluate
+interface ConditionalBlockerConfig<TState = unknown> extends Omit<BlockerConfig, "scope"> {
+  scope: string | ReadonlyArray<string>; // Required scope(s) to block
+  condition: (state?: TState) => boolean; // Condition to evaluate
   checkInterval?: number; // Check frequency in ms (default: 1000)
-  state?: any; // Optional state to pass to condition
+  state?: TState; // Optional state to pass to condition
 }
 ```
 

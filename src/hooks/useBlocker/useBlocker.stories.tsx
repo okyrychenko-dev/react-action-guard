@@ -98,7 +98,7 @@ const meta: Meta<typeof BlockerDemo> = {
       description: "Priority level (higher = more important, no upper limit)",
       table: {
         type: { summary: "number" },
-        defaultValue: { summary: "50" },
+        defaultValue: { summary: "20" },
       },
     },
     initialActive: {

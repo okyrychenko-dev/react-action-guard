@@ -14,7 +14,7 @@ Check if UI is currently blocked for specific scope(s) or globally. This is the 
 - **Scope-specific** checking - check if a particular scope is blocked
 - **Multi-scope** checking - check if any of multiple scopes are blocked
 - **Global** checking - check if the global scope is blocked
-- **Any scope** checking - check if any blocker exists
+- **Default global** checking - when omitted, checks `"global"` scope
 - **Reactive** - automatically re-renders when blocking state changes
 
 This hook is essential for connecting blocking state to your UI components.
@@ -31,7 +31,7 @@ useIsBlocked(scope?: string | string[]): boolean
 
 | Parameter | Type                 | Required | Default     | Description                                       |
 | --------- | -------------------- | -------- | ----------- | ------------------------------------------------- |
-| `scope`   | `string \| string[]` | ❌       | `undefined` | Scope(s) to check. If omitted, checks all scopes. |
+| `scope`   | `string \| string[]` | ❌       | `"global"` | Scope(s) to check. If omitted, checks global scope. |
 
 ### Return Value
 
@@ -45,7 +45,7 @@ Returns `boolean`:
 The hook returns `true` if:
 
 1. **With scope parameter**: Any blocker exists with matching scope OR global scope
-2. **Without scope parameter**: Any blocker exists in any scope
+2. **Without scope parameter**: Any blocker affects global scope (including direct `"global"` blockers)
 3. **With array of scopes**: Any blocker exists with any of the specified scopes OR global scope
 
 ## Basic Usage
@@ -161,17 +161,17 @@ function GlobalBlockingIndicator() {
 }
 ```
 
-### Any Scope
+### Default Global Scope
 
-Check if any blocker exists in any scope:
+Check global blocking state by omitting `scope`:
 
 ```tsx
 function AppStatusIndicator() {
-  const isAnyBlocked = useIsBlocked(); // No scope parameter
+  const isGloballyBlocked = useIsBlocked(); // Defaults to "global"
 
   return (
     <StatusBar>
-      {isAnyBlocked ? <span>⚠️ Some features are currently blocked</span> : <span>✅ All systems operational</span>}
+      {isGloballyBlocked ? <span>⚠️ Global actions are currently blocked</span> : <span>✅ Global scope is clear</span>}
     </StatusBar>
   );
 }

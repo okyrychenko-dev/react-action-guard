@@ -25,16 +25,18 @@ Perfect for API calls, form submissions, data fetching, and any async operation 
 ```typescript
 useAsyncAction<T = unknown>(
   actionId: string,
-  scope?: string | ReadonlyArray<string>
+  scope?: string | ReadonlyArray<string>,
+  options?: UseAsyncActionOptions
 ): (asyncFn: () => Promise<T>) => Promise<T>
 ```
 
 ### Parameters
 
-| Parameter  | Type                 | Required | Default    | Description                                                       |
-| ---------- | -------------------- | -------- | ---------- | ----------------------------------------------------------------- |
-| `actionId` | `string`             | ✅       | -          | Unique identifier for this action. Used in blocker ID generation. |
-| `scope`    | `string \| string[]` | ❌       | `'global'` | Scope(s) to block during execution.                               |
+| Parameter  | Type                    | Required | Default    | Description                                                       |
+| ---------- | ----------------------- | -------- | ---------- | ----------------------------------------------------------------- |
+| `actionId` | `string`                | ✅       | -          | Unique identifier for this action. Used in blocker ID generation. |
+| `scope`    | `string \| string[]`    | ❌       | `'global'` | Scope(s) to block during execution.                               |
+| `options`  | `UseAsyncActionOptions` | ❌       | -          | Optional timeout settings (`timeout`, `onTimeout`).               |
 
 ### Return Value
 

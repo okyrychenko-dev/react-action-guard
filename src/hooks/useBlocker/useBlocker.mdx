@@ -23,7 +23,7 @@ The foundation hook for manual UI blocking control. `useBlocker` gives you full 
 useBlocker(
   blockerId: string,
   config: BlockerConfig,
-  isActive: boolean
+  isActive?: boolean
 ): void
 ```
 
@@ -33,22 +33,30 @@ useBlocker(
 | ----------- | --------------- | -------- | -------------------------------------------------------------------------- |
 | `blockerId` | `string`        | ✅       | Unique identifier for this blocker. Must be unique across the application. |
 | `config`    | `BlockerConfig` | ✅       | Configuration object defining scope, reason, and priority.                 |
-| `isActive`  | `boolean`       | ✅       | Controls whether the blocker is currently active.                          |
+| `isActive`  | `boolean`       | ❌       | `true`  | Controls whether the blocker is currently active.                          |
 
 ### BlockerConfig
 
 ```typescript
 interface BlockerConfig {
   /** Scope of the blocker. Can be 'global' or any custom scope name(s) */
-  scope: string | ReadonlyArray<string>;
+  scope?: string | ReadonlyArray<string>;
 
   /** Human-readable reason for blocking (optional) */
   reason?: string;
 
   /** Priority level (default: 0). Higher priority takes precedence */
   priority?: number;
+
+  /** Auto-remove blocker after N milliseconds */
+  timeout?: number;
+
+  /** Optional callback when timeout triggers */
+  onTimeout?: (blockerId: string) => void;
 }
 ```
+
+When `isActive` is `true`, updates to `config` are applied to the active blocker automatically.
 
 ## Basic Usage
 

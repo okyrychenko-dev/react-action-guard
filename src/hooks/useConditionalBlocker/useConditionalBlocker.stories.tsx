@@ -26,8 +26,9 @@ function ConditionalBlockerDemo(props: ConditionalBlockerDemoProps): ReactElemen
 
   const [value, setValue] = useState(0);
   const isBlocked = useIsBlocked(scope);
+  const storyBlockerId = `${blockerId}-${scope}-${reason}-${checkIntervalMs.toString()}-${threshold.toString()}`;
 
-  useConditionalBlocker(blockerId, {
+  useConditionalBlocker(storyBlockerId, {
     scope,
     reason,
     condition: () => value > threshold,

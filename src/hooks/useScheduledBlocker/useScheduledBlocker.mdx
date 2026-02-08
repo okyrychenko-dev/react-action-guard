@@ -46,11 +46,13 @@ interface ScheduledBlockerConfig extends BlockerConfig {
 }
 
 interface BlockingSchedule {
-  start: Date | number; // When to start blocking
-  end?: Date | number; // When to end (optional if duration provided)
+  start: string | Date | number; // When to start blocking
+  end?: string | Date | number; // When to end (optional if duration provided)
   duration?: number; // Duration in ms (optional if end provided)
 }
 ```
+
+If both `duration` and `end` are provided, `duration` takes precedence.
 
 ### Schedule Configuration
 

@@ -29,6 +29,7 @@ export const DynamicTimeoutUpdate: Story = {
     );
 
     const [timeLeft, setTimeLeft] = useState<number | null>(null);
+    const [deadline, setDeadline] = useState<number | null>(null);
     const [isActive, setIsActive] = useState(false);
     const [logs, setLogs] = useState<Array<string>>([]);
 
@@ -37,21 +38,27 @@ export const DynamicTimeoutUpdate: Story = {
     };
 
     useEffect(() => {
+      return () => {
+        removeBlocker("session-demo");
+      };
+    }, [removeBlocker]);
+
+    useEffect(() => {
       const interval = setInterval(() => {
         const info = getBlockingInfo("demo");
-        if (info.length > 0 && info[0]?.timeout) {
-          const elapsed = Date.now() - info[0].timestamp;
-          const remaining = Math.max(0, info[0].timeout - elapsed);
-          setTimeLeft(remaining);
-        } else {
+        if (info.length === 0 || deadline === null) {
           setTimeLeft(null);
+          return;
         }
+
+        const remaining = Math.max(0, deadline - Date.now());
+        setTimeLeft(remaining);
       }, 100);
 
       return () => {
         clearInterval(interval);
       };
-    }, [getBlockingInfo]);
+    }, [deadline, getBlockingInfo]);
 
     const startSession = (): void => {
       addBlocker("session-demo", {
@@ -62,9 +69,11 @@ export const DynamicTimeoutUpdate: Story = {
         onTimeout: () => {
           addLog("⏱️ Session timed out");
           setIsActive(false);
+          setDeadline(null);
         },
       });
       setIsActive(true);
+      setDeadline(Date.now() + 10000);
       addLog("✅ Session started (10s timeout)");
     };
 
@@ -73,6 +82,7 @@ export const DynamicTimeoutUpdate: Story = {
         timeout: 20000, // 20 seconds - timer restarts!
         reason: "Session extended",
       });
+      setDeadline(Date.now() + 20000);
       addLog("🔄 Session extended (20s timeout, timer restarted)");
     };
 
@@ -81,6 +91,7 @@ export const DynamicTimeoutUpdate: Story = {
         timeout: 5000, // 5 seconds - timer restarts!
         reason: "Session shortened",
       });
+      setDeadline(Date.now() + 5000);
       addLog("⏩ Session shortened (5s timeout, timer restarted)");
     };
 
@@ -89,6 +100,7 @@ export const DynamicTimeoutUpdate: Story = {
         timeout: 0, // Clear timeout
         reason: "Timeout cleared",
       });
+      setDeadline(null);
       setTimeLeft(null);
       addLog("🚫 Timeout cleared (blocker still active)");
     };
@@ -96,6 +108,7 @@ export const DynamicTimeoutUpdate: Story = {
     const endSession = (): void => {
       removeBlocker("session-demo");
       setIsActive(false);
+      setDeadline(null);
       setTimeLeft(null);
       addLog("❌ Session ended");
     };

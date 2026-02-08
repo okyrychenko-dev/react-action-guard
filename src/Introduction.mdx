@@ -18,7 +18,7 @@ React Action Guard is a powerful yet simple library for managing UI blocking sta
 - **💬 Confirmable Actions** - Built-in support for confirmation dialogs
 - **🔌 Middleware System** - Extend functionality with custom middleware
 - **📦 TypeScript** - Fully typed for the best developer experience
-- **🪶 Lightweight** - Minimal bundle size with zero dependencies (except React and Zustand)
+- **🪶 Lightweight** - Minimal bundle size with focused runtime dependencies
 
 ## 📚 Core Concepts
 
@@ -216,13 +216,13 @@ useBlocker("high-priority", { scope: "app", priority: 90 }, true);
 Extend functionality with middleware for logging, analytics, or custom behavior:
 
 ```tsx
-import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 
 const loggingMiddleware = (context) => {
   console.log(`Blocker ${context.action}: ${context.blockerId}`);
 };
 
-useUIBlockingStore.getState().registerMiddleware("logger", loggingMiddleware);
+uiBlockingStoreApi.getState().registerMiddleware("logger", loggingMiddleware);
 ```
 
 ### Multiple Scopes

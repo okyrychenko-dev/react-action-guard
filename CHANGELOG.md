@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- 🔄 `useBlocker` now applies config updates to an already active blocker (without requiring remount)
+- ♻️ `configureMiddleware(...)` is now idempotent for global middleware registration:
+  - replaces previously configured `middleware-*` entries
+  - preserves provider-level middlewares (e.g., `provider-middleware-*`)
+- 🧼 `BlockerInfo` no longer exposes internal `timeoutId`
+
+### Fixed
+
+- 🛡️ Analytics middleware is now SSR-safe (`ga`, `mixpanel`, `amplitude` become no-op when `window` is unavailable)
+- 📚 Documentation updates across README and Storybook MDX:
+  - corrected `useBlocker` signature/defaults and config update behavior
+  - corrected `useIsBlocked` default scope semantics (`"global"`)
+  - corrected type signatures in `useAsyncAction`, `useConditionalBlocker`, `useScheduledBlocker`
+  - fixed Introduction middleware example to use `uiBlockingStoreApi`
+
 ## [0.7.0] - 2026-01-25
 
 ### Breaking Changes
