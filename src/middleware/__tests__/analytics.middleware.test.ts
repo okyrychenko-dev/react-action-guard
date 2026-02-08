@@ -392,4 +392,28 @@ describe("createAnalyticsMiddleware", () => {
       );
     });
   });
+
+  describe("SSR safety", () => {
+    it("should not throw when window is undefined", () => {
+      const middleware = createAnalyticsMiddleware({ provider: "ga" });
+
+      const context: MiddlewareContext = {
+        action: "add",
+        blockerId: "test-blocker",
+        config: {
+          scope: "test",
+          reason: "Test reason",
+        },
+        timestamp: Date.now(),
+      };
+
+      vi.stubGlobal("window", undefined);
+
+      try {
+        expect(() => middleware(context)).not.toThrow();
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+  });
 });

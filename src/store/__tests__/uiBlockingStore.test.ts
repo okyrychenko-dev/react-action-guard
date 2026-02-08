@@ -282,6 +282,20 @@ describe("uiBlockingStore", () => {
       expect(info).toHaveLength(1);
       expect(info[0]?.timestamp).toBeGreaterThanOrEqual(now);
     });
+
+    it("should not expose internal timeoutId in blocker info", () => {
+      const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", {
+        scope: "test",
+        timeout: 1000,
+      });
+
+      const info = getBlockingInfo("test");
+
+      expect(info).toHaveLength(1);
+      expect("timeoutId" in (info[0] ?? {})).toBe(false);
+    });
   });
 
   describe("clearAllBlockers", () => {

@@ -59,4 +59,33 @@ describe("configureMiddleware", () => {
     expect(names).toContain("middleware-1");
     expect(new Set(names).size).toBe(2); // All names are unique
   });
+
+  it("should replace previously configured middleware on repeated calls", () => {
+    const middleware1: Middleware = vi.fn();
+    const middleware2: Middleware = vi.fn();
+
+    configureMiddleware([middleware1, middleware2]);
+    configureMiddleware([middleware1]);
+
+    const state = uiBlockingStoreApi.getState();
+
+    expect(state.middlewares.size).toBe(1);
+    expect(state.middlewares.get("middleware-0")).toBe(middleware1);
+    expect(state.middlewares.has("middleware-1")).toBe(false);
+  });
+
+  it("should keep provider middlewares when reconfiguring global middleware", () => {
+    const providerMiddleware: Middleware = vi.fn();
+    const globalMiddleware: Middleware = vi.fn();
+
+    uiBlockingStoreApi.getState().registerMiddleware("provider-middleware-0", providerMiddleware);
+
+    configureMiddleware([globalMiddleware]);
+
+    const state = uiBlockingStoreApi.getState();
+
+    expect(state.middlewares.get("provider-middleware-0")).toBe(providerMiddleware);
+    expect(state.middlewares.get("middleware-0")).toBe(globalMiddleware);
+    expect(state.middlewares.size).toBe(2);
+  });
 });

@@ -196,6 +196,45 @@ describe("useBlocker", () => {
     expect(info[0]?.reason).toBe("Custom reason");
   });
 
+  it("should update blocker config when config changes while active", async () => {
+    const blockerId = "test-blocker";
+
+    const { rerender } = renderHook(
+      ({ reason, priority }: { reason: string; priority: number }) => {
+        useBlocker(
+          blockerId,
+          {
+            scope: "test",
+            reason,
+            priority,
+          },
+          true
+        );
+      },
+      {
+        initialProps: {
+          reason: "Initial reason",
+          priority: 10,
+        },
+      }
+    );
+
+    const { getBlockingInfo: getInitialInfo } = uiBlockingStoreApi.getState();
+    const initialInfo = getInitialInfo("test");
+    expect(initialInfo[0]?.reason).toBe("Initial reason");
+    expect(initialInfo[0]?.priority).toBe(10);
+
+    rerender({ reason: "Updated reason", priority: 80 });
+
+    await waitFor(() => {
+      const { getBlockingInfo } = uiBlockingStoreApi.getState();
+      const info = getBlockingInfo("test");
+
+      expect(info[0]?.reason).toBe("Updated reason");
+      expect(info[0]?.priority).toBe(80);
+    });
+  });
+
   it("should handle multiple instances of the hook", () => {
     const config1: BlockerConfig = { scope: "scope1" };
     const config2: BlockerConfig = { scope: "scope2" };
