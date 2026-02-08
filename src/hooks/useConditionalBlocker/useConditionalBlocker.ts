@@ -129,16 +129,10 @@ import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
  * Without state parameter (simple condition)
  * ```tsx
  * useConditionalBlocker('low-battery', {
- *   condition: () => {
- *     // Check battery level if available
- *     if ('getBattery' in navigator) {
- *       return navigator.getBattery().then(b => b.level < 0.05);
- *     }
- *     return false;
- *   },
+ *   condition: () => !navigator.onLine,
  *   checkInterval: 30000, // Check every 30 seconds
  *   scope: 'heavy-operations',
- *   reason: 'Battery level too low for this operation',
+ *   reason: 'Internet connection is required for this operation',
  *   priority: 80
  * });
  * ```

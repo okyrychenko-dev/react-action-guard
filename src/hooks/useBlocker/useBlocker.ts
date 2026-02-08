@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useResolvedStoreWithSelector } from "../../context";
 import type { BlockerConfig } from "../../store";
 
@@ -79,10 +79,12 @@ import type { BlockerConfig } from "../../store";
  * @since 0.6.0
  */
 export function useBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
-  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
+  const { addBlocker, removeBlocker, updateBlocker } = useResolvedStoreWithSelector((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
+    updateBlocker: state.updateBlocker,
   }));
+  const lastConfigRef = useRef<BlockerConfig | null>(null);
 
   useEffect(() => {
     if (!isActive || !blockerId) {
@@ -90,10 +92,25 @@ export function useBlocker(blockerId: string, config: BlockerConfig, isActive = 
     }
 
     addBlocker(blockerId, config);
+    lastConfigRef.current = config;
 
     return () => {
+      lastConfigRef.current = null;
       removeBlocker(blockerId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockerId, isActive, addBlocker, removeBlocker]);
+
+  useEffect(() => {
+    if (!isActive || !blockerId) {
+      return;
+    }
+
+    if (lastConfigRef.current === config) {
+      return;
+    }
+
+    updateBlocker(blockerId, config);
+    lastConfigRef.current = config;
+  }, [blockerId, config, isActive, updateBlocker]);
 }

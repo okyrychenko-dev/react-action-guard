@@ -93,7 +93,7 @@ export interface StoredBlocker {
  * @public
  * @since 0.6.0
  */
-export interface BlockerInfo extends StoredBlocker {
+export interface BlockerInfo extends Omit<StoredBlocker, "timeoutId"> {
   id: string;
 }
 

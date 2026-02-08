@@ -5,6 +5,14 @@ function capitalizeFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function getAnalyticsWindow(): Window | undefined {
+  if (typeof window === "undefined") {
+    return undefined;
+  }
+
+  return window;
+}
+
 export function buildEventData(context: MiddlewareContext): AnalyticsEventData {
   const eventData: AnalyticsEventData = {
     blocker_id: context.blockerId,
@@ -27,24 +35,30 @@ export function buildEventData(context: MiddlewareContext): AnalyticsEventData {
 }
 
 export function trackGoogleAnalytics(action: string, eventData: AnalyticsEventData): void {
-  if (window.gtag) {
-    window.gtag("event", `ui_blocking_${action}`, eventData);
+  const analyticsWindow = getAnalyticsWindow();
+
+  if (analyticsWindow?.gtag) {
+    analyticsWindow.gtag("event", `ui_blocking_${action}`, eventData);
   }
 }
 
 export function trackMixpanel(action: string, eventData: AnalyticsEventData): void {
-  if (window.mixpanel) {
+  const analyticsWindow = getAnalyticsWindow();
+
+  if (analyticsWindow?.mixpanel) {
     const eventName = `UI Blocking ${action.split("_").map(capitalizeFirst).join(" ")}`;
 
-    window.mixpanel.track(eventName, eventData);
+    analyticsWindow.mixpanel.track(eventName, eventData);
   }
 }
 
 export function trackAmplitude(action: string, eventData: AnalyticsEventData): void {
-  if (window.amplitude) {
+  const analyticsWindow = getAnalyticsWindow();
+
+  if (analyticsWindow?.amplitude) {
     const eventName = `UI Blocking ${action.split("_").map(capitalizeFirst).join(" ")}`;
 
-    window.amplitude.track(eventName, eventData);
+    analyticsWindow.amplitude.track(eventName, eventData);
   }
 }
 

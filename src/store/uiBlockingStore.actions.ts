@@ -411,7 +411,8 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       const blockerScopes = normalizeScopeToArray(blocker.scope);
 
       if (blocker.scope === DEFAULT_SCOPE || blockerScopes.includes(scope)) {
-        blockers.push({ id, ...blocker });
+        const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
+        blockers.push({ id, ...publicBlocker });
       }
     }
 
