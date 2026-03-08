@@ -4,27 +4,23 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 # React Action Guard
 
-**Elegant UI blocking management for React applications**
+**Coordinate UI blocking across async actions and competing interactions in React**
 
-React Action Guard is a powerful yet simple library for managing UI blocking states in React applications. It provides a declarative way to block user interactions during async operations, form validations, scheduled maintenance, and more.
+React Action Guard helps you prevent duplicate submits, conflicting actions, and stale UI interactions without scattering local `isLoading` flags across components.
 
-## 🎯 Key Features
+## Start Here
 
-- **🎣 React Hooks First** - Built with modern React hooks for seamless integration
-- **🔒 Declarative Blocking** - Define blocking rules with simple, readable code
-- **🎯 Scope-Based Control** - Block specific parts of your UI or go global
-- **⏱️ Scheduling Support** - Schedule blocking for maintenance windows or timed operations
-- **✅ Conditional Blocking** - Block based on dynamic conditions and validation rules
-- **💬 Confirmable Actions** - Built-in support for confirmation dialogs
-- **🔌 Middleware System** - Extend functionality with custom middleware
-- **📦 TypeScript** - Fully typed for the best developer experience
-- **🪶 Lightweight** - Minimal bundle size with focused runtime dependencies
+- Start with `useAsyncAction` when you need to block during async work
+- Use `scope` to coordinate blocking across unrelated components
+- Use `useIsBlocked` and `useBlockingInfo` to react to active blockers
+- Add `UIBlockingProvider` when you need isolated state for SSR, tests, or micro-frontends
+- Reach for advanced hooks only when you need scheduled, confirmable, or polling-based flows
 
-## 📚 Core Concepts
+## Core Concepts
 
 ### Blockers
 
-A **blocker** is a declarative way to block UI interactions. Each blocker has:
+A **blocker** is a declarative record that says some part of the UI should currently be treated as blocked. Each blocker has:
 
 - **ID** - Unique identifier
 - **Scope** - Which part of the UI to block (`global`, `form`, `payment`, etc.)
@@ -46,23 +42,39 @@ useBlocker("maintenance", { scope: "global" }, isMaintenanceMode);
 useBlocker("multi-scope", { scope: ["form", "buttons"] }, isActive);
 ```
 
+## Core Workflow
+
+For most apps, the path looks like this:
+
+1. Wrap async work with `useAsyncAction`
+2. Use a shared `scope`
+3. Disable or annotate related UI with `useIsBlocked` or `useBlockingInfo`
+
 ## Hooks Overview
 
-| Hook                    | Purpose                  | Use Case                                |
-| ----------------------- | ------------------------ | --------------------------------------- |
-| `useBlocker`            | Manual blocking control  | Toggle blocking on/off                  |
-| `useAsyncAction`        | Wrap async operations    | API calls, data fetching                |
-| `useConfirmableBlocker` | Confirmation dialogs     | Delete actions, destructive operations  |
-| `useScheduledBlocker`   | Time-based blocking      | Maintenance windows, timed restrictions |
-| `useConditionalBlocker` | Condition-based blocking | Validation rules, resource limits       |
-| `useIsBlocked`          | Check blocking state     | Disable buttons, show loaders           |
+### Core hooks
+
+| Hook              | Purpose                 | Typical use case                  |
+| ----------------- | ----------------------- | --------------------------------- |
+| `useAsyncAction`  | Wrap async operations   | API calls, mutations, submissions |
+| `useBlocker`      | Manual blocking control | Existing boolean state            |
+| `useIsBlocked`    | Check blocking state    | Disable buttons, show loaders     |
+| `useBlockingInfo` | Read blocker metadata   | Tooltips, banners, debug UI       |
+
+### Advanced hooks
+
+| Hook                    | Purpose                      | Typical use case                      |
+| ----------------------- | ---------------------------- | ------------------------------------- |
+| `useConfirmableBlocker` | Confirmation flow helper     | Destructive actions                   |
+| `useScheduledBlocker`   | Time-based blocking          | Maintenance windows                   |
+| `useConditionalBlocker` | Polling-based blocking sync  | External state without event hooks    |
 
 ## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-npm install @okyrychenko-dev/react-action-guard
+npm install @okyrychenko-dev/react-action-guard zustand
 ```
 
 ### Basic Example
@@ -88,7 +100,7 @@ function SaveButton() {
 }
 ```
 
-## 🎨 Common Patterns
+## Common Patterns
 
 ### Form Submission
 
@@ -114,7 +126,39 @@ function MyForm() {
 }
 ```
 
-### Confirmation Dialogs
+### Cross-Component Coordination
+
+```tsx
+function SaveButton() {
+  const runSave = useAsyncAction("save-form", "form");
+  const isBlocked = useIsBlocked("form");
+
+  return (
+    <button disabled={isBlocked} onClick={() => runSave(() => api.saveData())}>
+      Save
+    </button>
+  );
+}
+
+function FormStatus() {
+  const blockers = useBlockingInfo("form");
+  return blockers[0] ? <p>Blocked: {blockers[0].reason}</p> : null;
+}
+```
+
+### Provider Isolation
+
+```tsx
+function App() {
+  return (
+    <UIBlockingProvider>
+      <MyApp />
+    </UIBlockingProvider>
+  );
+}
+```
+
+### Advanced: Confirmation Dialogs
 
 ```tsx
 function DeleteButton({ itemId }) {
@@ -146,7 +190,7 @@ function DeleteButton({ itemId }) {
 }
 ```
 
-### Scheduled Maintenance
+### Advanced: Scheduled Maintenance
 
 ```tsx
 function App() {
@@ -176,7 +220,7 @@ function App() {
 }
 ```
 
-### Conditional Validation
+### Advanced: Conditional Validation
 
 ```tsx
 function PaymentForm() {
@@ -199,7 +243,7 @@ function PaymentForm() {
 }
 ```
 
-## 🔧 Advanced Features
+## Optional Extensions
 
 ### Priority System
 
@@ -213,7 +257,7 @@ useBlocker("high-priority", { scope: "app", priority: 90 }, true);
 
 ### Middleware
 
-Extend functionality with middleware for logging, analytics, or custom behavior:
+Middleware is optional. Use it when you need observability or analytics around blocker lifecycle events:
 
 ```tsx
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
@@ -237,14 +281,16 @@ useBlocker("multi", { scope: ["form", "buttons", "inputs"] }, isActive);
 const isAnyBlocked = useIsBlocked(["scope1", "scope2", "scope3"]);
 ```
 
-## 📖 Next Steps
+## Next Steps
 
-Explore the hooks in the sidebar to see interactive examples and detailed documentation for each feature.
+- Start with `useAsyncAction`, `useBlocker`, `useIsBlocked`, and `useBlockingInfo`
+- Explore advanced hooks only when your flow needs them
+- Use the sidebar for interactive examples and detailed API docs
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Visit my [GitHub repository](https://github.com/okyrychenko-dev/react-action-guard) to report issues or submit pull requests.
 
-## 📄 License
+## License
 
 MIT © [Oleksii Kyrychenko](https://github.com/okyrychenko-dev)

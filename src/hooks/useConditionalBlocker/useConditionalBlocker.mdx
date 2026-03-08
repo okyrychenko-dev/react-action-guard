@@ -5,7 +5,8 @@ import * as UseConditionalBlockerStories from "./useConditionalBlocker.stories";
 
 # useConditionalBlocker
 
-Automatically block UI based on dynamic conditions. Perfect for validation rules, resource limits, permission checks, or any scenario where blocking depends on runtime state.
+Automatically block UI based on dynamic conditions.
+This is an advanced hook for cases where polling is an acceptable tradeoff.
 
 ## Overview
 
@@ -16,7 +17,8 @@ Automatically block UI based on dynamic conditions. Perfect for validation rules
 - **Deactivates** when condition becomes false
 - **Reactive** to any state changes in your condition
 
-This enables declarative, condition-based UI blocking without manual state management.
+Use this hook when the blocking condition does not already have a clean event-driven trigger.
+If you already have explicit async state or a boolean flag, prefer `useAsyncAction` or `useBlocker`.
 
 ## API Reference
 
@@ -52,6 +54,8 @@ interface ConditionalBlockerConfig<TState = unknown> extends Omit<BlockerConfig,
 This hook returns `void` - it manages blocking automatically based on the condition.
 
 ## Basic Usage
+
+This hook is best for edge cases like external quotas, derived limits, or state that is only available via periodic checks.
 
 <Canvas of={UseConditionalBlockerStories.Basic} />
 

@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-03-08
+
+### Changed
+
+- 📚 Refocused README onboarding around core use cases: `useAsyncAction`, scoped coordination, and provider isolation
+- 🧭 Reframed `useConfirmableBlocker`, `useScheduledBlocker`, and `useConditionalBlocker` as advanced hooks in README and Storybook docs
+- 🧩 Clarified that middleware is optional and additive, not part of the primary onboarding path
+
 ## [1.0.0] - 2026-03-08
 
 ### Breaking Changes
@@ -31,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - preserves provider-level middlewares (e.g., `provider-middleware-*`)
 - 🧼 `BlockerInfo` no longer exposes internal `timeoutId`
 - 🔇 Core hooks/store runtime no longer emit default `console.*` side effects for scheduling, confirmable actions, middleware failures, or slow-block detection
+- 📚 README onboarding is now centered on core use cases (`useAsyncAction`, scoped coordination, provider isolation) and marks scheduled/confirmable/conditional hooks as advanced
 
 ### Fixed
 
@@ -305,7 +314,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...v0.6.1

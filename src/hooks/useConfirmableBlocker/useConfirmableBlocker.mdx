@@ -5,7 +5,8 @@ import * as UseConfirmableBlockerStories from "./useConfirmableBlocker.stories";
 
 # useConfirmableBlocker
 
-Create actions that require user confirmation before execution. Perfect for destructive operations like deletes, irreversible changes, or critical actions.
+Create actions that require user confirmation before execution.
+This is an advanced flow built on top of the core blocking primitives.
 
 ## Overview
 
@@ -14,7 +15,8 @@ Create actions that require user confirmation before execution. Perfect for dest
 1. **Dialog Phase** - Shows confirmation dialog, blocks UI
 2. **Execution Phase** - Runs async operation, blocks UI during execution
 
-This ensures users can't accidentally trigger destructive actions and provides clear feedback during async operations.
+Use it when a workflow needs both confirmation UI and blocking during execution.
+If you only need async blocking, start with `useAsyncAction`.
 
 ## API Reference
 
@@ -67,6 +69,8 @@ interface UseConfirmableBlockerReturn {
 ```
 
 ## Basic Usage
+
+This hook is most useful for destructive or irreversible actions.
 
 <Canvas of={UseConfirmableBlockerStories.Basic} />
 

@@ -4,25 +4,18 @@
 [![npm downloads](https://img.shields.io/npm/dm/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-> Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup
+> Coordinate UI blocking across async actions and competing interactions in React
 
-## Features
+`react-action-guard` helps you prevent duplicate submits, conflicting actions, and stale UI interactions without scattering local `isLoading` flags across components.
 
-- Priority-based blocking system
-- Scoped blocking (global, specific areas, or multiple scopes)
-- Automatic cleanup on unmount
-- **Timeout mechanism** - auto-remove blockers after specified time
-- **Provider pattern** - isolated stores for SSR, testing, and micro-frontends
-- Advanced hooks for different use cases:
-  - Confirmable blockers with custom dialogs
-  - Scheduled blocking for maintenance windows
-  - Conditional blocking based on application state
-  - Async action wrapping with timeout support
-- Advanced middleware system for analytics, logging, and performance monitoring
-- TypeScript support with full type safety (including optional type-safe scopes)
-- Built on Zustand for efficient state management
-- Tree-shakeable - import only what you need
-- Hooks-based API
+## Why Use It
+
+- Wrap async work with `useAsyncAction` and get blocker cleanup automatically
+- Coordinate blocking by `scope` across unrelated components
+- Inspect current blockers with `useIsBlocked` and `useBlockingInfo`
+- Isolate state per provider for SSR, tests, and micro-frontends
+- Extend lifecycle events with optional middleware
+- Add advanced hooks for scheduled, confirmable, or conditional flows when needed
 
 ## Installation
 
@@ -48,14 +41,42 @@ If you previously imported `createShallowStore`, `createStoreToolkit`, `createSt
 ## Quick Start
 
 ```jsx
-import { useBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
-function MyComponent() {
-  const isBlocked = useIsBlocked("my-scope");
+function SaveButton() {
+  const isSaving = useIsBlocked("form");
+  const runSave = useAsyncAction("save-profile", "form");
 
-  return <button disabled={isBlocked}>Click me</button>;
+  const handleClick = async () => {
+    await runSave(async () => {
+      await api.saveProfile();
+    });
+  };
+
+  return <button onClick={handleClick} disabled={isSaving}>Save</button>;
 }
 ```
+
+## Core Concepts
+
+- `scope` lets you coordinate blocking across components like `"form"`, `"navigation"`, or `"checkout"`
+- `useAsyncAction` is the fastest path for async workflows
+- `useBlocker` is the lower-level hook when you already have your own boolean state
+- `UIBlockingProvider` gives you isolated state instead of the default global store
+
+## Core Use Cases
+
+### Prevent duplicate async actions
+
+Use `useAsyncAction` when a button, mutation, or workflow should block while work is in flight.
+
+### Coordinate multiple components
+
+Use shared scopes when one component starts work and another component should react by disabling UI or showing blocker details.
+
+### Isolate blocking domains
+
+Use `UIBlockingProvider` when each request, test, or micro-frontend should get its own store instance.
 
 ## Documentation
 
@@ -70,6 +91,15 @@ npm run storybook
 ## API Reference
 
 ### Hooks
+
+#### Core hooks
+
+Start with these first:
+
+- `useAsyncAction`
+- `useBlocker`
+- `useIsBlocked`
+- `useBlockingInfo`
 
 #### `useBlocker(blockerId, config, isActive?)`
 
@@ -235,9 +265,18 @@ function ApiComponent() {
 }
 ```
 
+#### Advanced hooks
+
+These hooks are useful, but they are not the main onboarding path for most apps:
+
+- `useConfirmableBlocker` for confirmation flows
+- `useScheduledBlocker` for time-window blocking
+- `useConditionalBlocker` for polling-based conditional synchronization
+
 #### `useConfirmableBlocker(blockerId, config)`
 
 Creates a confirmable action with UI blocking while the dialog is open or the action is running.
+Use it for advanced confirmation flows after the core hooks are already a good fit.
 
 **Parameters:**
 
@@ -302,6 +341,7 @@ function UnsavedChangesGuard({ discardChanges }) {
 #### `useScheduledBlocker(blockerId, config)`
 
 Blocks UI during a scheduled time period or maintenance window.
+Use it when blocking is driven by time windows rather than user-triggered async work.
 
 **Parameters:**
 
@@ -342,6 +382,7 @@ function MaintenanceWindow() {
 #### `useConditionalBlocker(blockerId, config)`
 
 Periodically checks a condition and blocks/unblocks based on the result.
+Use this when polling is an acceptable tradeoff and the condition is not naturally event-driven.
 
 **Parameters:**
 
@@ -523,7 +564,9 @@ uiBlockingStoreApi.getState().addBlocker("server-call", {
 
 ## Middleware System
 
-The library includes a powerful middleware system that allows you to hook into blocker lifecycle events for analytics, logging, and performance monitoring.
+Middleware is optional. Use it when you need analytics, logging, or performance visibility around blocker lifecycle events.
+
+Most applications can start without middleware and add it later if blocker observability becomes important.
 
 ### Middleware Actions
 
@@ -550,6 +593,8 @@ Middleware receives events for the following actions:
 ```
 
 ### Built-in Middleware
+
+These are extensions around the blocker lifecycle, not the primary onboarding path for the library.
 
 #### Analytics Middleware
 
@@ -645,7 +690,7 @@ configureMiddleware([myCustomMiddleware]);
 
 ### Combining Middleware
 
-You can combine multiple middleware for comprehensive monitoring:
+You can combine multiple middleware when you need broader observability:
 
 ```jsx
 import {
@@ -740,6 +785,8 @@ useBlocker("save", { scope: "typo" }); // Type error
 
 ## Use Cases
 
+The first four examples below are the most representative starting points.
+
 ### Loading States
 
 ```jsx
@@ -783,7 +830,7 @@ function UserForm() {
 }
 ```
 
-### Unsaved Changes Protection
+### Advanced: Unsaved Changes Protection
 
 ```jsx
 import { useConfirmableBlocker } from "@okyrychenko-dev/react-action-guard";
@@ -880,7 +927,7 @@ function MultiStepWizard() {
 }
 ```
 
-### Scheduled Maintenance Window
+### Advanced: Scheduled Maintenance Window
 
 ```jsx
 import { useScheduledBlocker } from "@okyrychenko-dev/react-action-guard";
@@ -907,7 +954,7 @@ function App() {
 }
 ```
 
-### Dynamic Blocking Based on State
+### Advanced: Dynamic Blocking Based on State
 
 ```jsx
 import { useConditionalBlocker } from "@okyrychenko-dev/react-action-guard";

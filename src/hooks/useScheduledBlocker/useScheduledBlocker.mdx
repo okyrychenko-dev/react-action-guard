@@ -5,7 +5,8 @@ import * as UseScheduledBlockerStories from "./useScheduledBlocker.stories";
 
 # useScheduledBlocker
 
-Schedule UI blocking for specific time periods. Perfect for maintenance windows, scheduled updates, time-limited features, or any operation that needs to block UI at predetermined times.
+Schedule UI blocking for specific time periods.
+This is an advanced hook for maintenance windows, timed restrictions, or other schedule-driven flows.
 
 ## Overview
 
@@ -16,7 +17,8 @@ Schedule UI blocking for specific time periods. Perfect for maintenance windows,
 3. **Deactivates** automatically when the duration expires
 4. **Notifies** via callbacks when schedule starts/ends
 
-This ensures predictable, time-based UI blocking without manual timer management.
+Use it when blocking is driven by time rather than by a user-triggered async action.
+If a user interaction starts the work, prefer `useAsyncAction` or `useBlocker`.
 
 ## API Reference
 
@@ -77,6 +79,8 @@ schedule: {
 ```
 
 ## Basic Usage
+
+This hook is typically used for operational scenarios such as maintenance windows rather than day-to-day button handling.
 
 <Canvas of={UseScheduledBlockerStories.Basic} />
 
