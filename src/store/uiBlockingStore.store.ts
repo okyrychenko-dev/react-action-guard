@@ -17,9 +17,25 @@ import type { UIBlockingStore } from "./uiBlockingStore.types";
  * - Automatic shallow comparison for selectors
  *
  */
-const { useStore: useUIBlockingStore, useStoreApi: uiBlockingStoreApi } = createShallowStore<
-  UIBlockingStore,
-  [["zustand/devtools", never]]
->(devtools(createUIBlockingActions, devtoolsConfig));
+const storeBindings = createShallowStore<UIBlockingStore, [["zustand/devtools", never]]>(
+  devtools(createUIBlockingActions, devtoolsConfig)
+);
 
-export { useUIBlockingStore, uiBlockingStoreApi };
+const uiBlockingStoreApi = storeBindings.useStoreApi;
+
+export function useUIBlockingStore(): UIBlockingStore;
+export function useUIBlockingStore<T>(
+  selector: (state: UIBlockingStore) => T,
+  equalityFn?: (a: T, b: T) => boolean
+): T;
+export function useUIBlockingStore<T>(
+  selector?: (state: UIBlockingStore) => T,
+  equalityFn?: (a: T, b: T) => boolean
+): T | UIBlockingStore {
+  if (selector) {
+    return storeBindings.useStore(selector, equalityFn);
+  }
+
+  return storeBindings.useStore();
+}
+export { uiBlockingStoreApi };

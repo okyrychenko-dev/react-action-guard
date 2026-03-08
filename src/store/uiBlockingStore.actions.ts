@@ -67,11 +67,11 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
   runMiddlewares: async (context: MiddlewareContext) => {
     const { middlewares } = get();
 
-    for (const [name, middleware] of middlewares) {
+    for (const [, middleware] of middlewares) {
       try {
         await middleware(context);
-      } catch (error) {
-        console.error(`[UIBlocking] Middleware "${name}" error:`, error);
+      } catch {
+        // Swallow middleware failures so observability hooks never break core blocker flow.
       }
     }
   },

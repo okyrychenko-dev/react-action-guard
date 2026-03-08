@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-03-08
+
+### Breaking Changes
+
+- 🔒 Removed public re-exports of internal `react-zustand-toolkit` helpers from the root API:
+  - `createShallowStore`
+  - `createStoreToolkit`
+  - `createStoreProvider`
+  - `createResolvedStoreHooks`
+- 🧹 Tightened the public API boundary around `react-action-guard` store internals
+
+### Migration Notes
+
+- Import advanced store construction helpers directly from `@okyrychenko-dev/react-zustand-toolkit` if you still need them
+- Prefer `useUIBlockingStore`, `uiBlockingStoreApi`, and provider/hooks exported by `react-action-guard` for public integration
+
 ### Changed
 
 - 🔄 `useBlocker` now applies config updates to an already active blocker (without requiring remount)
@@ -14,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - replaces previously configured `middleware-*` entries
   - preserves provider-level middlewares (e.g., `provider-middleware-*`)
 - 🧼 `BlockerInfo` no longer exposes internal `timeoutId`
+- 🔇 Core hooks/store runtime no longer emit default `console.*` side effects for scheduling, confirmable actions, middleware failures, or slow-block detection
 
 ### Fixed
 
@@ -147,7 +164,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ⬆️ Updated peer dependencies to support React 19
   - React: `^18.0.0 || ^19.0.0`
   - Zustand: `^5.0.0`
-- 🔧 All hooks now use `useResolvedStore` / `useResolvedStoreWithSelector` for Provider support
+- 🔧 All hooks now use resolved store APIs for Provider support
 
 ## [0.3.3] - 2025-12-01
 
@@ -288,7 +305,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...v0.7.0
 [0.6.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.5.0...v0.6.0
@@ -299,6 +317,6 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 [0.3.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.3.0...v0.3.1
 [0.3.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.3...v0.3.0
 [0.2.3]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.2...v0.2.3
-[0.2.2]: https://github.com/okyrycheno/react-action-guard/compare/v0.2.1...v0.2.2
+[0.2.2]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/okyrychenko/react-action-guard/releases/tag/v0.1.0

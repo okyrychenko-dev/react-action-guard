@@ -4,10 +4,7 @@ import { createPerformanceMiddleware } from "../performanceMiddleware";
 import type { MiddlewareContext } from "../middleware.types";
 
 describe("createPerformanceMiddleware", () => {
-  let consoleWarnSpy: ReturnType<typeof vi.spyOn>;
-
   beforeEach(() => {
-    consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
     vi.useFakeTimers();
   });
 
@@ -50,7 +47,7 @@ describe("createPerformanceMiddleware", () => {
     expect(onSlowBlock).toHaveBeenCalledWith("test-blocker", expect.closeTo(1500, 50));
   });
 
-  it("should warn about slow blocks by default", () => {
+  it("should be side-effect free by default", () => {
     const middleware = createPerformanceMiddleware({
       slowBlockThreshold: 1000,
     });
@@ -78,10 +75,6 @@ describe("createPerformanceMiddleware", () => {
     };
 
     void middleware(removeContext);
-
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      '[UIBlocking] Slow block detected: "slow-blocker" took 2000ms'
-    );
   });
 
   it("should not warn for fast blocks", () => {
@@ -116,7 +109,6 @@ describe("createPerformanceMiddleware", () => {
     void middleware(removeContext);
 
     expect(onSlowBlock).not.toHaveBeenCalled();
-    expect(consoleWarnSpy).not.toHaveBeenCalled();
   });
 
   it("should use default threshold of 3000ms", () => {

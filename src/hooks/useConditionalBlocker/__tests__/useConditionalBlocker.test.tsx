@@ -181,6 +181,21 @@ describe("useConditionalBlocker", () => {
     expect(isBlockedAfter("test")).toBe(false);
   });
 
+  it("should unmount cleanly when blocker was never active", () => {
+    const { unmount } = renderHook(() =>
+      useConditionalBlocker("test-blocker", {
+        scope: "test",
+        condition: () => false,
+        checkInterval: 1000,
+      })
+    );
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+
+    expect(() => unmount()).not.toThrow();
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+  });
+
   it("should handle multiple scopes", () => {
     renderHook(() =>
       useConditionalBlocker("test-blocker", {

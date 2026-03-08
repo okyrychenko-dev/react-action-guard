@@ -164,9 +164,6 @@ export function useConfirmableBlocker(
 
     try {
       await config.onConfirm();
-    } catch (error) {
-      console.error("[UIBlocking] Confirmable action error:", error);
-      throw error;
     } finally {
       setIsExecuting(false);
     }

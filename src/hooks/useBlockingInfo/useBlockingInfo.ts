@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useStore } from "zustand";
-import { useResolvedStore } from "../../context";
+import { useResolvedStoreApi } from "../../context";
 import { DEFAULT_SCOPE } from "../../store";
 import type { BlockerInfo } from "../../store";
 
@@ -80,7 +80,7 @@ import type { BlockerInfo } from "../../store";
  * @since 0.6.0
  */
 export function useBlockingInfo(scope: string = DEFAULT_SCOPE): ReadonlyArray<BlockerInfo> {
-  const store = useResolvedStore();
+  const store = useResolvedStoreApi();
 
   // Subscribe to the activeBlockers Map to detect changes
   const activeBlockers = useStore(store, (state) => state.activeBlockers);

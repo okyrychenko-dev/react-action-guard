@@ -15,33 +15,26 @@ interface ScheduledBlockerDemoProps {
   durationSeconds?: number;
 }
 
-function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
-  const {
-    blockerId = "scheduled-maintenance",
-    scope = "scheduled-scope",
-    reason = "Scheduled maintenance in progress",
-    delaySeconds = 3,
-    durationSeconds = 5,
-  } = props;
+function ScheduledBlockerDemoSession({
+  blockerId,
+  scope,
+  reason,
+  delaySeconds,
+  durationSeconds,
+}: Required<ScheduledBlockerDemoProps>): ReactElement {
+  const [baseTime] = useState(() => Date.now());
+  const [countdown, setCountdown] = useState<number>(0);
+  const [scheduleStarted, setScheduleStarted] = useState(false);
+  const [scheduleEnded, setScheduleEnded] = useState(false);
 
-  const [baseTime, setBaseTime] = useState(() => Date.now());
   const scheduledTime = useMemo(() => {
     return baseTime + delaySeconds * 1000;
   }, [baseTime, delaySeconds]);
   const storyBlockerId = useMemo(() => {
     return `${blockerId}-${baseTime.toString()}-${delaySeconds.toString()}-${durationSeconds.toString()}`;
   }, [blockerId, baseTime, delaySeconds, durationSeconds]);
-  const [countdown, setCountdown] = useState<number>(0);
-  const [scheduleStarted, setScheduleStarted] = useState(false);
-  const [scheduleEnded, setScheduleEnded] = useState(false);
 
   const isBlocked = useIsBlocked(scope);
-
-  useEffect(() => {
-    setBaseTime(Date.now());
-    setScheduleStarted(false);
-    setScheduleEnded(false);
-  }, [blockerId, delaySeconds, durationSeconds, reason, scope]);
 
   useEffect(() => {
     if (!scheduledTime) {
@@ -121,6 +114,30 @@ function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
 
       <DebugPanel />
     </StoryContainer>
+  );
+}
+
+function ScheduledBlockerDemo(props: ScheduledBlockerDemoProps): ReactElement {
+  const {
+    blockerId = "scheduled-maintenance",
+    scope = "scheduled-scope",
+    reason = "Scheduled maintenance in progress",
+    delaySeconds = 3,
+    durationSeconds = 5,
+  } = props;
+  const storySessionKey = useMemo(() => {
+    return [blockerId, scope, reason, delaySeconds, durationSeconds].join(":");
+  }, [blockerId, scope, reason, delaySeconds, durationSeconds]);
+
+  return (
+    <ScheduledBlockerDemoSession
+      key={storySessionKey}
+      blockerId={blockerId}
+      delaySeconds={delaySeconds}
+      durationSeconds={durationSeconds}
+      reason={reason}
+      scope={scope}
+    />
   );
 }
 

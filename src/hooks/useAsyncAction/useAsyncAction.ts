@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { useResolvedStoreWithSelector } from "../../context";
+import { useResolvedValue } from "../../context";
 import { ASYNC_ACTION_PRIORITY } from "../../store";
 
 /**
@@ -144,7 +144,7 @@ export function useAsyncAction<T = unknown>(
   scope?: string | ReadonlyArray<string>,
   options?: UseAsyncActionOptions
 ): (asyncFn: () => Promise<T>) => Promise<T> {
-  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));

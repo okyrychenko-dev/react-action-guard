@@ -1,4 +1,4 @@
-import { useResolvedStoreWithSelector } from "../../context";
+import { useResolvedValue } from "../../context";
 
 /**
  * Checks if one or more scopes are currently blocked.
@@ -73,5 +73,5 @@ import { useResolvedStoreWithSelector } from "../../context";
  * @since 0.6.0
  */
 export function useIsBlocked(scope?: string | ReadonlyArray<string>): boolean {
-  return useResolvedStoreWithSelector((state) => state.isBlocked(scope));
+  return useResolvedValue((state) => state.isBlocked(scope));
 }

@@ -10,7 +10,7 @@ import {
   useUIBlockingContext,
   useUIBlockingStoreFromContext,
 } from "../UIBlockingContext";
-import { useResolvedStore, useResolvedStoreWithSelector } from "../useResolvedStore";
+import { useResolvedStoreApi, useResolvedValue } from "../useResolvedStore";
 
 describe("UIBlockingProvider", () => {
   beforeEach(() => {
@@ -57,9 +57,9 @@ describe("UIBlockingProvider", () => {
     });
   });
 
-  describe("useResolvedStore", () => {
+  describe("useResolvedStoreApi", () => {
     it("should return global store when outside provider", () => {
-      const { result } = renderHook(() => useResolvedStore());
+      const { result } = renderHook(() => useResolvedStoreApi());
       expect(result.current).toBe(uiBlockingStoreApi);
     });
 
@@ -67,7 +67,7 @@ describe("UIBlockingProvider", () => {
       const wrapper = ({ children }: { children: ReactNode }) => (
         <UIBlockingProvider>{children}</UIBlockingProvider>
       );
-      const { result } = renderHook(() => useResolvedStore(), { wrapper });
+      const { result } = renderHook(() => useResolvedStoreApi(), { wrapper });
       // Context store should be different from global store
       expect(result.current).not.toBe(uiBlockingStoreApi);
       expect(result.current.getState).toBeDefined();
@@ -138,6 +138,17 @@ describe("UIBlockingProvider", () => {
   });
 
   describe("useUIBlockingStoreFromContext", () => {
+    it("should return the full context store when used without a selector", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <UIBlockingProvider>{children}</UIBlockingProvider>
+      );
+
+      const { result } = renderHook(() => useUIBlockingStoreFromContext(), { wrapper });
+
+      expect(result.current.activeBlockers).toBeInstanceOf(Map);
+      expect(result.current.addBlocker).toBeTypeOf("function");
+    });
+
     it("should select state from context store", () => {
       const wrapper = ({ children }: { children: ReactNode }) => (
         <UIBlockingProvider>{children}</UIBlockingProvider>
@@ -164,15 +175,13 @@ describe("UIBlockingProvider", () => {
     });
   });
 
-  describe("useResolvedStoreWithSelector", () => {
+  describe("useResolvedValue", () => {
     it("should work with global store outside provider", () => {
       act(() => {
         uiBlockingStoreApi.getState().addBlocker("test", { scope: "global" });
       });
 
-      const { result } = renderHook(() =>
-        useResolvedStoreWithSelector((state) => state.isBlocked("global"))
-      );
+      const { result } = renderHook(() => useResolvedValue((state) => state.isBlocked("global")));
 
       expect(result.current).toBe(true);
     });
@@ -182,10 +191,9 @@ describe("UIBlockingProvider", () => {
         <UIBlockingProvider>{children}</UIBlockingProvider>
       );
 
-      const { result } = renderHook(
-        () => useResolvedStoreWithSelector((state) => state.isBlocked("test")),
-        { wrapper }
-      );
+      const { result } = renderHook(() => useResolvedValue((state) => state.isBlocked("test")), {
+        wrapper,
+      });
 
       expect(result.current).toBe(false);
     });
@@ -231,10 +239,10 @@ describe("UIBlockingProvider", () => {
 
   describe("Store stability", () => {
     it("should maintain same store instance across re-renders", () => {
-      const stores: Array<ReturnType<typeof useResolvedStore>> = [];
+      const stores: Array<ReturnType<typeof useResolvedStoreApi>> = [];
 
       const StoreCapture = () => {
-        const store = useResolvedStore();
+        const store = useResolvedStoreApi();
         stores.push(store);
         return null;
       };

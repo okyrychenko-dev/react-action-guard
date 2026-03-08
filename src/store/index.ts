@@ -12,13 +12,5 @@ export type {
   UIBlockingStore,
   UIBlockingStoreActions,
   UIBlockingStoreState,
+  ShallowStoreBindings,
 } from "./uiBlockingStore.types";
-// Export toolkit utilities for advanced usage
-export {
-  createShallowStore,
-  createStoreToolkit,
-  createStoreProvider,
-  createResolvedStoreHooks,
-} from "@okyrychenko-dev/react-zustand-toolkit";
-
-export type { ShallowStoreBindings } from "@okyrychenko-dev/react-zustand-toolkit";

@@ -26,10 +26,6 @@ function handleRemoveAction(
   blockStartTimes.delete(context.blockerId);
 
   if (duration >= slowBlockThreshold) {
-    console.warn(
-      `[UIBlocking] Slow block detected: "${context.blockerId}" took ${duration.toString()}ms`
-    );
-
     onSlowBlock?.(context.blockerId, duration);
   }
 }
@@ -37,12 +33,12 @@ function handleRemoveAction(
 /**
  * Creates middleware for monitoring blocker performance and detecting slow blocks.
  *
- * Tracks the duration of each blocker (from add to remove) and warns when a blocker
- * exceeds the configured threshold. Useful for identifying performance issues,
- * stuck blockers, or operations that take too long.
+ * Tracks the duration of each blocker (from add to remove) and invokes an optional
+ * callback when a blocker exceeds the configured threshold. Useful for identifying
+ * performance issues, stuck blockers, or operations that take too long.
  *
- * Automatically logs warnings to console for slow blocks and optionally invokes
- * a callback for custom handling (e.g., error reporting, analytics).
+ * The middleware is side-effect free by default; use `onSlowBlock` for custom
+ * reporting, logging, or analytics integration.
  *
  * @param config - Performance monitoring configuration
  * @param config.slowBlockThreshold - Duration in ms before considering a block "slow".
@@ -60,7 +56,7 @@ function handleRemoveAction(
  * const performanceMiddleware = createPerformanceMiddleware();
  *
  * configureMiddleware([performanceMiddleware]);
- * // Warns if any blocker lasts > 3 seconds
+ * // Track slow blocks via onSlowBlock if any blocker lasts > 3 seconds
  * ```
  *
  * @example

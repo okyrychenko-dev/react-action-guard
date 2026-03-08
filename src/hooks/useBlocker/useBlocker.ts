@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { useResolvedStoreWithSelector } from "../../context";
+import { useResolvedValue } from "../../context";
 import type { BlockerConfig } from "../../store";
 
 /**
@@ -79,7 +79,7 @@ import type { BlockerConfig } from "../../store";
  * @since 0.6.0
  */
 export function useBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
-  const { addBlocker, removeBlocker, updateBlocker } = useResolvedStoreWithSelector((state) => ({
+  const { addBlocker, removeBlocker, updateBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
     updateBlocker: state.updateBlocker,

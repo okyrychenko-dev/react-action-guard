@@ -31,11 +31,27 @@ export interface UIBlockingProviderProps {
  */
 const {
   Provider: BaseUIBlockingProvider,
-  useContext: useUIBlockingContext,
-  useContextStore: useUIBlockingStoreFromContext,
+  useContextStoreApi: useUIBlockingContext,
+  useContextStore: baseUseUIBlockingStoreFromContext,
   useIsInsideProvider: useIsInsideUIBlockingProvider,
-  useOptionalContext,
+  useContextStoreOptional: useOptionalUIBlockingContext,
 } = createStoreProvider(createUIBlockingActions, "UIBlocking");
+
+export function useUIBlockingStoreFromContext(): UIBlockingStore;
+export function useUIBlockingStoreFromContext<T>(
+  selector: (state: UIBlockingStore) => T,
+  equalityFn?: (a: T, b: T) => boolean
+): T;
+export function useUIBlockingStoreFromContext<T>(
+  selector?: (state: UIBlockingStore) => T,
+  equalityFn?: (a: T, b: T) => boolean
+): T | UIBlockingStore {
+  if (selector) {
+    return baseUseUIBlockingStoreFromContext(selector, equalityFn);
+  }
+
+  return baseUseUIBlockingStoreFromContext();
+}
 
 /**
  * Provider component for isolated UI blocking state management.
@@ -139,7 +155,7 @@ export function UIBlockingProvider({
   devtoolsName = "UIBlocking",
   middlewares = [],
 }: UIBlockingProviderProps): ReactNode {
-  const handleStoreCreate = (store: StoreApi<UIBlockingStore>): void => {
+  const handleStoreInit = (store: StoreApi<UIBlockingStore>): void => {
     // Register initial middlewares
     middlewares.forEach((mw, index) => {
       store.getState().registerMiddleware(`provider-middleware-${index.toString()}`, mw);
@@ -150,7 +166,7 @@ export function UIBlockingProvider({
     <BaseUIBlockingProvider
       enableDevtools={enableDevtools}
       devtoolsName={devtoolsName}
-      onStoreCreate={handleStoreCreate}
+      onStoreInit={handleStoreInit}
     >
       {children}
     </BaseUIBlockingProvider>
@@ -259,7 +275,8 @@ export function UIBlockingProvider({
 // Export hooks from base provider
 export {
   useUIBlockingContext,
-  useUIBlockingStoreFromContext,
   useIsInsideUIBlockingProvider,
-  useOptionalContext,
+  useOptionalUIBlockingContext,
+  /** @deprecated Use `useOptionalUIBlockingContext`. */
+  useOptionalUIBlockingContext as useOptionalContext,
 };

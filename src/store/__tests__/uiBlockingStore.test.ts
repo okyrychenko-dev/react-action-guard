@@ -519,6 +519,43 @@ describe("uiBlockingStore", () => {
       expect(onTimeout).toHaveBeenCalledWith("timeout-blocker");
     });
 
+    it("should not call onTimeout if blocker was removed before timeout fires", () => {
+      const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", {
+        scope: "test",
+        timeout: 1000,
+        onTimeout,
+      });
+
+      removeBlocker("timeout-blocker");
+      vi.advanceTimersByTime(1000);
+
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+
+    it("should skip add timeout callback when blocker record is missing at timeout time", () => {
+      const { addBlocker } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", {
+        scope: "test",
+        timeout: 1000,
+        onTimeout,
+      });
+
+      uiBlockingStoreApi.setState((state) => {
+        const activeBlockers = new Map(state.activeBlockers);
+        activeBlockers.delete("timeout-blocker");
+        return { activeBlockers };
+      });
+
+      vi.advanceTimersByTime(1000);
+
+      expect(onTimeout).not.toHaveBeenCalled();
+    });
+
     it("should not call onTimeout if blocker is removed manually before timeout", () => {
       const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
       const onTimeout = vi.fn();
@@ -554,6 +591,41 @@ describe("uiBlockingStore", () => {
       // New timeout expires
       vi.advanceTimersByTime(1500);
       expect(isBlocked("test")).toBe(false);
+    });
+
+    it("should add a timeout to an existing blocker without a previous timer", () => {
+      const { addBlocker, updateBlocker, removeBlocker, isBlocked } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", { scope: "test" });
+      updateBlocker("timeout-blocker", { timeout: 1000, onTimeout });
+
+      vi.advanceTimersByTime(500);
+      expect(isBlocked("test")).toBe(true);
+
+      removeBlocker("timeout-blocker");
+      vi.advanceTimersByTime(500);
+
+      expect(onTimeout).not.toHaveBeenCalled();
+      expect(isBlocked("test")).toBe(false);
+    });
+
+    it("should skip updated timeout callback when blocker record is missing at timeout time", () => {
+      const { addBlocker, updateBlocker } = uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", { scope: "test" });
+      updateBlocker("timeout-blocker", { timeout: 1000, onTimeout });
+
+      uiBlockingStoreApi.setState((state) => {
+        const activeBlockers = new Map(state.activeBlockers);
+        activeBlockers.delete("timeout-blocker");
+        return { activeBlockers };
+      });
+
+      vi.advanceTimersByTime(1000);
+
+      expect(onTimeout).not.toHaveBeenCalled();
     });
 
     it("should store timeout value in blocker info", () => {

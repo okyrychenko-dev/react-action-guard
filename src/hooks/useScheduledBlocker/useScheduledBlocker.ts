@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useResolvedStoreWithSelector } from "../../context";
+import { useResolvedValue } from "../../context";
 import { createBlockerConfig } from "../useBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
 import {
-  MAX_TIMEOUT_MS,
   calculateEndTime,
   isInBlockingPeriod,
   isSafeTimeout,
@@ -135,7 +134,7 @@ import {
  * @since 0.6.0
  */
 export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerConfig): void {
-  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));
@@ -163,7 +162,6 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
     // Validate start time
     if (!isValidTimestamp(startTime)) {
-      console.error(`[UIBlocking] Invalid start time for blocker "${blockerId}"`);
       return;
     }
 
@@ -194,9 +192,6 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       const delay = startTime - now;
 
       if (!isSafeTimeout(delay)) {
-        console.warn(
-          `[UIBlocking] Schedule delay exceeds maximum timeout (${MAX_TIMEOUT_MS.toString()}ms) for blocker "${blockerId}"`
-        );
         return;
       }
 
@@ -209,7 +204,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       if (isInBlockingPeriod(startTime, endTime, now)) {
         startBlocking();
       } else if (isScheduleInPast(startTime, endTime, now)) {
-        console.warn(`[UIBlocking] Schedule is in the past for blocker "${blockerId}"`);
+        return;
       }
     }
 

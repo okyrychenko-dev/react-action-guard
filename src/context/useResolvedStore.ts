@@ -1,7 +1,7 @@
 import { type StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { uiBlockingStoreApi } from "../store/uiBlockingStore.store";
-import { useOptionalContext } from "./UIBlockingContext";
+import { useOptionalUIBlockingContext } from "./UIBlockingContext";
 import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
 /**
@@ -9,7 +9,7 @@ import type { UIBlockingStore } from "../store/uiBlockingStore.types";
  * @internal
  */
 function useOptionalContextStore(): StoreApi<UIBlockingStore> | null {
-  return useOptionalContext();
+  return useOptionalUIBlockingContext();
 }
 
 /**
@@ -23,7 +23,7 @@ function useOptionalContextStore(): StoreApi<UIBlockingStore> | null {
  *
  * @returns The resolved store API
  */
-export function useResolvedStore(): StoreApi<UIBlockingStore> {
+export function useResolvedStoreApi(): StoreApi<UIBlockingStore> {
   const contextStore = useOptionalContextStore();
   // Return context store if inside Provider, otherwise global store
   return contextStore ?? uiBlockingStoreApi;
@@ -37,7 +37,16 @@ export function useResolvedStore(): StoreApi<UIBlockingStore> {
  * @param selector - Selector function to pick state from the store
  * @returns Selected state value
  */
-export function useResolvedStoreWithSelector<T>(selector: (state: UIBlockingStore) => T): T {
-  const store = useResolvedStore();
+export function useResolvedValue<T>(selector: (state: UIBlockingStore) => T): T {
+  const store = useResolvedStoreApi();
   return useStore(store, useShallow(selector));
 }
+
+/**
+ * @deprecated Use `useResolvedStoreApi`.
+ */
+export const useResolvedStore = useResolvedStoreApi;
+/**
+ * @deprecated Use `useResolvedValue`.
+ */
+export const useResolvedStoreWithSelector = useResolvedValue;

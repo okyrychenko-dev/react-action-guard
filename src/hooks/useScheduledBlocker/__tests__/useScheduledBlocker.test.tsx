@@ -167,8 +167,32 @@ describe("useScheduledBlocker", () => {
     expect(isBlocked("test")).toBe(true);
   });
 
-  it("should warn about past schedule", () => {
-    const consoleWarnSpy = vi.spyOn(console, "warn").mockImplementation(vi.fn());
+  it("should keep blocking when end time is no longer in the future during scheduling", () => {
+    const now = Date.now();
+    const dateNowSpy = vi.spyOn(Date, "now");
+    dateNowSpy.mockReturnValueOnce(now).mockReturnValue(now + 1);
+
+    renderHook(() =>
+      useScheduledBlocker("test-blocker", {
+        scope: "test",
+        reason: "Scheduled maintenance",
+        schedule: {
+          start: now,
+          end: now + 1,
+        },
+      })
+    );
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(10);
+    });
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(true);
+  });
+
+  it("should ignore past schedule", () => {
     const now = Date.now();
 
     renderHook(() =>
@@ -182,9 +206,44 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    expect(consoleWarnSpy).toHaveBeenCalledWith(
-      expect.stringContaining("[UIBlocking] Schedule is in the past")
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+  });
+
+  it("should ignore invalid start time", () => {
+    renderHook(() =>
+      useScheduledBlocker("invalid-start", {
+        scope: "test",
+        reason: "Invalid schedule",
+        schedule: {
+          start: Number.NaN,
+          duration: 1000,
+        },
+      })
     );
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+  });
+
+  it("should ignore schedules beyond the maximum safe timeout", () => {
+    const now = Date.now();
+    const hugeDelay = 2_147_483_648;
+
+    renderHook(() =>
+      useScheduledBlocker("too-far", {
+        scope: "test",
+        reason: "Far future schedule",
+        schedule: {
+          start: now + hugeDelay,
+          duration: 1000,
+        },
+      })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
   });
 
   it("should cleanup timeouts on unmount", () => {

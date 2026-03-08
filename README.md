@@ -39,6 +39,12 @@ This package requires the following peer dependencies:
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
 
+## 1.0 Migration
+
+`1.0.0` removes public re-exports of internal `react-zustand-toolkit` helpers from the root package.
+
+If you previously imported `createShallowStore`, `createStoreToolkit`, `createStoreProvider`, or `createResolvedStoreHooks` from `@okyrychenko-dev/react-action-guard`, import them directly from `@okyrychenko-dev/react-zustand-toolkit` instead.
+
 ## Quick Start
 
 ```jsx
@@ -424,9 +430,17 @@ function MicroFrontend() {
 
 #### Context Hooks
 
-- `useUIBlockingContext()` - Get store from context (throws if outside provider)
+- `useUIBlockingContext()` - Get store API from context (throws if outside provider)
+- `useOptionalUIBlockingContext()` - Get store API from context or `null` outside provider
 - `useIsInsideUIBlockingProvider()` - Check if inside a provider
 - `useUIBlockingStoreFromContext(selector)` - Select state from context store
+- `useResolvedStoreApi()` - Resolve to provider store API or global store API
+- `useResolvedValue(selector)` - Resolve to provider/global store and select with shallow comparison
+
+Legacy aliases remain available for backward compatibility:
+- `useOptionalContext()` -> `useOptionalUIBlockingContext()`
+- `useResolvedStore()` -> `useResolvedStoreApi()`
+- `useResolvedStoreWithSelector()` -> `useResolvedValue()`
 
 ### Store
 
@@ -506,15 +520,6 @@ uiBlockingStoreApi.getState().addBlocker("server-call", {
   reason: "Server call running",
 });
 ```
-
-### Store Toolkit Helpers
-
-Advanced store helpers are re-exported from the internal toolkit for custom setups:
-
-- `createShallowStore`
-- `createStoreToolkit`
-- `createStoreProvider`
-- `createResolvedStoreHooks`
 
 ## Middleware System
 

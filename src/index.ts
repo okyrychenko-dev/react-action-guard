@@ -1,3 +1,15 @@
+import {
+  UIBlockingProvider,
+  useIsInsideUIBlockingProvider,
+  useOptionalUIBlockingContext,
+  useResolvedStoreApi,
+  useResolvedValue,
+  useUIBlockingContext,
+  useUIBlockingStoreFromContext,
+} from "./context";
+import type { UIBlockingStore } from "./store";
+import type { StoreApi } from "zustand";
+
 // Core hooks
 export {
   useAsyncAction,
@@ -21,7 +33,7 @@ export type {
 } from "./hooks";
 
 // Store
-export { useUIBlockingStore, uiBlockingStoreApi, createShallowStore } from "./store";
+export { useUIBlockingStore, uiBlockingStoreApi } from "./store";
 export type { ShallowStoreBindings } from "./store";
 
 // Store types
@@ -61,7 +73,31 @@ export type { BlockerConfigTyped, DefaultScopes, ScopeValue } from "./types";
 export {
   UIBlockingProvider,
   useIsInsideUIBlockingProvider,
+  useOptionalUIBlockingContext,
+  useResolvedStoreApi,
+  useResolvedValue,
   useUIBlockingContext,
   useUIBlockingStoreFromContext,
-} from "./context";
+};
 export type { UIBlockingProviderProps } from "./context";
+
+/**
+ * @deprecated Use `useOptionalUIBlockingContext`.
+ */
+export function useOptionalContext(): ReturnType<typeof useOptionalUIBlockingContext> {
+  return useOptionalUIBlockingContext();
+}
+
+/**
+ * @deprecated Use `useResolvedStoreApi`.
+ */
+export function useResolvedStore(): StoreApi<UIBlockingStore> {
+  return useResolvedStoreApi();
+}
+
+/**
+ * @deprecated Use `useResolvedValue`.
+ */
+export function useResolvedStoreWithSelector<T>(selector: (state: UIBlockingStore) => T): T {
+  return useResolvedValue(selector);
+}

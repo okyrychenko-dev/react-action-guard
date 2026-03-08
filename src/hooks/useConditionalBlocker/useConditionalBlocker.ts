@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { useResolvedStoreWithSelector } from "../../context";
+import { useResolvedValue } from "../../context";
 import { createBlockerConfig } from "../useBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
@@ -148,7 +148,7 @@ export function useConditionalBlocker<TState = unknown>(
   blockerId: string,
   config: ConditionalBlockerConfig<TState>
 ): void {
-  const { addBlocker, removeBlocker } = useResolvedStoreWithSelector((state) => ({
+  const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));

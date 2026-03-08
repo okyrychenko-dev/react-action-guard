@@ -142,8 +142,8 @@ function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
             <code>useIsBlocked()</code> - Defaults to <code>&quot;global&quot;</code> scope
           </li>
           <li>
-            <code>useIsBlocked([scope, &quot;global&quot;])</code> -
-            Returns true when either scope is blocked
+            <code>useIsBlocked([scope, &quot;global&quot;])</code> - Returns true when either scope
+            is blocked
           </li>
         </ul>
       </div>
