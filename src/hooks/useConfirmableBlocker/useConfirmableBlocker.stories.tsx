@@ -1,6 +1,7 @@
 import { clsx } from "clsx";
 import { ReactElement, useState } from "react";
 import {
+  ConfirmDialog,
   DebugPanel,
   StatusDisplay,
   StoryContainer,
@@ -93,21 +94,14 @@ function ConfirmableBlockerDemo(props: ConfirmableBlockerDemoProps): ReactElemen
 
       {/* Confirmation Dialog */}
       {isDialogOpen && (
-        <div className="dialogOverlay">
-          <div className="dialog">
-            <h3 className="dialogTitle">{confirmConfig.title}</h3>
-            <p className="dialogMessage">{confirmConfig.message}</p>
-
-            <div className="dialogActions">
-              <button onClick={onCancel} className="cancelButton">
-                {confirmConfig.cancelText}
-              </button>
-              <button onClick={handleConfirm} className="confirmButton">
-                {confirmConfig.confirmText}
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmDialog
+          title={confirmConfig.title}
+          message={confirmConfig.message}
+          confirmLabel={confirmConfig.confirmText}
+          cancelLabel={confirmConfig.cancelText}
+          onConfirm={handleConfirm}
+          onCancel={onCancel}
+        />
       )}
 
       {/* Loading Overlay */}

@@ -434,8 +434,6 @@ Provides an isolated store instance for SSR, testing, or micro-frontends. Withou
 **Props:**
 
 - `children: ReactNode` - Child components
-- `enableDevtools?: boolean` - Enable Redux DevTools (default: true in development)
-- `devtoolsName?: string` - Name for DevTools (default: "UIBlocking")
 - `middlewares?: Middleware[]` - Initial middlewares to register
 
 **Example:**
@@ -462,7 +460,7 @@ function renderWithProvider(ui) {
 // Micro-frontends - each app has its own blocking state
 function MicroFrontend() {
   return (
-    <UIBlockingProvider devtoolsName="MicroApp-Blocking">
+    <UIBlockingProvider>
       <MicroApp />
     </UIBlockingProvider>
   );

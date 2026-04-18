@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "type": "module",
   "description": "Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup",
   "main": "./dist/index.js",
@@ -27,8 +27,9 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "npm run lint:fix && prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "npm run lint && prettier --check \"src/**/*.{ts,tsx}\"",
+    "check": "npm run lint && npm run typecheck && npm run test:run && npm run build",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -64,7 +65,7 @@
     "zustand": "^5.0.0"
   },
   "dependencies": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.3.0",
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.0",
     "immer": "^10.0.0"
   },
   "devDependencies": {

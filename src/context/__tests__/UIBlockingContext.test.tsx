@@ -41,7 +41,7 @@ describe("UIBlockingProvider", () => {
 
       expect(() => {
         renderHook(() => useUIBlockingContext());
-      }).toThrow("useUIBlockingContext must be used within a UIBlockingProvider");
+      }).toThrow("UIBlocking store hooks must be used within a UIBlockingProvider");
 
       consoleSpy.mockRestore();
     });
@@ -169,7 +169,7 @@ describe("UIBlockingProvider", () => {
 
       expect(() => {
         renderHook(() => useUIBlockingStoreFromContext((state) => state.isBlocked("test")));
-      }).toThrow("useUIBlockingContext must be used within a UIBlockingProvider");
+      }).toThrow("UIBlocking store hooks must be used within a UIBlockingProvider");
 
       consoleSpy.mockRestore();
     });
@@ -200,26 +200,6 @@ describe("UIBlockingProvider", () => {
   });
 
   describe("Provider options", () => {
-    it("should accept enableDevtools option", () => {
-      // Should not throw
-      const { unmount } = render(
-        <UIBlockingProvider enableDevtools={false}>
-          <div>Test</div>
-        </UIBlockingProvider>
-      );
-      unmount();
-    });
-
-    it("should accept devtoolsName option", () => {
-      // Should not throw
-      const { unmount } = render(
-        <UIBlockingProvider devtoolsName="CustomName">
-          <div>Test</div>
-        </UIBlockingProvider>
-      );
-      unmount();
-    });
-
     it("should accept middlewares option", () => {
       const middleware = vi.fn();
 

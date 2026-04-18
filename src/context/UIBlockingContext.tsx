@@ -17,10 +17,6 @@ import type { UIBlockingStore } from "../store/uiBlockingStore.types";
  */
 export interface UIBlockingProviderProps {
   children: ReactNode;
-  /** Enable Redux DevTools integration (default: true in development) */
-  enableDevtools?: boolean;
-  /** Name for Redux DevTools (default: "UIBlocking") */
-  devtoolsName?: string;
   /** Initial middlewares to register */
   middlewares?: ReadonlyArray<Middleware>;
 }
@@ -67,12 +63,10 @@ export function useUIBlockingStoreFromContext<T>(
  * - Modals/Dialogs - Scoped blocking within a dialog
  *
  * Uses `createStoreProvider` from `@okyrychenko-dev/react-zustand-toolkit` with
- * built-in DevTools support and middleware registration.
+ * provider-scoped store creation and middleware registration.
  *
  * @param props - Provider configuration
  * @param props.children - React children to wrap with the provider
- * @param props.enableDevtools - Enable Redux DevTools integration. Defaults to true in development, false in production.
- * @param props.devtoolsName - Name displayed in Redux DevTools. Defaults to "UIBlocking".
  * @param props.middlewares - Array of middleware functions to register on store creation
  *
  * @example
@@ -90,15 +84,13 @@ export function useUIBlockingStoreFromContext<T>(
  * ```
  *
  * @example
- * With middleware and custom DevTools name
+ * With middleware
  * ```tsx
  * import { UIBlockingProvider, loggerMiddleware } from '@okyrychenko-dev/react-action-guard';
  *
  * function App() {
  *   return (
  *     <UIBlockingProvider
- *       enableDevtools={true}
- *       devtoolsName="MyApp-UIBlocking"
  *       middlewares={[loggerMiddleware]}
  *     >
  *       <MyApplication />
@@ -113,11 +105,11 @@ export function useUIBlockingStoreFromContext<T>(
  * function MicroFrontendApp() {
  *   return (
  *     <div>
- *       <UIBlockingProvider devtoolsName="MicroApp1">
+ *       <UIBlockingProvider>
  *         <MicroApp1 />
  *       </UIBlockingProvider>
  *
- *       <UIBlockingProvider devtoolsName="MicroApp2">
+ *       <UIBlockingProvider>
  *         <MicroApp2 />
  *       </UIBlockingProvider>
  *     </div>
@@ -134,7 +126,7 @@ export function useUIBlockingStoreFromContext<T>(
  *
  * test('blocker behavior', () => {
  *   render(
- *     <UIBlockingProvider enableDevtools={false}>
+ *     <UIBlockingProvider>
  *       <ComponentUnderTest />
  *     </UIBlockingProvider>
  *   );
@@ -151,8 +143,6 @@ export function useUIBlockingStoreFromContext<T>(
  */
 export function UIBlockingProvider({
   children,
-  enableDevtools = process.env.NODE_ENV === "development",
-  devtoolsName = "UIBlocking",
   middlewares = [],
 }: UIBlockingProviderProps): ReactNode {
   const handleStoreInit = (store: StoreApi<UIBlockingStore>): void => {
@@ -162,15 +152,7 @@ export function UIBlockingProvider({
     });
   };
 
-  return (
-    <BaseUIBlockingProvider
-      enableDevtools={enableDevtools}
-      devtoolsName={devtoolsName}
-      onStoreInit={handleStoreInit}
-    >
-      {children}
-    </BaseUIBlockingProvider>
-  );
+  return <BaseUIBlockingProvider onStoreInit={handleStoreInit}>{children}</BaseUIBlockingProvider>;
 }
 
 /**

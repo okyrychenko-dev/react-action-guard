@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-04-18
+
+### Changed
+
+- Aligned provider docs and examples with `react-zustand-toolkit@0.4.0`
+- Removed obsolete provider-level DevTools props from the public provider contract
+
+### Fixed
+
+- Updated `UIBlockingProvider` source and tests to match the current toolkit provider API
+
 ## [1.0.1] - 2026-03-08
 
 ### Changed
@@ -314,7 +325,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...v1.0.0
 [0.7.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.6.1...v0.7.0
