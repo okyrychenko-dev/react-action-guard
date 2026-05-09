@@ -6,8 +6,8 @@ import {
   useUIBlockingStoreFromContext,
 } from "./UIBlockingContext";
 import { useResolvedStoreApi, useResolvedValue } from "./useResolvedStore";
-import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 import type { StoreApi } from "zustand";
+import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
 export {
   UIBlockingProvider,

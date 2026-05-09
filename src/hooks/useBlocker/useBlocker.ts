@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useResolvedValue } from "../../context";
+import { areBlockerConfigsEqual } from "./useBlocker.utils";
 import type { BlockerConfig } from "../../store";
 
 /**
@@ -106,7 +107,7 @@ export function useBlocker(blockerId: string, config: BlockerConfig, isActive = 
       return;
     }
 
-    if (lastConfigRef.current === config) {
+    if (lastConfigRef.current !== null && areBlockerConfigsEqual(lastConfigRef.current, config)) {
       return;
     }
 

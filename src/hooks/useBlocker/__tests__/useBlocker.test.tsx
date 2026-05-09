@@ -235,6 +235,41 @@ describe("useBlocker", () => {
     });
   });
 
+  it("should not update blocker config when inline config keeps the same values", () => {
+    const blockerId = "test-blocker";
+
+    const { rerender } = renderHook(({ tick }: { tick: number }) => {
+      useBlocker(
+        blockerId,
+        {
+          scope: ["scope1", "scope2"],
+          reason: "Same reason",
+          priority: 42,
+        },
+        true
+      );
+
+      return tick;
+    }, {
+      initialProps: {
+        tick: 1,
+      },
+    });
+
+    const { getBlockingInfo: getInitialInfo } = uiBlockingStoreApi.getState();
+    const initialInfo = getInitialInfo("scope1");
+    const initialTimestamp = initialInfo[0]?.timestamp;
+
+    rerender({ tick: 2 });
+
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
+    const info = getBlockingInfo("scope1");
+
+    expect(info[0]?.timestamp).toBe(initialTimestamp);
+    expect(info[0]?.reason).toBe("Same reason");
+    expect(info[0]?.priority).toBe(42);
+  });
+
   it("should handle multiple instances of the hook", () => {
     const config1: BlockerConfig = { scope: "scope1" };
     const config2: BlockerConfig = { scope: "scope2" };

@@ -1,13 +1,13 @@
 import { BlockingAction, Middleware, MiddlewareContext } from "../middleware";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
 import { normalizeScopeToArray } from "./uiBlockingStore.utils";
+import type { StateCreator } from "zustand";
 import type {
   BlockerConfig,
   BlockerInfo,
   StoredBlocker,
   UIBlockingStore,
 } from "./uiBlockingStore.types";
-import type { StateCreator } from "zustand";
 
 /**
  * Normalize priority value to ensure it's non-negative

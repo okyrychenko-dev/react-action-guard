@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-05-09
+
+### Fixed
+
+- Prevented `useBlocker` from updating an active blocker when inline config objects keep the same effective values.
+- Stabilized blocker config comparison through normalized scope snapshots and Zustand `shallow` equality.
+- Added regression coverage for inline blocker config rerenders.
+
 ## [1.0.2] - 2026-04-18
 
 ### Changed
@@ -325,7 +333,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...HEAD
+[1.0.3]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/okyrychenko/react-action-guard/compare/v0.7.0...v1.0.0

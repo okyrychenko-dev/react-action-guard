@@ -7,8 +7,8 @@ import {
   useUIBlockingContext,
   useUIBlockingStoreFromContext,
 } from "./context";
-import type { UIBlockingStore } from "./store";
 import type { StoreApi } from "zustand";
+import type { UIBlockingStore } from "./store";
 
 // Core hooks
 export {
