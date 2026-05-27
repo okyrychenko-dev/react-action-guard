@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.4] - 2026-05-27
+
+### Changed
+
+- Updated `@okyrychenko-dev/react-zustand-toolkit` to `^0.4.1`.
+- Prepared package metadata for the coordinated toolkit compatibility release.
+
 ## [1.0.3] - 2026-05-09
 
 ### Fixed
@@ -333,7 +340,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.4...HEAD
+[1.0.4]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.0...v1.0.1
