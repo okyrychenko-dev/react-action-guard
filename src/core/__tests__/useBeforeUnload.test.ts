@@ -201,7 +201,11 @@ describe("useBeforeUnload", () => {
       rerender();
 
       const secondCall = addEventListenerSpy.mock.calls[1];
-      if (!secondCall) throw new Error("Expected second call");
+
+      if (!secondCall) {
+        throw new Error("Expected second call");
+      }
+
       const secondHandler = secondCall[1];
 
       // Handlers should be different (new closure with new message)

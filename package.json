@@ -96,7 +96,7 @@
     }
   },
   "overrides": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.0",
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.1",
     "postcss": ">=8.5.10"
   },
   "devDependencies": {

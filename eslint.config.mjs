@@ -103,7 +103,6 @@ export default [
       "prefer-const": "error",
       "no-var": "error",
       eqeqeq: ["error", "always"],
-      curly: ["error", "all"],
     },
   },
   {
@@ -151,4 +150,9 @@ export default [
   },
   prettier,
   ...storybook.configs["flat/recommended"],
+  {
+    rules: {
+      curly: ["error", "all"],
+    },
+  },
 ];
