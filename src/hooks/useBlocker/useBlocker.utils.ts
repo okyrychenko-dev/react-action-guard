@@ -2,11 +2,7 @@ import { shallow } from "zustand/shallow";
 import { DEFAULT_SCOPE } from "../../store";
 import type { BlockerConfig } from "../../store";
 
-type BlockerConfigSnapshotValue =
-  | string
-  | number
-  | BlockerConfig["onTimeout"]
-  | undefined;
+type BlockerConfigSnapshotValue = string | number | BlockerConfig["onTimeout"] | undefined;
 
 /**
  * Creates a blocker configuration object from partial config.
@@ -28,9 +24,7 @@ export function createBlockerConfig(config: {
   };
 }
 
-function normalizeScopeSnapshot(
-  scope?: string | ReadonlyArray<string>,
-): ReadonlyArray<string> {
+function normalizeScopeSnapshot(scope?: string | ReadonlyArray<string>): ReadonlyArray<string> {
   if (scope === undefined) {
     return [DEFAULT_SCOPE];
   }
@@ -46,9 +40,7 @@ function getScopeSnapshotKey(scope?: string | ReadonlyArray<string>): string {
   return JSON.stringify(normalizeScopeSnapshot(scope));
 }
 
-function toBlockerConfigSnapshot(
-  config: BlockerConfig,
-): ReadonlyArray<BlockerConfigSnapshotValue> {
+function toBlockerConfigSnapshot(config: BlockerConfig): ReadonlyArray<BlockerConfigSnapshotValue> {
   return [
     getScopeSnapshotKey(config.scope),
     config.reason,

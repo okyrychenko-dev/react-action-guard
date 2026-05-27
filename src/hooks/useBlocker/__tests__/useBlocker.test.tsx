@@ -238,23 +238,26 @@ describe("useBlocker", () => {
   it("should not update blocker config when inline config keeps the same values", () => {
     const blockerId = "test-blocker";
 
-    const { rerender } = renderHook(({ tick }: { tick: number }) => {
-      useBlocker(
-        blockerId,
-        {
-          scope: ["scope1", "scope2"],
-          reason: "Same reason",
-          priority: 42,
-        },
-        true
-      );
+    const { rerender } = renderHook(
+      ({ tick }: { tick: number }) => {
+        useBlocker(
+          blockerId,
+          {
+            scope: ["scope1", "scope2"],
+            reason: "Same reason",
+            priority: 42,
+          },
+          true
+        );
 
-      return tick;
-    }, {
-      initialProps: {
-        tick: 1,
+        return tick;
       },
-    });
+      {
+        initialProps: {
+          tick: 1,
+        },
+      }
+    );
 
     const { getBlockingInfo: getInitialInfo } = uiBlockingStoreApi.getState();
     const initialInfo = getInitialInfo("scope1");
