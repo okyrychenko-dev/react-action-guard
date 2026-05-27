@@ -64,7 +64,7 @@
     "react": "^18.0.0 || ^19.0.0"
   },
   "overrides": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.0"
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

@@ -106,7 +106,6 @@ export default [
       "prefer-const": "error",
       "no-var": "error",
       eqeqeq: ["error", "always"],
-      curly: ["error", "all"],
     },
   },
   {
@@ -157,4 +156,9 @@ export default [
     },
   },
   prettier,
+  {
+    rules: {
+      curly: ["error", "all"],
+    },
+  },
 ];
