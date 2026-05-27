@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard-router",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "type": "module",
   "description": "Navigation blocking adapters for React Action Guard across React Router, TanStack Router, and Next.js",
   "main": "./dist/index.js",
@@ -78,7 +78,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@okyrychenko-dev/react-action-guard": "^1.0.3",
+    "@okyrychenko-dev/react-action-guard": "^1.0.4",
     "@tanstack/react-router": "^1.0.0",
     "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
     "react": "^18.0.0 || ^19.0.0",
@@ -101,7 +101,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@okyrychenko-dev/react-action-guard": "^1.0.3",
+    "@okyrychenko-dev/react-action-guard": "^1.0.4",
     "@storybook/addon-a11y": "10.0.8",
     "@storybook/addon-docs": "10.0.8",
     "@storybook/react-vite": "10.0.8",
