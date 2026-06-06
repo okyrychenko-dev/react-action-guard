@@ -115,6 +115,50 @@ describe("useConditionalBlocker", () => {
     expect(conditionFn).toHaveBeenCalledTimes(3);
   });
 
+  it("should restart condition checks when check interval changes", () => {
+    const conditionFn = vi.fn(() => false);
+    const { rerender } = renderHook(
+      ({ checkInterval }: { checkInterval: number }) =>
+        useConditionalBlocker("test-blocker", {
+          scope: "test",
+          condition: conditionFn,
+          checkInterval,
+        }),
+      { initialProps: { checkInterval: 1000 } }
+    );
+
+    expect(conditionFn).toHaveBeenCalledTimes(1);
+    rerender({ checkInterval: 100 });
+    expect(conditionFn).toHaveBeenCalledTimes(2);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(conditionFn).toHaveBeenCalledTimes(3);
+  });
+
+  it("should use the default interval when check interval is not positive", () => {
+    const conditionFn = vi.fn(() => false);
+    renderHook(() =>
+      useConditionalBlocker("test-blocker", {
+        scope: "test",
+        condition: conditionFn,
+        checkInterval: 0,
+      })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(999);
+    });
+    expect(conditionFn).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(conditionFn).toHaveBeenCalledTimes(2);
+  });
+
   it("should add blocker when condition changes from false to true", () => {
     let shouldBlock = false;
 

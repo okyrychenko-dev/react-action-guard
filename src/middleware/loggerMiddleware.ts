@@ -8,7 +8,7 @@ const LOG_PREFIX = "[UIBlocking]";
  *
  * Logs every blocker action (add, remove, update, timeout, clear) with emoji
  * indicators and formatted data. Useful for debugging blocking behavior during
- * development. Automatically disabled in production builds for performance.
+ * development. Register it conditionally when production logging is not desired.
  *
  * Output format: `[UIBlocking] 🔒 blocker-id {scope: "form", reason: "..."}`
  *

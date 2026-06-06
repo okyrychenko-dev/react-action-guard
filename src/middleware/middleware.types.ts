@@ -1,4 +1,4 @@
-import { BlockerConfig } from "../store";
+import type { BlockerConfig } from "../store/uiBlockingStore.types";
 
 export type BlockingAction = "add" | "update" | "remove" | "timeout" | "clear" | "clear_scope";
 

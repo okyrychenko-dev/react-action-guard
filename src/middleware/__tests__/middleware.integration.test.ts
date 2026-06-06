@@ -70,6 +70,22 @@ describe("Middleware Integration", () => {
     );
   });
 
+  it("should not expose internal timeout id to remove middleware", () => {
+    let removeContext: MiddlewareContext | undefined;
+    const { addBlocker, registerMiddleware, removeBlocker } = uiBlockingStoreApi.getState();
+    registerMiddleware("remove-context", (context) => {
+      if (context.action === "remove") {
+        removeContext = context;
+      }
+    });
+
+    addBlocker("test-blocker", { scope: "test", timeout: 1000 });
+    removeBlocker("test-blocker");
+
+    expect(removeContext?.config).not.toHaveProperty("timeoutId");
+    expect(removeContext?.prevState).not.toHaveProperty("timeoutId");
+  });
+
   it("should execute multiple middleware in registration order", async () => {
     const callOrder: Array<string> = [];
 

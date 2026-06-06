@@ -144,6 +144,11 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
   }>({});
   const configRef = useConfigRef(config);
 
+  const scheduleStart = parseDate(config.schedule.start);
+  const scheduleEnd =
+    config.schedule.end === undefined ? undefined : parseDate(config.schedule.end);
+  const scheduleDuration = config.schedule.duration;
+
   const cleanup = useCallback(() => {
     if (timeoutsRef.current.start) {
       clearTimeout(timeoutsRef.current.start);
@@ -212,7 +217,14 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       cleanup();
       removeBlocker(blockerId);
     };
-    // configRef is stable and doesn't need to be in dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockerId, addBlocker, removeBlocker, cleanup]);
+  }, [
+    blockerId,
+    addBlocker,
+    removeBlocker,
+    cleanup,
+    scheduleStart,
+    scheduleEnd,
+    scheduleDuration,
+    configRef,
+  ]);
 }

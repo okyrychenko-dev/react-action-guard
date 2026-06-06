@@ -23,7 +23,7 @@ function createMiddlewareContext(
   action: BlockingAction,
   blockerId: string,
   config?: Partial<BlockerConfig>,
-  prevState?: Partial<StoredBlocker>
+  prevState?: Partial<BlockerConfig>
 ): MiddlewareContext {
   return {
     action,
@@ -31,6 +31,17 @@ function createMiddlewareContext(
     config,
     timestamp: Date.now(),
     ...(prevState && { prevState }),
+  };
+}
+
+function toPublicBlockerConfig(blocker: StoredBlocker): BlockerConfig {
+  return {
+    scope: blocker.scope,
+    reason: blocker.reason,
+    priority: blocker.priority,
+    timestamp: blocker.timestamp,
+    timeout: blocker.timeout,
+    onTimeout: blocker.onTimeout,
   };
 }
 
@@ -124,17 +135,19 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     if (config.timeout && config.timeout > 0) {
       timeoutId = setTimeout(() => {
         // Check if blocker still exists
-        if (get().activeBlockers.has(id)) {
+        const blocker = get().activeBlockers.get(id);
+
+        if (blocker) {
           // Call onTimeout callback before removing
-          config.onTimeout?.(id);
+          blocker.onTimeout?.(id);
 
           // Run timeout middleware
           void get().runMiddlewares(
             createMiddlewareContext("timeout", id, {
-              scope: config.scope,
-              reason: config.reason,
-              priority: config.priority,
-              timeout: config.timeout,
+              scope: blocker.scope,
+              reason: blocker.reason,
+              priority: blocker.priority,
+              timeout: blocker.timeout,
             })
           );
 
@@ -219,18 +232,19 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       // Set up new timeout if specified
       if (config.timeout && config.timeout > 0) {
         const newTimeout = config.timeout;
-        const newOnTimeout = config.onTimeout ?? existingBlocker.onTimeout;
 
         timeoutId = setTimeout(() => {
-          if (get().activeBlockers.has(id)) {
-            newOnTimeout?.(id);
+          const blocker = get().activeBlockers.get(id);
+
+          if (blocker) {
+            blocker.onTimeout?.(id);
 
             void get().runMiddlewares(
               createMiddlewareContext("timeout", id, {
-                scope: config.scope ?? existingBlocker.scope,
-                reason: config.reason ?? existingBlocker.reason,
-                priority: config.priority ?? existingBlocker.priority,
-                timeout: newTimeout,
+                scope: blocker.scope,
+                reason: blocker.reason,
+                priority: blocker.priority,
+                timeout: blocker.timeout,
               })
             );
 
@@ -319,7 +333,8 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     });
 
     if (prevBlocker) {
-      void get().runMiddlewares(createMiddlewareContext("remove", id, prevBlocker, prevBlocker));
+      const publicConfig = toPublicBlockerConfig(prevBlocker);
+      void get().runMiddlewares(createMiddlewareContext("remove", id, publicConfig, publicConfig));
     }
   },
 

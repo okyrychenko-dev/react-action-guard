@@ -519,6 +519,25 @@ describe("uiBlockingStore", () => {
       expect(onTimeout).toHaveBeenCalledWith("timeout-blocker");
     });
 
+    it("should call the latest onTimeout callback without restarting the timeout", () => {
+      const { addBlocker, updateBlocker } = uiBlockingStoreApi.getState();
+      const initialOnTimeout = vi.fn();
+      const latestOnTimeout = vi.fn();
+
+      addBlocker("timeout-blocker", {
+        scope: "test",
+        timeout: 1000,
+        onTimeout: initialOnTimeout,
+      });
+
+      vi.advanceTimersByTime(500);
+      updateBlocker("timeout-blocker", { onTimeout: latestOnTimeout });
+      vi.advanceTimersByTime(500);
+
+      expect(initialOnTimeout).not.toHaveBeenCalled();
+      expect(latestOnTimeout).toHaveBeenCalledWith("timeout-blocker");
+    });
+
     it("should not call onTimeout if blocker was removed before timeout fires", () => {
       const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
       const onTimeout = vi.fn();

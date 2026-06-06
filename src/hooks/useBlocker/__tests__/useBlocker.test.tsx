@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uiBlockingStoreApi } from "../../../store";
 import { useBlocker } from "../useBlocker";
 import type { BlockerConfig } from "../../../store";
@@ -271,6 +271,60 @@ describe("useBlocker", () => {
     expect(info[0]?.timestamp).toBe(initialTimestamp);
     expect(info[0]?.reason).toBe("Same reason");
     expect(info[0]?.priority).toBe(42);
+  });
+
+  it("should not update blocker config when inline onTimeout callback changes", () => {
+    const updateMiddleware = vi.fn();
+
+    uiBlockingStoreApi.getState().registerMiddleware("update-spy", (context) => {
+      if (context.action === "update") {
+        updateMiddleware();
+      }
+    });
+
+    const { rerender } = renderHook(
+      ({ tick }: { tick: number }) => {
+        useBlocker("test-blocker", {
+          scope: "test",
+          timeout: 1000,
+          onTimeout: () => tick,
+        });
+      },
+      { initialProps: { tick: 1 } }
+    );
+
+    rerender({ tick: 2 });
+
+    expect(updateMiddleware).not.toHaveBeenCalled();
+
+    uiBlockingStoreApi.getState().unregisterMiddleware("update-spy");
+  });
+
+  it("should call the latest onTimeout callback without updating the blocker", () => {
+    vi.useFakeTimers();
+
+    const initialOnTimeout = vi.fn();
+    const latestOnTimeout = vi.fn();
+
+    const { rerender } = renderHook(
+      ({ onTimeout }: { onTimeout: (blockerId: string) => void }) => {
+        useBlocker("test-blocker", {
+          scope: "test",
+          timeout: 1000,
+          onTimeout,
+        });
+      },
+      { initialProps: { onTimeout: initialOnTimeout } }
+    );
+
+    rerender({ onTimeout: latestOnTimeout });
+
+    vi.advanceTimersByTime(1000);
+
+    expect(initialOnTimeout).not.toHaveBeenCalled();
+    expect(latestOnTimeout).toHaveBeenCalledWith("test-blocker");
+
+    vi.useRealTimers();
   });
 
   it("should handle multiple instances of the hook", () => {

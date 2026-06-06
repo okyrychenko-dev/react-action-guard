@@ -1,6 +1,7 @@
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 import { useResolvedValue } from "../../context";
 import { ASYNC_ACTION_PRIORITY } from "../../store";
+import { useBlockerIdAllocator } from "../useBlockerIdAllocator";
 
 /**
  * Options for useAsyncAction hook
@@ -144,18 +145,15 @@ export function useAsyncAction<T = unknown>(
   scope?: string | ReadonlyArray<string>,
   options?: UseAsyncActionOptions
 ): (asyncFn: () => Promise<T>) => Promise<T> {
+  const allocateBlockerId = useBlockerIdAllocator();
   const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
   }));
 
-  // Use counter instead of Date.now() to guarantee unique IDs even for rapid calls
-  const counterRef = useRef(0);
-
   const executeWithBlocking = useCallback(
     async (asyncFn: () => Promise<T>): Promise<T> => {
-      counterRef.current += 1;
-      const blockerId = `${actionId}-${String(counterRef.current)}`;
+      const blockerId = allocateBlockerId(actionId);
 
       try {
         addBlocker(blockerId, {
@@ -171,7 +169,15 @@ export function useAsyncAction<T = unknown>(
         removeBlocker(blockerId);
       }
     },
-    [actionId, scope, options?.timeout, options?.onTimeout, addBlocker, removeBlocker]
+    [
+      actionId,
+      scope,
+      options?.timeout,
+      options?.onTimeout,
+      allocateBlockerId,
+      addBlocker,
+      removeBlocker,
+    ]
   );
 
   return executeWithBlocking;

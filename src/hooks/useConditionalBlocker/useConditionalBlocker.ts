@@ -4,6 +4,8 @@ import { createBlockerConfig } from "../useBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
 
+const DEFAULT_CHECK_INTERVAL = 1000;
+
 /**
  * Blocks UI based on a dynamic condition that is periodically evaluated.
  *
@@ -156,6 +158,11 @@ export function useConditionalBlocker<TState = unknown>(
   const isBlockedRef = useRef(false);
   const configRef = useConfigRef(config);
 
+  const checkInterval =
+    config.checkInterval !== undefined && config.checkInterval > 0
+      ? config.checkInterval
+      : DEFAULT_CHECK_INTERVAL;
+
   const checkCondition = useCallback(() => {
     const currentConfig = configRef.current;
     const shouldBlock = currentConfig.condition(currentConfig.state);
@@ -176,8 +183,7 @@ export function useConditionalBlocker<TState = unknown>(
   useEffect(() => {
     checkCondition();
 
-    const interval = configRef.current.checkInterval ?? 1000;
-    intervalRef.current = setInterval(checkCondition, interval);
+    intervalRef.current = setInterval(checkCondition, checkInterval);
 
     return (): void => {
       if (intervalRef.current) {
@@ -189,7 +195,5 @@ export function useConditionalBlocker<TState = unknown>(
         isBlockedRef.current = false;
       }
     };
-    // configRef is stable and doesn't need to be in dependencies
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [checkCondition, blockerId, removeBlocker]);
+  }, [checkCondition, blockerId, removeBlocker, checkInterval]);
 }

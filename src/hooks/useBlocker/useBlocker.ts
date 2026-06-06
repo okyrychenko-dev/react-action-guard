@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useResolvedValue } from "../../context";
 import { areBlockerConfigsEqual } from "./useBlocker.utils";
 import type { BlockerConfig } from "../../store";
@@ -86,14 +86,29 @@ export function useBlocker(blockerId: string, config: BlockerConfig, isActive = 
     updateBlocker: state.updateBlocker,
   }));
   const lastConfigRef = useRef<BlockerConfig | null>(null);
+  const onTimeoutRef = useRef(config.onTimeout);
+
+  onTimeoutRef.current = config.onTimeout;
+
+  const handleTimeout = useCallback((id: string): void => {
+    onTimeoutRef.current?.(id);
+  }, []);
+
+  const storeConfig = useMemo<BlockerConfig>(
+    () => ({
+      ...config,
+      onTimeout: config.onTimeout ? handleTimeout : undefined,
+    }),
+    [config, handleTimeout]
+  );
 
   useEffect(() => {
     if (!isActive || !blockerId) {
       return;
     }
 
-    addBlocker(blockerId, config);
-    lastConfigRef.current = config;
+    addBlocker(blockerId, storeConfig);
+    lastConfigRef.current = storeConfig;
 
     return () => {
       lastConfigRef.current = null;
@@ -107,11 +122,14 @@ export function useBlocker(blockerId: string, config: BlockerConfig, isActive = 
       return;
     }
 
-    if (lastConfigRef.current !== null && areBlockerConfigsEqual(lastConfigRef.current, config)) {
+    if (
+      lastConfigRef.current !== null &&
+      areBlockerConfigsEqual(lastConfigRef.current, storeConfig)
+    ) {
       return;
     }
 
-    updateBlocker(blockerId, config);
-    lastConfigRef.current = config;
-  }, [blockerId, config, isActive, updateBlocker]);
+    updateBlocker(blockerId, storeConfig);
+    lastConfigRef.current = storeConfig;
+  }, [blockerId, storeConfig, isActive, updateBlocker]);
 }

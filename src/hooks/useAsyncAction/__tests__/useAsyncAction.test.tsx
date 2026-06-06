@@ -1,5 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
+import { type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { UIBlockingProvider, useResolvedStoreApi } from "../../../context";
 import { ASYNC_ACTION_PRIORITY, uiBlockingStoreApi } from "../../../store";
 import { actAsync } from "../../__tests__/test.utils";
 import { useAsyncAction } from "../useAsyncAction";
@@ -200,6 +202,128 @@ describe("useAsyncAction", () => {
 
       return Promise.all([promise1, promise2]);
     });
+  });
+
+  it("should create unique blocker ids across hook instances", async () => {
+    const first = renderHook(() => useAsyncAction("test-action", "test-scope"));
+    const second = renderHook(() => useAsyncAction("test-action", "test-scope"));
+
+    let resolveFirst: VoidFunction = () => undefined;
+    let resolveSecond: VoidFunction = () => undefined;
+
+    const firstAsyncFn = vi.fn(
+      async (): Promise<void> =>
+        new Promise((resolve) => {
+          resolveFirst = resolve;
+        })
+    );
+
+    const secondAsyncFn = vi.fn(
+      async (): Promise<void> =>
+        new Promise((resolve) => {
+          resolveSecond = resolve;
+        })
+    );
+
+    const firstPromise = first.result.current(firstAsyncFn);
+    const secondPromise = second.result.current(secondAsyncFn);
+
+    const info = uiBlockingStoreApi.getState().getBlockingInfo("test-scope");
+
+    expect(info).toHaveLength(2);
+    expect(info[0]?.id).not.toBe(info[1]?.id);
+
+    resolveFirst();
+    resolveSecond();
+
+    await Promise.all([firstPromise, secondPromise]);
+  });
+
+  it("should allocate blocker ids independently for isolated stores", async () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+
+    const first = renderHook(
+      () => ({
+        execute: useAsyncAction("test-action", "test-scope"),
+        store: useResolvedStoreApi(),
+      }),
+      { wrapper }
+    );
+
+    const second = renderHook(
+      () => ({
+        execute: useAsyncAction("test-action", "test-scope"),
+        store: useResolvedStoreApi(),
+      }),
+      { wrapper }
+    );
+
+    let resolveFirst: VoidFunction = () => undefined;
+    let resolveSecond: VoidFunction = () => undefined;
+
+    const firstPromise = first.result.current.execute(
+      async () =>
+        new Promise<void>((resolve) => {
+          resolveFirst = resolve;
+        })
+    );
+
+    const secondPromise = second.result.current.execute(
+      async () =>
+        new Promise<void>((resolve) => {
+          resolveSecond = resolve;
+        })
+    );
+
+    expect(first.result.current.store.getState().getBlockingInfo("test-scope")[0]?.id).toBe(
+      "test-action-1"
+    );
+    expect(second.result.current.store.getState().getBlockingInfo("test-scope")[0]?.id).toBe(
+      "test-action-1"
+    );
+
+    resolveFirst();
+    resolveSecond();
+
+    await Promise.all([firstPromise, secondPromise]);
+  });
+
+  it("should not overwrite an active blocker with an allocated id", async () => {
+    const wrapper = ({ children }: { children: ReactNode }) => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+
+    const { result } = renderHook(
+      () => ({
+        execute: useAsyncAction("test-action", "test-scope"),
+        store: useResolvedStoreApi(),
+      }),
+      { wrapper }
+    );
+
+    result.current.store.getState().addBlocker("test-action-1", { scope: "test-scope" });
+
+    let resolveAction: VoidFunction = () => undefined;
+
+    const actionPromise = result.current.execute(
+      async () =>
+        new Promise<void>((resolve) => {
+          resolveAction = resolve;
+        })
+    );
+
+    const blockerIds = result.current.store
+      .getState()
+      .getBlockingInfo("test-scope")
+      .map((blocker) => blocker.id);
+
+    expect(blockerIds).toEqual(expect.arrayContaining(["test-action-1", "test-action-2"]));
+
+    resolveAction();
+
+    await actionPromise;
   });
 
   it("should handle concurrent executions", async () => {

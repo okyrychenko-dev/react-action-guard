@@ -8,7 +8,7 @@ import {
   useUIBlockingStoreFromContext,
 } from "./context";
 import type { StoreApi } from "zustand";
-import type { UIBlockingStore } from "./store";
+import type { UIBlockingStore } from "./store/uiBlockingStore.types";
 
 // Core hooks
 export {
@@ -33,8 +33,8 @@ export type {
 } from "./hooks";
 
 // Store
-export { useUIBlockingStore, uiBlockingStoreApi } from "./store";
-export type { ShallowStoreBindings } from "./store";
+export { useUIBlockingStore, uiBlockingStoreApi } from "./store/uiBlockingStore.store";
+export type { ShallowStoreBindings } from "./store/uiBlockingStore.types";
 
 // Store types
 export type {
@@ -44,7 +44,7 @@ export type {
   UIBlockingStore,
   UIBlockingStoreActions,
   UIBlockingStoreState,
-} from "./store";
+} from "./store/uiBlockingStore.types";
 
 // Middleware
 export {

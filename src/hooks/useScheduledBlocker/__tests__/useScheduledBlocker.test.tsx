@@ -74,6 +74,36 @@ describe("useScheduledBlocker", () => {
     expect(onScheduleEnd).toHaveBeenCalledTimes(1);
   });
 
+  it("should reschedule blocking when schedule changes", () => {
+    const now = Date.now();
+
+    const { rerender } = renderHook(
+      ({ start }: { start: number }) =>
+        useScheduledBlocker("test-blocker", {
+          scope: "test",
+          schedule: {
+            start,
+            duration: 1000,
+          },
+        }),
+      { initialProps: { start: now + 1000 } }
+    );
+
+    rerender({ start: now + 2000 });
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(true);
+  });
+
   it("should support Date objects for schedule", () => {
     const now = new Date();
     const startDate = new Date(now.getTime() + 1000);
