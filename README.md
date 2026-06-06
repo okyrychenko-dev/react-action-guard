@@ -232,6 +232,10 @@ Wraps an async function with automatic blocking/unblocking.
 
 **Returns:** `(asyncFn: () => Promise<T>) => Promise<T>` - Function wrapper
 
+Each execution receives a unique blocker ID within the resolved store, including concurrent
+executions from different hook instances. Separate `UIBlockingProvider` stores allocate IDs
+independently.
+
 **Example:**
 
 ```jsx
@@ -355,6 +359,9 @@ Use it when blocking is driven by time windows rather than user-triggered async 
   - `onScheduleEnd?: () => void` - Callback when blocking ends
   - Plus all `BlockerConfig` properties (scope, reason, priority)
 
+Changing `schedule.start`, `schedule.end`, or `schedule.duration` on rerender cancels the previous
+timers and schedules the blocker using the latest values.
+
 **Example:**
 
 ```jsx
@@ -390,9 +397,11 @@ Use this when polling is an acceptable tradeoff and the condition is not natural
 - `config: ConditionalBlockerConfig<TState>`
   - `scope: string | string[]` - Required scope(s) to block
   - `condition: (state?: TState) => boolean` - Function that determines if blocking should be active
-  - `checkInterval?: number` - How often to check the condition in ms (default: 1000)
+  - `checkInterval?: number` - How often to check the condition in ms (default: 1000; non-positive values use the default)
   - `state?: TState` - Optional state to pass to the condition function
   - Plus all other `BlockerConfig` properties (reason, priority)
+
+Changing `checkInterval` on rerender restarts condition checks using the latest interval.
 
 **Example:**
 
@@ -626,6 +635,7 @@ configureMiddleware([
 #### Logger Middleware
 
 Log blocker lifecycle events to the console for debugging.
+The middleware is not disabled automatically in production; register it conditionally when needed.
 
 ```jsx
 import { configureMiddleware, loggerMiddleware } from "@okyrychenko-dev/react-action-guard";
