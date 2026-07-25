@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "type": "module",
   "description": "Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup",
   "main": "./dist/index.js",
@@ -51,7 +51,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/okyrychenko-dev/react-action-guard"
+    "url": "git+https://github.com/okyrychenko-dev/react-action-guard.git"
   },
   "bugs": {
     "url": "https://github.com/okyrychenko-dev/react-action-guard/issues"
@@ -65,7 +65,7 @@
     "zustand": "^5.0.0"
   },
   "dependencies": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.1",
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
     "immer": "^10.0.0"
   },
   "devDependencies": {

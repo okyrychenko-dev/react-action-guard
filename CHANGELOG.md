@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.5] - 2026-07-25
+
+### Changed
+
+- Made scheduled blockers react to runtime schedule changes.
+- Made conditional blockers react to runtime interval changes and fall back to
+  the default interval for non-positive values.
+- Removed the internal circular type dependency from the package entrypoint.
+
+### Fixed
+
+- Prevented `useAsyncAction` blocker ID collisions across hook instances while
+  preserving isolation between provider stores.
+- Prevented inline `useBlocker` timeout callbacks from causing redundant blocker
+  updates while still invoking the latest callback.
+- Ensured active timeout handlers and timeout middleware use the latest blocker
+  configuration.
+- Prevented remove middleware contexts from exposing the internal `timeoutId`.
+- Corrected `loggerMiddleware` documentation about production logging behavior.
+
 ## [1.0.4] - 2026-05-27
 
 ### Changed
@@ -340,7 +360,8 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.4...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...HEAD
+[1.0.5]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...v1.0.3
 [1.0.2]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.1...v1.0.2
