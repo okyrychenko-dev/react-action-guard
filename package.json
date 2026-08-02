@@ -32,7 +32,8 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
   },
   "keywords": [
     "react",
@@ -76,6 +77,7 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "happy-dom": "^20.0.10",
+    "husky": "^9.1.7",
     "prettier": "^3.6.2",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -84,5 +86,8 @@
     "typescript-eslint": "^8.46.4",
     "vitest": "^4.0.9",
     "zustand": "^5.0.8"
+  },
+  "allowScripts": {
+    "esbuild": true
   }
 }
