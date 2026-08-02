@@ -17,9 +17,7 @@ export function useMutationBlockerId(
   const instanceId = useId();
   return useMemo(
     () =>
-      mutationKey
-        ? `${prefix}-${hashKey(mutationKey)}-${instanceId}`
-        : `${prefix}-${instanceId}`,
+      mutationKey ? `${prefix}-${hashKey(mutationKey)}-${instanceId}` : `${prefix}-${instanceId}`,
     [prefix, mutationKey, instanceId]
   );
 }

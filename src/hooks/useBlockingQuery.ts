@@ -218,7 +218,9 @@ export function useBlockingQuery<
   } = blockingConfig;
 
   const shouldBlock =
-    (onLoading && query.isPending) || (onFetching && query.isRefetching) || (onError && query.isError);
+    (onLoading && query.isPending) ||
+    (onFetching && query.isRefetching) ||
+    (onError && query.isError);
 
   const currentReason = resolveBlockingReason({
     defaultReason: reason,

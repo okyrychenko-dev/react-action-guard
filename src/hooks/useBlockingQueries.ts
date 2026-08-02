@@ -161,16 +161,17 @@ import type { BlockingQueriesInput, QueriesBlockingConfig } from "./useBlockingQ
  * @public
  * @since 0.2.0
  */
-export function useBlockingQueries<
-  T extends Array<unknown>,
->(
+export function useBlockingQueries<T extends Array<unknown>>(
   queries: BlockingQueriesInput<T>,
   blockingConfig: QueriesBlockingConfig,
   queryClient?: QueryClient
 ): QueriesResults<T> {
-  const results = useQueries({
-    queries,
-  }, queryClient);
+  const results = useQueries(
+    {
+      queries,
+    },
+    queryClient
+  );
 
   const blockerId = useRandomBlockerId();
 

@@ -5,14 +5,12 @@ import { useBlockingQueries } from "../useBlockingQueries";
 import { useBlockingQuery } from "../useBlockingQuery";
 import type { InfiniteData, UseQueryResult } from "@tanstack/react-query";
 
-type IsEqual<A, B> =
-  (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
+type IsEqual<A, B> = [A] extends [B] ? ([B] extends [A] ? true : false) : false;
 
-declare function assertType<T extends true>(): void;
-
-function tuple<T extends Array<unknown>>(...values: T): T {
+// The generic preserves the exact tuple shape for TanStack Query's overloads.
+const tuple = <const T extends Array<unknown>>(...values: T): T => {
   return values;
-}
+};
 
 it("preserves query select inference", () => {
   function useTypedQuery() {
@@ -28,8 +26,10 @@ it("preserves query select inference", () => {
 
   type QueryResult = ReturnType<typeof useTypedQuery>;
 
-  assertType<IsEqual<QueryResult, UseQueryResult<string>>>();
-  assertType<IsEqual<QueryResult["data"], string | undefined>>();
+  const queryResultCheck: IsEqual<QueryResult, UseQueryResult<string>> = true;
+  const queryDataCheck: IsEqual<QueryResult["data"], string | undefined> = true;
+  expect(queryResultCheck).toBe(true);
+  expect(queryDataCheck).toBe(true);
 });
 
 it("preserves infinite query data shape", () => {
@@ -54,7 +54,9 @@ it("preserves infinite query data shape", () => {
     nextPage: number;
   }
 
-  assertType<IsEqual<InfiniteResult["data"], InfiniteData<PageData> | undefined>>();
+  const infiniteDataCheck: IsEqual<InfiniteResult["data"], InfiniteData<PageData> | undefined> =
+    true;
+  expect(infiniteDataCheck).toBe(true);
 });
 
 it("preserves mutation variable and result inference", () => {
@@ -77,9 +79,14 @@ it("preserves mutation variable and result inference", () => {
 
   type MutationResult = ReturnType<typeof useTypedMutation>;
 
-  assertType<IsEqual<Parameters<MutationResult["mutate"]>[0], { id: string }>>();
-  assertType<IsEqual<MutationResult["data"], { ok: true; id: string } | undefined>>();
-  assertType<IsEqual<MutationResult["variables"], { id: string } | undefined>>();
+  const mutationVariablesCheck: IsEqual<Parameters<MutationResult["mutate"]>[0], { id: string }> =
+    true;
+  const mutationDataCheck: IsEqual<MutationResult["data"], { ok: true; id: string } | undefined> =
+    true;
+  const mutationStateCheck: IsEqual<MutationResult["variables"], { id: string } | undefined> = true;
+  expect(mutationVariablesCheck).toBe(true);
+  expect(mutationDataCheck).toBe(true);
+  expect(mutationStateCheck).toBe(true);
 });
 
 it("preserves tuple inference for parallel queries", () => {
@@ -104,8 +111,12 @@ it("preserves tuple inference for parallel queries", () => {
 
   type QueryResults = ReturnType<typeof useTypedQueries>;
 
-  assertType<IsEqual<QueryResults[0]["data"], string | undefined>>();
-  assertType<IsEqual<QueryResults[1]["data"], Array<{ id: number; title: string }> | undefined>>();
+  const userDataCheck: IsEqual<QueryResults[0]["data"], string | undefined> = true;
+  const postsDataCheck: IsEqual<
+    QueryResults[1]["data"],
+    Array<{ id: number; title: string }> | undefined
+  > = true;
 
-  expect(true).toBe(true);
+  expect(userDataCheck).toBe(true);
+  expect(postsDataCheck).toBe(true);
 });

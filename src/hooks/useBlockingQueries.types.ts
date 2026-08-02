@@ -1,4 +1,9 @@
-import type { DefaultError, QueriesOptions, QueryKey, UseQueryOptions } from "@tanstack/react-query";
+import type {
+  DefaultError,
+  QueriesOptions,
+  QueryKey,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import type { BaseBlockingConfig } from "../types";
 
 /**
