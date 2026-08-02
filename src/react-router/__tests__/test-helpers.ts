@@ -7,7 +7,7 @@ const mockLocation: Location = {
   hash: "",
   state: null,
   key: "default",
-  unstable_mask: undefined
+  unstable_mask: undefined,
 };
 
 /**
