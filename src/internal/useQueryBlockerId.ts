@@ -11,5 +11,8 @@ import { useId, useMemo } from "react";
  */
 export function useQueryBlockerId(prefix: string, queryKey: QueryKey): string {
   const instanceId = useId();
-  return useMemo(() => `${prefix}-${hashKey(queryKey)}-${instanceId}`, [prefix, queryKey, instanceId]);
+  return useMemo(
+    () => `${prefix}-${hashKey(queryKey)}-${instanceId}`,
+    [prefix, queryKey, instanceId]
+  );
 }

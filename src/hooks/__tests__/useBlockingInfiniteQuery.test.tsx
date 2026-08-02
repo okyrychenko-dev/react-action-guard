@@ -386,7 +386,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const info = uiBlockingStoreApi.getState().getBlockingInfo("test");
-      
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Strict mode load");
     });

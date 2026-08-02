@@ -13,17 +13,15 @@ import { UseBlockingManagerOptions } from "./useBlockingManager.types";
  *
  * @param options - Configuration for blocker management
  */
-export function useBlockingManager(
-  {
-    blockerId,
-    shouldBlock,
-    scope,
-    reason,
-    priority,
-    timeout,
-    onTimeout,
-  }: UseBlockingManagerOptions
-): void {
+export function useBlockingManager({
+  blockerId,
+  shouldBlock,
+  scope,
+  reason,
+  priority,
+  timeout,
+  onTimeout,
+}: UseBlockingManagerOptions): void {
   const { addBlocker, updateBlocker, removeBlocker } = uiBlockingStoreApi.getState();
 
   // Track whether this hook instance currently owns an active blocker.
