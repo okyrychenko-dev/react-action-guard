@@ -1,4 +1,4 @@
-npm run typecheck
-npm run lint
-npm run test:run
-npm run build
+pnpm run typecheck
+pnpm run lint
+pnpm run test:run
+pnpm run build
