@@ -1,7 +1,7 @@
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useBlocker } from "../../hooks/useBlocker";
+import { useActionBlocker } from "../../hooks/useBlocker";
 import { useIsBlocked } from "../../hooks/useIsBlocked";
 import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import {
@@ -77,7 +77,7 @@ describe("UIBlockingProvider", () => {
   describe("Store isolation", () => {
     it("should isolate state between provider and global store", () => {
       const TestComponent = () => {
-        useBlocker("provider-blocker", { scope: "test", reason: "Provider test" });
+        useActionBlocker("provider-blocker", { scope: "test", reason: "Provider test" });
         const isBlocked = useIsBlocked("test");
         return <div data-testid="blocked">{isBlocked ? "blocked" : "not-blocked"}</div>;
       };
@@ -114,7 +114,7 @@ describe("UIBlockingProvider", () => {
       };
 
       const Provider1Content = () => {
-        useBlocker("blocker-1", { scope: "shared-scope", reason: "Provider 1" });
+        useActionBlocker("blocker-1", { scope: "shared-scope", reason: "Provider 1" });
         return <BlockerDisplay testId="provider-1" />;
       };
 
@@ -247,6 +247,6 @@ describe("UIBlockingProvider", () => {
 
 // Helper component for middleware test
 function TestBlockerComponent() {
-  useBlocker("test-blocker", { scope: "test", reason: "Test" });
+  useActionBlocker("test-blocker", { scope: "test", reason: "Test" });
   return <div data-testid="blocker-test">Test</div>;
 }

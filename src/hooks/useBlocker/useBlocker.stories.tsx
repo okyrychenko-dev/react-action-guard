@@ -7,10 +7,10 @@ import {
   StoryContainer,
 } from "../../storybook/components";
 import { useIsBlocked } from "../useIsBlocked";
-import { useBlocker } from "./useBlocker";
+import { useActionBlocker } from "./useBlocker";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../../storybook/components/shared.stories.css";
-import "./useBlocker.stories.css";
+import "./useActionBlocker.stories.css";
 interface BlockerDemoProps {
   blockerId?: string;
   scope?: string;
@@ -31,14 +31,14 @@ function BlockerDemo(props: BlockerDemoProps): ReactElement {
   const [isActive, setIsActive] = useState(initialActive);
   const isBlocked = useIsBlocked(scope);
 
-  useBlocker(blockerId, { scope, reason, priority }, isActive);
+  useActionBlocker(blockerId, { scope, reason, priority }, isActive);
 
   const handleToggle = (): void => {
     setIsActive((prev) => !prev);
   };
 
   return (
-    <StoryContainer title="useBlocker Demo">
+    <StoryContainer title="useActionBlocker Demo">
       <StatusDisplay>{isBlocked ? "🔒 Blocked" : "🔓 Not Blocked"}</StatusDisplay>
 
       <button

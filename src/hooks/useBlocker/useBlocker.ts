@@ -30,7 +30,7 @@ import type { BlockerConfig } from "../../store";
  * function MyForm() {
  *   const [isSubmitting, setIsSubmitting] = useState(false);
  *
- *   useBlocker('form-submit', {
+ *   useActionBlocker('form-submit', {
  *     scope: 'form',
  *     reason: 'Submitting form...',
  *     priority: 50,
@@ -48,7 +48,7 @@ import type { BlockerConfig } from "../../store";
  * @example
  * Multiple scopes with high priority
  * ```tsx
- * useBlocker('critical-save', {
+ * useActionBlocker('critical-save', {
  *   scope: ['form', 'navigation', 'actions'],
  *   reason: 'Saving critical data...',
  *   priority: 90,
@@ -61,7 +61,7 @@ import type { BlockerConfig } from "../../store";
  * function Editor() {
  *   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
  *
- *   useBlocker('unsaved-changes', {
+ *   useActionBlocker('unsaved-changes', {
  *     scope: 'navigation',
  *     reason: 'You have unsaved changes',
  *     priority: 80,
@@ -79,7 +79,7 @@ import type { BlockerConfig } from "../../store";
  * @public
  * @since 0.6.0
  */
-export function useBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
+export function useActionBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
   const { addBlocker, removeBlocker, updateBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
@@ -133,3 +133,8 @@ export function useBlocker(blockerId: string, config: BlockerConfig, isActive = 
     lastConfigRef.current = storeConfig;
   }, [blockerId, storeConfig, isActive, updateBlocker]);
 }
+
+/**
+ * @deprecated Use {@link useActionBlocker} to avoid confusion with React Router's `useBlocker`.
+ */
+export const useBlocker: typeof useActionBlocker = useActionBlocker;

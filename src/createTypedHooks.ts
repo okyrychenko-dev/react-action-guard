@@ -1,5 +1,5 @@
 import { type UseAsyncActionOptions, useAsyncAction } from "./hooks/useAsyncAction";
-import { useBlocker } from "./hooks/useBlocker";
+import { useActionBlocker } from "./hooks/useBlocker";
 import { useBlockingInfo } from "./hooks/useBlockingInfo";
 import { useIsBlocked } from "./hooks/useIsBlocked";
 import type { BlockerConfigTyped, ScopeValue } from "./types";
@@ -9,7 +9,17 @@ import type { BlockerConfigTyped, ScopeValue } from "./types";
  */
 export interface TypedHooks<TScope extends string> {
   /**
-   * Type-safe version of useBlocker hook
+   * Type-safe action blocker hook
+   */
+  useActionBlocker: (
+    blockerId: string,
+    config: BlockerConfigTyped<TScope>,
+    isActive?: boolean
+  ) => void;
+
+  /**
+   * Backward-compatible name for useActionBlocker
+   * @deprecated Use `useActionBlocker`.
    */
   useBlocker: (blockerId: string, config: BlockerConfigTyped<TScope>, isActive?: boolean) => void;
 
@@ -45,22 +55,27 @@ export interface TypedHooks<TScope extends string> {
  * type AppScopes = "global" | "form" | "navigation" | "checkout";
  *
  * // Create typed hooks
- * const { useBlocker, useIsBlocked, useAsyncAction } = createTypedHooks<AppScopes>();
+ * const { useActionBlocker, useIsBlocked, useAsyncAction } = createTypedHooks<AppScopes>();
  *
  * // Now TypeScript will catch typos
- * useBlocker("id", { scope: "form" }); // ✓ OK
- * useBlocker("id", { scope: "typo" }); // ✗ Type error!
+ * useActionBlocker("id", { scope: "form" }); // ✓ OK
+ * useActionBlocker("id", { scope: "typo" }); // ✗ Type error!
  * ```
  */
 export function createTypedHooks<TScope extends string>(): TypedHooks<TScope> {
   // TScope extends string, so all typed scopes are assignable to string | ReadonlyArray<string>
   // This allows us to pass typed values directly without casting
+  const useTypedActionBlocker = (
+    blockerId: string,
+    config: BlockerConfigTyped<TScope>,
+    isActive?: boolean
+  ): void => {
+    useActionBlocker(blockerId, config, isActive);
+  };
+
   return {
-    useBlocker: (blockerId, config, isActive) => {
-      // BlockerConfigTyped<TScope> is structurally compatible with BlockerConfig
-      // because TScope extends string
-      useBlocker(blockerId, config, isActive);
-    },
+    useActionBlocker: useTypedActionBlocker,
+    useBlocker: useTypedActionBlocker,
 
     useIsBlocked: (scope) => {
       // ScopeValue<TScope> = TScope | ReadonlyArray<TScope>

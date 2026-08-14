@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uiBlockingStoreApi } from "../../../store";
-import { useBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useBlocker";
 import type { BlockerConfig } from "../../../store";
 
 describe("useBlocker", () => {
@@ -14,7 +14,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test" };
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -27,7 +27,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test" };
 
     const { unmount } = renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
@@ -46,7 +46,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test" };
 
     renderHook(() => {
-      useBlocker(blockerId, config, false);
+      useActionBlocker(blockerId, config, false);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -60,7 +60,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ active }: { active: boolean }) => {
-        useBlocker(blockerId, config, active);
+        useActionBlocker(blockerId, config, active);
       },
       { initialProps: { active: false } }
     );
@@ -84,7 +84,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ active }: { active: boolean }) => {
-        useBlocker(blockerId, config, active);
+        useActionBlocker(blockerId, config, active);
       },
       { initialProps: { active: true } }
     );
@@ -107,7 +107,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ id }: { id: string }) => {
-        useBlocker(id, config);
+        useActionBlocker(id, config);
       },
       { initialProps: { id: "blocker-1" } }
     );
@@ -133,7 +133,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test" };
 
     renderHook(() => {
-      useBlocker("", config);
+      useActionBlocker("", config);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -146,7 +146,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = {};
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -159,7 +159,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: ["scope1", "scope2"] };
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -173,7 +173,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test", priority: 100 };
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
@@ -187,7 +187,7 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test", reason: "Custom reason" };
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
@@ -201,7 +201,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ reason, priority }: { reason: string; priority: number }) => {
-        useBlocker(
+        useActionBlocker(
           blockerId,
           {
             scope: "test",
@@ -240,7 +240,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ tick }: { tick: number }) => {
-        useBlocker(
+        useActionBlocker(
           blockerId,
           {
             scope: ["scope1", "scope2"],
@@ -284,7 +284,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ tick }: { tick: number }) => {
-        useBlocker("test-blocker", {
+        useActionBlocker("test-blocker", {
           scope: "test",
           timeout: 1000,
           onTimeout: () => tick,
@@ -308,7 +308,7 @@ describe("useBlocker", () => {
 
     const { rerender } = renderHook(
       ({ onTimeout }: { onTimeout: (blockerId: string) => void }) => {
-        useBlocker("test-blocker", {
+        useActionBlocker("test-blocker", {
           scope: "test",
           timeout: 1000,
           onTimeout,
@@ -332,10 +332,10 @@ describe("useBlocker", () => {
     const config2: BlockerConfig = { scope: "scope2" };
 
     renderHook(() => {
-      useBlocker("blocker-1", config1);
+      useActionBlocker("blocker-1", config1);
     });
     renderHook(() => {
-      useBlocker("blocker-2", config2);
+      useActionBlocker("blocker-2", config2);
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
@@ -349,10 +349,10 @@ describe("useBlocker", () => {
     const config2: BlockerConfig = { scope: "test" };
 
     renderHook(() => {
-      useBlocker("blocker-1", config1);
+      useActionBlocker("blocker-1", config1);
     });
     const { unmount } = renderHook(() => {
-      useBlocker("blocker-2", config2);
+      useActionBlocker("blocker-2", config2);
     });
 
     const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
@@ -371,17 +371,17 @@ describe("useBlocker", () => {
     const config: BlockerConfig = { scope: "test" };
 
     const { unmount: unmount1 } = renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
     unmount1();
 
     const { unmount: unmount2 } = renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
     unmount2();
 
     renderHook(() => {
-      useBlocker(blockerId, config);
+      useActionBlocker(blockerId, config);
     });
 
     await waitFor(() => {

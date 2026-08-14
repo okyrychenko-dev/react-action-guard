@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
-import { useBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useBlocker";
 import { useIsBlocked } from "./useIsBlocked";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../../storybook/components/shared.stories.css";
@@ -24,9 +24,9 @@ function IsBlockedDemo(props: IsBlockedDemoProps): ReactElement {
   const isBlockedScopeOrGlobal = useIsBlocked([scope, "global"]);
 
   // Individual blockers
-  useBlocker("blocker-1", { scope, reason: "Blocker 1 active" }, blocker1Active);
-  useBlocker("blocker-2", { scope, reason: "Blocker 2 active" }, blocker2Active);
-  useBlocker(
+  useActionBlocker("blocker-1", { scope, reason: "Blocker 1 active" }, blocker1Active);
+  useActionBlocker("blocker-2", { scope, reason: "Blocker 2 active" }, blocker2Active);
+  useActionBlocker(
     "global-blocker",
     { scope: "global", reason: "Global blocker active" },
     blocker3Active

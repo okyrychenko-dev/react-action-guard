@@ -13,6 +13,8 @@ import type { UIBlockingStore } from "./store/uiBlockingStore.types";
 // Core hooks
 export {
   useAsyncAction,
+  useActionBlocker,
+  // eslint-disable-next-line @typescript-eslint/no-deprecated -- Kept as a public compatibility alias.
   useBlocker,
   useBlockingInfo,
   useConditionalBlocker,

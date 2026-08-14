@@ -2,7 +2,7 @@
   "name": "@okyrychenko-dev/react-action-guard",
   "version": "1.0.5",
   "type": "module",
-  "description": "Elegant UI blocking management for React applications with priorities, scopes, and automatic cleanup",
+  "description": "Coordinate shared UI interaction locks across complex React forms and workflows",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -65,8 +65,7 @@
     "zustand": "^5.0.0"
   },
   "dependencies": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
-    "immer": "^10.0.0"
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

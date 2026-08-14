@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useBlocker } from "../../hooks";
+import { useActionBlocker } from "../../hooks";
 import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import type { Middleware, MiddlewareContext } from "../middleware.types";
 
@@ -24,7 +24,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
-      useBlocker("test-blocker", {
+      useActionBlocker("test-blocker", {
         scope: "test",
         reason: "Test reason",
       })
@@ -52,7 +52,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("test-middleware", middleware);
 
     const { unmount } = renderHook(() =>
-      useBlocker("test-blocker", {
+      useActionBlocker("test-blocker", {
         scope: "test",
         reason: "Test reason",
       })
@@ -107,7 +107,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("middleware3", middleware3);
 
     renderHook(() =>
-      useBlocker("test-blocker", {
+      useActionBlocker("test-blocker", {
         scope: "test",
         reason: "Test reason",
       })
@@ -128,7 +128,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("async-middleware", asyncMiddleware);
 
     renderHook(() =>
-      useBlocker("test-blocker", {
+      useActionBlocker("test-blocker", {
         scope: "test",
         reason: "Test reason",
       })
@@ -153,7 +153,7 @@ describe("Middleware Integration", () => {
 
     expect(() =>
       renderHook(() =>
-        useBlocker("test-blocker", {
+        useActionBlocker("test-blocker", {
           scope: "test",
           reason: "Test reason",
         })
@@ -174,7 +174,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("middleware2", middleware2);
 
     const { unmount } = renderHook(() =>
-      useBlocker("test-blocker-1", {
+      useActionBlocker("test-blocker-1", {
         scope: "test",
         reason: "Test reason",
       })
@@ -196,7 +196,7 @@ describe("Middleware Integration", () => {
 
     act(() => {
       renderHook(() =>
-        useBlocker("test-blocker-2", {
+        useActionBlocker("test-blocker-2", {
           scope: "test",
           reason: "Test reason",
         })
@@ -220,7 +220,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
-      useBlocker("test-blocker", {
+      useActionBlocker("test-blocker", {
         scope: ["scope1", "scope2"],
         reason: "Test reason",
         priority: 75,
@@ -242,7 +242,7 @@ describe("Middleware Integration", () => {
   it("should not execute middleware if none registered", () => {
     expect(() =>
       renderHook(() =>
-        useBlocker("test-blocker", {
+        useActionBlocker("test-blocker", {
           scope: "test",
           reason: "Test reason",
         })
@@ -262,7 +262,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("my-middleware", middleware1);
 
     const { unmount } = renderHook(() =>
-      useBlocker("test-blocker-1", {
+      useActionBlocker("test-blocker-1", {
         scope: "test",
         reason: "Test reason",
       })
@@ -283,7 +283,7 @@ describe("Middleware Integration", () => {
 
     act(() => {
       renderHook(() =>
-        useBlocker("test-blocker-2", {
+        useActionBlocker("test-blocker-2", {
           scope: "test",
           reason: "Test reason",
         })
@@ -310,7 +310,7 @@ describe("Middleware Integration", () => {
     registerMiddleware("analytics", analyticsMiddleware);
 
     const { unmount } = renderHook(() =>
-      useBlocker("composed-blocker", {
+      useActionBlocker("composed-blocker", {
         scope: "test",
         reason: "Test reason",
       })

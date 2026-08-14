@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
-import { useBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useBlocker";
 import { useBlockingInfo } from "./useBlockingInfo";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../../storybook/components/shared.stories.css";
@@ -23,17 +23,17 @@ function BlockingInfoDemo(props: BlockingInfoDemoProps): ReactElement {
   const globalBlockers = useBlockingInfo("global");
 
   // Individual blockers with different priorities
-  useBlocker(
+  useActionBlocker(
     "payment-processing",
     { scope, reason: "Payment is being processed", priority: 90 },
     blocker1Active
   );
-  useBlocker(
+  useActionBlocker(
     "inventory-check",
     { scope, reason: "Checking inventory availability", priority: 50 },
     blocker2Active
   );
-  useBlocker(
+  useActionBlocker(
     "global-maintenance",
     { scope: "global", reason: "System maintenance in progress", priority: 100 },
     blocker3Active

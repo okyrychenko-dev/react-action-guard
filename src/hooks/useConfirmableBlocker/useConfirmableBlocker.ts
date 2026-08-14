@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useBlocker";
 import {
   ConfirmableBlockerConfig,
   UseConfirmableBlockerReturn,
@@ -131,7 +131,7 @@ import {
  * }
  * ```
  *
- * @see {@link useBlocker} for simple blocking without confirmation
+ * @see {@link useActionBlocker} for simple blocking without confirmation
  * @see {@link ConfirmableBlockerConfig} for configuration options
  * @see {@link UseConfirmableBlockerReturn} for return value structure
  *
@@ -145,7 +145,7 @@ export function useConfirmableBlocker(
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
 
-  useBlocker(
+  useActionBlocker(
     blockerId,
     {
       ...config,

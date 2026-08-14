@@ -4,18 +4,21 @@
 [![npm downloads](https://img.shields.io/npm/dm/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-> Coordinate UI blocking across async actions and competing interactions in React
+> Coordinate shared UI interaction locks in form-heavy and workflow-heavy React applications
 
-`react-action-guard` helps you prevent duplicate submits, conflicting actions, and stale UI interactions without scattering local `isLoading` flags across components.
+`react-action-guard` is for interfaces where one operation must disable or inform several unrelated components. It coordinates duplicate-submit protection, conflicting actions, navigation-sensitive workflows, and non-network blockers through shared scopes with automatic lifecycle cleanup.
 
-## Why Use It
+For a button with one local loading state, React state or your data-fetching library is usually enough. This package becomes useful when multiple independent operations and components need to agree on what is blocked, where, and why.
 
-- Wrap async work with `useAsyncAction` and get blocker cleanup automatically
-- Coordinate blocking by `scope` across unrelated components
-- Inspect current blockers with `useIsBlocked` and `useBlockingInfo`
-- Isolate state per provider for SSR, tests, and micro-frontends
-- Extend lifecycle events with optional middleware
-- Add advanced hooks for scheduled, confirmable, or conditional flows when needed
+## When It Fits
+
+- Large or multi-step forms with duplicate-submit and conflicting-action risks
+- Dashboards where independent widgets react to the same in-flight operation
+- Enterprise workflows that need blocker reasons, priorities, and centralized visibility
+- Non-network rules such as scheduled, conditional, or confirmable blocking
+- SSR, tests, and micro-frontends that need provider-isolated blocking state
+
+It complements TanStack Query and similar server-state tools: they track requests and mutations, while `react-action-guard` coordinates the UI interaction policy around them.
 
 ## Installation
 
@@ -61,8 +64,14 @@ function SaveButton() {
 
 - `scope` lets you coordinate blocking across components like `"form"`, `"navigation"`, or `"checkout"`
 - `useAsyncAction` is the fastest path for async workflows
-- `useBlocker` is the lower-level hook when you already have your own boolean state
+- `useActionBlocker` is the lower-level hook when you already have your own boolean state
 - `UIBlockingProvider` gives you isolated state instead of the default global store
+
+### Not React Router's `useBlocker`
+
+`useActionBlocker` coordinates shared UI blocking state. It does not intercept browser navigation like React Router's [`useBlocker`](https://reactrouter.com/api/hooks/useBlocker).
+
+The original `useBlocker` export remains available as a deprecated alias for backward compatibility. Prefer `useActionBlocker` in new code, especially when the same application uses React Router.
 
 ## Core Use Cases
 
@@ -97,11 +106,11 @@ npm run storybook
 Start with these first:
 
 - `useAsyncAction`
-- `useBlocker`
+- `useActionBlocker` (`useBlocker` remains as a backward-compatible alias)
 - `useIsBlocked`
 - `useBlockingInfo`
 
-#### `useBlocker(blockerId, config, isActive?)`
+#### `useActionBlocker(blockerId, config, isActive?)`
 
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
