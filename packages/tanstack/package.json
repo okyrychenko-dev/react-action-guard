@@ -1,0 +1,102 @@
+{
+  "name": "@okyrychenko-dev/react-action-guard-tanstack",
+  "version": "0.3.5",
+  "type": "module",
+  "description": "TanStack Query integration for React Action Guard - seamless UI blocking for queries and mutations",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run clean && npm run build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "format": "npm run lint:fix && prettier --write \"src/**/*.{ts,tsx}\"",
+    "format:check": "npm run lint && prettier --check \"src/**/*.{ts,tsx}\"",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "react",
+    "ui-blocking",
+    "tanstack-query",
+    "react-query",
+    "typescript",
+    "state-management",
+    "loading",
+    "async-operations"
+  ],
+  "author": "Oleksii Kyrychenko alexey.kirichenko@gmail.com",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okyrychenko-dev/react-action-guard-tanstack"
+  },
+  "bugs": {
+    "url": "https://github.com/okyrychenko-dev/react-action-guard-tanstack/issues"
+  },
+  "homepage": "https://github.com/okyrychenko-dev/react-action-guard-tanstack#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "@okyrychenko-dev/react-action-guard": "^1.0.4",
+    "@tanstack/react-query": "^5.90.10",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "overrides": {
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@okyrychenko-dev/react-action-guard": "^1.0.4",
+    "@tanstack/react-query": "^5.90.10",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.10.4",
+    "@types/react": "^19.2.5",
+    "@typescript-eslint/eslint-plugin": "^8.48.0",
+    "@typescript-eslint/parser": "^8.48.0",
+    "@vitest/coverage-v8": "^4.0.9",
+    "@vitest/ui": "^4.0.9",
+    "baseline-browser-mapping": "^2.10.0",
+    "eslint": "^9.39.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "happy-dom": "^20.0.10",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tsup": "^8.5.1",
+    "typescript": "^5.6.3",
+    "typescript-eslint": "^8.48.0",
+    "vitest": "^4.0.9",
+    "zustand": "^5.0.8"
+  },
+  "allowScripts": {
+    "esbuild@0.27.0": true
+  }
+}
