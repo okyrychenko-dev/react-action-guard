@@ -1,0 +1,196 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Overview/Introduction" />
+
+# React Action Guard Router
+
+Router integrations for React Action Guard. The package blocks navigation when your app is in a
+protected state and optionally adds browser unload protection.
+
+## Key features
+
+- Router adapters for React Router, TanStack Router, and Next.js
+- Sync or async confirmation flows
+- Scope-based blocking that matches React Action Guard scopes
+- Optional browser unload protection
+- Type-safe APIs
+
+## Core concept
+
+You define when navigation should be blocked, and the adapter handles the rest.
+
+```tsx
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
+
+function EditForm() {
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useNavigationBlocker({
+    when: hasChanges,
+    message: "You have unsaved changes. Leave anyway?",
+  });
+
+  return <form />;
+}
+```
+
+## Async confirmation
+
+When you need async checks (validation, cleanup, audit logs), return a Promise.
+
+```tsx
+useNavigationBlocker({
+  when: hasChanges,
+  message: "Leave anyway?",
+  onConfirm: async (message) => {
+    const accepted = await showCustomDialog(message);
+    if (!accepted) {
+      return false;
+    }
+    await verifyOnServer();
+    return true;
+  },
+});
+```
+
+## Scope synchronization
+
+If you already use React Action Guard scopes, you can block navigation with the same scopes.
+
+```tsx
+useBlocker("checkout-lock", { scope: "checkout" }, isProcessing);
+
+useNavigationBlocker({
+  scope: "checkout",
+  message: "Checkout is in progress. Leave anyway?",
+});
+```
+
+## Router adapters
+
+- React Router v6+ — Full support, uses `useBlocker` under the hood
+- TanStack Router — Full support, uses `router.history.block`
+- Next.js Pages Router — Full support, async confirm + re-attempt
+- Next.js App Router — Limited support, relies mostly on `useBeforeUnload`
+
+## Adapter usage
+
+### React Router v6+
+
+```tsx
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
+
+function EditArticle() {
+  const [dirty, setDirty] = useState(false);
+
+  useNavigationBlocker({
+    when: dirty,
+    message: "You have unsaved changes. Leave anyway?",
+  });
+
+  return <form />;
+}
+```
+
+### TanStack Router
+
+```tsx
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/tanstack-router";
+
+function EditPost() {
+  const [dirty, setDirty] = useState(false);
+
+  useNavigationBlocker({
+    when: dirty,
+    message: "Leave without saving?",
+  });
+
+  return <form />;
+}
+```
+
+### Next.js Pages Router
+
+```tsx
+import { usePagesRouterBlocker } from "@okyrychenko-dev/react-action-guard-router/nextjs";
+
+function ProductEditor() {
+  const [dirty, setDirty] = useState(false);
+
+  usePagesRouterBlocker({
+    when: dirty,
+    message: "Leave this page?",
+  });
+
+  return <form />;
+}
+```
+
+### Next.js App Router (limited)
+
+```tsx
+"use client";
+
+import { useAppRouterBlocker } from "@okyrychenko-dev/react-action-guard-router/nextjs";
+
+export default function Settings() {
+  const [dirty, setDirty] = useState(false);
+
+  useAppRouterBlocker({
+    when: dirty,
+    message: "Leave settings?",
+  });
+
+  return <form />;
+}
+```
+
+## API reference
+
+### useNavigationBlocker (React Router, TanStack Router)
+
+```ts
+type UseNavigationBlockerOptions = {
+  when?: boolean | (() => boolean);
+  scope?: string | string[];
+  message?: string;
+  blockBrowserUnload?: boolean;
+  onConfirm?: (message: string) => boolean | PromiseLike<boolean>;
+  onBlock?: () => void;
+  onAllow?: () => void;
+};
+```
+
+### usePagesRouterBlocker (Next.js Pages Router)
+
+```ts
+type UsePagesRouterBlockerOptions = {
+  when?: boolean | (() => boolean);
+  scope?: string | string[];
+  message?: string;
+  blockBrowserUnload?: boolean;
+  onConfirm?: (message: string) => boolean | PromiseLike<boolean>;
+  onBlock?: () => void;
+  onAllow?: () => void;
+};
+```
+
+### useAppRouterBlocker (Next.js App Router)
+
+```ts
+type UseAppRouterBlockerOptions = {
+  when?: boolean | (() => boolean);
+  scope?: string | string[];
+  message?: string;
+  blockBrowserUnload?: boolean;
+  onBlock?: () => void;
+};
+```
+
+## Where to start
+
+- Examples/Window Confirm Dialog
+- Examples/Custom Dialog
+- Examples/Async Confirmation
+- Integration/Scope Synchronization
+- Integration/Combined Blocking Sources

@@ -1,0 +1,35 @@
+# Source files
+src/
+*.config.ts
+*.config.mjs
+tsconfig.json
+tsconfig.test.json
+
+# Development files
+.husky/
+.vscode/
+.idea/
+
+# Tests
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+
+# Documentation (keep README in package)
+docs/
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Other
+*.log
+.DS_Store
