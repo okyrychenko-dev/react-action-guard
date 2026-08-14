@@ -1,0 +1,22 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--ag-border);
+  border-radius: 6px;
+  background: var(--ag-bg-light);
+}
+
+.cardValue {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--ag-text);
+}
+
+.cardLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ag-text-muted);
+}

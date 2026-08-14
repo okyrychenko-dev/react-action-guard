@@ -1,0 +1,17 @@
+.positionBase {
+  position: fixed;
+}
+
+.positionLeft {
+  bottom: 16px;
+  left: 16px;
+}
+
+.positionRight {
+  bottom: 16px;
+  right: 16px;
+}
+
+.overlayLayer {
+  z-index: 100000;
+}

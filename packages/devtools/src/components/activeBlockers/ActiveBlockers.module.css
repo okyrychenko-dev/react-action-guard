@@ -1,0 +1,50 @@
+.blockerItem {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--ag-border);
+}
+
+.blockerItemStuck {
+  border-left: 3px solid var(--ag-warning);
+  background: rgb(var(--ag-warning-rgb) / 0.08);
+}
+
+.blockerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.blockerId {
+  font-weight: 600;
+  color: var(--ag-primary);
+}
+
+.blockerMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--ag-text-muted);
+}
+
+.activeBadge {
+  background: var(--ag-success);
+}
+
+.stuckBadge {
+  background: var(--ag-warning);
+}
+
+.emptyIcon {
+  display: inline-flex;
+}
+
+.emptyTitle {
+  margin-top: 12px;
+}
+
+.emptySubtext {
+  font-size: 11px;
+  margin-top: 4px;
+}

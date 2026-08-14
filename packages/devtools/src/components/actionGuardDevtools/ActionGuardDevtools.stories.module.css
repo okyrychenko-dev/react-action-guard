@@ -1,0 +1,49 @@
+.demoApp {
+  padding: 2rem;
+  font-family: system-ui;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.buttonBase {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+}
+
+.buttonInteractive {
+  cursor: pointer;
+}
+
+.buttonDisabled {
+  cursor: not-allowed;
+}
+
+.actionButton {
+  border: none;
+  border-radius: 4px;
+  color: #ffffff;
+}
+
+.unsavedInactive {
+  background: #6366f1;
+}
+
+.unsavedActive {
+  background: #f59e0b;
+}
+
+.saveButton {
+  background: #10b981;
+}
+
+.buttonDimmed {
+  opacity: 0.5;
+}
+
+.statusSection {
+  margin-top: 2rem;
+}

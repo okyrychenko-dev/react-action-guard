@@ -1,0 +1,77 @@
+.panel {
+  width: 420px;
+  background: var(--ag-bg);
+  border: 1px solid var(--ag-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ag-text);
+}
+
+.panelExpanded {
+  top: 16px;
+}
+
+.panelMinimized {
+  height: auto;
+  top: auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--ag-bg-light);
+  border-bottom: 1px solid var(--ag-border);
+}
+
+.headerTitle {
+  font-weight: 600;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.headerCount {
+  margin-left: 4px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 4px;
+}
+
+.pauseButtonActive {
+  color: var(--ag-warning);
+}
+
+.tabs {
+  display: flex;
+  border-bottom: 1px solid var(--ag-border);
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--ag-text-muted);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition:
+    color 0.15s,
+    background 0.15s;
+}
+
+.tabActive {
+  color: var(--ag-primary);
+  background: var(--ag-bg-light);
+  border-bottom: 2px solid var(--ag-primary);
+}
