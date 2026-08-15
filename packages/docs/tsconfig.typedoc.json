@@ -1,0 +1,32 @@
+{
+    "extends": "../../tsconfig.base.json",
+    "compilerOptions": {
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "DOM"
+        ],
+        "target": "ES2015",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "jsx": "react-jsx",
+        "types": [
+            "node"
+        ]
+    },
+    "include": [
+        "../core/src/**/*",
+        "../devtools/src/**/*",
+        "../tanstack/src/**/*",
+        "../../../react-zustand-toolkit/src/**/*"
+    ],
+    "exclude": [
+        "**/*.stories.tsx",
+        "**/*.test.tsx",
+        "**/*.spec.tsx",
+        "**/node_modules"
+    ]
+}

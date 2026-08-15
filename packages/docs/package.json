@@ -1,0 +1,47 @@
+{
+  "name": "@okyrychenko-dev/react-action-guard-docs",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Documentation for React Action Guard - Elegant UI blocking management for React applications",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev",
+    "build": "vitepress build",
+    "preview": "vitepress preview",
+    "typedoc": "pnpm run typedoc:core && pnpm run typedoc:devtools && pnpm run typedoc:tanstack && pnpm run typedoc:zustand",
+    "typedoc:core": "typedoc --options src/typedoc.core.json",
+    "typedoc:devtools": "typedoc --options src/typedoc.devtools.json",
+    "typedoc:tanstack": "typedoc --options src/typedoc.tanstack.json",
+    "typedoc:zustand": "typedoc --options src/typedoc.zustand.json",
+    "typedoc:watch": "typedoc --options src/typedoc.core.json --watch",
+    "typedoc:watch:devtools": "typedoc --options src/typedoc.devtools.json --watch",
+    "typedoc:watch:tanstack": "typedoc --options src/typedoc.tanstack.json --watch",
+    "typedoc:watch:zustand": "typedoc --options src/typedoc.zustand.json --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/okyrychenko-dev/react-action-guard.git",
+    "directory": "packages/docs"
+  },
+  "keywords": [
+    "react",
+    "documentation",
+    "vitepress",
+    "ui-blocking",
+    "zustand",
+    "tanstack-query"
+  ],
+  "author": "Oleksii Kyrychenko",
+  "license": "MIT",
+  "devDependencies": {
+    "mermaid": "^11.12.2",
+    "typedoc": "^0.28.0",
+    "typedoc-plugin-markdown": "^4.0.0",
+    "vitepress": "^1.0.0",
+    "vitepress-plugin-mermaid": "^2.0.17",
+    "vue": "^3.4.0"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
+  }
+}
