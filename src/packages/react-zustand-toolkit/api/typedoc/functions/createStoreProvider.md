@@ -19,8 +19,8 @@ each provider instance to have its own isolated store. This is essential for:
 - **Micro-frontends**: Isolated state per application instance
 - **Multiple instances**: Same component tree with independent state
 
-The provider automatically integrates Zustand DevTools in development mode and
-provides hooks for accessing the store from components within the provider tree.
+The provider creates isolated store instances and exposes hooks for accessing
+the store from components within the provider tree.
 
 Returns an object with:
 - `Provider`: React component to wrap your app
@@ -133,7 +133,7 @@ function Counter({ title }) {
 }
 ```
 
-With DevTools and store creation callback
+With lifecycle hooks
 ```tsx
 const { Provider, useContextStore } = createStoreProvider<AppState>(
   (set) => ({
@@ -145,14 +145,15 @@ const { Provider, useContextStore } = createStoreProvider<AppState>(
 function App() {
   return (
     <Provider
-      enableDevtools={true}
-      devtoolsName="My App Store"
-      onStoreCreate={(store) => {
-        // Called once when store is created
-        console.log('Store initialized:', store.getState());
-        
-        // Register middleware
-        store.registerMiddleware('logger', loggerMiddleware);
+      onStoreInit={(store) => {
+        // Pure synchronous initialization
+        console.log('Initial snapshot:', store.getState());
+      }}
+      onStoreReady={(store) => {
+        // Post-commit side effects
+        store.subscribe((state) => {
+          console.log('Store updated:', state);
+        });
       }}
     >
       <MyApp />

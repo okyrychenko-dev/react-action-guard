@@ -69,7 +69,7 @@ Each micro-frontend gets independent state:
 // Micro-Frontend A
 function MicroAppA() {
   return (
-    <UIBlockingProvider devtoolsName="MicroApp-A">
+    <UIBlockingProvider>
       <AppA />
     </UIBlockingProvider>
   );
@@ -78,7 +78,7 @@ function MicroAppA() {
 // Micro-Frontend B
 function MicroAppB() {
   return (
-    <UIBlockingProvider devtoolsName="MicroApp-B">
+    <UIBlockingProvider>
       <AppB />
     </UIBlockingProvider>
   );
@@ -143,45 +143,9 @@ function MyComponent() {
 ```tsx
 interface UIBlockingProviderProps {
   children: ReactNode;
-  enableDevtools?: boolean;      // Enable Redux DevTools (default: true in dev)
-  devtoolsName?: string;         // DevTools name (default: "UIBlocking")
   middlewares?: Middleware[];    // Initial middlewares
-  onStoreCreate?: (store: StoreApi<UIBlockingStore>) => void;
 }
 ```
-
-### enableDevtools
-
-Control Redux DevTools integration:
-
-```tsx
-// Enable in development only (default behavior)
-<UIBlockingProvider enableDevtools={process.env.NODE_ENV === 'development'}>
-  <App />
-</UIBlockingProvider>
-
-// Always disabled
-<UIBlockingProvider enableDevtools={false}>
-  <App />
-</UIBlockingProvider>
-
-// Always enabled (not recommended for production)
-<UIBlockingProvider enableDevtools={true}>
-  <App />
-</UIBlockingProvider>
-```
-
-### devtoolsName
-
-Customize DevTools instance name:
-
-```tsx
-<UIBlockingProvider devtoolsName="MyApp-Blocking">
-  <App />
-</UIBlockingProvider>
-```
-
-Useful when running multiple providers or micro-frontends.
 
 ### middlewares
 
@@ -202,31 +166,8 @@ import { loggerMiddleware, createAnalyticsMiddleware } from '@okyrychenko-dev/re
 
 **Note:** These middlewares only apply to this provider's store, not the global store.
 
-### onStoreCreate
-
-Initialize store after creation:
-
-```tsx
-<UIBlockingProvider
-  onStoreCreate={(store) => {
-    // Register additional middlewares
-    store.getState().registerMiddleware('custom', customMiddleware);
-    
-    // Add initial blockers
-    store.getState().addBlocker('init', {
-      scope: 'global',
-      reason: 'Initializing...',
-    });
-    
-    // Subscribe to changes
-    store.subscribe((state) => {
-      console.log('Store changed:', state.blockers.size);
-    });
-  }}
->
-  <App />
-</UIBlockingProvider>
-```
+Provider lifecycle hooks come from `react-zustand-toolkit` and stay internal to `UIBlockingProvider`.
+If you need Redux DevTools, connect them at the Zustand store creator level rather than through provider props.
 
 ## Context Hooks
 
@@ -361,12 +302,12 @@ test('component works', () => {
 ```tsx
 function App() {
   return (
-    <UIBlockingProvider devtoolsName="App">
+    <UIBlockingProvider>
       <MainContent />
       
       {/* Nested provider for modal */}
       <Modal>
-        <UIBlockingProvider devtoolsName="Modal">
+        <UIBlockingProvider>
           <ModalContent />
         </UIBlockingProvider>
       </Modal>
@@ -545,11 +486,11 @@ function Component() {
 This is expected when using multiple providers. Give each a unique name:
 
 ```tsx
-<UIBlockingProvider devtoolsName="App-Main">
+<UIBlockingProvider>
   <MainApp />
 </UIBlockingProvider>
 
-<UIBlockingProvider devtoolsName="App-Modal">
+<UIBlockingProvider>
   <ModalApp />
 </UIBlockingProvider>
 ```
@@ -559,7 +500,7 @@ This is expected when using multiple providers. Give each a unique name:
 1. **Use provider for SSR** - Always wrap SSR apps in provider
 2. **Use provider for tests** - Isolated state per test
 3. **Don't over-nest** - Usually one provider per app is enough
-4. **Name providers** - Use `devtoolsName` for debugging
+4. **Keep providers focused** - Use providers for isolated state, not runtime DevTools wiring
 5. **Initialize carefully** - Use `onStoreCreate` for setup logic
 
 ## Next Steps

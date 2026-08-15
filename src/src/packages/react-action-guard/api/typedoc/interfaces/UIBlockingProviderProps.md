@@ -28,30 +28,10 @@ Defined in: [src/context/UIBlockingContext.tsx:19](https://github.com/okyrychenk
 
 ***
 
-### enableDevtools?
-
-> `optional` **enableDevtools**: `boolean`
-
-Defined in: [src/context/UIBlockingContext.tsx:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L21)
-
-Enable Redux DevTools integration (default: true in development)
-
-***
-
-### devtoolsName?
-
-> `optional` **devtoolsName**: `string`
-
-Defined in: [src/context/UIBlockingContext.tsx:23](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L23)
-
-Name for Redux DevTools (default: "UIBlocking")
-
-***
-
 ### middlewares?
 
 > `optional` **middlewares**: readonly [`Middleware`](../type-aliases/Middleware.md)[]
 
-Defined in: [src/context/UIBlockingContext.tsx:25](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L25)
+Defined in: [src/context/UIBlockingContext.tsx:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L20)
 
 Initial middlewares to register

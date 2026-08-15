@@ -23,7 +23,7 @@ store and other provider instances.
 - Modals/Dialogs - Scoped blocking within a dialog
 
 Uses `createStoreProvider` from `@okyrychenko-dev/react-zustand-toolkit` with
-built-in DevTools support and middleware registration.
+provider-scoped store creation and middleware registration.
 
 ## Parameters
 
@@ -52,15 +52,13 @@ function App() {
 }
 ```
 
-With middleware and custom DevTools name
+With middleware
 ```tsx
 import { UIBlockingProvider, loggerMiddleware } from '@okyrychenko-dev/react-action-guard';
 
 function App() {
   return (
     <UIBlockingProvider
-      enableDevtools={true}
-      devtoolsName="MyApp-UIBlocking"
       middlewares={[loggerMiddleware]}
     >
       <MyApplication />
@@ -74,11 +72,11 @@ Multiple providers for micro-frontends
 function MicroFrontendApp() {
   return (
     <div>
-      <UIBlockingProvider devtoolsName="MicroApp1">
+      <UIBlockingProvider>
         <MicroApp1 />
       </UIBlockingProvider>
       
-      <UIBlockingProvider devtoolsName="MicroApp2">
+      <UIBlockingProvider>
         <MicroApp2 />
       </UIBlockingProvider>
     </div>
@@ -94,7 +92,7 @@ import { UIBlockingProvider } from '@okyrychenko-dev/react-action-guard';
 
 test('blocker behavior', () => {
   render(
-    <UIBlockingProvider enableDevtools={false}>
+    <UIBlockingProvider>
       <ComponentUnderTest />
     </UIBlockingProvider>
   );

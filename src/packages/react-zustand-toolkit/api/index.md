@@ -173,6 +173,9 @@ function createStoreProvider<T>(
 ): StoreProvider<T>
 ```
 
+Provider lifecycle hooks are limited to `onStoreInit`, `onStoreReady`, and deprecated `onStoreCreate`.
+Redux DevTools should be wired through `zustand/middleware/devtools` in the store creator rather than provider props.
+
 **Returns:**
 
 ```typescript

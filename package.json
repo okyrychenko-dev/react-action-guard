@@ -38,5 +38,8 @@
     "vitepress": "^1.0.0",
     "vitepress-plugin-mermaid": "^2.0.17",
     "vue": "^3.4.0"
+  },
+  "allowScripts": {
+    "esbuild@0.21.5": true
   }
 }

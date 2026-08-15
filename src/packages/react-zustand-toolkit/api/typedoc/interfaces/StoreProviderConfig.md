@@ -22,35 +22,44 @@ Configuration for store provider
 
 ## Properties
 
-### enableDevtools?
+### onStoreInit()?
 
-> `optional` **enableDevtools**: `boolean`
+> `optional` **onStoreInit**: (`store`) => `void`
 
-Defined in: [types/index.ts:30](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L30)
+Defined in: [types/index.ts:45](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L45)
 
-Enable Redux DevTools integration
+Pure synchronous initialization hook invoked when the store instance is created.
+This callback must stay idempotent and side-effect free.
 
-#### Default
+#### Parameters
 
-```ts
-process.env.NODE_ENV === 'development'
-```
+##### store
+
+`StoreApi`\<`TState`\>
+
+#### Returns
+
+`void`
 
 ***
 
-### devtoolsName?
+### onStoreReady()?
 
-> `optional` **devtoolsName**: `string`
+> `optional` **onStoreReady**: (`store`) => `void`
 
-Defined in: [types/index.ts:35](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L35)
+Defined in: [types/index.ts:49](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L49)
 
-Name for the DevTools instance
+Post-commit lifecycle hook for side effects that need a ready store instance.
 
-#### Default
+#### Parameters
 
-```ts
-'Store'
-```
+##### store
+
+`StoreApi`\<`TState`\>
+
+#### Returns
+
+`void`
 
 ***
 
@@ -58,10 +67,9 @@ Name for the DevTools instance
 
 > `optional` **onStoreCreate**: (`store`) => `void`
 
-Defined in: [types/index.ts:40](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L40)
+Defined in: [types/index.ts:53](https://github.com/okyrychenko-dev/react-zustand-toolkit/blob/main/src/types/index.ts#L53)
 
-Callback called after store is created
-Use this to initialize the store, register middlewares, etc.
+Deprecated alias for `onStoreReady`.
 
 #### Parameters
 
