@@ -1,0 +1,47 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "../../react-action-guard/src/index.ts"
+    ],
+    "tsconfig": "../tsconfig.typedoc.json",
+    "out": "./packages/react-action-guard/api/typedoc",
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+    "skipErrorChecking": true,
+    "readme": "none",
+    "hideGenerator": true,
+    "disableSources": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "sort": [
+        "source-order"
+    ],
+    "kindSortOrder": [
+        "Function",
+        "Class",
+        "Interface",
+        "TypeAlias",
+        "Variable",
+        "Enum"
+    ],
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Hooks",
+        "Store",
+        "Middleware",
+        "Provider",
+        "Types",
+        "*"
+    ],
+    "name": "React Action Guard API",
+    "includeVersion": true,
+    "gitRevision": "main",
+    "gitRemote": "origin",
+    "exclude": [
+        "**/*.stories.tsx",
+        "**/*.test.tsx",
+        "**/*.spec.tsx"
+    ]
+}

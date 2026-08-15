@@ -1,0 +1,39 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "../../react-zustand-toolkit/src/index.ts"
+    ],
+    "tsconfig": "../tsconfig.typedoc.json",
+    "out": "./packages/react-zustand-toolkit/api/typedoc",
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+    "skipErrorChecking": true,
+    "readme": "none",
+    "hideGenerator": true,
+    "disableSources": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "sort": [
+        "source-order"
+    ],
+    "kindSortOrder": [
+        "Function",
+        "Interface",
+        "TypeAlias",
+        "Variable"
+    ],
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Store Creation",
+        "Provider",
+        "Hooks",
+        "Types",
+        "*"
+    ],
+    "name": "React Zustand Toolkit API",
+    "includeVersion": true,
+    "gitRevision": "main",
+    "gitRemote": "origin"
+}

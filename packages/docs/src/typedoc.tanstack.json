@@ -1,0 +1,37 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": [
+        "../../react-action-guard-tanstack/src/index.ts"
+    ],
+    "tsconfig": "../tsconfig.typedoc.json",
+    "out": "./packages/react-action-guard-tanstack/api/typedoc",
+    "plugin": [
+        "typedoc-plugin-markdown"
+    ],
+    "skipErrorChecking": true,
+    "readme": "none",
+    "hideGenerator": true,
+    "disableSources": false,
+    "excludePrivate": true,
+    "excludeProtected": true,
+    "excludeInternal": true,
+    "sort": [
+        "source-order"
+    ],
+    "kindSortOrder": [
+        "Function",
+        "Interface",
+        "TypeAlias",
+        "Variable"
+    ],
+    "categorizeByGroup": true,
+    "categoryOrder": [
+        "Hooks",
+        "Types",
+        "*"
+    ],
+    "name": "React Action Guard TanStack API",
+    "includeVersion": true,
+    "gitRevision": "main",
+    "gitRemote": "origin"
+}

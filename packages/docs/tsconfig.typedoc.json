@@ -1,0 +1,32 @@
+{
+    "extends": "../react-action-guard/tsconfig.json",
+    "compilerOptions": {
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "DOM"
+        ],
+        "target": "ES2015",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "jsx": "react-jsx",
+        "types": [
+            "node"
+        ]
+    },
+    "include": [
+        "../react-action-guard/src/**/*",
+        "../react-action-guard-devtools/src/**/*",
+        "../react-action-guard-tanstack/src/**/*",
+        "../react-zustand-toolkit/src/**/*"
+    ],
+    "exclude": [
+        "**/*.stories.tsx",
+        "**/*.test.tsx",
+        "**/*.spec.tsx",
+        "**/node_modules"
+    ]
+}
