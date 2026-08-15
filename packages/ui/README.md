@@ -422,43 +422,39 @@ Instead, build small local wrappers around your own components. The library owns
 
 ## Development
 
+This package lives in the [react-action-guard monorepo](https://github.com/okyrychenko-dev/react-action-guard)
+(pnpm workspaces). From the monorepo root:
+
 ```bash
-# Install dependencies
-npm install
+# Install dependencies for all packages
+pnpm install
 
-# Run tests
-npm run test
+# Run this package's scripts with --filter
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run test
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run test:coverage
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run build
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run typecheck
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run lint
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run lint:fix
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run format
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run dev
 
-# Run tests with coverage
-npm run test:coverage
-
-# Build the package
-npm run build
-
-# Type checking
-npm run typecheck
-
-# Lint code
-npm run lint
-
-# Fix lint errors
-npm run lint:fix
-
-# Format code
-npm run format
-
-# Watch mode for development
-npm run dev
+# Or cd into the package and run scripts directly
+cd packages/ui
+pnpm run test
 ```
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+Contributions are welcome! Please ensure, before opening a PR:
 
-1. All tests pass (`npm run test`)
-2. Code is properly typed (`npm run typecheck`)
-3. Linting passes (`npm run lint`)
-4. Code is formatted (`npm run format`)
+1. All tests pass (`pnpm run test`)
+2. Code is properly typed (`pnpm run typecheck`)
+3. Linting passes (`pnpm run lint`)
+4. Code is formatted (`pnpm run format`)
+5. If the change affects this package's public behavior, add a changeset: `pnpm changeset`
+   (see the [Releasing](https://github.com/okyrychenko-dev/react-action-guard#releasing) section
+   of the monorepo README)
 
 ## Changelog
 

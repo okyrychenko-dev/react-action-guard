@@ -6,9 +6,7 @@ import type {
   UseTopBlockerReturn,
 } from "../../types";
 
-export interface UseGuardedLinkParams<
-  TElement extends HTMLElement = HTMLAnchorElement,
->
+export interface UseGuardedLinkParams<TElement extends HTMLElement = HTMLAnchorElement>
   extends GuardedScopeProps, GuardedReasonProps {
   disabled?: boolean;
   removeFromTabOrder?: boolean;
@@ -16,9 +14,7 @@ export interface UseGuardedLinkParams<
   onClick?: MouseEventHandler<TElement>;
 }
 
-export interface UseGuardedLinkReturn<
-  TElement extends HTMLElement = HTMLAnchorElement,
-> {
+export interface UseGuardedLinkReturn<TElement extends HTMLElement = HTMLAnchorElement> {
   blocker: UseTopBlockerReturn;
   isBlocked: boolean;
   linkState: GuardedLinkState;

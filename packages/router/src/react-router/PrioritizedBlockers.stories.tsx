@@ -1,4 +1,4 @@
-import { useBlocker } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
 import clsx from "clsx";
 import { ReactElement, useState } from "react";
 import { useNavigationBlocker } from "../react-router";
@@ -40,13 +40,17 @@ const PrioritizedBlockersDemo = (): ReactElement => {
   const paymentActive = activeIds.includes("payment");
   const draftActive = activeIds.includes("draft");
 
-  useBlocker("upload", { scope: "upload", reason: "upload active", priority: 90 }, uploadActive);
-  useBlocker(
+  useActionBlocker(
+    "upload",
+    { scope: "upload", reason: "upload active", priority: 90 },
+    uploadActive
+  );
+  useActionBlocker(
     "payment",
     { scope: "payment", reason: "payment active", priority: 80 },
     paymentActive
   );
-  useBlocker("draft", { scope: "draft", reason: "draft active", priority: 50 }, draftActive);
+  useActionBlocker("draft", { scope: "draft", reason: "draft active", priority: 50 }, draftActive);
 
   // Navigation blocker watches all scopes
   useNavigationBlocker({

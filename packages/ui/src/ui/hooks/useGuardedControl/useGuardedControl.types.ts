@@ -7,9 +7,7 @@ import type {
   UseTopBlockerReturn,
 } from "../../types";
 
-export type ResolveGuardedControlState<TBaseState> = (
-  isBlocked: boolean,
-) => TBaseState;
+export type ResolveGuardedControlState<TBaseState> = (isBlocked: boolean) => TBaseState;
 
 export type ResolveGuardedControlReason<
   TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
@@ -37,10 +35,7 @@ export interface UseGuardedControlParams<
 export type UseUnmappedGuardedControlParams<
   TBaseState,
   TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
-> = Omit<
-  UseGuardedControlParams<TBaseState, TBaseState, TReasonMode>,
-  "getControlState"
-> & {
+> = Omit<UseGuardedControlParams<TBaseState, TBaseState, TReasonMode>, "getControlState"> & {
   getControlState?: undefined;
 };
 

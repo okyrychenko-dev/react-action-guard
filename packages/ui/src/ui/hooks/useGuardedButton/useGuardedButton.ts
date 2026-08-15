@@ -1,24 +1,17 @@
 import { useGuardedAction } from "../useGuardedAction";
 import type { GuardedActionState } from "../../types";
-import type {
-  UseGuardedButtonParams,
-  UseGuardedButtonReturn,
-} from "./useGuardedButton.types";
+import type { UseGuardedButtonParams, UseGuardedButtonReturn } from "./useGuardedButton.types";
 
-interface UseMappedGuardedButtonParams<
-  TButtonState,
-> extends UseGuardedButtonParams<TButtonState> {
+interface UseMappedGuardedButtonParams<TButtonState> extends UseGuardedButtonParams<TButtonState> {
   getButtonState: (state: GuardedActionState) => TButtonState;
 }
 
-export function useGuardedButton(
-  params?: UseGuardedButtonParams,
-): UseGuardedButtonReturn;
+export function useGuardedButton(params?: UseGuardedButtonParams): UseGuardedButtonReturn;
 export function useGuardedButton<TButtonState>(
-  params: UseMappedGuardedButtonParams<TButtonState>,
+  params: UseMappedGuardedButtonParams<TButtonState>
 ): UseGuardedButtonReturn<TButtonState>;
 export function useGuardedButton<TButtonState>(
-  params: UseGuardedButtonParams<TButtonState> = {},
+  params: UseGuardedButtonParams<TButtonState> = {}
 ): UseGuardedButtonReturn<GuardedActionState | TButtonState> {
   const {
     blockedState = "disabled",

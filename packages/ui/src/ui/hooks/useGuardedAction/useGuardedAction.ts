@@ -2,28 +2,21 @@ import { useCallback } from "react";
 import { resolveActionReason, resolveGuardedActionState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
 import type { GuardedActionState } from "../../types";
-import type {
-  UseGuardedActionParams,
-  UseGuardedActionReturn,
-} from "./useGuardedAction.types";
+import type { UseGuardedActionParams, UseGuardedActionReturn } from "./useGuardedAction.types";
 
-interface UseMappedGuardedActionParams<
-  TActionState,
-> extends UseGuardedActionParams<TActionState> {
+interface UseMappedGuardedActionParams<TActionState> extends UseGuardedActionParams<TActionState> {
   getActionState: (state: GuardedActionState) => TActionState;
 }
 
-export function useGuardedAction(
-  params?: UseGuardedActionParams,
-): UseGuardedActionReturn;
+export function useGuardedAction(params?: UseGuardedActionParams): UseGuardedActionReturn;
 export function useGuardedAction<TActionState>(
-  params: UseMappedGuardedActionParams<TActionState>,
+  params: UseMappedGuardedActionParams<TActionState>
 ): UseGuardedActionReturn<TActionState>;
 export function useGuardedAction<TActionState>(
-  params: UseGuardedActionParams<TActionState>,
+  params: UseGuardedActionParams<TActionState>
 ): UseGuardedActionReturn<GuardedActionState | TActionState>;
 export function useGuardedAction<TActionState>(
-  params: UseGuardedActionParams<TActionState> = {},
+  params: UseGuardedActionParams<TActionState> = {}
 ): UseGuardedActionReturn<GuardedActionState | TActionState> {
   const {
     blockedState = "disabled",
@@ -44,7 +37,7 @@ export function useGuardedAction<TActionState>(
         isBlocked,
         loading,
       }),
-    [blockedState, disabled, loading],
+    [blockedState, disabled, loading]
   );
 
   const control = useGuardedControl({

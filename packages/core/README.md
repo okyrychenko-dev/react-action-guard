@@ -91,10 +91,10 @@ Use `UIBlockingProvider` when each request, test, or micro-frontend should get i
 
 📚 **Interactive Storybook Documentation** - Run locally to explore live examples and detailed guides for all hooks
 
-To run Storybook locally:
+To run Storybook locally (from the monorepo root):
 
 ```bash
-npm run storybook
+pnpm --filter @okyrychenko-dev/react-action-guard run storybook
 ```
 
 ## API Reference
@@ -1093,43 +1093,39 @@ function SessionManager() {
 
 ## Development
 
+This package lives in the [react-action-guard monorepo](https://github.com/okyrychenko-dev/react-action-guard)
+(pnpm workspaces). From the monorepo root:
+
 ```bash
-# Install dependencies
-npm install
+# Install dependencies for all packages
+pnpm install
 
-# Run tests
-npm run test
+# Run this package's scripts with --filter
+pnpm --filter @okyrychenko-dev/react-action-guard run test
+pnpm --filter @okyrychenko-dev/react-action-guard run test:coverage
+pnpm --filter @okyrychenko-dev/react-action-guard run build
+pnpm --filter @okyrychenko-dev/react-action-guard run typecheck
+pnpm --filter @okyrychenko-dev/react-action-guard run lint
+pnpm --filter @okyrychenko-dev/react-action-guard run lint:fix
+pnpm --filter @okyrychenko-dev/react-action-guard run format
+pnpm --filter @okyrychenko-dev/react-action-guard run dev
 
-# Run tests with coverage
-npm run test:coverage
-
-# Build the package
-npm run build
-
-# Type checking
-npm run typecheck
-
-# Lint code
-npm run lint
-
-# Fix lint errors
-npm run lint:fix
-
-# Format code
-npm run format
-
-# Watch mode for development
-npm run dev
+# Or cd into the package and run scripts directly
+cd packages/core
+pnpm run test
 ```
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+Contributions are welcome! Please ensure, before opening a PR:
 
-1. All tests pass (`npm run test`)
-2. Code is properly typed (`npm run typecheck`)
-3. Linting passes (`npm run lint`)
-4. Code is formatted (`npm run format`)
+1. All tests pass (`pnpm run test`)
+2. Code is properly typed (`pnpm run typecheck`)
+3. Linting passes (`pnpm run lint`)
+4. Code is formatted (`pnpm run format`)
+5. If the change affects this package's public behavior, add a changeset: `pnpm changeset`
+   (see the [Releasing](https://github.com/okyrychenko-dev/react-action-guard#releasing) section
+   of the monorepo README)
 
 ## Changelog
 

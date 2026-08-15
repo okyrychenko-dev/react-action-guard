@@ -1,14 +1,11 @@
 import { type MouseEvent, useCallback } from "react";
 import { resolveActionReason, resolveGuardedLinkState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
-import type {
-  UseGuardedLinkParams,
-  UseGuardedLinkReturn,
-} from "./useGuardedLink.types";
+import type { UseGuardedLinkParams, UseGuardedLinkReturn } from "./useGuardedLink.types";
 
-export function useGuardedLink<
-  TElement extends HTMLElement = HTMLAnchorElement,
->(params: UseGuardedLinkParams<TElement> = {}): UseGuardedLinkReturn<TElement> {
+export function useGuardedLink<TElement extends HTMLElement = HTMLAnchorElement>(
+  params: UseGuardedLinkParams<TElement> = {}
+): UseGuardedLinkReturn<TElement> {
   const {
     disabled,
     onClick,
@@ -27,7 +24,7 @@ export function useGuardedLink<
         isBlocked,
         removeFromTabOrder,
       }),
-    [disabled, removeFromTabOrder],
+    [disabled, removeFromTabOrder]
   );
 
   const control = useGuardedControl({
@@ -53,11 +50,7 @@ export function useGuardedLink<
 
       onClick?.(e);
     },
-    [
-      control.controlState.onClickShouldPrevent,
-      onClick,
-      stopPropagationWhenBlocked,
-    ],
+    [control.controlState.onClickShouldPrevent, onClick, stopPropagationWhenBlocked]
   );
 
   return {

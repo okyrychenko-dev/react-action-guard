@@ -11,34 +11,30 @@ import type {
 
 export function useGuardedControl<
   TBaseState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode =
-    GuardedReasonMode,
+  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
 >(
-  params: UseUnmappedGuardedControlParams<TBaseState, TReasonMode>,
+  params: UseUnmappedGuardedControlParams<TBaseState, TReasonMode>
 ): UseGuardedControlReturn<TBaseState>;
 export function useGuardedControl<
   TBaseState,
   TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode =
-    GuardedReasonMode,
+  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
 >(
-  params: UseMappedGuardedControlParams<TBaseState, TControlState, TReasonMode>,
+  params: UseMappedGuardedControlParams<TBaseState, TControlState, TReasonMode>
 ): UseGuardedControlReturn<TControlState>;
 export function useGuardedControl<
   TBaseState,
   TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode =
-    GuardedReasonMode,
+  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
 >(
-  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>,
+  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>
 ): UseGuardedControlReturn<TBaseState | TControlState>;
 export function useGuardedControl<
   TBaseState,
   TControlState = TBaseState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode =
-    GuardedReasonMode,
+  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
 >(
-  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>,
+  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>
 ): UseGuardedControlReturn<TBaseState | TControlState> {
   const {
     getControlState,
@@ -54,7 +50,7 @@ export function useGuardedControl<
 
   const baseState = useMemo(
     () => resolveState(blocker.isBlocked),
-    [blocker.isBlocked, resolveState],
+    [blocker.isBlocked, resolveState]
   );
 
   const controlState = useMemo(() => {
@@ -70,7 +66,7 @@ export function useGuardedControl<
       isBlocked: blocker.isBlocked,
       reason: blocker.reason,
     }),
-    [blocker.isBlocked, blocker.reason],
+    [blocker.isBlocked, blocker.reason]
   );
 
   const reason = useMemo(
@@ -81,7 +77,7 @@ export function useGuardedControl<
         mode: reasonMode,
         reasonId,
       }),
-    [reasonBlocker, reasonFallback, reasonId, reasonMode, resolveReason],
+    [reasonBlocker, reasonFallback, reasonId, reasonMode, resolveReason]
   );
 
   return useMemo(
@@ -92,6 +88,6 @@ export function useGuardedControl<
       reasonContent: reason.reasonContent,
       ariaDescribedBy: reason.ariaDescribedBy,
     }),
-    [blocker, controlState, reason.ariaDescribedBy, reason.reasonContent],
+    [blocker, controlState, reason.ariaDescribedBy, reason.reasonContent]
   );
 }

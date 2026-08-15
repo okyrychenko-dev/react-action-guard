@@ -27,7 +27,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
@@ -37,9 +37,8 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build",
-    "prepare": "husky"
+    "storybook": "storybook dev -p 6008",
+    "build-storybook": "storybook build"
   },
   "keywords": [
     "react",
@@ -53,12 +52,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/okyrychenko-dev/react-action-guard-devtools.git"
+    "url": "git+https://github.com/okyrychenko-dev/react-action-guard.git",
+    "directory": "packages/devtools"
   },
   "bugs": {
-    "url": "https://github.com/okyrychenko-dev/react-action-guard-devtools/issues"
+    "url": "https://github.com/okyrychenko-dev/react-action-guard/issues"
   },
-  "homepage": "https://github.com/okyrychenko-dev/react-action-guard-devtools#readme",
+  "homepage": "https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/devtools#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -71,16 +71,12 @@
     "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
     "clsx": "^2.1.1"
   },
-  "overrides": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
-    "brace-expansion": "5.0.8",
-    "minimatch": "10.2.5"
-  },
   "devDependencies": {
-    "@okyrychenko-dev/react-action-guard": "^1.0.5",
+    "@okyrychenko-dev/react-action-guard": "workspace:*",
     "@storybook/addon-a11y": "10.2.16",
     "@storybook/addon-docs": "10.2.16",
     "@storybook/react-vite": "10.2.16",
+    "@types/node": "^24.10.4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

@@ -1,5 +1,2 @@
 export { useGuardedLink } from "./useGuardedLink";
-export type {
-  UseGuardedLinkParams,
-  UseGuardedLinkReturn,
-} from "./useGuardedLink.types";
+export type { UseGuardedLinkParams, UseGuardedLinkReturn } from "./useGuardedLink.types";

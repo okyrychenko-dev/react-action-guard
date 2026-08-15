@@ -1,11 +1,5 @@
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import {
-  act,
-  fireEvent,
-  render,
-  renderHook,
-  screen,
-} from "@testing-library/react";
+import { act, fireEvent, render, renderHook, screen } from "@testing-library/react";
 import { type ReactNode, useEffect } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GuardedScopeProvider } from "../context";
@@ -76,7 +70,7 @@ describe("guarded ui hooks", () => {
           reasonId: "profile-blocked-reason",
           reasonMode: "helperText",
         }),
-      { wrapper },
+      { wrapper }
     );
 
     expect(result.current.isBlocked).toBe(true);
@@ -97,10 +91,7 @@ describe("guarded ui hooks", () => {
       <GuardedScopeProvider scope="profile">{children}</GuardedScopeProvider>
     );
 
-    const { result } = renderHook(
-      () => useGuardedAction({ blockedState: "loading" }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useGuardedAction({ blockedState: "loading" }), { wrapper });
 
     expect(result.current.isBlocked).toBe(true);
     expect(result.current.actionState.disabled).toBe(true);
@@ -118,10 +109,7 @@ describe("guarded ui hooks", () => {
       <GuardedScopeProvider scope="profile">{children}</GuardedScopeProvider>
     );
 
-    const { result } = renderHook(
-      () => useGuardedButton({ scope: "billing" }),
-      { wrapper },
-    );
+    const { result } = renderHook(() => useGuardedButton({ scope: "billing" }), { wrapper });
 
     expect(result.current.isBlocked).toBe(true);
     expect(result.current.buttonState.disabled).toBe(true);
@@ -140,7 +128,7 @@ describe("guarded ui hooks", () => {
         scope: "settings",
         reasonMode: "description",
         reasonId: "settings-blocked-reason",
-      }),
+      })
     );
 
     expect(result.current.isBlocked).toBe(true);
@@ -163,7 +151,7 @@ describe("guarded ui hooks", () => {
         scope: "profile",
         reasonMode: "visible",
         reasonId: "profile-blocked-reason",
-      }),
+      })
     );
 
     expect(result.current.reasonContent).toBe("Saving profile");
@@ -186,11 +174,7 @@ describe("guarded ui hooks", () => {
       });
 
       return (
-        <a
-          href="/next"
-          aria-disabled={linkState.ariaDisabled}
-          onClick={onClick}
-        >
+        <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
           Next
         </a>
       );
@@ -198,9 +182,7 @@ describe("guarded ui hooks", () => {
 
     render(<GuardedLinkExample />);
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
   });
 
@@ -230,7 +212,7 @@ describe("guarded ui hooks", () => {
         blockedState: "none",
         disabled: true,
         scope: "profile",
-      }),
+      })
     );
 
     expect(result.current.isBlocked).toBe(true);
@@ -255,7 +237,7 @@ describe("guarded ui hooks", () => {
           busy: state.loading,
           disabled: state.disabled,
         }),
-      }),
+      })
     );
 
     expect(result.current.buttonState).toEqual({
@@ -279,7 +261,7 @@ describe("guarded ui hooks", () => {
           disabled: state.disabled,
           locked: state.readOnly,
         }),
-      }),
+      })
     );
 
     expect(result.current.fieldState).toEqual({
@@ -307,11 +289,7 @@ describe("guarded ui hooks", () => {
 
       return (
         <div onClick={handleParentClick}>
-          <a
-            href="/next"
-            aria-disabled={linkState.ariaDisabled}
-            onClick={onClick}
-          >
+          <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
             Next
           </a>
         </div>
@@ -320,9 +298,7 @@ describe("guarded ui hooks", () => {
 
     render(<GuardedLinkExample />);
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
     expect(handleParentClick).not.toHaveBeenCalled();
   });

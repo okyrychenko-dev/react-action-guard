@@ -1,4 +1,4 @@
-import { useBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement, useState } from "react";
 import { useNavigationBlocker } from "../react-router";
 import {
@@ -32,7 +32,7 @@ const ScopeSyncDemo = ({ scope = "payment" }: ScopeSyncDemoProps): ReactElement 
   const isBlocked = useIsBlocked(scope);
 
   // UI Blocking
-  useBlocker(
+  useActionBlocker(
     "payment-processing",
     {
       scope,

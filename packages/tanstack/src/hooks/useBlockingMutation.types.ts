@@ -65,8 +65,7 @@ interface MutationBlockingConfigWithError extends BaseBlockingConfig {
  * Use `onError: true` to also block when mutation fails.
  */
 export type MutationBlockingConfig =
-  | MutationBlockingConfigWithoutError
-  | MutationBlockingConfigWithError;
+  MutationBlockingConfigWithoutError | MutationBlockingConfigWithError;
 
 /**
  * Options for useBlockingMutation hook.

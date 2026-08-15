@@ -1,16 +1,11 @@
-import {
-  UIBlockingProvider,
-  useResolvedStoreApi,
-} from "@okyrychenko-dev/react-action-guard";
+import { UIBlockingProvider, useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { useGuardedLink } from "../useGuardedLink";
 import type { ReactNode } from "react";
 
-function renderWithUIBlockingProvider(
-  children: ReactNode,
-): ReturnType<typeof render> {
+function renderWithUIBlockingProvider(children: ReactNode): ReturnType<typeof render> {
   return render(<UIBlockingProvider>{children}</UIBlockingProvider>);
 }
 
@@ -34,21 +29,16 @@ describe("useGuardedLink", () => {
     const handleClick = vi.fn();
 
     function GuardedLinkExample(): ReactNode {
-      const { linkState, onClick, reasonContent, ariaDescribedBy } =
-        useGuardedLink({
-          disabled: true,
-          onClick: handleClick,
-          reasonFallback: "Unavailable",
-          reasonMode: "visible",
-        });
+      const { linkState, onClick, reasonContent, ariaDescribedBy } = useGuardedLink({
+        disabled: true,
+        onClick: handleClick,
+        reasonFallback: "Unavailable",
+        reasonMode: "visible",
+      });
 
       return (
         <>
-          <a
-            href="/next"
-            aria-disabled={linkState.ariaDisabled}
-            onClick={onClick}
-          >
+          <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
             Next
           </a>
           <span data-testid="reason">{reasonContent}</span>
@@ -59,9 +49,7 @@ describe("useGuardedLink", () => {
 
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
     expect(screen.getByTestId("reason")).toBeEmptyDOMElement();
     expect(screen.getByTestId("description")).toBeEmptyDOMElement();
@@ -76,11 +64,7 @@ describe("useGuardedLink", () => {
       });
 
       return (
-        <a
-          href="/next"
-          aria-disabled={linkState.ariaDisabled}
-          onClick={onClick}
-        >
+        <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
           Next
         </a>
       );
@@ -88,9 +72,7 @@ describe("useGuardedLink", () => {
 
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      true,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(true);
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
@@ -107,11 +89,7 @@ describe("useGuardedLink", () => {
       return (
         <>
           <ScopedBlocker />
-          <a
-            href="/next"
-            aria-disabled={linkState.ariaDisabled}
-            onClick={onClick}
-          >
+          <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
             Next
           </a>
           <span data-testid="reason">{reasonContent}</span>
@@ -122,15 +100,10 @@ describe("useGuardedLink", () => {
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
     await waitFor(() =>
-      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      ),
+      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute("aria-disabled", "true")
     );
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
     expect(screen.getByTestId("reason")).toHaveTextContent("Saving navigation");
   });
@@ -155,10 +128,7 @@ describe("useGuardedLink", () => {
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
     await waitFor(() =>
-      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
-        "tabindex",
-        "-1",
-      ),
+      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute("tabindex", "-1")
     );
   });
 
@@ -176,11 +146,7 @@ describe("useGuardedLink", () => {
       return (
         <div onClick={handleParentClick}>
           <ScopedBlocker />
-          <a
-            href="/next"
-            aria-disabled={linkState.ariaDisabled}
-            onClick={onClick}
-          >
+          <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
             Next
           </a>
         </div>
@@ -190,15 +156,10 @@ describe("useGuardedLink", () => {
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
     await waitFor(() =>
-      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      ),
+      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute("aria-disabled", "true")
     );
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
     expect(handleParentClick).not.toHaveBeenCalled();
   });
@@ -216,11 +177,7 @@ describe("useGuardedLink", () => {
       return (
         <div onClick={handleParentClick}>
           <ScopedBlocker />
-          <a
-            href="/next"
-            aria-disabled={linkState.ariaDisabled}
-            onClick={onClick}
-          >
+          <a href="/next" aria-disabled={linkState.ariaDisabled} onClick={onClick}>
             Next
           </a>
         </div>
@@ -230,27 +187,21 @@ describe("useGuardedLink", () => {
     renderWithUIBlockingProvider(<GuardedLinkExample />);
 
     await waitFor(() =>
-      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
-        "aria-disabled",
-        "true",
-      ),
+      expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute("aria-disabled", "true")
     );
 
-    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(
-      false,
-    );
+    expect(fireEvent.click(screen.getByRole("link", { name: "Next" }))).toBe(false);
     expect(handleClick).not.toHaveBeenCalled();
     expect(handleParentClick).toHaveBeenCalledTimes(1);
   });
 
   it("should expose description id for blocked link reasons", async () => {
     function GuardedLinkExample(): ReactNode {
-      const { linkState, onClick, reasonContent, ariaDescribedBy } =
-        useGuardedLink({
-          scope: "navigation",
-          reasonId: "navigation-blocked-reason",
-          reasonMode: "description",
-        });
+      const { linkState, onClick, reasonContent, ariaDescribedBy } = useGuardedLink({
+        scope: "navigation",
+        reasonId: "navigation-blocked-reason",
+        reasonMode: "description",
+      });
 
       return (
         <>
@@ -273,16 +224,14 @@ describe("useGuardedLink", () => {
     await waitFor(() =>
       expect(screen.getByRole("link", { name: "Next" })).toHaveAttribute(
         "aria-describedby",
-        "navigation-blocked-reason",
-      ),
+        "navigation-blocked-reason"
+      )
     );
     expect(screen.getByText("Saving navigation")).toBeInTheDocument();
   });
 
   it("should reject description reason mode without a reason id while blocked", () => {
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => undefined);
+    const consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => undefined);
 
     function GuardedLinkExample(): ReactNode {
       useGuardedLink({
@@ -294,9 +243,9 @@ describe("useGuardedLink", () => {
     }
 
     try {
-      expect(() =>
-        renderWithUIBlockingProvider(<GuardedLinkExample />),
-      ).toThrow('reasonId is required when reasonMode is "description"');
+      expect(() => renderWithUIBlockingProvider(<GuardedLinkExample />)).toThrow(
+        'reasonId is required when reasonMode is "description"'
+      );
     } finally {
       consoleErrorSpy.mockRestore();
     }

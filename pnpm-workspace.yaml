@@ -1,2 +1,8 @@
 packages:
   - "packages/*"
+
+overrides:
+  "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2"
+  postcss: ">=8.5.10"
+  brace-expansion: "5.0.8"
+  minimatch: "10.2.5"

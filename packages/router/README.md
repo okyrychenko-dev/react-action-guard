@@ -473,24 +473,23 @@ import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router
 
 ## Development
 
+This package lives in the [react-action-guard monorepo](https://github.com/okyrychenko-dev/react-action-guard)
+(pnpm workspaces). From the monorepo root:
+
 ```bash
-# Install dependencies
-npm install
+# Install dependencies for all packages
+pnpm install
 
-# Run tests
-npm run test
+# Run this package's scripts with --filter
+pnpm --filter @okyrychenko-dev/react-action-guard-router run test
+pnpm --filter @okyrychenko-dev/react-action-guard-router run build
+pnpm --filter @okyrychenko-dev/react-action-guard-router run typecheck
+pnpm --filter @okyrychenko-dev/react-action-guard-router run lint
+pnpm --filter @okyrychenko-dev/react-action-guard-router run lint:fix
 
-# Build the package
-npm run build
-
-# Type checking
-npm run typecheck
-
-# Lint
-npm run lint
-
-# Fix lint errors
-npm run lint:fix
+# Or cd into the package and run scripts directly
+cd packages/router
+pnpm run test
 ```
 
 ---
@@ -505,12 +504,15 @@ npm run lint:fix
 
 ## Contributing
 
-Contributions are welcome! Please ensure:
+Contributions are welcome! Please ensure, before opening a PR:
 
-1. Tests pass (`npm run test:run`)
-2. Code is properly typed (`npm run typecheck`)
-3. Linting passes (`npm run lint`)
-4. Code is formatted (`npm run format`)
+1. Tests pass (`pnpm run test:run`)
+2. Code is properly typed (`pnpm run typecheck`)
+3. Linting passes (`pnpm run lint`)
+4. Code is formatted (`pnpm run format`)
+5. If the change affects this package's public behavior, add a changeset: `pnpm changeset`
+   (see the [Releasing](https://github.com/okyrychenko-dev/react-action-guard#releasing) section
+   of the monorepo README)
 
 ---
 

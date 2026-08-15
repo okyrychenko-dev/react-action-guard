@@ -1,10 +1,10 @@
-import { useBlocker } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
 import { clsx } from "clsx";
 import { ReactElement, useEffect, useState } from "react";
 import ActionGuardDevtools from "./ActionGuardDevtools";
 import styles from "./ActionGuardDevtools.stories.module.css";
 import { ActionGuardDevtoolsProps } from "./ActionGuardDevtools.types";
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 
 const meta: Meta<typeof ActionGuardDevtools> = {
   title: "Components/ActionGuardDevtools",
@@ -47,7 +47,7 @@ function DemoApp(): ReactElement {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Simulate loading blocker
-  useBlocker(
+  useActionBlocker(
     "demo-loading",
     {
       scope: "global",
@@ -58,7 +58,7 @@ function DemoApp(): ReactElement {
   );
 
   // Simulate saving blocker with higher priority
-  useBlocker(
+  useActionBlocker(
     "demo-saving",
     {
       scope: ["form", "navigation"],
@@ -69,7 +69,7 @@ function DemoApp(): ReactElement {
   );
 
   // Simulate unsaved changes blocker
-  useBlocker(
+  useActionBlocker(
     "demo-unsaved",
     {
       scope: "navigation",
@@ -216,9 +216,9 @@ function AutoCycleDemo(): ReactElement {
     };
   }, []);
 
-  useBlocker("auto-cycle-1", { scope: "demo", reason: "First blocker" }, cycle === 0);
-  useBlocker("auto-cycle-2", { scope: "demo", reason: "Second blocker" }, cycle === 1);
-  useBlocker("auto-cycle-3", { scope: "demo", reason: "Third blocker" }, cycle === 2);
+  useActionBlocker("auto-cycle-1", { scope: "demo", reason: "First blocker" }, cycle === 0);
+  useActionBlocker("auto-cycle-2", { scope: "demo", reason: "Second blocker" }, cycle === 1);
+  useActionBlocker("auto-cycle-3", { scope: "demo", reason: "Third blocker" }, cycle === 2);
 
   return (
     <div className={styles.demoApp}>

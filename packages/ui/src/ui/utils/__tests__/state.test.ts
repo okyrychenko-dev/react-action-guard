@@ -41,25 +41,19 @@ describe("state utils", () => {
   });
 
   it("should resolve each blocked action state", () => {
-    expect(
-      resolveGuardedActionState({ blockedState: "disabled", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedActionState({ blockedState: "disabled", isBlocked: true })).toEqual({
       disabled: true,
       loading: false,
       ariaBusy: undefined,
       ariaDisabled: true,
     });
-    expect(
-      resolveGuardedActionState({ blockedState: "loading", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedActionState({ blockedState: "loading", isBlocked: true })).toEqual({
       disabled: true,
       loading: true,
       ariaBusy: true,
       ariaDisabled: true,
     });
-    expect(
-      resolveGuardedActionState({ blockedState: "none", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedActionState({ blockedState: "none", isBlocked: true })).toEqual({
       disabled: false,
       loading: false,
       ariaBusy: undefined,
@@ -74,7 +68,7 @@ describe("state utils", () => {
         isBlocked: false,
         disabled: true,
         loading: true,
-      }),
+      })
     ).toEqual({
       disabled: true,
       loading: true,
@@ -92,9 +86,7 @@ describe("state utils", () => {
   });
 
   it("should resolve each blocked field state", () => {
-    expect(
-      resolveGuardedFieldState({ blockedState: "disabled", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedFieldState({ blockedState: "disabled", isBlocked: true })).toEqual({
       disabled: true,
       readOnly: false,
       loading: false,
@@ -102,9 +94,7 @@ describe("state utils", () => {
       ariaDisabled: true,
       ariaReadOnly: undefined,
     });
-    expect(
-      resolveGuardedFieldState({ blockedState: "readOnly", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedFieldState({ blockedState: "readOnly", isBlocked: true })).toEqual({
       disabled: false,
       readOnly: true,
       loading: false,
@@ -112,9 +102,7 @@ describe("state utils", () => {
       ariaDisabled: undefined,
       ariaReadOnly: true,
     });
-    expect(
-      resolveGuardedFieldState({ blockedState: "loading", isBlocked: true }),
-    ).toEqual({
+    expect(resolveGuardedFieldState({ blockedState: "loading", isBlocked: true })).toEqual({
       disabled: true,
       readOnly: false,
       loading: true,
@@ -122,9 +110,7 @@ describe("state utils", () => {
       ariaDisabled: true,
       ariaReadOnly: undefined,
     });
-    expect(
-      resolveGuardedFieldState({ blockedState: "none", isBlocked: false }),
-    ).toEqual({
+    expect(resolveGuardedFieldState({ blockedState: "none", isBlocked: false })).toEqual({
       disabled: false,
       readOnly: false,
       loading: false,
@@ -142,7 +128,7 @@ describe("state utils", () => {
         disabled: true,
         readOnly: true,
         loading: true,
-      }),
+      })
     ).toEqual({
       disabled: true,
       readOnly: true,
@@ -171,7 +157,7 @@ describe("state utils", () => {
       resolveGuardedLinkState({
         isBlocked: true,
         removeFromTabOrder: true,
-      }),
+      })
     ).toEqual({
       ariaDisabled: true,
       tabIndex: -1,
@@ -182,7 +168,7 @@ describe("state utils", () => {
         disabled: true,
         isBlocked: false,
         removeFromTabOrder: false,
-      }),
+      })
     ).toEqual({
       ariaDisabled: true,
       tabIndex: undefined,

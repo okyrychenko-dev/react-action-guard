@@ -1,4 +1,4 @@
-import { useBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement, useState } from "react";
 import { useNavigationBlocker } from "../react-router";
 import {
@@ -26,7 +26,7 @@ const CombinedSourcesDemo = (): ReactElement => {
   const [isUploading, setIsUploading] = useState(false);
   const isUploadBlocked = useIsBlocked("upload");
 
-  useBlocker(
+  useActionBlocker(
     "upload-processing",
     {
       scope: "upload",

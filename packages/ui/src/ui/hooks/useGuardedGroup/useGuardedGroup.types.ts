@@ -5,8 +5,7 @@ import type {
   UseTopBlockerReturn,
 } from "../../types";
 
-export interface UseGuardedGroupParams
-  extends GuardedScopeProps, GuardedReasonProps {}
+export interface UseGuardedGroupParams extends GuardedScopeProps, GuardedReasonProps {}
 
 export interface UseGuardedGroupReturn {
   blocker: UseTopBlockerReturn;

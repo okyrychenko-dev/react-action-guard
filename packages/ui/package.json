@@ -23,17 +23,16 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build",
+    "prepublishOnly": "pnpm run clean && pnpm run build",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "check": "npm run lint && npm run typecheck && npm run test:run && npm run build",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test:run && pnpm run build",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "prepare": "husky"
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "react",
@@ -47,12 +46,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/okyrychenko-dev/react-action-guard-ui"
+    "url": "git+https://github.com/okyrychenko-dev/react-action-guard.git",
+    "directory": "packages/ui"
   },
   "bugs": {
-    "url": "https://github.com/okyrychenko-dev/react-action-guard-ui/issues"
+    "url": "https://github.com/okyrychenko-dev/react-action-guard/issues"
   },
-  "homepage": "https://github.com/okyrychenko-dev/react-action-guard-ui#readme",
+  "homepage": "https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/ui#readme",
   "publishConfig": {
     "access": "public"
   },
@@ -62,7 +62,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
-    "@okyrychenko-dev/react-action-guard": "^1.0.4",
+    "@okyrychenko-dev/react-action-guard": "workspace:*",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

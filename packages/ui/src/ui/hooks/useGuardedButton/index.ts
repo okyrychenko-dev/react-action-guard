@@ -1,5 +1,2 @@
 export { useGuardedButton } from "./useGuardedButton";
-export type {
-  UseGuardedButtonParams,
-  UseGuardedButtonReturn,
-} from "./useGuardedButton.types";
+export type { UseGuardedButtonParams, UseGuardedButtonReturn } from "./useGuardedButton.types";

@@ -22,7 +22,4 @@ export interface CustomAnalyticsConfig {
 }
 
 export type AnalyticsConfig =
-  | GoogleAnalyticsConfig
-  | MixpanelConfig
-  | AmplitudeConfig
-  | CustomAnalyticsConfig;
+  GoogleAnalyticsConfig | MixpanelConfig | AmplitudeConfig | CustomAnalyticsConfig;

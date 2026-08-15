@@ -5,22 +5,17 @@ import type {
   GuardedReasonResult,
 } from "../types";
 
-export function getGuardedReason(
-  blocker: GuardedReasonBlocker,
-  fallback?: string,
-): string | null {
+export function getGuardedReason(blocker: GuardedReasonBlocker, fallback?: string): string | null {
   return blocker.reason ?? fallback ?? null;
 }
 
-function shouldLinkReason(
-  mode: GuardedReasonMode | GuardedFieldReasonMode,
-): boolean {
+function shouldLinkReason(mode: GuardedReasonMode | GuardedFieldReasonMode): boolean {
   return mode === "description" || mode === "helperText";
 }
 
 function getRequiredReasonId(
   mode: GuardedReasonMode | GuardedFieldReasonMode,
-  reasonId?: string,
+  reasonId?: string
 ): string {
   if (reasonId === undefined || reasonId.trim().length === 0) {
     throw new Error(`reasonId is required when reasonMode is "${mode}"`);
@@ -37,11 +32,7 @@ function resolveGuardedReason(params: {
 }): GuardedReasonResult {
   const reason = getGuardedReason(params.blocker, params.fallback);
 
-  if (
-    !params.blocker.isBlocked ||
-    reason === null ||
-    params.mode === "hidden"
-  ) {
+  if (!params.blocker.isBlocked || reason === null || params.mode === "hidden") {
     return { ariaDescribedBy: undefined, reasonContent: null };
   }
 

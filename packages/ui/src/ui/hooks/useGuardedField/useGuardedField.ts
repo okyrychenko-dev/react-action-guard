@@ -2,25 +2,18 @@ import { useCallback } from "react";
 import { resolveFieldReason, resolveGuardedFieldState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
 import type { GuardedFieldState } from "../../types";
-import type {
-  UseGuardedFieldParams,
-  UseGuardedFieldReturn,
-} from "./useGuardedField.types";
+import type { UseGuardedFieldParams, UseGuardedFieldReturn } from "./useGuardedField.types";
 
-interface UseMappedGuardedFieldParams<
-  TFieldState,
-> extends UseGuardedFieldParams<TFieldState> {
+interface UseMappedGuardedFieldParams<TFieldState> extends UseGuardedFieldParams<TFieldState> {
   getFieldState: (state: GuardedFieldState) => TFieldState;
 }
 
-export function useGuardedField(
-  params?: UseGuardedFieldParams,
-): UseGuardedFieldReturn;
+export function useGuardedField(params?: UseGuardedFieldParams): UseGuardedFieldReturn;
 export function useGuardedField<TFieldState>(
-  params: UseMappedGuardedFieldParams<TFieldState>,
+  params: UseMappedGuardedFieldParams<TFieldState>
 ): UseGuardedFieldReturn<TFieldState>;
 export function useGuardedField<TFieldState>(
-  params: UseGuardedFieldParams<TFieldState> = {},
+  params: UseGuardedFieldParams<TFieldState> = {}
 ): UseGuardedFieldReturn<GuardedFieldState | TFieldState> {
   const {
     blockedState = "disabled",
@@ -43,7 +36,7 @@ export function useGuardedField<TFieldState>(
         loading,
         readOnly,
       }),
-    [blockedState, disabled, loading, readOnly],
+    [blockedState, disabled, loading, readOnly]
   );
 
   const control = useGuardedControl({

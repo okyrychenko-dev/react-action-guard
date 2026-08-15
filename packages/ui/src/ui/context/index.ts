@@ -4,7 +4,4 @@ export {
   useGuardedScope,
   useResolvedGuardedScope,
 } from "./GuardedScopeContext";
-export type {
-  GuardedScopeContextValue,
-  GuardedScopeProviderProps,
-} from "./GuardedScopeContext";
+export type { GuardedScopeContextValue, GuardedScopeProviderProps } from "./GuardedScopeContext";

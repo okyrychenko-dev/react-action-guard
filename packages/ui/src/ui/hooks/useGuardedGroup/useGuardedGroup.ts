@@ -1,19 +1,11 @@
 import { useCallback } from "react";
 import { resolveActionReason, resolveGuardedGroupState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
-import type {
-  UseGuardedGroupParams,
-  UseGuardedGroupReturn,
-} from "./useGuardedGroup.types";
+import type { UseGuardedGroupParams, UseGuardedGroupReturn } from "./useGuardedGroup.types";
 
-export function useGuardedGroup(
-  params: UseGuardedGroupParams = {},
-): UseGuardedGroupReturn {
+export function useGuardedGroup(params: UseGuardedGroupParams = {}): UseGuardedGroupReturn {
   const { reasonFallback, reasonId, reasonMode = "hidden", scope } = params;
-  const resolveState = useCallback(
-    (isBlocked: boolean) => resolveGuardedGroupState(isBlocked),
-    [],
-  );
+  const resolveState = useCallback((isBlocked: boolean) => resolveGuardedGroupState(isBlocked), []);
 
   const control = useGuardedControl({
     reasonFallback,

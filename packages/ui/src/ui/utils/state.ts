@@ -13,10 +13,7 @@ import type {
 const normalizedScopeCache = new Map<string, ReadonlyArray<string>>();
 const NORMALIZED_SCOPE_CACHE_MAX_SIZE = 256;
 
-function mergeWithBlockedFlag(
-  value: boolean | undefined,
-  isBlocked: boolean,
-): boolean {
+function mergeWithBlockedFlag(value: boolean | undefined, isBlocked: boolean): boolean {
   return (value ?? false) || isBlocked;
 }
 
@@ -28,10 +25,7 @@ function trueOrUndefined(value: boolean): true | undefined {
   return undefined;
 }
 
-function blockedLinkTabIndex(
-  isDisabled: boolean,
-  removeFromTabOrder?: boolean,
-): -1 | undefined {
+function blockedLinkTabIndex(isDisabled: boolean, removeFromTabOrder?: boolean): -1 | undefined {
   if (isDisabled && removeFromTabOrder === true) {
     return -1;
   }
@@ -43,15 +37,13 @@ function getNormalizedScopeCacheKey(scopes: ReadonlyArray<string>): string {
   return JSON.stringify([...scopes].sort());
 }
 
-function normalizeScopeList(
-  scopes: ReadonlyArray<string>,
-): ReadonlyArray<string> {
+function normalizeScopeList(scopes: ReadonlyArray<string>): ReadonlyArray<string> {
   return [...new Set(scopes)].sort();
 }
 
 function refreshNormalizedScopeCacheEntry(
   cacheKey: string,
-  scopes: ReadonlyArray<string>,
+  scopes: ReadonlyArray<string>
 ): ReadonlyArray<string> {
   normalizedScopeCache.delete(cacheKey);
   normalizedScopeCache.set(cacheKey, scopes);
@@ -65,9 +57,7 @@ function evictOldestNormalizedScopeCacheEntry(): void {
   }
 }
 
-function getCachedNormalizedScope(
-  scopes: ReadonlyArray<string>,
-): ReadonlyArray<string> {
+function getCachedNormalizedScope(scopes: ReadonlyArray<string>): ReadonlyArray<string> {
   const cacheKey = getNormalizedScopeCacheKey(scopes);
   const cachedScope = normalizedScopeCache.get(cacheKey);
 
@@ -86,9 +76,7 @@ function getCachedNormalizedScope(
   return normalizedScope;
 }
 
-export function normalizeGuardedScope(
-  scope?: GuardedScope,
-): ReadonlyArray<string> {
+export function normalizeGuardedScope(scope?: GuardedScope): ReadonlyArray<string> {
   if (scope === undefined) {
     return getCachedNormalizedScope([DEFAULT_GUARDED_SCOPE]);
   }
@@ -212,9 +200,7 @@ export function resolveGuardedLinkState(params: {
   };
 }
 
-export function resolveGuardedGroupState(
-  isBlocked: boolean,
-): GuardedGroupState {
+export function resolveGuardedGroupState(isBlocked: boolean): GuardedGroupState {
   return {
     ariaBusy: trueOrUndefined(isBlocked),
     ariaDisabled: trueOrUndefined(isBlocked),

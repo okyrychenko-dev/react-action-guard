@@ -16,7 +16,7 @@ describe("reason utils", () => {
       resolveActionReason({
         blocker: blockedScope,
         mode: "description",
-      }),
+      })
     ).toThrow('reasonId is required when reasonMode is "description"');
   });
 });

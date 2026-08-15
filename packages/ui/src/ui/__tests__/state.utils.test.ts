@@ -16,7 +16,7 @@ describe("ui state utils", () => {
       resolveGuardedActionState({
         blockedState: "disabled",
         isBlocked: true,
-      }),
+      })
     ).toEqual({
       disabled: true,
       loading: false,
@@ -30,7 +30,7 @@ describe("ui state utils", () => {
       resolveGuardedActionState({
         blockedState: "loading",
         isBlocked: true,
-      }),
+      })
     ).toEqual({
       disabled: true,
       loading: true,
@@ -44,7 +44,7 @@ describe("ui state utils", () => {
       resolveGuardedFieldState({
         blockedState: "readOnly",
         isBlocked: true,
-      }),
+      })
     ).toEqual({
       disabled: false,
       readOnly: true,
@@ -61,7 +61,7 @@ describe("ui state utils", () => {
         blockedState: "none",
         disabled: true,
         isBlocked: true,
-      }).disabled,
+      }).disabled
     ).toBe(true);
   });
 
@@ -70,7 +70,7 @@ describe("ui state utils", () => {
       resolveGuardedLinkState({
         isBlocked: true,
         removeFromTabOrder: true,
-      }),
+      })
     ).toEqual({
       ariaDisabled: true,
       tabIndex: -1,

@@ -4,10 +4,7 @@ export {
   useGuardedScope,
   useResolvedGuardedScope,
 } from "./context";
-export type {
-  GuardedScopeContextValue,
-  GuardedScopeProviderProps,
-} from "./context";
+export type { GuardedScopeContextValue, GuardedScopeProviderProps } from "./context";
 export {
   useGuardedAction,
   useGuardedButton,
@@ -35,11 +32,7 @@ export {
   resolveGuardedGroupState,
   resolveGuardedLinkState,
 } from "./utils";
-export {
-  visuallyHiddenClassName,
-  visuallyHiddenCss,
-  visuallyHiddenStyle,
-} from "./styles";
+export { visuallyHiddenClassName, visuallyHiddenCss, visuallyHiddenStyle } from "./styles";
 export type {
   GuardedActionBlockedState,
   GuardedActionState,

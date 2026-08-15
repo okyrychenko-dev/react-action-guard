@@ -14,7 +14,7 @@ interface BlockerScopeSnapshot {
 
 function blockerAffectsScope(
   blocker: BlockerScopeSnapshot,
-  checkedScopes: ReadonlyArray<string>,
+  checkedScopes: ReadonlyArray<string>
 ): boolean {
   if (blocker.scope === undefined || blocker.scope === DEFAULT_GUARDED_SCOPE) {
     return true;

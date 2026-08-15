@@ -1,8 +1,4 @@
-export type GuardedFieldBlockedState =
-  | "disabled"
-  | "readOnly"
-  | "loading"
-  | "none";
+export type GuardedFieldBlockedState = "disabled" | "readOnly" | "loading" | "none";
 
 export interface GuardedFieldState {
   disabled: boolean;
