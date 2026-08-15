@@ -1,5 +1,5 @@
+import { useActionBlocker } from "./hooks/useActionBlocker";
 import { type UseAsyncActionOptions, useAsyncAction } from "./hooks/useAsyncAction";
-import { useActionBlocker } from "./hooks/useBlocker";
 import { useBlockingInfo } from "./hooks/useBlockingInfo";
 import { useIsBlocked } from "./hooks/useIsBlocked";
 import type { BlockerConfigTyped, ScopeValue } from "./types";

@@ -7,7 +7,7 @@ import {
   StoryContainer,
 } from "../../storybook/components";
 import { useIsBlocked } from "../useIsBlocked";
-import { useActionBlocker } from "./useBlocker";
+import { useActionBlocker } from "./useActionBlocker";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../../storybook/components/shared.stories.css";
 import "./useActionBlocker.stories.css";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useResolvedValue } from "../../context";
-import { createBlockerConfig } from "../useBlocker";
+import { createBlockerConfig } from "../useActionBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
 

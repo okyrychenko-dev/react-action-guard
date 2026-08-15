@@ -59,11 +59,11 @@ jobs:
       - name: Format check
         run: pnpm run format:check
 
-      - name: Test
-        run: pnpm run test:coverage
-
       - name: Build
         run: pnpm run build
+
+      - name: Test
+        run: pnpm run test:coverage
 
       - name: Upload coverage
         if: matrix.node == 22

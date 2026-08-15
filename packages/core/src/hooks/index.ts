@@ -1,8 +1,8 @@
 export { useAsyncAction } from "./useAsyncAction";
 export type { UseAsyncActionOptions } from "./useAsyncAction";
-export { useActionBlocker } from "./useBlocker";
+export { useActionBlocker } from "./useActionBlocker";
 // eslint-disable-next-line @typescript-eslint/no-deprecated -- Kept as a public compatibility alias.
-export { useBlocker } from "./useBlocker";
+export { useBlocker } from "./useActionBlocker";
 export { useBlockingInfo } from "./useBlockingInfo";
 export type { ConditionalBlockerConfig } from "./useConditionalBlocker";
 export { useConditionalBlocker } from "./useConditionalBlocker";

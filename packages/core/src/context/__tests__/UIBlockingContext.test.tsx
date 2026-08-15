@@ -1,7 +1,7 @@
 import { act, render, renderHook, screen } from "@testing-library/react";
 import { type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useActionBlocker } from "../../hooks/useBlocker";
+import { useActionBlocker } from "../../hooks/useActionBlocker";
 import { useIsBlocked } from "../../hooks/useIsBlocked";
 import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import {

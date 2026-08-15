@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@okyrychenko-dev/react-action-guard": ["../core/src/index.ts"]
+    },
+    "rootDir": ".."
+  },
+  "include": ["src", "../core/src/middleware/window.types.ts"]
+}

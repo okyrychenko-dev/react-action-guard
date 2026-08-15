@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { useActionBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useActionBlocker";
 import {
   ConfirmableBlockerConfig,
   UseConfirmableBlockerReturn,

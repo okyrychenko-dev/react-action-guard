@@ -12,7 +12,7 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.typecheck.json",
         tsconfigRootDir: import.meta.dirname,
       },
     },

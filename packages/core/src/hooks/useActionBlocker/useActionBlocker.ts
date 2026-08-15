@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import { useResolvedValue } from "../../context";
-import { areBlockerConfigsEqual } from "./useBlocker.utils";
+import { areBlockerConfigsEqual } from "./useActionBlocker.utils";
 import type { BlockerConfig } from "../../store";
 
 /**
@@ -88,7 +88,9 @@ export function useActionBlocker(blockerId: string, config: BlockerConfig, isAct
   const lastConfigRef = useRef<BlockerConfig | null>(null);
   const onTimeoutRef = useRef(config.onTimeout);
 
-  onTimeoutRef.current = config.onTimeout;
+  useEffect(() => {
+    onTimeoutRef.current = config.onTimeout;
+  }, [config.onTimeout]);
 
   const handleTimeout = useCallback((id: string): void => {
     onTimeoutRef.current?.(id);

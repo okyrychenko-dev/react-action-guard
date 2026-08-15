@@ -1,7 +1,7 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uiBlockingStoreApi } from "../../../store";
-import { useActionBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useActionBlocker";
 import type { BlockerConfig } from "../../../store";
 
 describe("useBlocker", () => {

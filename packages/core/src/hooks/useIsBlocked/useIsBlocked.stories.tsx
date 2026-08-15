@@ -1,7 +1,7 @@
 import { clsx } from "clsx";
 import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
-import { useActionBlocker } from "../useBlocker";
+import { useActionBlocker } from "../useActionBlocker";
 import { useIsBlocked } from "./useIsBlocked";
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import "../../storybook/components/shared.stories.css";

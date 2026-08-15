@@ -13,7 +13,7 @@ export default [
   {
     languageOptions: {
       parserOptions: {
-        projectService: true,
+        project: "./tsconfig.typecheck.json",
         tsconfigRootDir: import.meta.dirname,
       },
     },
@@ -129,6 +129,7 @@ export default [
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/no-deprecated": "off",
+      "@typescript-eslint/unbound-method": "off",
       "import/order": "off",
       "sort-imports": "off",
     },
