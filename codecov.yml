@@ -1,0 +1,16 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 1%
+    patch:
+      default:
+        informational: true
+
+ignore:
+  - "**/index.ts"
+  - "**/index.tsx"
+  - "**/*.stories.tsx"
+  - "**/*.types.ts"
+  - "**/*.mdx"
