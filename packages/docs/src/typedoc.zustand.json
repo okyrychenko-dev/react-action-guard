@@ -1,7 +1,7 @@
 {
     "$schema": "https://typedoc.org/schema.json",
     "entryPoints": [
-        "../../react-zustand-toolkit/src/index.ts"
+        "../../../../react-zustand-toolkit/src/index.ts"
     ],
     "tsconfig": "../tsconfig.typedoc.json",
     "out": "./packages/react-zustand-toolkit/api/typedoc",

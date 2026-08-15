@@ -1,13 +1,14 @@
 {
   "name": "@okyrychenko-dev/react-action-guard-docs",
   "version": "1.0.1",
+  "private": true,
   "description": "Documentation for React Action Guard - Elegant UI blocking management for React applications",
   "type": "module",
   "scripts": {
     "dev": "vitepress dev",
     "build": "vitepress build",
     "preview": "vitepress preview",
-    "typedoc": "npm run typedoc:core && npm run typedoc:devtools && npm run typedoc:tanstack && npm run typedoc:zustand",
+    "typedoc": "pnpm run typedoc:core && pnpm run typedoc:devtools && pnpm run typedoc:tanstack && pnpm run typedoc:zustand",
     "typedoc:core": "typedoc --options src/typedoc.core.json",
     "typedoc:devtools": "typedoc --options src/typedoc.devtools.json",
     "typedoc:tanstack": "typedoc --options src/typedoc.tanstack.json",
@@ -19,7 +20,8 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/okyrychenko-dev/react-action-guard-docs.git"
+    "url": "git+https://github.com/okyrychenko-dev/react-action-guard.git",
+    "directory": "packages/docs"
   },
   "keywords": [
     "react",

@@ -1,7 +1,7 @@
 {
     "$schema": "https://typedoc.org/schema.json",
     "entryPoints": [
-        "../../react-action-guard-tanstack/src/index.ts"
+        "../../tanstack/src/index.ts"
     ],
     "tsconfig": "../tsconfig.typedoc.json",
     "out": "./packages/react-action-guard-tanstack/api/typedoc",

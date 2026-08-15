@@ -1,5 +1,5 @@
 {
-    "extends": "../react-action-guard/tsconfig.json",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "lib": [
             "ES2015",
@@ -18,10 +18,10 @@
         ]
     },
     "include": [
-        "../react-action-guard/src/**/*",
-        "../react-action-guard-devtools/src/**/*",
-        "../react-action-guard-tanstack/src/**/*",
-        "../react-zustand-toolkit/src/**/*"
+        "../core/src/**/*",
+        "../devtools/src/**/*",
+        "../tanstack/src/**/*",
+        "../../../react-zustand-toolkit/src/**/*"
     ],
     "exclude": [
         "**/*.stories.tsx",
