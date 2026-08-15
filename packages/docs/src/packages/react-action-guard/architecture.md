@@ -114,7 +114,7 @@ interface UIBlockingStoreActions {
 }
 ```
 
-[See complete store API →](../api/store)
+[See complete store API →](./api/store)
 
 ## Blocker Lifecycle
 
@@ -421,7 +421,7 @@ const createAnalyticsMiddleware = (config: AnalyticsConfig) => {
 };
 ```
 
-[Learn more about middleware →](../guides/middleware-system)
+[Learn more about middleware →](./guides/middleware-system)
 
 ## Provider Pattern
 
@@ -482,7 +482,7 @@ function useBlocker(id: string, config: BlockerConfig, isActive = true) {
 - Testing becomes trivial (wrap in Provider)
 - SSR works out of the box
 
-[Learn more about providers →](../guides/provider-pattern)
+[Learn more about providers →](./guides/provider-pattern)
 
 ## Performance Optimizations
 
