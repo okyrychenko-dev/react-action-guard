@@ -3,6 +3,9 @@
   "version": "1.0.5",
   "type": "module",
   "description": "Coordinate shared UI interaction locks across complex React forms and workflows",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
