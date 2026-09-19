@@ -1,3 +1,4 @@
+import { isFunction, isObject } from "@okyrychenko-dev/type-utils";
 import { useRouter } from "@tanstack/react-router";
 import { useEffect } from "react";
 import {
@@ -15,24 +16,24 @@ interface RetryableUpdate {
 }
 
 const hasBlockingHistory = (value: unknown): value is SafeTanStackRouter => {
-  if (!value || typeof value !== "object") {
+  if (!isObject(value)) {
     return false;
   }
   if (!("history" in value)) {
     return false;
   }
   const history = value.history;
-  if (!history || typeof history !== "object") {
+  if (!isObject(history)) {
     return false;
   }
   if (!("block" in history)) {
     return false;
   }
-  return typeof history.block === "function";
+  return isFunction(history.block);
 };
 
 const hasRetry = (value: Record<string, unknown>): value is RetryableUpdate =>
-  typeof value.retry === "function";
+  isFunction(value.retry);
 
 const attemptRetry = (update: Record<string, unknown>): void => {
   if (hasRetry(update)) {

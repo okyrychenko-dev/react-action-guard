@@ -1,3 +1,6 @@
+import { isArray, isFunction, isObject } from "@okyrychenko-dev/type-utils";
+import type { Optional } from "@okyrychenko-dev/type-utils";
+
 /**
  * Resolves a condition value (boolean or function returning boolean)
  *
@@ -5,15 +8,14 @@
  * @returns Resolved boolean value
  */
 export function resolveCondition(condition: boolean | (() => boolean)): boolean {
-  return typeof condition === "function" ? condition() : condition;
+  return isFunction(condition) ? condition() : condition;
 }
 
 interface Thenable {
   then: (...args: Array<unknown>) => unknown;
 }
 
-const hasThen = (value: unknown): value is Thenable =>
-  typeof value === "object" && value !== null && "then" in value;
+const hasThen = (value: unknown): value is Thenable => isObject(value) && "then" in value;
 
 /**
  * Checks if a value behaves like a Promise (thenable)
@@ -22,7 +24,7 @@ export function isThenable<T>(value: unknown): value is PromiseLike<T> {
   if (!hasThen(value)) {
     return false;
   }
-  return typeof value.then === "function";
+  return isFunction(value.then);
 }
 
 export interface ConfirmResultSync {
@@ -42,7 +44,7 @@ export type ConfirmResult = ConfirmResultSync | ConfirmResultAsync;
  */
 export function resolveConfirmResult(
   message: string,
-  onConfirm: ((message: string) => boolean | PromiseLike<boolean>) | undefined,
+  onConfirm: Optional<(message: string) => boolean | PromiseLike<boolean>>,
   fallbackConfirm: (message: string) => boolean
 ): ConfirmResult {
   if (!onConfirm) {
@@ -65,7 +67,7 @@ export function resolveConfirmResult(
  * @returns Unique blocker ID
  */
 export function createBlockerId(prefix: string, scope?: string | Array<string>): string {
-  const scopePart = scope ? `-${Array.isArray(scope) ? scope.join("-") : scope}` : "";
+  const scopePart = scope ? `-${isArray(scope) ? scope.join("-") : scope}` : "";
   const timestamp = String(Date.now());
   return `${prefix}${scopePart}-${timestamp}`;
 }
@@ -76,9 +78,7 @@ export function createBlockerId(prefix: string, scope?: string | Array<string>):
  * @param value - Value to check
  * @returns True if value is defined and not empty
  */
-export function isDefined<T>(value: T | undefined | null): value is T {
-  return value !== undefined && value !== null;
-}
+export { isDefined } from "@okyrychenko-dev/type-utils";
 
 /**
  * Normalizes scope to an array
@@ -86,9 +86,9 @@ export function isDefined<T>(value: T | undefined | null): value is T {
  * @param scope - String or array of strings
  * @returns Array of scope strings
  */
-export function normalizeScope(scope: string | Array<string> | undefined): Array<string> {
+export function normalizeScope(scope: Optional<string | Array<string>>): Array<string> {
   if (!scope) {
     return [];
   }
-  return Array.isArray(scope) ? scope : [scope];
+  return isArray(scope) ? scope : [scope];
 }

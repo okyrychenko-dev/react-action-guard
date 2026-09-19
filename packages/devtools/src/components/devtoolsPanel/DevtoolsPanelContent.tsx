@@ -3,6 +3,7 @@ import { ActiveBlockers } from "../activeBlockers";
 import { ErrorBoundary } from "../shared";
 import { Stats } from "../stats";
 import { Timeline } from "../timeline";
+import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsState } from "../../types";
 import type { UIBlockingStoreApi } from "../actionGuardDevtools";
 
@@ -14,8 +15,8 @@ interface DevtoolsPanelContentProps {
 
 function renderTab(
   activeTab: DevtoolsState["activeTab"],
-  store: UIBlockingStoreApi | undefined,
-  stuckThresholdMs: number | undefined
+  store: Optional<UIBlockingStoreApi>,
+  stuckThresholdMs: Optional<number>
 ): ReactElement {
   switch (activeTab) {
     case "blockers":

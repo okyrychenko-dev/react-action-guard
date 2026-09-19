@@ -1,6 +1,7 @@
 import { BlockingAction, Middleware, MiddlewareContext } from "../middleware";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
 import { normalizeScopeToArray } from "./uiBlockingStore.utils";
+import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { StateCreator } from "zustand";
 import type {
   BlockerConfig,
@@ -129,7 +130,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       clearTimeout(existingBlocker.timeoutId);
     }
 
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    let timeoutId: Optional<ReturnType<typeof setTimeout>>;
 
     // Set up timeout if specified
     if (config.timeout && config.timeout > 0) {

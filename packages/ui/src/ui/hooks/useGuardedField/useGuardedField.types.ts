@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedFieldBlockedState,
   GuardedFieldReasonProps,
@@ -19,6 +20,6 @@ export interface UseGuardedFieldReturn<TFieldState = GuardedFieldState> {
   blocker: UseTopBlockerReturn;
   isBlocked: boolean;
   fieldState: TFieldState;
-  reasonContent: string | null;
+  reasonContent: Nullable<string>;
   ariaDescribedBy?: string;
 }

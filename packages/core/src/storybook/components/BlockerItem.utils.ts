@@ -1,3 +1,5 @@
+import { isReadonlyArray } from "@okyrychenko-dev/type-utils";
+
 export function formatScope(scope: string | ReadonlyArray<string>): string {
-  return Array.isArray(scope) ? scope.join(", ") : (scope as string);
+  return isReadonlyArray(scope) ? scope.join(", ") : scope;
 }

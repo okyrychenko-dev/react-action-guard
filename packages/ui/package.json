@@ -89,5 +89,8 @@
   },
   "allowScripts": {
     "esbuild": true
+  },
+  "dependencies": {
+    "@okyrychenko-dev/type-utils": "^0.1.2"
   }
 }

@@ -69,6 +69,7 @@
   },
   "dependencies": {
     "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
+    "@okyrychenko-dev/type-utils": "^0.1.2",
     "clsx": "^2.1.1"
   },
   "devDependencies": {
@@ -76,10 +77,10 @@
     "@storybook/addon-a11y": "^10.3.6",
     "@storybook/addon-docs": "^10.3.6",
     "@storybook/react-vite": "^10.3.6",
-    "@types/node": "^24.10.4",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",
+    "@types/node": "^24.10.4",
     "@types/react": "^19.2.5",
     "@vitest/coverage-v8": "^4.0.9",
     "@vitest/ui": "^4.0.9",

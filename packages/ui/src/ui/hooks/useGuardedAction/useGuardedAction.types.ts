@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedActionBlockedState,
   GuardedActionState,
@@ -18,6 +19,6 @@ export interface UseGuardedActionReturn<TActionState = GuardedActionState> {
   blocker: UseTopBlockerReturn;
   isBlocked: boolean;
   actionState: TActionState;
-  reasonContent: string | null;
+  reasonContent: Nullable<string>;
   ariaDescribedBy?: string;
 }

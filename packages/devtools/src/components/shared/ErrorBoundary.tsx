@@ -1,5 +1,6 @@
 import { Component, ReactNode } from "react";
 import sharedStyles from "../../styles/shared.module.css";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -8,7 +9,7 @@ interface ErrorBoundaryProps {
 
 interface ErrorBoundaryState {
   hasError: boolean;
-  error: Error | null;
+  error: Nullable<Error>;
 }
 
 class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {

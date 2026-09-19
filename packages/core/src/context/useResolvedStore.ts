@@ -2,13 +2,14 @@ import { type StoreApi, useStore } from "zustand";
 import { useShallow } from "zustand/shallow";
 import { uiBlockingStoreApi } from "../store/uiBlockingStore.store";
 import { useOptionalUIBlockingContext } from "./UIBlockingContext";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
 /**
  * Hook to get the optional context store (returns null if not inside provider)
  * @internal
  */
-function useOptionalContextStore(): StoreApi<UIBlockingStore> | null {
+function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
   return useOptionalUIBlockingContext();
 }
 

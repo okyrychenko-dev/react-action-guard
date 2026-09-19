@@ -1,4 +1,5 @@
 import type { BlockingAction } from "@okyrychenko-dev/react-action-guard";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 /**
  * Extended event stored in devtools history
@@ -84,7 +85,7 @@ export interface DevtoolsState {
   /** Current filter settings */
   filter: DevtoolsFilter;
   /** Selected event for detail view */
-  selectedEventId: string | null;
+  selectedEventId: Nullable<string>;
   /** Whether devtools is paused (stops recording) */
   isPaused: boolean;
 }
@@ -110,7 +111,7 @@ export interface DevtoolsActions {
   /** Reset filters to default */
   resetFilter: VoidFunction;
   /** Select an event for detail view */
-  selectEvent: (eventId: string | null) => void;
+  selectEvent: (eventId: Nullable<string>) => void;
   /** Toggle pause state */
   togglePause: VoidFunction;
   /** Set max events limit */

@@ -1,3 +1,4 @@
+import { isNumber, isString } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent, DevtoolsEventStats, DevtoolsFilter, DevtoolsStore } from "../types";
 
 type ScopeValue = string | ReadonlyArray<string> | undefined;
@@ -68,7 +69,7 @@ function normalizeScopes(scope: ScopeValue): ReadonlyArray<string> {
     return [];
   }
 
-  if (typeof scope === "string") {
+  if (isString(scope)) {
     return [scope];
   }
 
@@ -179,7 +180,7 @@ export const selectEventStats = createMemoizedSingleInputSelector(
         scopeCounts.set(scope, (scopeCounts.get(scope) ?? 0) + 1);
       });
 
-      if (typeof event.duration === "number") {
+      if (isNumber(event.duration)) {
         durationSum += event.duration;
         durationSampleCount += 1;
         maxDurationMs = Math.max(maxDurationMs, event.duration);

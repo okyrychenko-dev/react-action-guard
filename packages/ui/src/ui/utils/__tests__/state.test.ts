@@ -82,7 +82,7 @@ describe("state utils", () => {
       void Reflect.apply(resolveGuardedActionState, undefined, [
         { blockedState: "unexpected", isBlocked: false },
       ]);
-    }).toThrow("Unhandled GuardedActionBlockedState: unexpected");
+    }).toThrow("GuardedActionBlockedState Unexpected value in exhaustive check");
   });
 
   it("should resolve each blocked field state", () => {
@@ -144,7 +144,7 @@ describe("state utils", () => {
       void Reflect.apply(resolveGuardedFieldState, undefined, [
         { blockedState: "unexpected", isBlocked: false },
       ]);
-    }).toThrow("Unhandled GuardedFieldBlockedState: unexpected");
+    }).toThrow("GuardedFieldBlockedState Unexpected value in exhaustive check");
   });
 
   it("should resolve link state for disabled and tab-order options", () => {

@@ -1,3 +1,4 @@
+import { type Optional, isArray } from "@okyrychenko-dev/type-utils";
 import { createContext, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
 import type { GuardedScope } from "../types";
@@ -21,14 +22,14 @@ export function GuardedScopeProvider({ children, scope }: GuardedScopeProviderPr
 
 export const GuardedFormScopeProvider = GuardedScopeProvider;
 
-export function useGuardedScope(): GuardedScope | undefined {
+export function useGuardedScope(): Optional<GuardedScope> {
   return useContext(GuardedScopeContext)?.scope;
 }
 
-export function useResolvedGuardedScope(explicitScope?: GuardedScope): GuardedScope | undefined {
+export function useResolvedGuardedScope(explicitScope?: GuardedScope): Optional<GuardedScope> {
   const contextScope = useGuardedScope();
 
-  if (Array.isArray(explicitScope) && explicitScope.length === 0) {
+  if (isArray(explicitScope) && explicitScope.length === 0) {
     return contextScope;
   }
 

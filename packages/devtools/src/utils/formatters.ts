@@ -1,3 +1,5 @@
+import { isString } from "@okyrychenko-dev/type-utils";
+
 export type FormattableScope = string | ReadonlyArray<string>;
 
 export function formatDuration(ms: number): string {
@@ -17,7 +19,7 @@ export function formatScope(scope?: FormattableScope): string {
     return "global";
   }
 
-  if (typeof scope === "string") {
+  if (isString(scope)) {
     return scope;
   }
 
