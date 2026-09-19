@@ -1,6 +1,6 @@
 import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { renderHook } from "@testing-library/react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useShouldBlock } from "../useShouldBlock";
 
 // Mock react-action-guard
@@ -15,6 +15,11 @@ describe("useShouldBlock", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockUseIsBlocked.mockReturnValue(false);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
   });
 
   describe("Condition-based blocking", () => {
@@ -39,6 +44,20 @@ describe("useShouldBlock", () => {
 
       expect(result.current).toBe(true);
       expect(condition).toHaveBeenCalled();
+    });
+
+    it("should warn about function conditions in development", () => {
+      vi.stubEnv("NODE_ENV", "development");
+      const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+      const condition = (): boolean => true;
+
+      const { rerender } = renderHook(() => useShouldBlock(condition));
+      rerender();
+
+      expect(warnSpy).toHaveBeenCalledOnce();
+      expect(warnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('useShouldBlock: "when" is a function')
+      );
     });
 
     it("should update when condition changes", () => {
