@@ -188,6 +188,14 @@ describe("uiBlockingStore", () => {
       expect(isBlocked("any-scope")).toBe(true);
     });
 
+    it("should return true for any scope when an array-form global blocker exists", () => {
+      const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", { scope: [DEFAULT_SCOPE] });
+
+      expect(isBlocked("any-scope")).toBe(true);
+    });
+
     it("should check multiple scopes", () => {
       const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
 
@@ -238,6 +246,16 @@ describe("uiBlockingStore", () => {
       const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
 
       addBlocker("global-blocker", { scope: DEFAULT_SCOPE });
+
+      const info = getBlockingInfo("any-scope");
+      expect(info).toHaveLength(1);
+      expect(info[0]?.id).toBe("global-blocker");
+    });
+
+    it("should return array-form global blockers for any scope", () => {
+      const { addBlocker, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("global-blocker", { scope: [DEFAULT_SCOPE] });
 
       const info = getBlockingInfo("any-scope");
       expect(info).toHaveLength(1);
@@ -345,6 +363,31 @@ describe("uiBlockingStore", () => {
       expect(isBlocked()).toBe(true); // Global blocker still exists
       expect(isBlocked("test")).toBe(true); // Still blocked by global
     });
+
+    it("should not clear array-form global blockers", () => {
+      const { addBlocker, clearBlockersForScope, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      addBlocker("global-blocker", { scope: [DEFAULT_SCOPE] });
+      addBlocker("scoped-blocker", { scope: "test" });
+
+      clearBlockersForScope("test");
+
+      expect(getBlockingInfo("test").map(({ id }) => id)).toEqual(["global-blocker"]);
+    });
+
+    it.each([DEFAULT_SCOPE, [DEFAULT_SCOPE]])(
+      "should not clear a %j blocker when clearing the global scope",
+      (globalScope) => {
+        const { addBlocker, clearBlockersForScope, getBlockingInfo } =
+          uiBlockingStoreApi.getState();
+
+        addBlocker("global-blocker", { scope: globalScope });
+
+        clearBlockersForScope(DEFAULT_SCOPE);
+
+        expect(getBlockingInfo(DEFAULT_SCOPE).map(({ id }) => id)).toEqual(["global-blocker"]);
+      }
+    );
 
     it("should handle array scopes", () => {
       const { addBlocker, clearBlockersForScope, isBlocked } = uiBlockingStoreApi.getState();
