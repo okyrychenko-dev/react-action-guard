@@ -1,3 +1,4 @@
+import { UIBlockingProvider } from "@okyrychenko-dev/react-action-guard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act } from "@testing-library/react";
 import { ReactElement, ReactNode, StrictMode } from "react";
@@ -13,6 +14,7 @@ export async function actAsync<T>(fn: () => Promise<T>): Promise<T> {
 }
 
 interface CreateWrapperOptions {
+  blockingProvider?: boolean;
   strictMode?: boolean;
 }
 
@@ -27,7 +29,11 @@ export function createWrapper(options: CreateWrapperOptions = {}) {
   });
 
   return function ({ children }: { children: ReactNode }): ReactElement {
-    const content = <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+    let content = <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+
+    if (options.blockingProvider) {
+      content = <UIBlockingProvider>{content}</UIBlockingProvider>;
+    }
 
     if (options.strictMode) {
       return <StrictMode>{content}</StrictMode>;

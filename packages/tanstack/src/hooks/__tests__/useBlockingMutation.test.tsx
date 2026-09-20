@@ -1,4 +1,4 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+import { uiBlockingStoreApi, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { actAsync, createWrapper } from "../../test/test.utils";
@@ -8,6 +8,26 @@ import { MutationBlockingConfig } from "../useBlockingMutation.types";
 describe("useBlockingMutation", () => {
   beforeEach(() => {
     uiBlockingStoreApi.getState().clearAllBlockers();
+  });
+
+  it("should use the UIBlockingProvider store", async () => {
+    const { result } = renderHook(
+      () => ({
+        mutation: useBlockingMutation({
+          mutationFn: () => new Promise(() => undefined),
+          blockingConfig: { scope: "provider-mutation" },
+        }),
+        isBlocked: useIsBlocked("provider-mutation"),
+      }),
+      { wrapper: createWrapper({ blockingProvider: true }) }
+    );
+
+    result.current.mutation.mutate(undefined);
+
+    await waitFor(() => {
+      expect(result.current.isBlocked).toBe(true);
+    });
+    expect(uiBlockingStoreApi.getState().isBlocked("provider-mutation")).toBe(false);
   });
 
   it("should block UI during mutation execution", async () => {
