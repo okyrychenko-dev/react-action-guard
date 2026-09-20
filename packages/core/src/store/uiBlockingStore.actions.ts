@@ -1,6 +1,6 @@
 import { BlockingAction, Middleware, MiddlewareContext } from "../middleware";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
-import { normalizeScopeToArray } from "./uiBlockingStore.utils";
+import { matchesScope } from "./uiBlockingStore.utils";
 import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { StateCreator } from "zustand";
 import type {
@@ -367,18 +367,9 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
    */
   isBlocked: (scope: string | ReadonlyArray<string> = DEFAULT_SCOPE): boolean => {
     const { activeBlockers } = get();
-    const scopes = normalizeScopeToArray(scope);
 
     for (const [, blocker] of activeBlockers) {
-      // Global blocking blocks everything
-      if (blocker.scope === DEFAULT_SCOPE) {
-        return true;
-      }
-
-      // Check scope intersection
-      const blockerScopes = normalizeScopeToArray(blocker.scope);
-
-      if (scopes.some((s) => blockerScopes.includes(s))) {
+      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: true })) {
         return true;
       }
     }
@@ -424,9 +415,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     const blockers: Array<BlockerInfo> = [];
 
     for (const [id, blocker] of activeBlockers) {
-      const blockerScopes = normalizeScopeToArray(blocker.scope);
-
-      if (blocker.scope === DEFAULT_SCOPE || blockerScopes.includes(scope)) {
+      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: true })) {
         const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
         blockers.push({ id, ...publicBlocker });
       }
@@ -503,8 +492,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     // Clear timeouts for blockers that will be removed
     for (const [, blocker] of activeBlockers) {
-      const blockerScopes = normalizeScopeToArray(blocker.scope);
-      if (blockerScopes.includes(scope)) {
+      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: false })) {
         if (blocker.timeoutId) {
           clearTimeout(blocker.timeoutId);
         }
@@ -516,9 +504,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       const newBlockers = new Map();
 
       for (const [id, blocker] of state.activeBlockers) {
-        const blockerScopes = normalizeScopeToArray(blocker.scope);
-
-        if (!blockerScopes.includes(scope)) {
+        if (!matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: false })) {
           newBlockers.set(id, blocker);
         }
       }
