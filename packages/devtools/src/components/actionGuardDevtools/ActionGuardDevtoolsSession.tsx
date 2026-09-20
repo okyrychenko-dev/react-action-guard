@@ -24,6 +24,7 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     store: customStore,
     targetStore,
   } = props;
+
   const initialDefaultOpenRef = useRef(defaultOpen);
 
   const { setOpen, setMaxEvents, isOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({

@@ -1,6 +1,7 @@
 import { isDefined } from "@okyrychenko-dev/type-utils";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings } from "../../store";
+import type { Middleware } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../../store";
 import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 
@@ -22,6 +23,12 @@ export interface ObservationSession {
 }
 
 const observationSessions = new WeakMap<UIBlockingStoreApi, ObservationSession>();
+
+function resetObservationSession(devtoolsStore: DevtoolsStoreApi): void {
+  const { events, isOpen, isPaused, maxEvents, selectedEventId } = devtoolsStore.getInitialState();
+
+  devtoolsStore.setState({ events, isOpen, isPaused, maxEvents, selectedEventId });
+}
 
 export function getDevtoolsObservationSession(
   store: UIBlockingStoreApi,
@@ -50,12 +57,10 @@ export function acquireDevtoolsMiddleware(
 
   if (observerCount === 0) {
     observationSessions.set(store, session);
-    store
-      .getState()
-      .registerMiddleware(
-        DEVTOOLS_MIDDLEWARE_NAME,
-        createDevtoolsMiddlewareForStore(session.devtoolsStore)
-      );
+
+    const middleware: Middleware = createDevtoolsMiddlewareForStore(session.devtoolsStore);
+
+    store.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
   }
 
   session.observerCount += 1;
@@ -66,14 +71,17 @@ export function acquireDevtoolsMiddleware(
     if (released) {
       return;
     }
+
     released = true;
 
     session.observerCount -= 1;
 
     if (session.observerCount === 0) {
       observationSessions.delete(store);
+
       store.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-      session.devtoolsStore.setState(session.devtoolsStore.getInitialState(), true);
+
+      resetObservationSession(session.devtoolsStore);
     }
   };
 }

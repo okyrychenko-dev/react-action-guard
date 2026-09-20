@@ -2,6 +2,7 @@ export {
   DEFAULT_FILTER,
   DEFAULT_MAX_EVENTS,
   DEFAULT_TAB,
+  DEVTOOLS_STORAGE_KEY,
   createDefaultFilter,
 } from "./devtoolsStore.constants";
 export { DevtoolsStoreProvider, useDevtoolsStore } from "./devtoolsStore.context";

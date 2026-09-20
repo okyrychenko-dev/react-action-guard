@@ -7,7 +7,13 @@ import { assertDefined, isDefined, isUndefined } from "@okyrychenko-dev/type-uti
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { ReactElement, useState } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_FILTER, DEFAULT_MAX_EVENTS, DEFAULT_TAB, devtoolsStoreApi } from "../../../store";
+import {
+  DEFAULT_FILTER,
+  DEFAULT_MAX_EVENTS,
+  DEFAULT_TAB,
+  DEVTOOLS_STORAGE_KEY,
+  devtoolsStoreApi,
+} from "../../../store";
 import { renderWithProviders } from "../../../test/utils";
 import ActionGuardDevtools from "../ActionGuardDevtools";
 import ActionGuardDevtoolsContent from "../ActionGuardDevtoolsContent";
@@ -359,6 +365,45 @@ describe("ActionGuardDevtools", () => {
       expect(screen.getByText("No events recorded yet.")).toBeInTheDocument();
     });
     expect(screen.queryByText("global-session-blocker")).not.toBeInTheDocument();
+  });
+
+  it("should preserve persisted preferences after the final global observer detaches", () => {
+    renderWithProviders(
+      <ObservationSessionHarness
+        addLabel="Add unused blocker"
+        blockerId="unused-blocker"
+        toggleLabel="Toggle persisted observation"
+        useGlobalStore={true}
+      />
+    );
+    const store = devtoolsStoreApi.getState();
+
+    act(() => {
+      store.toggleMinimized();
+      store.setActiveTab("stats");
+      store.setFilter({ search: "persisted search" });
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle persisted observation" }));
+
+    const stateAfterDetach = devtoolsStoreApi.getState();
+
+    expect(stateAfterDetach.isMinimized).toBe(true);
+    expect(stateAfterDetach.activeTab).toBe("stats");
+    expect(stateAfterDetach.filter.search).toBe("persisted search");
+    expect(window.localStorage.getItem(DEVTOOLS_STORAGE_KEY)).toContain('"isMinimized":true');
+    expect(window.localStorage.getItem(DEVTOOLS_STORAGE_KEY)).toContain('"activeTab":"stats"');
+    expect(window.localStorage.getItem(DEVTOOLS_STORAGE_KEY)).toContain(
+      '"search":"persisted search"'
+    );
+  });
+
+  it("should persist preferences when the global store is passed explicitly", () => {
+    renderWithProviders(<ActionGuardDevtools store={uiBlockingStoreApi} defaultOpen={true} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Stats" }));
+
+    expect(window.localStorage.getItem(DEVTOOLS_STORAGE_KEY)).toContain('"activeTab":"stats"');
   });
 });
 
