@@ -29,7 +29,7 @@ interface MatchesScopeOptions {
  */
 export function createShallowStore<
   StoreState,
-  TMutators extends Array<[keyof StoreMutators<StoreState, StoreState>, unknown]> = []
+  TMutators extends Array<[keyof StoreMutators<StoreState, StoreState>, unknown]> = [],
 >(
   storeCreator: StateCreator<StoreState, [], TMutators, StoreState>
 ): ShallowStoreBindings<StoreState> {
