@@ -1,2 +1,2 @@
-export { ActionGuardDevtools } from "./actionGuardDevtools";
+export { ActionGuardDevtools, ActionGuardDevtoolsProvider } from "./actionGuardDevtools";
 export { EventDetails } from "./eventDetails";

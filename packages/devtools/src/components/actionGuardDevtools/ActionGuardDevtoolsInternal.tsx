@@ -9,6 +9,7 @@ function ActionGuardDevtoolsInternal(
   props: Omit<ActionGuardDevtoolsProps, "showInProduction">
 ): ReactElement {
   const { store: customStore } = props;
+
   const targetStore = customStore ?? uiBlockingStoreApi;
 
   const observationSession = getDevtoolsObservationSession(

@@ -1,4 +1,5 @@
 import type { UIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+import type { ReactNode } from "react";
 import type { StoreApi } from "zustand";
 import type { DevtoolsPosition } from "../../types";
 
@@ -6,6 +7,14 @@ import type { DevtoolsPosition } from "../../types";
  * Store API type for UIBlockingProvider integration
  */
 export type UIBlockingStoreApi = StoreApi<UIBlockingStore>;
+
+export interface ActionGuardDevtoolsProviderProps {
+  children: ReactNode;
+  /** Enable observation-session resources in production (default: false). */
+  showInProduction?: boolean;
+  /** Blocking store whose observation session is exposed to descendant Devtools hooks. */
+  store?: UIBlockingStoreApi;
+}
 
 /**
  * Props for the main ActionGuardDevtools component
@@ -26,8 +35,8 @@ export interface ActionGuardDevtoolsProps {
   showInProduction?: boolean;
   /**
    * Custom blocking store instance to observe instead of the global store.
-   * This only changes the source of active blockers and middleware registration.
-   * Devtools UI state and event history remain shared within the devtools package.
+   * Wrap the panel and adjacent `useDevtoolsStore` consumers in
+   * `ActionGuardDevtoolsProvider` to expose this store's observation session.
    */
   store?: UIBlockingStoreApi;
 }

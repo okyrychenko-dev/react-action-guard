@@ -110,11 +110,25 @@ The main devtools component that renders the toggle button and panel.
 
 ```jsx
 import { UIBlockingProvider, useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
-import { ActionGuardDevtools } from "@okyrychenko-dev/react-action-guard-devtools";
+import {
+  ActionGuardDevtools,
+  ActionGuardDevtoolsProvider,
+  useDevtoolsStore,
+} from "@okyrychenko-dev/react-action-guard-devtools";
+
+function ObservedEventCount() {
+  const count = useDevtoolsStore((state) => state.events.length);
+  return <span>{count} observed events</span>;
+}
 
 function DevtoolsWithProvider() {
   const store = useUIBlockingContext();
-  return <ActionGuardDevtools store={store} />;
+  return (
+    <ActionGuardDevtoolsProvider store={store}>
+      <ActionGuardDevtools store={store} />
+      <ObservedEventCount />
+    </ActionGuardDevtoolsProvider>
+  );
 }
 
 function App() {
@@ -132,6 +146,12 @@ Each blocking store has an isolated observation session containing its Devtools 
 event history. Multiple Devtools instances observing the same store share that session and one
 middleware registration, so events are not duplicated and the middleware remains active until the
 last instance unmounts. When the final observer unmounts, the session is discarded.
+
+Wrap a custom-store panel and adjacent `useDevtoolsStore` consumers in
+`ActionGuardDevtoolsProvider`. The provider binds the public hook to that store's observation
+session and keeps the session active for the lifetime of its subtree. In production it passes
+children through without allocating observation resources unless `showInProduction` is enabled on
+the provider.
 
 ## Advanced Usage
 
