@@ -1,4 +1,4 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+import { uiBlockingStoreApi, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createWrapper } from "../../test/test.utils";
@@ -8,6 +8,27 @@ import { InfiniteQueryBlockingConfig } from "../useBlockingInfiniteQuery.types";
 describe("useBlockingInfiniteQuery", () => {
   beforeEach(() => {
     uiBlockingStoreApi.getState().clearAllBlockers();
+  });
+
+  it("should use the UIBlockingProvider store", async () => {
+    const { result } = renderHook(
+      () => {
+        useBlockingInfiniteQuery({
+          queryKey: ["provider-infinite-query"],
+          queryFn: () => new Promise(() => undefined),
+          initialPageParam: 1,
+          getNextPageParam: () => undefined,
+          blockingConfig: { scope: "provider-infinite-query" },
+        });
+        return useIsBlocked("provider-infinite-query");
+      },
+      { wrapper: createWrapper({ blockingProvider: true }) }
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe(true);
+    });
+    expect(uiBlockingStoreApi.getState().isBlocked("provider-infinite-query")).toBe(false);
   });
 
   it("should block UI during initial loading", async () => {

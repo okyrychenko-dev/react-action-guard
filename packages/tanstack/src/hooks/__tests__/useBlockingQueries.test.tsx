@@ -1,4 +1,4 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+import { uiBlockingStoreApi, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createWrapper } from "../../test/test.utils";
@@ -8,6 +8,29 @@ import { QueriesBlockingConfig } from "../useBlockingQueries.types";
 describe("useBlockingQueries", () => {
   beforeEach(() => {
     uiBlockingStoreApi.getState().clearAllBlockers();
+  });
+
+  it("should use the UIBlockingProvider store", async () => {
+    const { result } = renderHook(
+      () => {
+        useBlockingQueries(
+          [
+            {
+              queryKey: ["provider-queries"],
+              queryFn: () => new Promise(() => undefined),
+            },
+          ],
+          { scope: "provider-queries" }
+        );
+        return useIsBlocked("provider-queries");
+      },
+      { wrapper: createWrapper({ blockingProvider: true }) }
+    );
+
+    await waitFor(() => {
+      expect(result.current).toBe(true);
+    });
+    expect(uiBlockingStoreApi.getState().isBlocked("provider-queries")).toBe(false);
   });
 
   it("should block UI during initial loading of multiple queries", async () => {

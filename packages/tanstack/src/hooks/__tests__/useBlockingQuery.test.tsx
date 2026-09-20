@@ -1,5 +1,10 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { renderHook, waitFor } from "@testing-library/react";
+import {
+  UIBlockingProvider,
+  uiBlockingStoreApi,
+  useIsBlocked,
+} from "@okyrychenko-dev/react-action-guard";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { render, renderHook, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { actAsync, createWrapper } from "../../test/test.utils";
 import { useBlockingQuery } from "../useBlockingQuery";
@@ -8,6 +13,47 @@ import { QueryBlockingConfig } from "../useBlockingQuery.types";
 describe("useBlockingQuery", () => {
   beforeEach(() => {
     uiBlockingStoreApi.getState().clearAllBlockers();
+  });
+
+  it("should isolate blocking state between sibling UIBlockingProviders", async () => {
+    const firstClient = new QueryClient();
+    const secondClient = new QueryClient();
+
+    function BlockingQuery(): null {
+      useBlockingQuery({
+        queryKey: ["provider-isolation"],
+        queryFn: () => new Promise(() => undefined),
+        blockingConfig: { scope: "provider-isolation" },
+      });
+      return null;
+    }
+
+    function BlockingStatus({ testId }: { testId: string }) {
+      const isBlocked = useIsBlocked("provider-isolation");
+      return <div data-testid={testId}>{isBlocked ? "blocked" : "not-blocked"}</div>;
+    }
+
+    render(
+      <>
+        <QueryClientProvider client={firstClient}>
+          <UIBlockingProvider>
+            <BlockingQuery />
+            <BlockingStatus testId="first-provider" />
+          </UIBlockingProvider>
+        </QueryClientProvider>
+        <QueryClientProvider client={secondClient}>
+          <UIBlockingProvider>
+            <BlockingStatus testId="second-provider" />
+          </UIBlockingProvider>
+        </QueryClientProvider>
+      </>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId("first-provider")).toHaveTextContent("blocked");
+    });
+    expect(screen.getByTestId("second-provider")).toHaveTextContent("not-blocked");
+    expect(uiBlockingStoreApi.getState().isBlocked("provider-isolation")).toBe(false);
   });
 
   it("should block UI during initial loading", async () => {
