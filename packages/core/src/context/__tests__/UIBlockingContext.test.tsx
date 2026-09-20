@@ -7,6 +7,7 @@ import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import {
   UIBlockingProvider,
   useIsInsideUIBlockingProvider,
+  useOptionalUIBlockingContext,
   useUIBlockingContext,
   useUIBlockingStoreFromContext,
 } from "../UIBlockingContext";
@@ -54,6 +55,24 @@ describe("UIBlockingProvider", () => {
       expect(result.current).toBeDefined();
       expect(result.current.getState).toBeDefined();
       expect(result.current.getState().addBlocker).toBeDefined();
+    });
+  });
+
+  describe("useOptionalUIBlockingContext", () => {
+    it("should return null when used outside provider", () => {
+      const { result } = renderHook(() => useOptionalUIBlockingContext());
+
+      expect(result.current).toBeNull();
+    });
+
+    it("should return the nearest store when used inside provider", () => {
+      const wrapper = ({ children }: { children: ReactNode }) => (
+        <UIBlockingProvider>{children}</UIBlockingProvider>
+      );
+      const { result } = renderHook(() => useOptionalUIBlockingContext(), { wrapper });
+
+      expect(result.current).not.toBeNull();
+      expect(result.current).not.toBe(uiBlockingStoreApi);
     });
   });
 
@@ -135,6 +154,29 @@ describe("UIBlockingProvider", () => {
       // Provider 2 should NOT be blocked (isolated store)
       expect(screen.getByTestId("provider-2")).toHaveTextContent("not-blocked");
     });
+
+    it("should resolve the nearest nested provider store", () => {
+      const stores: Array<ReturnType<typeof useResolvedStoreApi>> = [];
+
+      function StoreCapture(): null {
+        stores.push(useResolvedStoreApi());
+        return null;
+      }
+
+      render(
+        <UIBlockingProvider>
+          <StoreCapture />
+          <UIBlockingProvider>
+            <StoreCapture />
+          </UIBlockingProvider>
+        </UIBlockingProvider>
+      );
+
+      expect(stores).toHaveLength(2);
+      expect(stores[0]).not.toBe(stores[1]);
+      expect(stores[0]).not.toBe(uiBlockingStoreApi);
+      expect(stores[1]).not.toBe(uiBlockingStoreApi);
+    });
   });
 
   describe("useUIBlockingStoreFromContext", () => {
@@ -215,6 +257,58 @@ describe("UIBlockingProvider", () => {
       // Middleware should have been called when blocker was added
       expect(middleware).toHaveBeenCalled();
     });
+
+    it("should keep middleware configuration stable for one provider lifetime", () => {
+      const initialMiddleware = vi.fn();
+      const updatedMiddleware = vi.fn();
+
+      const { rerender } = render(
+        <UIBlockingProvider middlewares={[initialMiddleware]}>
+          <AddBlockerButton blockerId="first" />
+        </UIBlockingProvider>
+      );
+
+      act(() => {
+        screen.getByRole("button", { name: "Add blocker" }).click();
+      });
+      initialMiddleware.mockClear();
+
+      rerender(
+        <UIBlockingProvider middlewares={[updatedMiddleware]}>
+          <AddBlockerButton blockerId="second" />
+        </UIBlockingProvider>
+      );
+
+      act(() => {
+        screen.getByRole("button", { name: "Add blocker" }).click();
+      });
+
+      expect(initialMiddleware).toHaveBeenCalledOnce();
+      expect(updatedMiddleware).not.toHaveBeenCalled();
+    });
+
+    it("should apply middleware configuration to a new keyed provider lifetime", () => {
+      const initialMiddleware = vi.fn();
+      const replacementMiddleware = vi.fn();
+
+      const { rerender } = render(
+        <UIBlockingProvider key="initial" middlewares={[initialMiddleware]}>
+          <AddBlockerButton blockerId="first" />
+        </UIBlockingProvider>
+      );
+
+      rerender(
+        <UIBlockingProvider key="replacement" middlewares={[replacementMiddleware]}>
+          <AddBlockerButton blockerId="second" />
+        </UIBlockingProvider>
+      );
+
+      act(() => {
+        screen.getByRole("button", { name: "Add blocker" }).click();
+      });
+
+      expect(replacementMiddleware).toHaveBeenCalledOnce();
+    });
   });
 
   describe("Store stability", () => {
@@ -249,4 +343,14 @@ describe("UIBlockingProvider", () => {
 function TestBlockerComponent() {
   useActionBlocker("test-blocker", { scope: "test", reason: "Test" });
   return <div data-testid="blocker-test">Test</div>;
+}
+
+function AddBlockerButton({ blockerId }: { blockerId: string }) {
+  const store = useUIBlockingContext();
+
+  function handleClick(): void {
+    store.getState().addBlocker(blockerId);
+  }
+
+  return <button onClick={handleClick}>Add blocker</button>;
 }
