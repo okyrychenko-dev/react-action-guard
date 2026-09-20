@@ -1,103 +1,7 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { ReactElement, useEffect, useMemo, useRef } from "react";
-import { DEFAULT_MAX_EVENTS, useDevtoolsStore } from "../../store";
-import { acquireDevtoolsMiddleware } from "./acquireDevtoolsMiddleware";
-import { getDevtoolsKeyboardAction } from "./ActionGuardDevtools.utils";
-import ActionGuardDevtoolsContent from "./ActionGuardDevtoolsContent";
+import { ReactElement } from "react";
+import ActionGuardDevtoolsInternal from "./ActionGuardDevtoolsInternal";
 import type { ActionGuardDevtoolsProps } from "./ActionGuardDevtools.types";
 import "../../styles/theme.css";
-
-/**
- * Internal component that handles all the devtools logic.
- * Separated to allow early return in production without breaking hooks rules.
- */
-function ActionGuardDevtoolsInternal(
-  props: Omit<ActionGuardDevtoolsProps, "showInProduction">
-): ReactElement {
-  const {
-    position = "right",
-    defaultOpen = false,
-    maxEvents = DEFAULT_MAX_EVENTS,
-    stuckThresholdMs,
-    store: customStore,
-  } = props;
-  const initialDefaultOpenRef = useRef(defaultOpen);
-
-  const { setOpen, setMaxEvents, isOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({
-    setOpen: state.setOpen,
-    setMaxEvents: state.setMaxEvents,
-    isOpen: state.isOpen,
-    togglePause: state.togglePause,
-    clearEvents: state.clearEvents,
-  }));
-
-  // Get the store to use (custom or global)
-  const targetStore = useMemo(() => customStore ?? uiBlockingStoreApi, [customStore]);
-
-  // Register middleware on mount. Ref-counted per store so multiple devtools instances on the
-  // same store don't double-record events or tear each other's middleware down on unmount.
-  useEffect(() => acquireDevtoolsMiddleware(targetStore), [targetStore]);
-
-  // Set initial open state once. defaultOpen is an initial value, not a controlled prop.
-  useEffect(() => {
-    setOpen(initialDefaultOpenRef.current);
-  }, [setOpen]);
-
-  // Keep runtime maxEvents changes scoped to the event buffer.
-  useEffect(() => {
-    setMaxEvents(maxEvents);
-  }, [maxEvents, setMaxEvents]);
-
-  // Stable ref for keyboard handler to avoid re-registering event listener
-  const stateRef = useRef({ isOpen, setOpen, togglePause, clearEvents });
-
-  // Keep ref in sync with latest values
-  useEffect(() => {
-    stateRef.current = { isOpen, setOpen, togglePause, clearEvents };
-  }, [isOpen, setOpen, togglePause, clearEvents]);
-
-  // Register keyboard shortcuts once
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent): void => {
-      const { isOpen, setOpen, togglePause, clearEvents } = stateRef.current;
-      const action = getDevtoolsKeyboardAction(event, isOpen);
-
-      if (!action) {
-        return;
-      }
-
-      if (action.preventDefault) {
-        event.preventDefault();
-      }
-
-      switch (action.action) {
-        case "close":
-          setOpen(false);
-          break;
-        case "togglePause":
-          togglePause();
-          break;
-        case "clearEvents":
-          clearEvents();
-          break;
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
-  return (
-    <ActionGuardDevtoolsContent
-      position={position}
-      store={customStore}
-      stuckThresholdMs={stuckThresholdMs}
-    />
-  );
-}
 
 /**
  * ActionGuardDevtools - Visual developer tools panel for debugging UI blocking.
@@ -179,8 +83,9 @@ function ActionGuardDevtoolsInternal(
  * }
  * ```
  *
- * Note: the `store` prop switches the observed blocking store, but devtools UI state and
- * event history remain shared within the devtools package.
+ * Note: the `store` prop switches the observed blocking store. Devtools instances observing the
+ * same store share panel state and event history; instances observing different stores are
+ * isolated.
  *
  * @example
  * Keyboard shortcuts

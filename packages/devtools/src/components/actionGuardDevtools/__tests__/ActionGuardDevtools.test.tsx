@@ -1,5 +1,11 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { act, fireEvent, screen, waitFor } from "@testing-library/react";
+import {
+  UIBlockingProvider,
+  uiBlockingStoreApi,
+  useOptionalUIBlockingContext,
+} from "@okyrychenko-dev/react-action-guard";
+import { assertDefined, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
+import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
+import { ReactElement, useState } from "react";
 import { beforeEach, describe, expect, it } from "vitest";
 import { DEFAULT_FILTER, DEFAULT_MAX_EVENTS, DEFAULT_TAB, devtoolsStoreApi } from "../../../store";
 import { renderWithProviders } from "../../../test/utils";
@@ -18,6 +24,53 @@ function resetDevtoolsStore(): void {
     selectedEventId: null,
     isPaused: false,
   });
+}
+
+interface ObservationSessionHarnessProps {
+  addLabel: string;
+  blockerId: string;
+  observerNames?: ReadonlyArray<string>;
+  toggleLabel?: string;
+  useGlobalStore?: boolean;
+}
+
+function ObservationSessionHarness(props: ObservationSessionHarnessProps): ReactElement {
+  const { addLabel, blockerId, observerNames, toggleLabel, useGlobalStore = false } = props;
+  const contextStore = useOptionalUIBlockingContext();
+  const [isObserving, setIsObserving] = useState(true);
+  const store = useGlobalStore ? uiBlockingStoreApi : contextStore;
+
+  assertDefined(store, "Custom observation-session harness requires UIBlockingProvider");
+
+  const addBlocker = (): void => {
+    store.getState().addBlocker(blockerId, {
+      scope: blockerId,
+      reason: `${blockerId} reason`,
+      priority: 1,
+    });
+  };
+
+  const toggleObservation = (): void => {
+    setIsObserving((current) => !current);
+  };
+
+  const observedStore = useGlobalStore ? undefined : store;
+
+  return (
+    <>
+      <button onClick={addBlocker}>{addLabel}</button>
+      {isDefined(toggleLabel) && <button onClick={toggleObservation}>{toggleLabel}</button>}
+      {isObserving && isUndefined(observerNames) && (
+        <ActionGuardDevtools store={observedStore} defaultOpen={true} />
+      )}
+      {isObserving &&
+        observerNames?.map((observerName) => (
+          <section key={observerName} aria-label={observerName}>
+            <ActionGuardDevtools store={observedStore} defaultOpen={true} />
+          </section>
+        ))}
+    </>
+  );
 }
 
 describe("ActionGuardDevtools", () => {
@@ -193,6 +246,119 @@ describe("ActionGuardDevtools", () => {
     expect(
       devtoolsStoreApi.getState().events.some((event) => event.blockerId === "blocker-2")
     ).toBe(true);
+  });
+
+  it("should isolate observation sessions for different custom stores", async () => {
+    renderWithProviders(
+      <>
+        <UIBlockingProvider>
+          <ObservationSessionHarness
+            addLabel="Add first blocker"
+            blockerId="first-blocker"
+            observerNames={["first devtools"]}
+          />
+        </UIBlockingProvider>
+        <UIBlockingProvider>
+          <ObservationSessionHarness
+            addLabel="Add second blocker"
+            blockerId="second-blocker"
+            observerNames={["second devtools"]}
+          />
+        </UIBlockingProvider>
+      </>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add first blocker" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add second blocker" }));
+
+    const firstDevtools = within(screen.getByRole("region", { name: "first devtools" }));
+    const secondDevtools = within(screen.getByRole("region", { name: "second devtools" }));
+
+    await waitFor(() => {
+      expect(firstDevtools.getByText("first-blocker")).toBeInTheDocument();
+      expect(secondDevtools.getByText("second-blocker")).toBeInTheDocument();
+    });
+
+    expect(firstDevtools.queryByText("second-blocker")).not.toBeInTheDocument();
+    expect(secondDevtools.queryByText("first-blocker")).not.toBeInTheDocument();
+
+    fireEvent.click(firstDevtools.getByTitle("Pause recording"));
+
+    expect(firstDevtools.getByTitle("Resume recording")).toBeInTheDocument();
+    expect(secondDevtools.getByTitle("Pause recording")).toBeInTheDocument();
+  });
+
+  it("should share an observation session between observers of the same store", async () => {
+    renderWithProviders(
+      <UIBlockingProvider>
+        <ObservationSessionHarness
+          addLabel="Add shared blocker"
+          blockerId="shared-blocker"
+          observerNames={["first observer", "second observer"]}
+        />
+      </UIBlockingProvider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add shared blocker" }));
+
+    const firstObserver = within(screen.getByRole("region", { name: "first observer" }));
+    const secondObserver = within(screen.getByRole("region", { name: "second observer" }));
+
+    await waitFor(() => {
+      expect(firstObserver.getByText("shared-blocker")).toBeInTheDocument();
+      expect(secondObserver.getByText("shared-blocker")).toBeInTheDocument();
+    });
+  });
+
+  it("should discard a session after its final observer detaches", async () => {
+    renderWithProviders(
+      <UIBlockingProvider>
+        <ObservationSessionHarness
+          addLabel="Add lifecycle blocker"
+          blockerId="previous-session-blocker"
+          toggleLabel="Toggle observation"
+        />
+      </UIBlockingProvider>
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add lifecycle blocker" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("previous-session-blocker")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle observation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle observation" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("No events recorded yet.")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("previous-session-blocker")).not.toBeInTheDocument();
+  });
+
+  it("should discard the global session after its final observer detaches", async () => {
+    renderWithProviders(
+      <ObservationSessionHarness
+        addLabel="Add global lifecycle blocker"
+        blockerId="global-session-blocker"
+        toggleLabel="Toggle global observation"
+        useGlobalStore={true}
+      />
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Add global lifecycle blocker" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("global-session-blocker")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle global observation" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle global observation" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("No events recorded yet.")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("global-session-blocker")).not.toBeInTheDocument();
   });
 });
 

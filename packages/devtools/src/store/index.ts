@@ -4,7 +4,9 @@ export {
   DEFAULT_TAB,
   createDefaultFilter,
 } from "./devtoolsStore.constants";
-export { useDevtoolsStore, devtoolsStoreApi } from "./devtoolsStore.store";
+export { DevtoolsStoreProvider, useDevtoolsStore } from "./devtoolsStore.context";
+export { createDevtoolsStoreBindings, devtoolsStoreApi } from "./devtoolsStore.store";
+export type { DevtoolsStoreApi } from "./devtoolsStore.store";
 export {
   selectEventStats,
   selectFilteredEvents,

@@ -39,29 +39,38 @@ type PersistedDevtoolsState = Pick<DevtoolsStore, "isMinimized" | "activeTab" | 
  * - UI preferences persisted to localStorage across reloads
  * - Automatic shallow comparison for selectors
  */
-const {
-  useStore: useDevtoolsStore,
-  store: devtoolsStoreApi,
-}: ShallowStoreBindings<DevtoolsStore, [["zustand/persist", unknown]]> = createShallowStore<
+export type DevtoolsStoreBindings = ShallowStoreBindings<DevtoolsStore>;
+
+export type DevtoolsStoreApi = DevtoolsStoreBindings["store"];
+
+export function createDevtoolsStoreBindings(): DevtoolsStoreBindings {
+  return createShallowStore<DevtoolsStore>(createDevtoolsActions);
+}
+
+function createPersistedDevtoolsStoreBindings(): ShallowStoreBindings<
   DevtoolsStore,
   [["zustand/persist", unknown]]
->(
-  persist(createDevtoolsActions, {
-    name: DEVTOOLS_STORAGE_KEY,
-    version: DEVTOOLS_STORAGE_VERSION,
-    // Guard against SSR / environments without localStorage.
-    storage: createJSONStorage(() =>
-      typeof window === "undefined" ? noopStorage : window.localStorage
-    ),
-    // `isOpen` / `maxEvents` are intentionally excluded — they are owned by the `defaultOpen`
-    // and `maxEvents` props, which are re-applied on every mount and would clash with a
-    // restored value.
-    partialize: (state): PersistedDevtoolsState => ({
-      isMinimized: state.isMinimized,
-      activeTab: state.activeTab,
-      filter: state.filter,
-    }),
-  })
-);
+> {
+  return createShallowStore<DevtoolsStore, [["zustand/persist", unknown]]>(
+    persist(createDevtoolsActions, {
+      name: DEVTOOLS_STORAGE_KEY,
+      version: DEVTOOLS_STORAGE_VERSION,
+      // Guard against SSR / environments without localStorage.
+      storage: createJSONStorage(() =>
+        typeof window === "undefined" ? noopStorage : window.localStorage
+      ),
+      // `isOpen` / `maxEvents` are intentionally excluded — they are owned by the `defaultOpen`
+      // and `maxEvents` props, which are re-applied on every mount and would clash with a
+      // restored value.
+      partialize: (state): PersistedDevtoolsState => ({
+        isMinimized: state.isMinimized,
+        activeTab: state.activeTab,
+        filter: state.filter,
+      }),
+    })
+  );
+}
 
-export { useDevtoolsStore, devtoolsStoreApi };
+const { store: devtoolsStoreApi } = createPersistedDevtoolsStoreBindings();
+
+export { devtoolsStoreApi };

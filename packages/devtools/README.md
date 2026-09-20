@@ -72,14 +72,14 @@ The main devtools component that renders the toggle button and panel.
 
 #### Props
 
-| Prop               | Type                 | Default     | Description                                                    |
-| ------------------ | -------------------- | ----------- | -------------------------------------------------------------- |
-| `position`         | `DevtoolsPosition`   | `"right"`   | Position of the toggle button and panel                        |
-| `defaultOpen`      | `boolean`            | `false`     | Whether the panel is open by default                           |
-| `maxEvents`        | `number`             | `200`       | Maximum number of events to store in history                   |
-| `stuckThresholdMs` | `number`             | `10000`     | Age (ms) after which an active blocker is flagged as stuck     |
-| `showInProduction` | `boolean`            | `false`     | Whether to show devtools in production                         |
-| `store`            | `UIBlockingStoreApi` | `undefined` | Blocking store to observe instead of the global store          |
+| Prop               | Type                 | Default     | Description                                                |
+| ------------------ | -------------------- | ----------- | ---------------------------------------------------------- |
+| `position`         | `DevtoolsPosition`   | `"right"`   | Position of the toggle button and panel                    |
+| `defaultOpen`      | `boolean`            | `false`     | Whether the panel is open by default                       |
+| `maxEvents`        | `number`             | `200`       | Maximum number of events to store in history               |
+| `stuckThresholdMs` | `number`             | `10000`     | Age (ms) after which an active blocker is flagged as stuck |
+| `showInProduction` | `boolean`            | `false`     | Whether to show devtools in production                     |
+| `store`            | `UIBlockingStoreApi` | `undefined` | Blocking store to observe instead of the global store      |
 
 #### Position Options
 
@@ -128,10 +128,10 @@ function App() {
 ```
 
 `store` changes which blocking store is observed and where middleware is registered.
-Devtools panel state and event history remain shared inside the devtools package.
-Multiple devtools instances can safely observe the same store: they share one middleware
-registration, so events are not duplicated and the middleware remains active until the last
-instance unmounts.
+Each blocking store has an isolated observation session containing its Devtools panel state and
+event history. Multiple Devtools instances observing the same store share that session and one
+middleware registration, so events are not duplicated and the middleware remains active until the
+last instance unmounts. When the final observer unmounts, the session is discarded.
 
 ## Advanced Usage
 
