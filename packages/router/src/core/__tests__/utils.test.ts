@@ -1,7 +1,11 @@
-import { describe, expect, it } from "vitest";
-import { isThenable, resolveConfirmResult } from "../utils";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createBlockerId, isThenable, resolveConfirmResult } from "../utils";
 
 describe("utils", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
   describe("isThenable", () => {
     it("should return true for thenable objects", () => {
       const thenable = { then: () => undefined };
@@ -41,6 +45,28 @@ describe("utils", () => {
       if (result.kind === "async") {
         await expect(result.promise).resolves.toBe(true);
       }
+    });
+  });
+
+  describe("createBlockerId", () => {
+    it("should omit the scope segment when no scope is provided", () => {
+      vi.spyOn(Date, "now").mockReturnValue(100);
+
+      expect(createBlockerId("navigation")).toBe("navigation-100");
+    });
+
+    it("should include a string scope and timestamp", () => {
+      vi.spyOn(Date, "now").mockReturnValue(123);
+
+      expect(createBlockerId("navigation", "checkout")).toBe("navigation-checkout-123");
+    });
+
+    it("should join array scopes", () => {
+      vi.spyOn(Date, "now").mockReturnValue(456);
+
+      expect(createBlockerId("navigation", ["checkout", "payment"])).toBe(
+        "navigation-checkout-payment-456"
+      );
     });
   });
 });

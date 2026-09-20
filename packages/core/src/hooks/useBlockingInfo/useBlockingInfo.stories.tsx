@@ -1,3 +1,4 @@
+import { isArray } from "@okyrychenko-dev/type-utils";
 import { clsx } from "clsx";
 import { ReactElement, useState } from "react";
 import { DebugPanel, StoryContainer } from "../../storybook/components";
@@ -115,7 +116,7 @@ function BlockingInfoDemo(props: BlockingInfoDemoProps): ReactElement {
                     <div className="blockerCardRow">
                       <strong>Scope:</strong>
                       <code>
-                        {Array.isArray(blocker.scope) ? blocker.scope.join(", ") : blocker.scope}
+                        {isArray(blocker.scope) ? blocker.scope.join(", ") : blocker.scope}
                       </code>
                     </div>
                     <div className="blockerCardRow">

@@ -1,18 +1,20 @@
+import { isInstanceOf } from "@okyrychenko-dev/type-utils";
 import { DevtoolsKeyboardResult } from "./ActionGuardDevtools.types";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
-function isTypingTarget(target: EventTarget | null): boolean {
+function isTypingTarget(target: Nullable<EventTarget>): boolean {
   return (
-    target instanceof HTMLInputElement ||
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement ||
-    (target instanceof HTMLElement && target.isContentEditable)
+    isInstanceOf(target, HTMLInputElement) ||
+    isInstanceOf(target, HTMLTextAreaElement) ||
+    isInstanceOf(target, HTMLSelectElement) ||
+    (isInstanceOf(target, HTMLElement) && target.isContentEditable)
   );
 }
 
 export function getDevtoolsKeyboardAction(
   event: KeyboardEvent,
   isOpen: boolean
-): DevtoolsKeyboardResult | null {
+): Nullable<DevtoolsKeyboardResult> {
   if (!isOpen) {
     return null;
   }

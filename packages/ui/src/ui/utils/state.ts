@@ -1,5 +1,5 @@
+import { type Optional, assertNever, isString } from "@okyrychenko-dev/type-utils";
 import { DEFAULT_GUARDED_SCOPE } from "../constants";
-import { assertNever } from "./assert";
 import type {
   GuardedActionBlockedState,
   GuardedActionState,
@@ -13,11 +13,11 @@ import type {
 const normalizedScopeCache = new Map<string, ReadonlyArray<string>>();
 const NORMALIZED_SCOPE_CACHE_MAX_SIZE = 256;
 
-function mergeWithBlockedFlag(value: boolean | undefined, isBlocked: boolean): boolean {
+function mergeWithBlockedFlag(value: Optional<boolean>, isBlocked: boolean): boolean {
   return (value ?? false) || isBlocked;
 }
 
-function trueOrUndefined(value: boolean): true | undefined {
+function trueOrUndefined(value: boolean): Optional<true> {
   if (value) {
     return true;
   }
@@ -81,7 +81,7 @@ export function normalizeGuardedScope(scope?: GuardedScope): ReadonlyArray<strin
     return getCachedNormalizedScope([DEFAULT_GUARDED_SCOPE]);
   }
 
-  if (typeof scope === "string") {
+  if (isString(scope)) {
     return getCachedNormalizedScope([scope]);
   }
 

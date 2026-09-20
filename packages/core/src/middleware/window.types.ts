@@ -1,4 +1,6 @@
-type AnalyticsEventValue = string | number | boolean | null | undefined;
+import type { Nullish } from "@okyrychenko-dev/type-utils";
+
+type AnalyticsEventValue = Nullish<string | number | boolean>;
 
 type AnalyticsEventParams = Record<
   string,

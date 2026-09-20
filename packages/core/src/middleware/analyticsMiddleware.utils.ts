@@ -1,3 +1,4 @@
+import { type Optional, isArray } from "@okyrychenko-dev/type-utils";
 import { AnalyticsEventData } from "./analyticsMiddleware.types";
 import { MiddlewareContext } from "./middleware.types";
 
@@ -5,7 +6,7 @@ function capitalizeFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function getAnalyticsWindow(): Window | undefined {
+function getAnalyticsWindow(): Optional<Window> {
   if (typeof window === "undefined") {
     return undefined;
   }
@@ -20,7 +21,7 @@ export function buildEventData(context: MiddlewareContext): AnalyticsEventData {
   const { scope, reason, priority } = context.config ?? {};
 
   if (scope !== undefined) {
-    eventData.scope = Array.isArray(scope) ? scope.join(",") : scope;
+    eventData.scope = isArray(scope) ? scope.join(",") : scope;
   }
 
   if (reason !== undefined) {

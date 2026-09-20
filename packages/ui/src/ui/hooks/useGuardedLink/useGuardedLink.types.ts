@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { MouseEventHandler } from "react";
 import type {
   GuardedLinkState,
@@ -19,6 +20,6 @@ export interface UseGuardedLinkReturn<TElement extends HTMLElement = HTMLAnchorE
   isBlocked: boolean;
   linkState: GuardedLinkState;
   onClick: MouseEventHandler<TElement>;
-  reasonContent: string | null;
+  reasonContent: Nullable<string>;
   ariaDescribedBy?: string;
 }

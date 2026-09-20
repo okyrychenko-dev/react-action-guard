@@ -1,3 +1,4 @@
+import { isFunction, isObject } from "@okyrychenko-dev/type-utils";
 import { renderHook } from "@testing-library/react";
 import { type MockInstance, afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_UNLOAD_MESSAGE, useBeforeUnload } from "../useBeforeUnload";
@@ -17,16 +18,11 @@ describe("useBeforeUnload", () => {
       throw new Error("Expected handler");
     }
 
-    if (typeof handler === "function") {
+    if (isFunction(handler)) {
       return handler;
     }
 
-    if (
-      typeof handler === "object" &&
-      handler !== null &&
-      "handleEvent" in handler &&
-      typeof handler.handleEvent === "function"
-    ) {
+    if (isObject(handler) && "handleEvent" in handler && isFunction(handler.handleEvent)) {
       return (event: Event) => handler.handleEvent(event);
     }
 

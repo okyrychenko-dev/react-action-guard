@@ -1,3 +1,4 @@
+import { isString } from "@okyrychenko-dev/type-utils";
 import { shallow } from "zustand/shallow";
 import { DEFAULT_SCOPE } from "../../store";
 import type { BlockerConfig } from "../../store";
@@ -29,7 +30,7 @@ function normalizeScopeSnapshot(scope?: string | ReadonlyArray<string>): Readonl
     return [DEFAULT_SCOPE];
   }
 
-  if (typeof scope === "string") {
+  if (isString(scope)) {
     return [scope];
   }
 

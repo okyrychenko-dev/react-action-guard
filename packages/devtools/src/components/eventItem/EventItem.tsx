@@ -3,12 +3,13 @@ import { ReactElement, memo } from "react";
 import styles from "./EventItem.module.css";
 import EventItemDetails from "./EventItemDetails";
 import EventItemHeader from "./EventItemHeader";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent } from "../../types";
 
 interface EventItemProps {
   event: DevtoolsEvent;
   selected: boolean;
-  onSelect: (eventId: string | null) => void;
+  onSelect: (eventId: Nullable<string>) => void;
 }
 
 function EventItem(props: EventItemProps): ReactElement {

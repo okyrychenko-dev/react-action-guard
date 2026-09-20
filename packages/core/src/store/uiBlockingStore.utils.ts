@@ -1,3 +1,4 @@
+import { isString } from "@okyrychenko-dev/type-utils";
 import { StateCreator, StoreApi, StoreMutators, createStore, useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
 import { ShallowStoreBindings } from "./uiBlockingStore.types";
@@ -50,7 +51,7 @@ export function createShallowStore<
  * @internal
  */
 export function normalizeScopeToArray(scope: string | ReadonlyArray<string>): Array<string> {
-  if (typeof scope === "string") {
+  if (isString(scope)) {
     return [scope];
   }
   return Array.from(scope);

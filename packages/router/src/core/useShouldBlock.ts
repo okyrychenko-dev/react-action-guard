@@ -1,4 +1,5 @@
 import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import { isFunction } from "@okyrychenko-dev/type-utils";
 import { useEffect, useMemo, useRef } from "react";
 import { isDefined, normalizeScope, resolveCondition } from "./utils";
 
@@ -42,7 +43,7 @@ export function useShouldBlock(
       );
     }
 
-    if (!warnedFunctionRef.current && typeof when === "function") {
+    if (!warnedFunctionRef.current && isFunction(when)) {
       warnedFunctionRef.current = true;
       console.warn(
         '[react-action-guard-router] useShouldBlock: "when" is a function. ' +

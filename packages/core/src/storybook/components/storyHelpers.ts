@@ -1,3 +1,5 @@
+import { isError } from "@okyrychenko-dev/type-utils";
+
 /**
  * Simulates an async operation with delay and optional failure
  * @param delayMs - Delay in milliseconds
@@ -22,5 +24,5 @@ export function simulateAsyncOperation(delayMs: number, shouldFail: boolean): Pr
  * @returns Formatted error message
  */
 export function formatErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Unknown error";
+  return isError(error) ? error.message : "Unknown error";
 }

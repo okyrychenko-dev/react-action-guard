@@ -2,12 +2,13 @@ import { ReactElement } from "react";
 import { EventItem } from "../eventItem";
 import { Content, EmptyState } from "../shared";
 import styles from "./Timeline.module.css";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent } from "../../types";
 
 interface TimelineContentProps {
   events: Array<DevtoolsEvent>;
-  selectedEventId: string | null;
-  onSelectEvent: (eventId: string | null) => void;
+  selectedEventId: Nullable<string>;
+  onSelectEvent: (eventId: Nullable<string>) => void;
 }
 
 function TimelineContent(props: TimelineContentProps): ReactElement {

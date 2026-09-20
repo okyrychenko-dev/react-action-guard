@@ -3,6 +3,9 @@
   "version": "0.2.4",
   "type": "module",
   "description": "Navigation blocking adapters for React Action Guard across React Router, TanStack Router, and Next.js",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -136,5 +139,8 @@
   "allowScripts": {
     "esbuild@0.27.2": true,
     "sharp@0.34.5": true
+  },
+  "dependencies": {
+    "@okyrychenko-dev/type-utils": "^0.1.2"
   }
 }

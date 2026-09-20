@@ -1,3 +1,4 @@
+import { isFunction } from "@okyrychenko-dev/type-utils";
 import { type MockInstance, vi } from "vitest";
 import type { Blocker, Location } from "react-router-dom";
 
@@ -56,5 +57,5 @@ export function getMockCall<TArgs extends Array<unknown>>(
  * Type guard for a no-argument blocker function
  */
 export function isNoArgBlocker(fn: unknown): fn is () => boolean {
-  return typeof fn === "function" && fn.length === 0;
+  return isFunction(fn) && fn.length === 0;
 }

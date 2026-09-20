@@ -16,10 +16,11 @@ export interface GuardedFieldReasonProps {
 
 export interface GuardedReasonBlocker {
   isBlocked: boolean;
-  reason: string | null;
+  reason: Nullable<string>;
 }
 
 export interface GuardedReasonResult {
   ariaDescribedBy?: string;
-  reasonContent: string | null;
+  reasonContent: Nullable<string>;
 }
+import type { Nullable } from "@okyrychenko-dev/type-utils";

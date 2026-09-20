@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 /**
  * State object for a confirmation dialog
@@ -19,7 +20,7 @@ export interface DialogState<T = string> {
  */
 export interface UseDialogStateReturn<T = string> {
   /** Current dialog state (null when closed) */
-  dialogState: DialogState<T> | null;
+  dialogState: Nullable<DialogState<T>>;
 
   /**
    * Function to use as onConfirm callback.
@@ -96,8 +97,8 @@ export interface UseDialogStateReturn<T = string> {
  * ```
  */
 export function useDialogState<T = string>(): UseDialogStateReturn<T> {
-  const [dialogState, setDialogState] = useState<DialogState<T> | null>(null);
-  const resolveRef = useRef<DialogState<T>["resolve"] | null>(null);
+  const [dialogState, setDialogState] = useState<Nullable<DialogState<T>>>(null);
+  const resolveRef = useRef<Nullable<DialogState<T>["resolve"]>>(null);
 
   const confirm = useCallback((message: T): Promise<boolean> => {
     return new Promise<boolean>((resolve) => {

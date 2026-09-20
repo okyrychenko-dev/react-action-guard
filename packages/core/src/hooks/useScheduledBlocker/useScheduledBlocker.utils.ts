@@ -1,3 +1,4 @@
+import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { BlockingSchedule } from "./useScheduledBlocker.types";
 
 /**
@@ -34,10 +35,7 @@ export function isValidTimestamp(timestamp: number): boolean {
  * @param startTime - Start time in milliseconds
  * @returns End time in milliseconds, or undefined if not specified
  */
-export function calculateEndTime(
-  schedule: BlockingSchedule,
-  startTime: number
-): number | undefined {
+export function calculateEndTime(schedule: BlockingSchedule, startTime: number): Optional<number> {
   if (schedule.duration) {
     return startTime + schedule.duration;
   }
@@ -70,7 +68,7 @@ export function isSafeTimeout(delay: number): boolean {
  */
 export function isInBlockingPeriod(
   startTime: number,
-  endTime: number | undefined,
+  endTime: Optional<number>,
   now: number
 ): boolean {
   if (startTime > now) {
@@ -94,7 +92,7 @@ export function isInBlockingPeriod(
  */
 export function isScheduleInPast(
   startTime: number,
-  endTime: number | undefined,
+  endTime: Optional<number>,
   now: number
 ): boolean {
   if (!endTime) {

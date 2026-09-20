@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedFieldReasonMode,
   GuardedReasonBlocker,
@@ -5,7 +6,10 @@ import type {
   GuardedReasonResult,
 } from "../types";
 
-export function getGuardedReason(blocker: GuardedReasonBlocker, fallback?: string): string | null {
+export function getGuardedReason(
+  blocker: GuardedReasonBlocker,
+  fallback?: string
+): Nullable<string> {
   return blocker.reason ?? fallback ?? null;
 }
 

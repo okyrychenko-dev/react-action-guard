@@ -1,3 +1,4 @@
+import { isArray } from "@okyrychenko-dev/type-utils";
 import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 
@@ -94,7 +95,7 @@ export function createDevtoolsMiddleware(): Middleware {
         continue;
       }
 
-      if (Array.isArray(trackedBlocker.scope) && trackedBlocker.scope.includes(scope)) {
+      if (isArray(trackedBlocker.scope) && trackedBlocker.scope.includes(scope)) {
         activeBlockers.delete(blockerId);
       }
     }

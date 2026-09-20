@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedGroupState,
   GuardedReasonProps,
@@ -11,6 +12,6 @@ export interface UseGuardedGroupReturn {
   blocker: UseTopBlockerReturn;
   isBlocked: boolean;
   groupState: GuardedGroupState;
-  reasonContent: string | null;
+  reasonContent: Nullable<string>;
   ariaDescribedBy?: string;
 }

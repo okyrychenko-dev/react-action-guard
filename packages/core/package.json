@@ -3,6 +3,9 @@
   "version": "1.0.5",
   "type": "module",
   "description": "Coordinate shared UI interaction locks across complex React forms and workflows",
+  "engines": {
+    "node": ">=20"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",
@@ -65,7 +68,8 @@
     "zustand": "^5.0.0"
   },
   "dependencies": {
-    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2"
+    "@okyrychenko-dev/react-zustand-toolkit": "^0.4.2",
+    "@okyrychenko-dev/type-utils": "^0.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
