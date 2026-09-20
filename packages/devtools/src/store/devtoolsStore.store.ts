@@ -41,7 +41,7 @@ type PersistedDevtoolsState = Pick<DevtoolsStore, "isMinimized" | "activeTab" | 
  */
 const {
   useStore: useDevtoolsStore,
-  useStoreApi: devtoolsStoreApi,
+  store: devtoolsStoreApi,
 }: ShallowStoreBindings<DevtoolsStore, [["zustand/persist", unknown]]> = createShallowStore<
   DevtoolsStore,
   [["zustand/persist", unknown]]

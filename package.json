@@ -18,7 +18,8 @@
     "test": "pnpm -r run test:run",
     "test:run": "pnpm -r run test:run",
     "test:coverage": "pnpm -r run test:coverage",
-    "check": "pnpm run build && pnpm run lint && pnpm run typecheck && pnpm run test:run",
+    "check": "pnpm run check:toolkit-version && pnpm run build && pnpm run lint && pnpm run typecheck && pnpm run test:run",
+    "check:toolkit-version": "node scripts/check-react-zustand-toolkit-version.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm run build && changeset publish",
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",
-    "husky": "^9.1.7"
+    "husky": "^9.1.7",
+    "yaml": "2.9.0"
   }
 }

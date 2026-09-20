@@ -30,8 +30,8 @@ const {
   useContextStoreApi: useUIBlockingContext,
   useContextStore: baseUseUIBlockingStoreFromContext,
   useIsInsideProvider: useIsInsideUIBlockingProvider,
-  useContextStoreOptional: useOptionalUIBlockingContext,
-} = createStoreProvider(createUIBlockingActions, "UIBlocking");
+  useProviderStoreOptional: useOptionalUIBlockingContext,
+} = createStoreProvider<UIBlockingStore>(() => createUIBlockingActions, "UIBlocking");
 
 export function useUIBlockingStoreFromContext(): UIBlockingStore;
 export function useUIBlockingStoreFromContext<T>(
@@ -152,7 +152,11 @@ export function UIBlockingProvider({
     });
   };
 
-  return <BaseUIBlockingProvider onStoreInit={handleStoreInit}>{children}</BaseUIBlockingProvider>;
+  return (
+    <BaseUIBlockingProvider input={undefined} onStoreInit={handleStoreInit}>
+      {children}
+    </BaseUIBlockingProvider>
+  );
 }
 
 /**

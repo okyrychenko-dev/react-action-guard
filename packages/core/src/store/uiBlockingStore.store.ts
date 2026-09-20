@@ -21,7 +21,7 @@ const storeBindings = createShallowStore<UIBlockingStore, [["zustand/devtools", 
   devtools(createUIBlockingActions, devtoolsConfig)
 );
 
-const uiBlockingStoreApi = storeBindings.useStoreApi;
+const uiBlockingStoreApi = storeBindings.store;
 
 export function useUIBlockingStore(): UIBlockingStore;
 export function useUIBlockingStore<T>(
