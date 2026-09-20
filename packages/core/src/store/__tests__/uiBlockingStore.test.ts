@@ -1,6 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
 import { uiBlockingStoreApi } from "../uiBlockingStore.store";
+import type { MiddlewareContext } from "../../middleware";
+
+type TimeoutSchedulingAction = "addBlocker" | "updateBlocker";
 
 describe("uiBlockingStore", () => {
   beforeEach(() => {
@@ -474,6 +477,58 @@ describe("uiBlockingStore", () => {
     afterEach(() => {
       vi.useRealTimers();
     });
+
+    function verifyCompleteTimeoutLifecycle(action: TimeoutSchedulingAction): void {
+      const { addBlocker, updateBlocker, registerMiddleware, unregisterMiddleware, isBlocked } =
+        uiBlockingStoreApi.getState();
+      const onTimeout = vi.fn();
+      const timeoutMiddleware = vi.fn();
+
+      function recordTimeout(context: MiddlewareContext): void {
+        if (context.action === "timeout") {
+          timeoutMiddleware(context);
+        }
+      }
+
+      registerMiddleware("timeout-lifecycle", recordTimeout);
+
+      addBlocker("timeout-blocker", {
+        scope: "test",
+        reason: "Waiting",
+        priority: 42,
+        ...(action === "addBlocker" && { timeout: 1000, onTimeout }),
+      });
+
+      if (action === "updateBlocker") {
+        updateBlocker("timeout-blocker", { timeout: 1000, onTimeout });
+      }
+
+      vi.advanceTimersByTime(1000);
+
+      expect(onTimeout).toHaveBeenCalledOnce();
+      expect(onTimeout).toHaveBeenCalledWith("timeout-blocker");
+      expect(timeoutMiddleware).toHaveBeenCalledOnce();
+      expect(timeoutMiddleware).toHaveBeenCalledWith(
+        expect.objectContaining({
+          action: "timeout",
+          blockerId: "timeout-blocker",
+          config: {
+            scope: "test",
+            reason: "Waiting",
+            priority: 42,
+            timeout: 1000,
+          },
+        })
+      );
+      expect(isBlocked("test")).toBe(false);
+
+      unregisterMiddleware("timeout-lifecycle");
+    }
+
+    it.each<TimeoutSchedulingAction>(["addBlocker", "updateBlocker"])(
+      "should apply the complete timeout lifecycle when scheduled via %s",
+      verifyCompleteTimeoutLifecycle
+    );
 
     it("should automatically remove blocker after timeout", () => {
       const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
