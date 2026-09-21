@@ -3,7 +3,11 @@ import { fireEvent, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { devtoolsStoreApi } from "../../../store";
 import { renderWithProviders } from "../../../test/utils";
-import { CustomObservationTestApp, ProductionObservationTestApp } from "./fixtures";
+import {
+  CustomObservationTestApp,
+  ProductionObservationTestApp,
+  SharedConfigurationTestApp,
+} from "./fixtures";
 
 describe("ActionGuardDevtoolsProvider", () => {
   beforeEach(() => {
@@ -27,6 +31,19 @@ describe("ActionGuardDevtoolsProvider", () => {
 
     expect(screen.getByText("Observed events: provider-blocker-1")).toBeInTheDocument();
     expect(screen.queryByText(/provider-blocker-2/)).not.toBeInTheDocument();
+  });
+
+  it("should keep the first panel configuration and warn about later conflicts", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    renderWithProviders(<SharedConfigurationTestApp />);
+
+    expect(screen.getByText("Configured maximum: 1")).toBeInTheDocument();
+    expect(screen.getByText("Configured open state: open")).toBeInTheDocument();
+    expect(warn).toHaveBeenCalledWith(
+      "[ActionGuardDevtools] Ignored conflicting observation-session configuration. " +
+        "The first panel for a blocking store controls defaultOpen and maxEvents."
+    );
   });
 
   it("should not observe events in production by default", () => {

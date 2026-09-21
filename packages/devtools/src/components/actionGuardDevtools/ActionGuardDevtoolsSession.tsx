@@ -1,6 +1,9 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { DEFAULT_MAX_EVENTS, useDevtoolsStore } from "../../store";
-import { acquireDevtoolsMiddleware } from "./acquireDevtoolsMiddleware";
+import {
+  acquireDevtoolsMiddleware,
+  configureDevtoolsObservationSession,
+} from "./acquireDevtoolsMiddleware";
 import { getDevtoolsKeyboardAction } from "./ActionGuardDevtools.utils";
 import ActionGuardDevtoolsContent from "./ActionGuardDevtoolsContent";
 import type { ObservationSession } from "./acquireDevtoolsMiddleware";
@@ -25,12 +28,12 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     targetStore,
   } = props;
 
+  const configurationOwnerRef = useRef({});
   const initialDefaultOpenRef = useRef(defaultOpen);
 
-  const { setOpen, setMaxEvents, isOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({
-    setOpen: state.setOpen,
-    setMaxEvents: state.setMaxEvents,
+  const { isOpen, setOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({
     isOpen: state.isOpen,
+    setOpen: state.setOpen,
     togglePause: state.togglePause,
     clearEvents: state.clearEvents,
   }));
@@ -41,12 +44,12 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
   );
 
   useEffect(() => {
-    setOpen(initialDefaultOpenRef.current);
-  }, [setOpen]);
-
-  useEffect(() => {
-    setMaxEvents(maxEvents);
-  }, [maxEvents, setMaxEvents]);
+    configureDevtoolsObservationSession(observationSession, {
+      defaultOpen: initialDefaultOpenRef.current,
+      maxEvents,
+      owner: configurationOwnerRef.current,
+    });
+  }, [maxEvents, observationSession]);
 
   const stateRef = useRef({ isOpen, setOpen, togglePause, clearEvents });
 

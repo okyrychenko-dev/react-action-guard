@@ -1,5 +1,5 @@
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { isDefined } from "@okyrychenko-dev/type-utils";
+import { isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
 import type { Middleware } from "@okyrychenko-dev/react-action-guard";
@@ -19,8 +19,21 @@ import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
  * @returns A release function to call on unmount (idempotent)
  */
 export interface ObservationSession {
+  configuration: ObservationSessionConfiguration | undefined;
   devtoolsStore: DevtoolsStoreApi;
   observerCount: number;
+}
+
+interface ObservationSessionConfiguration {
+  defaultOpen: boolean;
+  maxEvents: number;
+  owner: object;
+}
+
+interface ConfigureObservationSessionOptions {
+  defaultOpen: boolean;
+  maxEvents: number;
+  owner: object;
 }
 
 export interface ResolvedObservationSession {
@@ -47,6 +60,7 @@ export function getDevtoolsObservationSession(
   }
 
   const session: ObservationSession = {
+    configuration: undefined,
     devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
     observerCount: 0,
   };
@@ -65,6 +79,43 @@ export function resolveDevtoolsObservationSession(
   );
 
   return { observationSession, targetStore };
+}
+
+export function configureDevtoolsObservationSession(
+  session: ObservationSession,
+  options: ConfigureObservationSessionOptions
+): void {
+  const { configuration, devtoolsStore } = session;
+  const { defaultOpen, maxEvents, owner } = options;
+
+  if (isUndefined(configuration)) {
+    devtoolsStore.getState().setOpen(defaultOpen);
+    devtoolsStore.getState().setMaxEvents(maxEvents);
+    session.configuration = {
+      defaultOpen,
+      maxEvents: devtoolsStore.getState().maxEvents,
+      owner,
+    };
+    return;
+  }
+
+  if (configuration.owner === owner) {
+    if (configuration.maxEvents !== maxEvents) {
+      devtoolsStore.getState().setMaxEvents(maxEvents);
+      configuration.maxEvents = devtoolsStore.getState().maxEvents;
+    }
+    return;
+  }
+
+  const hasConflict =
+    configuration.defaultOpen !== defaultOpen || configuration.maxEvents !== maxEvents;
+
+  if (process.env.NODE_ENV !== "production" && hasConflict) {
+    console.warn(
+      "[ActionGuardDevtools] Ignored conflicting observation-session configuration. " +
+        "The first panel for a blocking store controls defaultOpen and maxEvents."
+    );
+  }
 }
 
 export function acquireDevtoolsMiddleware(
@@ -96,6 +147,7 @@ export function acquireDevtoolsMiddleware(
 
     if (session.observerCount === 0) {
       observationSessions.delete(store);
+      session.configuration = undefined;
 
       store.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
 
