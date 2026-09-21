@@ -182,10 +182,10 @@ uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
 
 If automatic observation finds this manual registration on the global blocking store, it keeps the
 caller-owned middleware, records each event once, and emits a development warning. On a custom
-blocking store, `createDevtoolsMiddleware()` still targets the global compatibility session, so
-automatic observation preserves it and adds a separately named, session-specific registration for
-the custom panel. Unmounting the automatic panel removes only its own registration and never
-unregisters the manual middleware.
+blocking store, automatic observation always uses a separately named, session-specific
+registration because `createDevtoolsMiddleware()` targets the global compatibility session. This
+keeps the custom panel active even when manual middleware is registered after it mounts. Unmounting
+the automatic panel removes only its own registration and never unregisters the manual middleware.
 
 ### Accessing Devtools Store
 

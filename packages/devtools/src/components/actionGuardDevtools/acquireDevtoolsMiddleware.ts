@@ -160,16 +160,21 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
 
     const { middlewares } = targetStore.getState();
     const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
+    const isGlobalSession = targetStore === uiBlockingStoreApi;
+
+    if (isGlobalSession) {
+      if (isUndefined(existingMiddleware)) {
+        registerSessionMiddleware(session, DEVTOOLS_MIDDLEWARE_NAME);
+      }
+    } else {
+      const middlewareName = getAvailableMiddlewareName(middlewares);
+
+      registerSessionMiddleware(session, middlewareName);
+    }
 
     if (isDefined(existingMiddleware)) {
-      if (targetStore !== uiBlockingStoreApi) {
-        const middlewareName = getAvailableMiddlewareName(middlewares);
-
-        registerSessionMiddleware(session, middlewareName);
-      }
-
       if (process.env.NODE_ENV !== "production") {
-        if (targetStore === uiBlockingStoreApi) {
+        if (isGlobalSession) {
           console.warn(
             "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
               "middleware registration. The manual registration remains authoritative."
@@ -181,8 +186,6 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
           );
         }
       }
-    } else {
-      registerSessionMiddleware(session, DEVTOOLS_MIDDLEWARE_NAME);
     }
   }
 

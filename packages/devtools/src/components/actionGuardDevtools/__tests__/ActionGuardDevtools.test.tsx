@@ -443,6 +443,25 @@ describe("ActionGuardDevtools", () => {
     expect(events.some((event) => event.blockerId === "manual-custom-blocker")).toBe(true);
   });
 
+  it("should keep observing a custom store after caller-owned middleware is registered", async () => {
+    renderWithProviders(
+      <UIBlockingProvider>
+        <ManualCustomObservationContent
+          onReservedMiddlewareCall={vi.fn()}
+          registerManualBeforeObservation={false}
+        />
+      </UIBlockingProvider>
+    );
+
+    await screen.findByText("Action Guard");
+    fireEvent.click(screen.getByRole("button", { name: "Register manual custom middleware" }));
+    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("manual-custom-blocker")).toBeInTheDocument();
+    });
+  });
+
   it("should isolate observation sessions for different custom stores", async () => {
     renderWithProviders(
       <>
