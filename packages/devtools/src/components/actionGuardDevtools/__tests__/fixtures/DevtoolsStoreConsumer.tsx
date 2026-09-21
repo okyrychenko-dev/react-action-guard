@@ -52,6 +52,15 @@ function DevtoolsStoreConsumer(): ReactElement {
   return (
     <div>
       <span>Observed events: {events.map((event) => event.blockerId).join(", ")}</span>
+      <span>
+        Observed event details:{" "}
+        {events
+          .map(
+            (event) =>
+              `${event.action}:${isDefined(event.duration) ? event.duration.toString() : "none"}`
+          )
+          .join(", ")}
+      </span>
       <span>Configured maximum: {maxEvents}</span>
       <span>Configured open state: {isOpen ? "open" : "closed"}</span>
       <span>Active preference: {activeTab}</span>

@@ -1,4 +1,4 @@
-import { ReactElement, useEffect } from "react";
+import { ReactElement, useLayoutEffect } from "react";
 import { DevtoolsStoreProvider } from "../../store";
 import {
   acquireDevtoolsMiddleware,
@@ -12,7 +12,7 @@ function ActionGuardDevtoolsProviderInternal(
   const { children, store: customStore } = props;
   const observationSession = resolveDevtoolsObservationSession(customStore);
 
-  useEffect(() => acquireDevtoolsMiddleware(observationSession), [observationSession]);
+  useLayoutEffect(() => acquireDevtoolsMiddleware(observationSession), [observationSession]);
 
   return (
     <DevtoolsStoreProvider store={observationSession.devtoolsStore}>

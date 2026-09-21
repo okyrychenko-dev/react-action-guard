@@ -28,6 +28,7 @@ describe("ActionGuardDevtoolsProvider", () => {
   });
 
   afterEach(() => {
+    vi.useRealTimers();
     vi.unstubAllEnvs();
   });
 
@@ -43,6 +44,27 @@ describe("ActionGuardDevtoolsProvider", () => {
 
     expect(screen.getByText("Observed events: provider-blocker-1")).toBeInTheDocument();
     expect(screen.queryByText(/provider-blocker-2/)).not.toBeInTheDocument();
+  });
+
+  it("should observe blockers activated by descendant passive effects", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+
+    renderWithProviders(<CustomObservationTestApp hasInitialBlocker={true} />);
+
+    expect(
+      screen.getByText(
+        "Observed events: initial-scheduled-blocker, initial-conditional-blocker, " +
+          "initial-action-blocker"
+      )
+    ).toBeInTheDocument();
+
+    vi.setSystemTime(1_500);
+    fireEvent.click(screen.getByRole("button", { name: "Remove initial blocker" }));
+
+    expect(
+      screen.getByText("Observed event details: remove:500, add:none, add:none, add:none")
+    ).toBeInTheDocument();
   });
 
   it("should keep the first panel configuration and warn about later conflicts", () => {
