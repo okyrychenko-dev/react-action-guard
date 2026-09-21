@@ -2,36 +2,34 @@ import { ActionGuardDevtools } from "@devtools/components/actionGuardDevtools";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "@devtools/middleware";
 import { useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
 import { isDefined } from "@okyrychenko-dev/type-utils";
-import { ReactElement, useCallback, useRef, useState } from "react";
+import { ReactElement, useCallback, useState } from "react";
 
-function ManualCustomObservationContent(): ReactElement {
+const RESERVED_SESSION_MIDDLEWARE_NAME = `${DEVTOOLS_MIDDLEWARE_NAME}-observation-session`;
+
+interface ManualCustomObservationContentProps {
+  onReservedMiddlewareCall: VoidFunction;
+}
+
+function ManualCustomObservationContent(props: ManualCustomObservationContentProps): ReactElement {
+  const { onReservedMiddlewareCall } = props;
   const store = useUIBlockingContext();
   const [isObserving, setIsObserving] = useState(true);
   const [manualMiddleware] = useState(createDevtoolsMiddleware);
-  const manualMiddlewareRegisteredRef = useRef(false);
 
   const handleFixtureElement = useCallback(
     (element: HTMLDivElement | null): void => {
       const { registerMiddleware, unregisterMiddleware } = store.getState();
 
       if (isDefined(element)) {
-        if (!manualMiddlewareRegisteredRef.current) {
-          registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
-
-          manualMiddlewareRegisteredRef.current = true;
-        }
-        return;
-      }
-
-      if (!manualMiddlewareRegisteredRef.current) {
+        registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
+        registerMiddleware(RESERVED_SESSION_MIDDLEWARE_NAME, onReservedMiddlewareCall);
         return;
       }
 
       unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-
-      manualMiddlewareRegisteredRef.current = false;
+      unregisterMiddleware(RESERVED_SESSION_MIDDLEWARE_NAME);
     },
-    [manualMiddleware, store]
+    [manualMiddleware, onReservedMiddlewareCall, store]
   );
 
   const addBlocker = (): void => {

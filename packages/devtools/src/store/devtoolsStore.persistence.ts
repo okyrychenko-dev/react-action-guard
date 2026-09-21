@@ -1,4 +1,4 @@
-import { isNullish, isPromise, isUndefined } from "@okyrychenko-dev/type-utils";
+import { assertDefined, isNullish, isPromise, isUndefined } from "@okyrychenko-dev/type-utils";
 import { createJSONStorage } from "zustand/middleware";
 import {
   DEFAULT_TAB,
@@ -103,19 +103,13 @@ function getBrowserStorage(): StateStorage {
   return window.localStorage;
 }
 
-function createJsonStorage(): PersistStorage<PersistedDevtoolsState> {
-  const storage = createJSONStorage<PersistedDevtoolsState>(getBrowserStorage);
+function createJsonStorage(getStorage: () => StateStorage): PersistStorage<PersistedDevtoolsState> {
+  const storage = createJSONStorage<PersistedDevtoolsState>(getStorage);
 
   if (isUndefined(storage)) {
     const fallbackStorage = createJSONStorage<PersistedDevtoolsState>(() => noopStorage);
 
-    if (isUndefined(fallbackStorage)) {
-      return {
-        getItem: () => null,
-        setItem: () => undefined,
-        removeItem: () => undefined,
-      };
-    }
+    assertDefined(fallbackStorage, "No-op Devtools preference storage should be available");
 
     return fallbackStorage;
   }
@@ -130,8 +124,10 @@ function createJsonStorage(): PersistStorage<PersistedDevtoolsState> {
  * latest value before each write prevents a stale session from replacing preferences changed by
  * another session when Zustand persists an unrelated runtime update.
  */
-export function createDevtoolsPreferenceStorage(): PersistStorage<PersistedDevtoolsState> {
-  const storage = createJsonStorage();
+export function createDevtoolsPreferenceStorage(
+  getStorage: () => StateStorage = getBrowserStorage
+): PersistStorage<PersistedDevtoolsState> {
+  const storage = createJsonStorage(getStorage);
   let previousPreferences = createDefaultPreferences();
 
   const rememberPreferences = (

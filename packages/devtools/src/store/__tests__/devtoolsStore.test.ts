@@ -1,7 +1,15 @@
+import { assertDefined } from "@okyrychenko-dev/type-utils";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_MAX_EVENTS, DEVTOOLS_STORAGE_KEY } from "../devtoolsStore.constants";
+import {
+  DEFAULT_MAX_EVENTS,
+  DEVTOOLS_STORAGE_KEY,
+  DEVTOOLS_STORAGE_VERSION,
+  createDefaultFilter,
+} from "../devtoolsStore.constants";
+import { createDevtoolsPreferenceStorage } from "../devtoolsStore.persistence";
 import { selectEventStats, selectFilteredEvents } from "../devtoolsStore.selectors";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../devtoolsStore.store";
+import type { StateStorage } from "zustand/middleware";
 import type { DevtoolsEvent, DevtoolsStore } from "../../types";
 
 describe("devtoolsStore", () => {
@@ -659,6 +667,42 @@ describe("devtoolsStore", () => {
       } finally {
         localStorage.mockRestore();
       }
+    });
+
+    it("should support asynchronous preference storage and clearing", async () => {
+      const values = new Map<string, string>();
+      const removeItem = vi.fn((name: string): void => {
+        values.delete(name);
+      });
+      const asyncStorage: StateStorage = {
+        getItem: async (name) => values.get(name) ?? null,
+        setItem: (name, value) => {
+          values.set(name, value);
+        },
+        removeItem,
+      };
+      const storage = createDevtoolsPreferenceStorage(() => asyncStorage);
+
+      expect(await storage.getItem(DEVTOOLS_STORAGE_KEY)).toBeNull();
+
+      await storage.setItem(DEVTOOLS_STORAGE_KEY, {
+        state: {
+          isMinimized: false,
+          activeTab: "stats",
+          filter: createDefaultFilter(),
+        },
+        version: DEVTOOLS_STORAGE_VERSION,
+      });
+
+      const persistedValue = await storage.getItem(DEVTOOLS_STORAGE_KEY);
+
+      assertDefined(persistedValue, "Asynchronous storage should retain preferences");
+      expect(persistedValue.state.activeTab).toBe("stats");
+
+      await storage.removeItem(DEVTOOLS_STORAGE_KEY);
+
+      expect(removeItem).toHaveBeenCalledWith(DEVTOOLS_STORAGE_KEY);
+      expect(values.has(DEVTOOLS_STORAGE_KEY)).toBe(false);
     });
   });
 

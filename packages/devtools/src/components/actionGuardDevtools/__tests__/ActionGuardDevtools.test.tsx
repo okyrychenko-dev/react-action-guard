@@ -412,10 +412,11 @@ describe("ActionGuardDevtools", () => {
 
   it("should record custom-store events when caller-owned middleware is already registered", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const reservedMiddleware = vi.fn();
 
     renderWithProviders(
       <UIBlockingProvider>
-        <ManualCustomObservationContent />
+        <ManualCustomObservationContent onReservedMiddlewareCall={reservedMiddleware} />
       </UIBlockingProvider>
     );
 
@@ -425,6 +426,7 @@ describe("ActionGuardDevtools", () => {
     await waitFor(() => {
       expect(screen.getByText("manual-custom-blocker")).toBeInTheDocument();
     });
+    expect(reservedMiddleware).toHaveBeenCalledOnce();
     expect(warn).toHaveBeenCalledWith(
       "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
         "Devtools middleware and added a session-specific registration for the custom store."
