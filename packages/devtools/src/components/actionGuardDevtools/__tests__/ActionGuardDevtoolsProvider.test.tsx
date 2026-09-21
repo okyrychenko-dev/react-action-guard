@@ -1,7 +1,7 @@
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { fireEvent, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { devtoolsStoreApi } from "../../../store";
+import { DEVTOOLS_STORAGE_KEY, devtoolsStoreApi } from "../../../store";
 import { renderWithProviders } from "../../../test/utils";
 import {
   CustomObservationTestApp,
@@ -11,7 +11,15 @@ import {
 
 describe("ActionGuardDevtoolsProvider", () => {
   beforeEach(() => {
-    devtoolsStoreApi.getState().clearEvents();
+    const store = devtoolsStoreApi.getState();
+
+    store.clearEvents();
+    store.setActiveTab("timeline");
+    store.resetFilter();
+    if (store.isMinimized) {
+      store.toggleMinimized();
+    }
+    window.localStorage.clear();
     uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
@@ -44,6 +52,30 @@ describe("ActionGuardDevtoolsProvider", () => {
       "[ActionGuardDevtools] Ignored conflicting observation-session configuration. " +
         "The first panel for a blocking store controls defaultOpen and maxEvents."
     );
+  });
+
+  it("should persist custom-session preferences for future observation sessions", () => {
+    const firstObservation = renderWithProviders(<CustomObservationTestApp />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Set stats preference" }));
+    fireEvent.click(screen.getByRole("button", { name: "Set search preference" }));
+    fireEvent.click(screen.getByRole("button", { name: "Toggle minimized preference" }));
+
+    const persistedPreferences = window.localStorage.getItem(DEVTOOLS_STORAGE_KEY);
+
+    expect(persistedPreferences).toContain('"activeTab":"stats"');
+    expect(persistedPreferences).toContain('"search":"persisted custom search"');
+    expect(persistedPreferences).toContain('"isMinimized":true');
+
+    firstObservation.unmount();
+    renderWithProviders(<CustomObservationTestApp />);
+
+    expect(screen.getByText("Active preference: stats")).toBeInTheDocument();
+    expect(screen.getByText("Search preference: persisted custom search")).toBeInTheDocument();
+    expect(screen.getByText("Minimized preference: minimized")).toBeInTheDocument();
+    expect(screen.getByText("Observed events:")).toBeInTheDocument();
+    expect(screen.getByText("Configured open state: closed")).toBeInTheDocument();
+    expect(screen.getByText("Configured maximum: 200")).toBeInTheDocument();
   });
 
   it("should not observe events in production by default", () => {

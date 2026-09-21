@@ -39,18 +39,14 @@ type PersistedDevtoolsState = Pick<DevtoolsStore, "isMinimized" | "activeTab" | 
  * - UI preferences persisted to localStorage across reloads
  * - Automatic shallow comparison for selectors
  */
-export type DevtoolsStoreBindings = ShallowStoreBindings<DevtoolsStore>;
+export type DevtoolsStoreBindings = ShallowStoreBindings<
+  DevtoolsStore,
+  [["zustand/persist", unknown]]
+>;
 
 export type DevtoolsStoreApi = DevtoolsStoreBindings["store"];
 
 export function createDevtoolsStoreBindings(): DevtoolsStoreBindings {
-  return createShallowStore<DevtoolsStore>(createDevtoolsActions);
-}
-
-function createPersistedDevtoolsStoreBindings(): ShallowStoreBindings<
-  DevtoolsStore,
-  [["zustand/persist", unknown]]
-> {
   return createShallowStore<DevtoolsStore, [["zustand/persist", unknown]]>(
     persist(createDevtoolsActions, {
       name: DEVTOOLS_STORAGE_KEY,
@@ -71,6 +67,6 @@ function createPersistedDevtoolsStoreBindings(): ShallowStoreBindings<
   );
 }
 
-const { store: devtoolsStoreApi } = createPersistedDevtoolsStoreBindings();
+const { store: devtoolsStoreApi } = createDevtoolsStoreBindings();
 
 export { devtoolsStoreApi };
