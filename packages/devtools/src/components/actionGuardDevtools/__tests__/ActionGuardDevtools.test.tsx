@@ -377,6 +377,39 @@ describe("ActionGuardDevtools", () => {
     unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
   });
 
+  it("should preserve caller middleware that replaces an automatic registration", () => {
+    const devtools = renderWithProviders(<ActionGuardDevtools />);
+    const replacementMiddleware = createDevtoolsMiddleware();
+    const { middlewares, registerMiddleware } = uiBlockingStoreApi.getState();
+    const automaticMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
+
+    assertDefined(automaticMiddleware, "Automatic Devtools middleware should be registered");
+    expect(automaticMiddleware).not.toBe(replacementMiddleware);
+
+    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, replacementMiddleware);
+    devtools.unmount();
+
+    const {
+      addBlocker,
+      middlewares: middlewaresAfterUnmount,
+      unregisterMiddleware,
+    } = uiBlockingStoreApi.getState();
+
+    expect(middlewaresAfterUnmount.get(DEVTOOLS_MIDDLEWARE_NAME)).toBe(replacementMiddleware);
+
+    act(() => {
+      addBlocker("replacement-after-automatic-blocker");
+    });
+
+    const { events } = devtoolsStoreApi.getState();
+
+    expect(events.some((event) => event.blockerId === "replacement-after-automatic-blocker")).toBe(
+      true
+    );
+
+    unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+  });
+
   it("should record custom-store events when caller-owned middleware is already registered", async () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
 

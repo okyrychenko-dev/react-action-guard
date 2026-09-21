@@ -21,9 +21,14 @@ import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 export interface ObservationSession {
   configuration: Optional<ObservationSessionConfiguration>;
   devtoolsStore: DevtoolsStoreApi;
-  middlewareRegistrationName: Optional<string>;
+  middlewareRegistration: Optional<ObservationSessionMiddlewareRegistration>;
   observerCount: number;
   targetStore: UIBlockingStoreApi;
+}
+
+interface ObservationSessionMiddlewareRegistration {
+  middleware: Middleware;
+  name: string;
 }
 
 interface ObservationSessionConfiguration {
@@ -59,7 +64,7 @@ function registerSessionMiddleware(session: ObservationSession, name: string): v
   const middleware: Middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
 
   registerMiddleware(name, middleware);
-  session.middlewareRegistrationName = name;
+  session.middlewareRegistration = { middleware, name };
 }
 
 function resetObservationSession(devtoolsStore: DevtoolsStoreApi): void {
@@ -81,7 +86,7 @@ export function getDevtoolsObservationSession(
   const session: ObservationSession = {
     configuration: undefined,
     devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
-    middlewareRegistrationName: undefined,
+    middlewareRegistration: undefined,
     observerCount: 0,
     targetStore: store,
   };
@@ -200,11 +205,15 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
       }
       session.configuration = undefined;
 
-      if (isDefined(session.middlewareRegistrationName)) {
-        const { unregisterMiddleware } = targetStore.getState();
+      if (isDefined(session.middlewareRegistration)) {
+        const { middleware, name } = session.middlewareRegistration;
+        const { middlewares, unregisterMiddleware } = targetStore.getState();
+        const currentMiddleware = middlewares.get(name);
 
-        unregisterMiddleware(session.middlewareRegistrationName);
-        session.middlewareRegistrationName = undefined;
+        if (currentMiddleware === middleware) {
+          unregisterMiddleware(name);
+        }
+        session.middlewareRegistration = undefined;
       }
 
       resetObservationSession(session.devtoolsStore);
