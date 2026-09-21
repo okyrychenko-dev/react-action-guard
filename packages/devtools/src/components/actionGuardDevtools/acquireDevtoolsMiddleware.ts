@@ -23,6 +23,7 @@ export interface ObservationSession {
   devtoolsStore: DevtoolsStoreApi;
   observerCount: number;
   ownsMiddlewareRegistration: boolean;
+  targetStore: UIBlockingStoreApi;
 }
 
 interface ObservationSessionConfiguration {
@@ -35,11 +36,6 @@ interface ConfigureObservationSessionOptions {
   defaultOpen: boolean;
   maxEvents: number;
   owner: object;
-}
-
-export interface ResolvedObservationSession {
-  observationSession: ObservationSession;
-  targetStore: UIBlockingStoreApi;
 }
 
 const observationSessions = new WeakMap<UIBlockingStoreApi, ObservationSession>();
@@ -65,6 +61,7 @@ export function getDevtoolsObservationSession(
     devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
     observerCount: 0,
     ownsMiddlewareRegistration: false,
+    targetStore: store,
   };
 
   observationSessions.set(store, session);
@@ -73,14 +70,12 @@ export function getDevtoolsObservationSession(
 
 export function resolveDevtoolsObservationSession(
   customStore?: UIBlockingStoreApi
-): ResolvedObservationSession {
+): ObservationSession {
   const targetStore = customStore ?? uiBlockingStoreApi;
-  const observationSession = getDevtoolsObservationSession(
+  return getDevtoolsObservationSession(
     targetStore,
     targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
   );
-
-  return { observationSession, targetStore };
 }
 
 export function configureDevtoolsObservationSession(
@@ -130,16 +125,13 @@ export function configureDevtoolsObservationSession(
   }
 }
 
-export function acquireDevtoolsMiddleware(
-  store: UIBlockingStoreApi,
-  session: ObservationSession
-): VoidFunction {
-  const { observerCount } = session;
+export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunction {
+  const { observerCount, targetStore } = session;
 
   if (observerCount === 0) {
-    observationSessions.set(store, session);
+    observationSessions.set(targetStore, session);
 
-    const { middlewares, registerMiddleware } = store.getState();
+    const { middlewares, registerMiddleware } = targetStore.getState();
     const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
 
     if (isDefined(existingMiddleware)) {
@@ -171,13 +163,13 @@ export function acquireDevtoolsMiddleware(
     session.observerCount -= 1;
 
     if (session.observerCount === 0) {
-      if (store !== uiBlockingStoreApi) {
-        observationSessions.delete(store);
+      if (targetStore !== uiBlockingStoreApi) {
+        observationSessions.delete(targetStore);
       }
       session.configuration = undefined;
 
       if (session.ownsMiddlewareRegistration) {
-        const { unregisterMiddleware } = store.getState();
+        const { unregisterMiddleware } = targetStore.getState();
 
         unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
         session.ownsMiddlewareRegistration = false;

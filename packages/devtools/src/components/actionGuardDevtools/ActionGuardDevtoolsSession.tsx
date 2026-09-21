@@ -14,7 +14,6 @@ interface ActionGuardDevtoolsSessionProps extends Omit<
   "showInProduction"
 > {
   observationSession: ObservationSession;
-  targetStore: NonNullable<ActionGuardDevtoolsProps["store"]>;
 }
 
 function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): ReactElement {
@@ -25,7 +24,6 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     observationSession,
     stuckThresholdMs,
     store: customStore,
-    targetStore,
   } = props;
 
   const configurationOwnerRef = useRef({});
@@ -38,10 +36,7 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     clearEvents: state.clearEvents,
   }));
 
-  useEffect(
-    () => acquireDevtoolsMiddleware(targetStore, observationSession),
-    [observationSession, targetStore]
-  );
+  useEffect(() => acquireDevtoolsMiddleware(observationSession), [observationSession]);
 
   useEffect(() => {
     configureDevtoolsObservationSession(observationSession, {

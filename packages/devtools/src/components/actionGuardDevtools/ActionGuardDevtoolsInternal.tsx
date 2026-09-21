@@ -8,15 +8,11 @@ function ActionGuardDevtoolsInternal(
   props: Omit<ActionGuardDevtoolsProps, "showInProduction">
 ): ReactElement {
   const { store: customStore } = props;
-  const { observationSession, targetStore } = resolveDevtoolsObservationSession(customStore);
+  const observationSession = resolveDevtoolsObservationSession(customStore);
 
   return (
     <DevtoolsStoreProvider store={observationSession.devtoolsStore}>
-      <ActionGuardDevtoolsSession
-        {...props}
-        observationSession={observationSession}
-        targetStore={targetStore}
-      />
+      <ActionGuardDevtoolsSession {...props} observationSession={observationSession} />
     </DevtoolsStoreProvider>
   );
 }

@@ -10,12 +10,9 @@ function ActionGuardDevtoolsProviderInternal(
   props: Omit<ActionGuardDevtoolsProviderProps, "showInProduction">
 ): ReactElement {
   const { children, store: customStore } = props;
-  const { observationSession, targetStore } = resolveDevtoolsObservationSession(customStore);
+  const observationSession = resolveDevtoolsObservationSession(customStore);
 
-  useEffect(
-    () => acquireDevtoolsMiddleware(targetStore, observationSession),
-    [observationSession, targetStore]
-  );
+  useEffect(() => acquireDevtoolsMiddleware(observationSession), [observationSession]);
 
   return (
     <DevtoolsStoreProvider store={observationSession.devtoolsStore}>
