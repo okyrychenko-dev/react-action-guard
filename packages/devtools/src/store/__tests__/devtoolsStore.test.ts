@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_MAX_EVENTS, DEVTOOLS_STORAGE_KEY } from "../devtoolsStore.constants";
 import { selectEventStats, selectFilteredEvents } from "../devtoolsStore.selectors";
-import { devtoolsStoreApi } from "../devtoolsStore.store";
+import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../devtoolsStore.store";
 import type { DevtoolsEvent, DevtoolsStore } from "../../types";
 
 describe("devtoolsStore", () => {
@@ -581,6 +581,18 @@ describe("devtoolsStore", () => {
       expect(serialized).not.toContain('"events":');
       expect(serialized).not.toContain('"selectedEventId":');
       expect(serialized).not.toContain('"isPaused":');
+    });
+
+    it("should create an observation-session store when browser storage is unavailable", () => {
+      const localStorage = vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
+        throw new Error("Storage access denied");
+      });
+
+      try {
+        expect(() => createDevtoolsStoreBindings()).not.toThrow();
+      } finally {
+        localStorage.mockRestore();
+      }
     });
   });
 
