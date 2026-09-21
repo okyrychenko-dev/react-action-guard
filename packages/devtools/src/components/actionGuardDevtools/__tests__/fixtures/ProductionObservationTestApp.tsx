@@ -11,9 +11,9 @@ function ProductionObservationTestApp(props: ProductionObservationTestAppProps):
   const { showInProduction } = props;
 
   const addBlocker = (): void => {
-    const state = uiBlockingStoreApi.getState();
+    const { addBlocker: addGlobalBlocker } = uiBlockingStoreApi.getState();
 
-    state.addBlocker("production-provider-blocker");
+    addGlobalBlocker("production-provider-blocker");
   };
 
   return (

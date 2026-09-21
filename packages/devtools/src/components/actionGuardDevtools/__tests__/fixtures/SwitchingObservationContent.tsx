@@ -18,11 +18,15 @@ function SwitchingObservationContent(props: SwitchingObservationContentProps): R
   const observedStore = isObservingFirst ? firstStore : secondStore;
 
   const addFirstBlocker = (): void => {
-    firstStore.getState().addBlocker("first-store-blocker");
+    const { addBlocker } = firstStore.getState();
+
+    addBlocker("first-store-blocker");
   };
 
   const addSecondBlocker = (): void => {
-    secondStore.getState().addBlocker("second-store-blocker");
+    const { addBlocker } = secondStore.getState();
+
+    addBlocker("second-store-blocker");
   };
 
   const switchStore = (): void => {

@@ -91,11 +91,16 @@ export function configureDevtoolsObservationSession(
   const { defaultOpen, maxEvents, owner } = options;
 
   if (isUndefined(configuration)) {
-    devtoolsStore.getState().setOpen(defaultOpen);
-    devtoolsStore.getState().setMaxEvents(maxEvents);
+    const { setMaxEvents, setOpen } = devtoolsStore.getState();
+
+    setOpen(defaultOpen);
+    setMaxEvents(maxEvents);
+
+    const { maxEvents: configuredMaxEvents } = devtoolsStore.getState();
+
     session.configuration = {
       defaultOpen,
-      maxEvents: devtoolsStore.getState().maxEvents,
+      maxEvents: configuredMaxEvents,
       owner,
     };
     return;
@@ -103,8 +108,13 @@ export function configureDevtoolsObservationSession(
 
   if (configuration.owner === owner) {
     if (configuration.maxEvents !== maxEvents) {
-      devtoolsStore.getState().setMaxEvents(maxEvents);
-      configuration.maxEvents = devtoolsStore.getState().maxEvents;
+      const { setMaxEvents } = devtoolsStore.getState();
+
+      setMaxEvents(maxEvents);
+
+      const { maxEvents: configuredMaxEvents } = devtoolsStore.getState();
+
+      configuration.maxEvents = configuredMaxEvents;
     }
     return;
   }
@@ -129,7 +139,8 @@ export function acquireDevtoolsMiddleware(
   if (observerCount === 0) {
     observationSessions.set(store, session);
 
-    const existingMiddleware = store.getState().middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
+    const { middlewares, registerMiddleware } = store.getState();
+    const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
 
     if (isDefined(existingMiddleware)) {
       if (process.env.NODE_ENV !== "production") {
@@ -141,7 +152,7 @@ export function acquireDevtoolsMiddleware(
     } else {
       const middleware: Middleware = createDevtoolsMiddlewareForStore(session.devtoolsStore);
 
-      store.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+      registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
       session.ownsMiddlewareRegistration = true;
     }
   }
@@ -166,7 +177,9 @@ export function acquireDevtoolsMiddleware(
       session.configuration = undefined;
 
       if (session.ownsMiddlewareRegistration) {
-        store.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+        const { unregisterMiddleware } = store.getState();
+
+        unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
         session.ownsMiddlewareRegistration = false;
       }
 

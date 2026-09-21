@@ -50,7 +50,9 @@ function ObservationSessionHarness(props: ObservationSessionHarnessProps): React
   assertDefined(store, "Custom observation-session harness requires UIBlockingProvider");
 
   const addBlocker = (): void => {
-    store.getState().addBlocker(blockerId, {
+    const { addBlocker: addStoreBlocker } = store.getState();
+
+    addStoreBlocker(blockerId, {
       scope: blockerId,
       reason: `${blockerId} reason`,
       priority: 1,
@@ -83,7 +85,9 @@ function ObservationSessionHarness(props: ObservationSessionHarnessProps): React
 describe("ActionGuardDevtools", () => {
   beforeEach(() => {
     resetDevtoolsStore();
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
   });
 
   it("should render toggle button when closed", () => {
@@ -127,8 +131,10 @@ describe("ActionGuardDevtools", () => {
 
     rerender(<ActionGuardDevtools maxEvents={300} />);
 
+    const { maxEvents } = devtoolsStoreApi.getState();
+
     expect(screen.getByText("Action Guard")).toBeInTheDocument();
-    expect(devtoolsStoreApi.getState().maxEvents).toBe(300);
+    expect(maxEvents).toBe(300);
   });
 
   it("should handle keyboard shortcuts", async () => {
@@ -193,7 +199,9 @@ describe("ActionGuardDevtools", () => {
 
     fireEvent.keyDown(editableElement, { key: "c" });
 
-    expect(devtoolsStoreApi.getState().events).toHaveLength(1);
+    const { events: recordedEvents } = devtoolsStoreApi.getState();
+
+    expect(recordedEvents).toHaveLength(1);
 
     editableElement.remove();
   });
@@ -220,7 +228,9 @@ describe("ActionGuardDevtools", () => {
 
     fireEvent.keyDown(selectElement, { key: "c" });
 
-    expect(devtoolsStoreApi.getState().events).toHaveLength(1);
+    const { events: recordedEvents } = devtoolsStoreApi.getState();
+
+    expect(recordedEvents).toHaveLength(1);
 
     selectElement.remove();
   });
@@ -228,31 +238,34 @@ describe("ActionGuardDevtools", () => {
   it("should record each event once and keep middleware alive across instances", () => {
     const first = renderWithProviders(<ActionGuardDevtools />);
     renderWithProviders(<ActionGuardDevtools />);
+    const { addBlocker } = uiBlockingStoreApi.getState();
 
     // Two instances share one ref-counted middleware → exactly one event per action.
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("blocker-1", {
+      addBlocker("blocker-1", {
         scope: "x",
         reason: "r",
         priority: 1,
       });
     });
-    expect(
-      devtoolsStoreApi.getState().events.filter((event) => event.blockerId === "blocker-1")
-    ).toHaveLength(1);
+
+    const { events: firstEvents } = devtoolsStoreApi.getState();
+
+    expect(firstEvents.filter((event) => event.blockerId === "blocker-1")).toHaveLength(1);
 
     // Unmounting one instance must not tear the middleware down for the other.
     first.unmount();
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("blocker-2", {
+      addBlocker("blocker-2", {
         scope: "x",
         reason: "r",
         priority: 1,
       });
     });
-    expect(
-      devtoolsStoreApi.getState().events.some((event) => event.blockerId === "blocker-2")
-    ).toBe(true);
+
+    const { events: secondEvents } = devtoolsStoreApi.getState();
+
+    expect(secondEvents.some((event) => event.blockerId === "blocker-2")).toBe(true);
   });
 
   it("should record each event once in React Strict Mode", () => {
@@ -262,15 +275,15 @@ describe("ActionGuardDevtools", () => {
       </StrictMode>
     );
 
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("strict-mode-blocker");
+      addBlocker("strict-mode-blocker");
     });
 
-    expect(
-      devtoolsStoreApi
-        .getState()
-        .events.filter((event) => event.blockerId === "strict-mode-blocker")
-    ).toHaveLength(1);
+    const { events } = devtoolsStoreApi.getState();
+
+    expect(events.filter((event) => event.blockerId === "strict-mode-blocker")).toHaveLength(1);
   });
 
   it("should preserve timeout and remove as separate observed events", () => {
@@ -278,9 +291,10 @@ describe("ActionGuardDevtools", () => {
 
     try {
       renderWithProviders(<ActionGuardDevtools />);
+      const { addBlocker } = uiBlockingStoreApi.getState();
 
       act(() => {
-        uiBlockingStoreApi.getState().addBlocker("timeout-observation-blocker", {
+        addBlocker("timeout-observation-blocker", {
           timeout: 1_000,
         });
       });
@@ -289,9 +303,9 @@ describe("ActionGuardDevtools", () => {
         vi.advanceTimersByTime(1_000);
       });
 
-      const observedActions = devtoolsStoreApi
-        .getState()
-        .events.filter((event) => event.blockerId === "timeout-observation-blocker")
+      const { events } = devtoolsStoreApi.getState();
+      const observedActions = events
+        .filter((event) => event.blockerId === "timeout-observation-blocker")
         .map((event) => event.action);
 
       expect(observedActions).toEqual(["remove", "timeout", "add"]);
@@ -301,37 +315,44 @@ describe("ActionGuardDevtools", () => {
   });
 
   it("should show pre-existing blockers without synthesizing historical events", () => {
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("pre-existing-blocker");
+      addBlocker("pre-existing-blocker");
     });
 
     renderWithProviders(<ActionGuardDevtools defaultOpen={true} />);
 
-    expect(devtoolsStoreApi.getState().events).toHaveLength(0);
+    const { events } = devtoolsStoreApi.getState();
+
+    expect(events).toHaveLength(0);
     expect(screen.getByText("No events recorded yet.")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Active Blockers" }));
 
     expect(screen.getByText("pre-existing-blocker")).toBeInTheDocument();
-    expect(devtoolsStoreApi.getState().events).toHaveLength(0);
+    expect(events).toHaveLength(0);
   });
 
   it("should preserve caller-owned manual middleware during automatic observation", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
     const manualMiddleware = createDevtoolsMiddleware();
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
 
-    uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
+    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
 
     const devtools = renderWithProviders(<ActionGuardDevtools />);
 
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("manual-and-automatic-blocker");
+      addBlocker("manual-and-automatic-blocker");
     });
 
+    const { events: eventsDuringAutomaticObservation } = devtoolsStoreApi.getState();
+
     expect(
-      devtoolsStoreApi
-        .getState()
-        .events.filter((event) => event.blockerId === "manual-and-automatic-blocker")
+      eventsDuringAutomaticObservation.filter(
+        (event) => event.blockerId === "manual-and-automatic-blocker"
+      )
     ).toHaveLength(1);
     expect(warn).toHaveBeenCalledWith(
       "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
@@ -341,16 +362,18 @@ describe("ActionGuardDevtools", () => {
     devtools.unmount();
 
     act(() => {
-      uiBlockingStoreApi.getState().addBlocker("manual-after-automatic-blocker");
+      addBlocker("manual-after-automatic-blocker");
     });
 
+    const { events: eventsAfterAutomaticObservation } = devtoolsStoreApi.getState();
+
     expect(
-      devtoolsStoreApi
-        .getState()
-        .events.some((event) => event.blockerId === "manual-after-automatic-blocker")
+      eventsAfterAutomaticObservation.some(
+        (event) => event.blockerId === "manual-after-automatic-blocker"
+      )
     ).toBe(true);
 
-    uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+    unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
   });
 
   it("should isolate observation sessions for different custom stores", async () => {
@@ -475,12 +498,12 @@ describe("ActionGuardDevtools", () => {
         useGlobalStore={true}
       />
     );
-    const store = devtoolsStoreApi.getState();
+    const { setActiveTab, setFilter, toggleMinimized } = devtoolsStoreApi.getState();
 
     act(() => {
-      store.toggleMinimized();
-      store.setActiveTab("stats");
-      store.setFilter({ search: "persisted search" });
+      toggleMinimized();
+      setActiveTab("stats");
+      setFilter({ search: "persisted search" });
     });
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle persisted observation" }));

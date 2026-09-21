@@ -57,7 +57,9 @@ describe("Timeline", () => {
     const input = screen.getByPlaceholderText("Search by ID or reason...");
     fireEvent.change(input, { target: { value: "blocker-2" } });
 
-    expect(devtoolsStoreApi.getState().filter.search).toBe("blocker-2");
+    const { filter } = devtoolsStoreApi.getState();
+
+    expect(filter.search).toBe("blocker-2");
   });
 
   it("should show event details when selecting an event", () => {
@@ -83,8 +85,10 @@ describe("Timeline", () => {
     fireEvent.click(screen.getByTitle("Close details"));
 
     // Details should be hidden
+    const { selectedEventId } = devtoolsStoreApi.getState();
+
     expect(screen.queryByText("Blocker ID")).not.toBeInTheDocument();
-    expect(devtoolsStoreApi.getState().selectedEventId).toBeNull();
+    expect(selectedEventId).toBeNull();
   });
 
   it("should clear selection when selected event is removed from buffer", () => {
@@ -93,7 +97,9 @@ describe("Timeline", () => {
     const { rerender } = renderWithProviders(<Timeline />);
 
     // Event is selected
-    expect(devtoolsStoreApi.getState().selectedEventId).toBe("event-1");
+    const { selectedEventId: selectedEventIdBeforeRemoval } = devtoolsStoreApi.getState();
+
+    expect(selectedEventIdBeforeRemoval).toBe("event-1");
 
     // Remove the selected event from the store (simulating circular buffer eviction)
     act(() => {
@@ -106,7 +112,9 @@ describe("Timeline", () => {
     });
 
     // Selection should be cleared
-    expect(devtoolsStoreApi.getState().selectedEventId).toBeNull();
+    const { selectedEventId: selectedEventIdAfterRemoval } = devtoolsStoreApi.getState();
+
+    expect(selectedEventIdAfterRemoval).toBeNull();
   });
 
   it("should clear selection when selected event is filtered out", () => {
@@ -118,7 +126,9 @@ describe("Timeline", () => {
       target: { value: "blocker-2" },
     });
 
-    expect(devtoolsStoreApi.getState().selectedEventId).toBeNull();
+    const { selectedEventId } = devtoolsStoreApi.getState();
+
+    expect(selectedEventId).toBeNull();
     expect(screen.queryByText("Blocker ID")).not.toBeInTheDocument();
   });
 });

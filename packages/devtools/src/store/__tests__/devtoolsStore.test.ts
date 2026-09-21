@@ -24,7 +24,9 @@ describe("devtoolsStore", () => {
 
   describe("events management", () => {
     it("should add event to store", () => {
-      devtoolsStoreApi.getState().addEvent({
+      const { addEvent } = devtoolsStoreApi.getState();
+
+      addEvent({
         action: "add",
         blockerId: "test-blocker",
         timestamp: Date.now(),
@@ -113,7 +115,8 @@ describe("devtoolsStore", () => {
         timestamp: 2,
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[1].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[1].id;
       store.selectEvent(selectedEventId);
 
       store.addEvent({
@@ -122,20 +125,28 @@ describe("devtoolsStore", () => {
         timestamp: 3,
       });
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterAdd } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterAdd).toBe(null);
     });
 
     it("should normalize invalid maxEvents values", () => {
       const store = devtoolsStoreApi.getState();
 
       store.setMaxEvents(0);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(1);
+      const { maxEvents: minimumMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(minimumMaxEvents).toBe(1);
 
       store.setMaxEvents(-10);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(1);
+      const { maxEvents: negativeMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(negativeMaxEvents).toBe(1);
 
       store.setMaxEvents(Number.POSITIVE_INFINITY);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(DEFAULT_MAX_EVENTS);
+      const { maxEvents: infiniteMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(infiniteMaxEvents).toBe(DEFAULT_MAX_EVENTS);
     });
 
     it("should deselect event when maxEvents trims it from the buffer", () => {
@@ -152,12 +163,15 @@ describe("devtoolsStore", () => {
         timestamp: 2,
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[1].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[1].id;
       store.selectEvent(selectedEventId);
 
       store.setMaxEvents(1);
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterTrim } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterTrim).toBe(null);
     });
 
     it("should not add events when paused", () => {
@@ -271,11 +285,14 @@ describe("devtoolsStore", () => {
         config: { scope: "checkout" },
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[0].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[0].id;
       store.selectEvent(selectedEventId);
       store.setFilter({ scopes: ["profile"] });
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterFilter } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterFilter).toBe(null);
     });
   });
 

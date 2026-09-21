@@ -36,7 +36,9 @@ describe("ToggleButtonBadge", () => {
 describe("ToggleButton", () => {
   beforeEach(() => {
     resetDevtoolsStore();
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
   });
 
   it("should render button when panel is closed", () => {
@@ -54,8 +56,10 @@ describe("ToggleButton", () => {
   });
 
   it("should show active blockers count", () => {
-    uiBlockingStoreApi.getState().addBlocker("blocker-1");
-    uiBlockingStoreApi.getState().addBlocker("blocker-2");
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("blocker-1");
+    addBlocker("blocker-2");
 
     renderWithProviders(<ToggleButton position="right" />);
 
@@ -67,6 +71,8 @@ describe("ToggleButton", () => {
 
     fireEvent.click(screen.getByTitle("Open Action Guard Devtools"));
 
-    expect(devtoolsStoreApi.getState().isOpen).toBe(true);
+    const { isOpen } = devtoolsStoreApi.getState();
+
+    expect(isOpen).toBe(true);
   });
 });

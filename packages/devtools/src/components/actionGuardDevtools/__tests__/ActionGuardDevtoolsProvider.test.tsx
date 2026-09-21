@@ -12,16 +12,19 @@ import {
 
 describe("ActionGuardDevtoolsProvider", () => {
   beforeEach(() => {
-    const store = devtoolsStoreApi.getState();
+    const { clearEvents, isMinimized, resetFilter, setActiveTab, toggleMinimized } =
+      devtoolsStoreApi.getState();
 
-    store.clearEvents();
-    store.setActiveTab("timeline");
-    store.resetFilter();
-    if (store.isMinimized) {
-      store.toggleMinimized();
+    clearEvents();
+    setActiveTab("timeline");
+    resetFilter();
+    if (isMinimized) {
+      toggleMinimized();
     }
     window.localStorage.clear();
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
   });
 
   afterEach(() => {

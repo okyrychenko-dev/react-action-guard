@@ -40,10 +40,11 @@ const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>([
  *
  * // Register manually
  * const middleware = createDevtoolsMiddleware();
- * uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+ * const { registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+ * registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
  *
  * // Cleanup
- * uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+ * unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
  * ```
  *
  * @example

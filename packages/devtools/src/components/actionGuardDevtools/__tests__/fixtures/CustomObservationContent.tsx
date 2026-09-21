@@ -20,9 +20,9 @@ function CustomObservationContent(props: CustomObservationContentProps): ReactEl
   const addBlocker = (): void => {
     blockerNumberRef.current += 1;
 
-    const state = store.getState();
+    const { addBlocker: addStoreBlocker } = store.getState();
 
-    state.addBlocker(`provider-blocker-${blockerNumberRef.current.toString()}`);
+    addStoreBlocker(`provider-blocker-${blockerNumberRef.current.toString()}`);
   };
 
   return (
