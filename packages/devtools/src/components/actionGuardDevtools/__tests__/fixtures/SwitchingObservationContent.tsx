@@ -38,7 +38,7 @@ function SwitchingObservationContent(props: SwitchingObservationContentProps): R
       <button onClick={addFirstBlocker}>Add first-store blocker</button>
       <button onClick={addSecondBlocker}>Add second-store blocker</button>
       <button onClick={switchStore}>Switch observed store</button>
-      <ActionGuardDevtools store={observedStore} />
+      <ActionGuardDevtools store={observedStore} defaultOpen={isObservingFirst} />
       <DevtoolsStoreConsumer />
     </ActionGuardDevtoolsProvider>
   );

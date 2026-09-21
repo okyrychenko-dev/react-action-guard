@@ -1,7 +1,7 @@
 import { DEVTOOLS_STORAGE_KEY, devtoolsStoreApi } from "@devtools/store";
 import { renderWithProviders } from "@devtools/test/utils";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { fireEvent, screen, within } from "@testing-library/react";
+import { fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   CustomObservationTestApp,
@@ -135,6 +135,20 @@ describe("ActionGuardDevtoolsProvider", () => {
     fireEvent.click(screen.getByRole("button", { name: "Add second-store blocker" }));
     expect(screen.getByText("Observed events: second-store-blocker")).toBeInTheDocument();
     expect(screen.queryByText(/Observed events:.*first-store-blocker/)).not.toBeInTheDocument();
+  });
+
+  it("should initialize each observed store from its current defaultOpen prop", async () => {
+    renderWithProviders(<SwitchingObservationTestApp />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Configured open state: open")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Switch observed store" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Configured open state: closed")).toBeInTheDocument();
+    });
   });
 
   it("should not observe events in production by default", () => {

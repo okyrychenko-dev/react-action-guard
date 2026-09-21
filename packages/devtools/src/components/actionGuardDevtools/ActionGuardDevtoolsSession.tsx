@@ -27,7 +27,6 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
   } = props;
 
   const configurationOwnerRef = useRef({});
-  const initialDefaultOpenRef = useRef(defaultOpen);
 
   const { isOpen, setOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({
     isOpen: state.isOpen,
@@ -40,11 +39,11 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
 
   useEffect(() => {
     configureDevtoolsObservationSession(observationSession, {
-      defaultOpen: initialDefaultOpenRef.current,
+      defaultOpen,
       maxEvents,
       owner: configurationOwnerRef.current,
     });
-  }, [maxEvents, observationSession]);
+  }, [defaultOpen, maxEvents, observationSession]);
 
   const stateRef = useRef({ isOpen, setOpen, togglePause, clearEvents });
 
