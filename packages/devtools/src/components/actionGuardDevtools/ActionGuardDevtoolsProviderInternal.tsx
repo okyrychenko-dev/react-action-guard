@@ -1,12 +1,11 @@
-import { ReactElement, useEffect, useLayoutEffect } from "react";
+import { ReactElement } from "react";
+import { useIsomorphicLayoutEffect } from "../../hooks";
 import { DevtoolsStoreProvider } from "../../store";
 import {
   acquireDevtoolsMiddleware,
   resolveDevtoolsObservationSession,
 } from "./acquireDevtoolsMiddleware";
 import type { ActionGuardDevtoolsProviderProps } from "./ActionGuardDevtools.types";
-
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 function ActionGuardDevtoolsProviderInternal(
   props: Omit<ActionGuardDevtoolsProviderProps, "showInProduction">

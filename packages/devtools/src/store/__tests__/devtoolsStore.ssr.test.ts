@@ -1,7 +1,7 @@
 /** @vitest-environment node */
 
+import { createDevtoolsStoreBindings } from "@devtools/store";
 import { describe, expect, it } from "vitest";
-import { createDevtoolsStoreBindings } from "..";
 
 describe("devtoolsStore SSR persistence", () => {
   it("should write and clear preferences without browser storage", () => {
