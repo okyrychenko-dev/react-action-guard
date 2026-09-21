@@ -51,7 +51,9 @@ describe("DevtoolsPanel", () => {
 
 describe("DevtoolsPanelContent", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
   });
 
   it("should render timeline content when activeTab is timeline", () => {

@@ -72,14 +72,14 @@ The main devtools component that renders the toggle button and panel.
 
 #### Props
 
-| Prop               | Type                 | Default     | Description                                                    |
-| ------------------ | -------------------- | ----------- | -------------------------------------------------------------- |
-| `position`         | `DevtoolsPosition`   | `"right"`   | Position of the toggle button and panel                        |
-| `defaultOpen`      | `boolean`            | `false`     | Whether the panel is open by default                           |
-| `maxEvents`        | `number`             | `200`       | Maximum number of events to store in history                   |
-| `stuckThresholdMs` | `number`             | `10000`     | Age (ms) after which an active blocker is flagged as stuck     |
-| `showInProduction` | `boolean`            | `false`     | Whether to show devtools in production                         |
-| `store`            | `UIBlockingStoreApi` | `undefined` | Blocking store to observe instead of the global store          |
+| Prop               | Type                 | Default     | Description                                                |
+| ------------------ | -------------------- | ----------- | ---------------------------------------------------------- |
+| `position`         | `DevtoolsPosition`   | `"right"`   | Position of the toggle button and panel                    |
+| `defaultOpen`      | `boolean`            | `false`     | Whether the panel is open by default                       |
+| `maxEvents`        | `number`             | `200`       | Maximum number of events to store in history               |
+| `stuckThresholdMs` | `number`             | `10000`     | Age (ms) after which an active blocker is flagged as stuck |
+| `showInProduction` | `boolean`            | `false`     | Whether to show devtools in production                     |
+| `store`            | `UIBlockingStoreApi` | `undefined` | Blocking store to observe instead of the global store      |
 
 #### Position Options
 
@@ -110,11 +110,25 @@ The main devtools component that renders the toggle button and panel.
 
 ```jsx
 import { UIBlockingProvider, useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
-import { ActionGuardDevtools } from "@okyrychenko-dev/react-action-guard-devtools";
+import {
+  ActionGuardDevtools,
+  ActionGuardDevtoolsProvider,
+  useDevtoolsStore,
+} from "@okyrychenko-dev/react-action-guard-devtools";
+
+function ObservedEventCount() {
+  const count = useDevtoolsStore((state) => state.events.length);
+  return <span>{count} observed events</span>;
+}
 
 function DevtoolsWithProvider() {
   const store = useUIBlockingContext();
-  return <ActionGuardDevtools store={store} />;
+  return (
+    <ActionGuardDevtoolsProvider store={store}>
+      <ActionGuardDevtools store={store} />
+      <ObservedEventCount />
+    </ActionGuardDevtoolsProvider>
+  );
 }
 
 function App() {
@@ -128,10 +142,22 @@ function App() {
 ```
 
 `store` changes which blocking store is observed and where middleware is registered.
-Devtools panel state and event history remain shared inside the devtools package.
-Multiple devtools instances can safely observe the same store: they share one middleware
-registration, so events are not duplicated and the middleware remains active until the last
-instance unmounts.
+Each blocking store has an isolated observation session containing its Devtools panel state and
+event history. Multiple Devtools instances observing the same store share that session and one
+middleware registration, so events are not duplicated and the middleware remains active until the
+last instance unmounts. When the final custom-store observer unmounts, its session is discarded.
+The default global compatibility session remains available to the public hook and manual
+middleware factory, while its observation-specific state is cleared between mounted observers.
+
+The first panel observing a store establishes the shared `defaultOpen` and `maxEvents`
+configuration. Later panels with conflicting values do not overwrite it and produce a development
+warning.
+
+Wrap a custom-store panel and adjacent `useDevtoolsStore` consumers in
+`ActionGuardDevtoolsProvider`. The provider binds the public hook to that store's observation
+session and keeps the session active for the lifetime of its subtree. In production it passes
+children through without allocating observation resources unless `showInProduction` is enabled on
+the provider.
 
 ## Advanced Usage
 
@@ -153,6 +179,13 @@ uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middl
 // Later, unregister if needed
 uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
 ```
+
+If automatic observation finds this manual registration on the global blocking store, it keeps the
+caller-owned middleware, records each event once, and emits a development warning. On a custom
+blocking store, automatic observation always uses a separately named, session-specific
+registration because `createDevtoolsMiddleware()` targets the global compatibility session. This
+keeps the custom panel active even when manual middleware is registered after it mounts. Unmounting
+the automatic panel removes only its own registration and never unregisters the manual middleware.
 
 ### Accessing Devtools Store
 
@@ -274,7 +307,8 @@ When the panel is open (and focus is not in an input or editable element):
 
 ### Persistence
 
-UI preferences are persisted to `localStorage` and restored across reloads:
+UI preferences are persisted to `localStorage` and restored across reloads and new custom-store
+observation sessions:
 
 - Minimized state
 - Active tab

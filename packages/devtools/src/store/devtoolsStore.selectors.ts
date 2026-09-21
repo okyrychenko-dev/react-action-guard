@@ -1,4 +1,4 @@
-import { isNumber, isString } from "@okyrychenko-dev/type-utils";
+import { isDefined, isNumber, isString } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent, DevtoolsEventStats, DevtoolsFilter, DevtoolsStore } from "../types";
 
 type ScopeValue = string | ReadonlyArray<string> | undefined;
@@ -6,59 +6,44 @@ type ScopeValue = string | ReadonlyArray<string> | undefined;
 /** Number of most-frequent scopes surfaced by the stats selector. */
 const TOP_SCOPES_LIMIT = 5;
 
-function createMemoizedSelector<TState, TFirstInput, TSecondInput, TResult>(
+function createMemoizedSelector<TState extends object, TFirstInput, TSecondInput, TResult>(
   selectFirstInput: (state: TState) => TFirstInput,
   selectSecondInput: (state: TState) => TSecondInput,
   compute: (firstInput: TFirstInput, secondInput: TSecondInput) => TResult
 ): (state: TState) => TResult {
-  let hasPreviousResult = false;
-  let previousFirstInput: TFirstInput;
-  let previousSecondInput: TSecondInput;
-  let previousResult: TResult;
+  const results = new WeakMap<TState, TResult>();
 
   return (state) => {
-    const firstInput = selectFirstInput(state);
-    const secondInput = selectSecondInput(state);
+    const previousResult = results.get(state);
 
-    if (
-      hasPreviousResult &&
-      previousFirstInput === firstInput &&
-      previousSecondInput === secondInput
-    ) {
+    if (isDefined(previousResult)) {
       return previousResult;
     }
 
-    const result = compute(firstInput, secondInput);
+    const result = compute(selectFirstInput(state), selectSecondInput(state));
 
-    hasPreviousResult = true;
-    previousFirstInput = firstInput;
-    previousSecondInput = secondInput;
-    previousResult = result;
+    results.set(state, result);
 
     return result;
   };
 }
 
-function createMemoizedSingleInputSelector<TState, TInput, TResult>(
+function createMemoizedSingleInputSelector<TState extends object, TInput, TResult>(
   selectInput: (state: TState) => TInput,
   compute: (input: TInput) => TResult
 ): (state: TState) => TResult {
-  let hasPreviousResult = false;
-  let previousInput: TInput;
-  let previousResult: TResult;
+  const results = new WeakMap<TState, TResult>();
 
   return (state) => {
-    const input = selectInput(state);
+    const previousResult = results.get(state);
 
-    if (hasPreviousResult && previousInput === input) {
+    if (isDefined(previousResult)) {
       return previousResult;
     }
 
-    const result = compute(input);
+    const result = compute(selectInput(state));
 
-    hasPreviousResult = true;
-    previousInput = input;
-    previousResult = result;
+    results.set(state, result);
 
     return result;
   };

@@ -1,6 +1,7 @@
-import { isArray } from "@okyrychenko-dev/type-utils";
+import { isArray, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
+import type { DevtoolsStoreApi } from "../store";
 
 export const DEVTOOLS_MIDDLEWARE_NAME = "action-guard-devtools";
 
@@ -39,10 +40,11 @@ const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>([
  *
  * // Register manually
  * const middleware = createDevtoolsMiddleware();
- * uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+ * const { registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+ * registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
  *
  * // Cleanup
- * uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+ * unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
  * ```
  *
  * @example
@@ -66,7 +68,9 @@ const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>([
  *
  * @public
  */
-export function createDevtoolsMiddleware(): Middleware {
+export function createDevtoolsMiddlewareForStore(
+  targetDevtoolsStore: DevtoolsStoreApi
+): Middleware {
   // Track add timestamps for duration calculation
   const activeBlockers = new Map<string, TrackedBlocker>();
 
@@ -80,7 +84,7 @@ export function createDevtoolsMiddleware(): Middleware {
     }
 
     const trackedBlocker = activeBlockers.get(blockerId);
-    if (trackedBlocker === undefined) {
+    if (isUndefined(trackedBlocker)) {
       return undefined;
     }
 
@@ -107,7 +111,7 @@ export function createDevtoolsMiddleware(): Middleware {
         activeBlockers.clear();
         break;
       case "clear_scope":
-        if (context.scope !== undefined) {
+        if (isDefined(context.scope)) {
           clearScopedBlockers(context.scope);
         }
         break;
@@ -117,7 +121,7 @@ export function createDevtoolsMiddleware(): Middleware {
   };
 
   return (context: MiddlewareContext): void => {
-    const { addEvent } = devtoolsStoreApi.getState();
+    const { addEvent } = targetDevtoolsStore.getState();
 
     // Track when blockers are added
     if (context.action === "add") {
@@ -143,4 +147,8 @@ export function createDevtoolsMiddleware(): Middleware {
       count: context.count,
     });
   };
+}
+
+export function createDevtoolsMiddleware(): Middleware {
+  return createDevtoolsMiddlewareForStore(devtoolsStoreApi);
 }

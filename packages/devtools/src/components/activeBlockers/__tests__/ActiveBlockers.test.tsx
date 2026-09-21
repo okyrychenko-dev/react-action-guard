@@ -10,7 +10,9 @@ import type { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
 
 describe("ActiveBlockers", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
   });
 
   it("should render empty state when no blockers", () => {
@@ -21,7 +23,9 @@ describe("ActiveBlockers", () => {
   });
 
   it("should render blockers list when blockers exist", () => {
-    uiBlockingStoreApi.getState().addBlocker("blocker-1", {
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("blocker-1", {
       scope: "test",
       reason: "Loading data",
       priority: 20,
@@ -34,7 +38,9 @@ describe("ActiveBlockers", () => {
   });
 
   it("should flag a blocker as stuck once it crosses the threshold", () => {
-    uiBlockingStoreApi.getState().addBlocker("blocker-1", {
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("blocker-1", {
       scope: "test",
       reason: "Loading data",
       priority: 20,

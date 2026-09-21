@@ -1,30 +1,44 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_MAX_EVENTS, DEVTOOLS_STORAGE_KEY } from "../devtoolsStore.constants";
+import { assertDefined } from "@okyrychenko-dev/type-utils";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  DEFAULT_MAX_EVENTS,
+  DEVTOOLS_STORAGE_KEY,
+  DEVTOOLS_STORAGE_VERSION,
+  createDefaultFilter,
+} from "../devtoolsStore.constants";
+import { createDevtoolsPreferenceStorage } from "../devtoolsStore.persistence";
 import { selectEventStats, selectFilteredEvents } from "../devtoolsStore.selectors";
-import { devtoolsStoreApi } from "../devtoolsStore.store";
+import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../devtoolsStore.store";
+import type { StateStorage } from "zustand/middleware";
 import type { DevtoolsEvent, DevtoolsStore } from "../../types";
 
 describe("devtoolsStore", () => {
   beforeEach(() => {
-    // Reset store completely before each test
-    const store = devtoolsStoreApi.getState();
-    store.clearEvents();
-    store.setOpen(false);
-    store.resetFilter();
-    store.setActiveTab("timeline");
-    // Ensure pause is off
-    const currentState = devtoolsStoreApi.getState();
-    if (currentState.isPaused) {
-      store.togglePause();
+    window.localStorage.clear();
+
+    const { clearEvents, resetFilter, setActiveTab, setOpen, toggleMinimized, togglePause } =
+      devtoolsStoreApi.getState();
+
+    clearEvents();
+    setOpen(false);
+    resetFilter();
+    setActiveTab("timeline");
+
+    const { isMinimized, isPaused } = devtoolsStoreApi.getState();
+
+    if (isPaused) {
+      togglePause();
     }
-    if (currentState.isMinimized) {
-      store.toggleMinimized();
+    if (isMinimized) {
+      toggleMinimized();
     }
   });
 
   describe("events management", () => {
     it("should add event to store", () => {
-      devtoolsStoreApi.getState().addEvent({
+      const { addEvent } = devtoolsStoreApi.getState();
+
+      addEvent({
         action: "add",
         blockerId: "test-blocker",
         timestamp: Date.now(),
@@ -113,7 +127,8 @@ describe("devtoolsStore", () => {
         timestamp: 2,
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[1].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[1].id;
       store.selectEvent(selectedEventId);
 
       store.addEvent({
@@ -122,20 +137,28 @@ describe("devtoolsStore", () => {
         timestamp: 3,
       });
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterAdd } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterAdd).toBe(null);
     });
 
     it("should normalize invalid maxEvents values", () => {
       const store = devtoolsStoreApi.getState();
 
       store.setMaxEvents(0);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(1);
+      const { maxEvents: minimumMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(minimumMaxEvents).toBe(1);
 
       store.setMaxEvents(-10);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(1);
+      const { maxEvents: negativeMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(negativeMaxEvents).toBe(1);
 
       store.setMaxEvents(Number.POSITIVE_INFINITY);
-      expect(devtoolsStoreApi.getState().maxEvents).toBe(DEFAULT_MAX_EVENTS);
+      const { maxEvents: infiniteMaxEvents } = devtoolsStoreApi.getState();
+
+      expect(infiniteMaxEvents).toBe(DEFAULT_MAX_EVENTS);
     });
 
     it("should deselect event when maxEvents trims it from the buffer", () => {
@@ -152,12 +175,15 @@ describe("devtoolsStore", () => {
         timestamp: 2,
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[1].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[1].id;
       store.selectEvent(selectedEventId);
 
       store.setMaxEvents(1);
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterTrim } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterTrim).toBe(null);
     });
 
     it("should not add events when paused", () => {
@@ -271,11 +297,14 @@ describe("devtoolsStore", () => {
         config: { scope: "checkout" },
       });
 
-      const selectedEventId = devtoolsStoreApi.getState().events[0].id;
+      const { events } = devtoolsStoreApi.getState();
+      const selectedEventId = events[0].id;
       store.selectEvent(selectedEventId);
       store.setFilter({ scopes: ["profile"] });
 
-      expect(devtoolsStoreApi.getState().selectedEventId).toBe(null);
+      const { selectedEventId: selectedEventIdAfterFilter } = devtoolsStoreApi.getState();
+
+      expect(selectedEventIdAfterFilter).toBe(null);
     });
   });
 
@@ -560,12 +589,57 @@ describe("devtoolsStore", () => {
   });
 
   describe("persistence", () => {
+    it("should preserve the latest preference when another session records an event", () => {
+      window.localStorage.clear();
+
+      const { store: firstSessionStore } = createDevtoolsStoreBindings();
+      const { store: secondSessionStore } = createDevtoolsStoreBindings();
+      const { setActiveTab } = firstSessionStore.getState();
+      const { addEvent } = secondSessionStore.getState();
+
+      setActiveTab("stats");
+      const { activeTab: secondSessionActiveTab } = secondSessionStore.getState();
+
+      expect(secondSessionActiveTab).toBe("timeline");
+
+      addEvent({ action: "add", blockerId: "second-session-blocker", timestamp: 1_000 });
+
+      const { store: reloadedStore } = createDevtoolsStoreBindings();
+      const { activeTab } = reloadedStore.getState();
+
+      expect(activeTab).toBe("stats");
+    });
+
+    it("should merge independently changed filter fields across concurrent sessions", () => {
+      window.localStorage.clear();
+
+      const { store: searchSessionStore } = createDevtoolsStoreBindings();
+      const { store: actionsSessionStore } = createDevtoolsStoreBindings();
+      const { setFilter: setSearchFilter } = searchSessionStore.getState();
+      const { setFilter: setActionsFilter } = actionsSessionStore.getState();
+
+      setSearchFilter({ search: "checkout" });
+
+      const { filter: staleActionsSessionFilter } = actionsSessionStore.getState();
+
+      expect(staleActionsSessionFilter.search).toBe("");
+
+      setActionsFilter({ actions: ["add"] });
+
+      const { store: reloadedStore } = createDevtoolsStoreBindings();
+      const { filter } = reloadedStore.getState();
+
+      expect(filter.search).toBe("checkout");
+      expect(filter.actions).toEqual(["add"]);
+    });
+
     it("should persist UI preferences but never events, open state, or maxEvents", () => {
-      const store = devtoolsStoreApi.getState();
-      store.setOpen(true);
-      store.toggleMinimized();
-      store.setMaxEvents(50);
-      store.addEvent({ action: "add", blockerId: "persist-blocker", timestamp: 1_000 });
+      const { addEvent, setMaxEvents, setOpen, toggleMinimized } = devtoolsStoreApi.getState();
+
+      setOpen(true);
+      toggleMinimized();
+      setMaxEvents(50);
+      addEvent({ action: "add", blockerId: "persist-blocker", timestamp: 1_000 });
 
       const raw = window.localStorage.getItem(DEVTOOLS_STORAGE_KEY);
       expect(raw).not.toBeNull();
@@ -581,6 +655,54 @@ describe("devtoolsStore", () => {
       expect(serialized).not.toContain('"events":');
       expect(serialized).not.toContain('"selectedEventId":');
       expect(serialized).not.toContain('"isPaused":');
+    });
+
+    it("should create an observation-session store when browser storage is unavailable", () => {
+      const localStorage = vi.spyOn(window, "localStorage", "get").mockImplementation(() => {
+        throw new Error("Storage access denied");
+      });
+
+      try {
+        expect(() => createDevtoolsStoreBindings()).not.toThrow();
+      } finally {
+        localStorage.mockRestore();
+      }
+    });
+
+    it("should support asynchronous preference storage and clearing", async () => {
+      const values = new Map<string, string>();
+      const removeItem = vi.fn((name: string): void => {
+        values.delete(name);
+      });
+      const asyncStorage: StateStorage = {
+        getItem: async (name) => values.get(name) ?? null,
+        setItem: (name, value) => {
+          values.set(name, value);
+        },
+        removeItem,
+      };
+      const storage = createDevtoolsPreferenceStorage(() => asyncStorage);
+
+      expect(await storage.getItem(DEVTOOLS_STORAGE_KEY)).toBeNull();
+
+      await storage.setItem(DEVTOOLS_STORAGE_KEY, {
+        state: {
+          isMinimized: false,
+          activeTab: "stats",
+          filter: createDefaultFilter(),
+        },
+        version: DEVTOOLS_STORAGE_VERSION,
+      });
+
+      const persistedValue = await storage.getItem(DEVTOOLS_STORAGE_KEY);
+
+      assertDefined(persistedValue, "Asynchronous storage should retain preferences");
+      expect(persistedValue.state.activeTab).toBe("stats");
+
+      await storage.removeItem(DEVTOOLS_STORAGE_KEY);
+
+      expect(removeItem).toHaveBeenCalledWith(DEVTOOLS_STORAGE_KEY);
+      expect(values.has(DEVTOOLS_STORAGE_KEY)).toBe(false);
     });
   });
 

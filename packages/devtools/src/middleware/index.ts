@@ -1,1 +1,5 @@
-export { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "./devtoolsMiddleware";
+export {
+  DEVTOOLS_MIDDLEWARE_NAME,
+  createDevtoolsMiddleware,
+  createDevtoolsMiddlewareForStore,
+} from "./devtoolsMiddleware";
