@@ -59,6 +59,18 @@ function areFiltersEqual(first: DevtoolsFilter, second: DevtoolsFilter): boolean
   );
 }
 
+function mergeChangedFilter(
+  previous: DevtoolsFilter,
+  next: DevtoolsFilter,
+  persisted: DevtoolsFilter
+): DevtoolsFilter {
+  return {
+    actions: areArraysEqual(previous.actions, next.actions) ? persisted.actions : next.actions,
+    scopes: areArraysEqual(previous.scopes, next.scopes) ? persisted.scopes : next.scopes,
+    search: previous.search === next.search ? persisted.search : next.search,
+  };
+}
+
 function arePreferencesEqual(
   first: PersistedDevtoolsState,
   second: PersistedDevtoolsState
@@ -79,7 +91,7 @@ function mergeChangedPreferences(
     isMinimized:
       previous.isMinimized === next.isMinimized ? persisted.isMinimized : next.isMinimized,
     activeTab: previous.activeTab === next.activeTab ? persisted.activeTab : next.activeTab,
-    filter: areFiltersEqual(previous.filter, next.filter) ? persisted.filter : next.filter,
+    filter: mergeChangedFilter(previous.filter, next.filter, persisted.filter),
   };
 }
 

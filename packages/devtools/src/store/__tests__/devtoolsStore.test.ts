@@ -602,6 +602,29 @@ describe("devtoolsStore", () => {
       expect(activeTab).toBe("stats");
     });
 
+    it("should merge independently changed filter fields across concurrent sessions", () => {
+      window.localStorage.clear();
+
+      const { store: searchSessionStore } = createDevtoolsStoreBindings();
+      const { store: actionsSessionStore } = createDevtoolsStoreBindings();
+      const { setFilter: setSearchFilter } = searchSessionStore.getState();
+      const { setFilter: setActionsFilter } = actionsSessionStore.getState();
+
+      setSearchFilter({ search: "checkout" });
+
+      const { filter: staleActionsSessionFilter } = actionsSessionStore.getState();
+
+      expect(staleActionsSessionFilter.search).toBe("");
+
+      setActionsFilter({ actions: ["add"] });
+
+      const { store: reloadedStore } = createDevtoolsStoreBindings();
+      const { filter } = reloadedStore.getState();
+
+      expect(filter.search).toBe("checkout");
+      expect(filter.actions).toEqual(["add"]);
+    });
+
     it("should persist UI preferences but never events, open state, or maxEvents", () => {
       const { addEvent, setMaxEvents, setOpen, toggleMinimized } = devtoolsStoreApi.getState();
 
