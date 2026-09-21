@@ -6,7 +6,8 @@ import {
 import { assertDefined, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
 import { ReactElement, useState } from "react";
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "../../../middleware";
 import {
   DEFAULT_FILTER,
   DEFAULT_MAX_EVENTS,
@@ -252,6 +253,43 @@ describe("ActionGuardDevtools", () => {
     expect(
       devtoolsStoreApi.getState().events.some((event) => event.blockerId === "blocker-2")
     ).toBe(true);
+  });
+
+  it("should preserve caller-owned manual middleware during automatic observation", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const manualMiddleware = createDevtoolsMiddleware();
+
+    uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
+
+    const devtools = renderWithProviders(<ActionGuardDevtools />);
+
+    act(() => {
+      uiBlockingStoreApi.getState().addBlocker("manual-and-automatic-blocker");
+    });
+
+    expect(
+      devtoolsStoreApi
+        .getState()
+        .events.filter((event) => event.blockerId === "manual-and-automatic-blocker")
+    ).toHaveLength(1);
+    expect(warn).toHaveBeenCalledWith(
+      "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
+        "middleware registration. The manual registration remains authoritative."
+    );
+
+    devtools.unmount();
+
+    act(() => {
+      uiBlockingStoreApi.getState().addBlocker("manual-after-automatic-blocker");
+    });
+
+    expect(
+      devtoolsStoreApi
+        .getState()
+        .events.some((event) => event.blockerId === "manual-after-automatic-blocker")
+    ).toBe(true);
+
+    uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
   });
 
   it("should isolate observation sessions for different custom stores", async () => {

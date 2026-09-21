@@ -22,6 +22,7 @@ export interface ObservationSession {
   configuration: ObservationSessionConfiguration | undefined;
   devtoolsStore: DevtoolsStoreApi;
   observerCount: number;
+  ownsMiddlewareRegistration: boolean;
 }
 
 interface ObservationSessionConfiguration {
@@ -63,6 +64,7 @@ export function getDevtoolsObservationSession(
     configuration: undefined,
     devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
     observerCount: 0,
+    ownsMiddlewareRegistration: false,
   };
 
   observationSessions.set(store, session);
@@ -127,9 +129,21 @@ export function acquireDevtoolsMiddleware(
   if (observerCount === 0) {
     observationSessions.set(store, session);
 
-    const middleware: Middleware = createDevtoolsMiddlewareForStore(session.devtoolsStore);
+    const existingMiddleware = store.getState().middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
 
-    store.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+    if (isDefined(existingMiddleware)) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn(
+          "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
+            "middleware registration. The manual registration remains authoritative."
+        );
+      }
+    } else {
+      const middleware: Middleware = createDevtoolsMiddlewareForStore(session.devtoolsStore);
+
+      store.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+      session.ownsMiddlewareRegistration = true;
+    }
   }
 
   session.observerCount += 1;
@@ -146,10 +160,15 @@ export function acquireDevtoolsMiddleware(
     session.observerCount -= 1;
 
     if (session.observerCount === 0) {
-      observationSessions.delete(store);
+      if (store !== uiBlockingStoreApi) {
+        observationSessions.delete(store);
+      }
       session.configuration = undefined;
 
-      store.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+      if (session.ownsMiddlewareRegistration) {
+        store.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+        session.ownsMiddlewareRegistration = false;
+      }
 
       resetObservationSession(session.devtoolsStore);
     }
