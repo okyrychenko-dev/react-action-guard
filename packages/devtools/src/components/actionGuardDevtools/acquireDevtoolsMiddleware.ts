@@ -1,6 +1,7 @@
+import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { isDefined } from "@okyrychenko-dev/type-utils";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
-import { createDevtoolsStoreBindings } from "../../store";
+import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
 import type { Middleware } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../../store";
 import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
@@ -20,6 +21,11 @@ import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 export interface ObservationSession {
   devtoolsStore: DevtoolsStoreApi;
   observerCount: number;
+}
+
+export interface ResolvedObservationSession {
+  observationSession: ObservationSession;
+  targetStore: UIBlockingStoreApi;
 }
 
 const observationSessions = new WeakMap<UIBlockingStoreApi, ObservationSession>();
@@ -47,6 +53,18 @@ export function getDevtoolsObservationSession(
 
   observationSessions.set(store, session);
   return session;
+}
+
+export function resolveDevtoolsObservationSession(
+  customStore?: UIBlockingStoreApi
+): ResolvedObservationSession {
+  const targetStore = customStore ?? uiBlockingStoreApi;
+  const observationSession = getDevtoolsObservationSession(
+    targetStore,
+    targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
+  );
+
+  return { observationSession, targetStore };
 }
 
 export function acquireDevtoolsMiddleware(

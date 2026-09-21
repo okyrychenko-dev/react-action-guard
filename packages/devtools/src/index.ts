@@ -1,6 +1,6 @@
 // Main component
 export { ActionGuardDevtools, ActionGuardDevtoolsProvider } from "./components";
-export type { ActionGuardDevtoolsProviderProps } from "./components/actionGuardDevtools";
+export type { ActionGuardDevtoolsProviderProps } from "./components";
 
 // Store (for advanced usage)
 export {

@@ -1,7 +1,6 @@
-import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement } from "react";
-import { DevtoolsStoreProvider, devtoolsStoreApi } from "../../store";
-import { getDevtoolsObservationSession } from "./acquireDevtoolsMiddleware";
+import { DevtoolsStoreProvider } from "../../store";
+import { resolveDevtoolsObservationSession } from "./acquireDevtoolsMiddleware";
 import ActionGuardDevtoolsSession from "./ActionGuardDevtoolsSession";
 import type { ActionGuardDevtoolsProps } from "./ActionGuardDevtools.types";
 
@@ -9,13 +8,7 @@ function ActionGuardDevtoolsInternal(
   props: Omit<ActionGuardDevtoolsProps, "showInProduction">
 ): ReactElement {
   const { store: customStore } = props;
-
-  const targetStore = customStore ?? uiBlockingStoreApi;
-
-  const observationSession = getDevtoolsObservationSession(
-    targetStore,
-    targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
-  );
+  const { observationSession, targetStore } = resolveDevtoolsObservationSession(customStore);
 
   return (
     <DevtoolsStoreProvider store={observationSession.devtoolsStore}>

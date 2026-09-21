@@ -29,7 +29,7 @@ type PersistedDevtoolsState = Pick<DevtoolsStore, "isMinimized" | "activeTab" | 
 /**
  * Devtools Store
  *
- * Global Zustand store for managing devtools state across the application.
+ * Zustand store bindings for default and custom observation sessions.
  *
  * Features:
  * - Event history with circular buffer
