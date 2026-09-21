@@ -1,3 +1,12 @@
+import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "@devtools/middleware";
+import {
+  DEFAULT_FILTER,
+  DEFAULT_MAX_EVENTS,
+  DEFAULT_TAB,
+  DEVTOOLS_STORAGE_KEY,
+  devtoolsStoreApi,
+} from "@devtools/store";
+import { renderWithProviders } from "@devtools/test/utils";
 import {
   UIBlockingProvider,
   uiBlockingStoreApi,
@@ -5,20 +14,11 @@ import {
 } from "@okyrychenko-dev/react-action-guard";
 import { assertDefined, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { act, fireEvent, screen, waitFor, within } from "@testing-library/react";
-import { ReactElement, useState } from "react";
+import { ReactElement, StrictMode, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "../../../middleware";
-import {
-  DEFAULT_FILTER,
-  DEFAULT_MAX_EVENTS,
-  DEFAULT_TAB,
-  DEVTOOLS_STORAGE_KEY,
-  devtoolsStoreApi,
-} from "../../../store";
-import { renderWithProviders } from "../../../test/utils";
 import ActionGuardDevtools from "../ActionGuardDevtools";
 import ActionGuardDevtoolsContent from "../ActionGuardDevtoolsContent";
-import type { DevtoolsEvent } from "../../../types";
+import type { DevtoolsEvent } from "@devtools/types";
 
 function resetDevtoolsStore(): void {
   devtoolsStoreApi.setState({
@@ -253,6 +253,67 @@ describe("ActionGuardDevtools", () => {
     expect(
       devtoolsStoreApi.getState().events.some((event) => event.blockerId === "blocker-2")
     ).toBe(true);
+  });
+
+  it("should record each event once in React Strict Mode", () => {
+    renderWithProviders(
+      <StrictMode>
+        <ActionGuardDevtools />
+      </StrictMode>
+    );
+
+    act(() => {
+      uiBlockingStoreApi.getState().addBlocker("strict-mode-blocker");
+    });
+
+    expect(
+      devtoolsStoreApi
+        .getState()
+        .events.filter((event) => event.blockerId === "strict-mode-blocker")
+    ).toHaveLength(1);
+  });
+
+  it("should preserve timeout and remove as separate observed events", () => {
+    vi.useFakeTimers();
+
+    try {
+      renderWithProviders(<ActionGuardDevtools />);
+
+      act(() => {
+        uiBlockingStoreApi.getState().addBlocker("timeout-observation-blocker", {
+          timeout: 1_000,
+        });
+      });
+
+      act(() => {
+        vi.advanceTimersByTime(1_000);
+      });
+
+      const observedActions = devtoolsStoreApi
+        .getState()
+        .events.filter((event) => event.blockerId === "timeout-observation-blocker")
+        .map((event) => event.action);
+
+      expect(observedActions).toEqual(["remove", "timeout", "add"]);
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("should show pre-existing blockers without synthesizing historical events", () => {
+    act(() => {
+      uiBlockingStoreApi.getState().addBlocker("pre-existing-blocker");
+    });
+
+    renderWithProviders(<ActionGuardDevtools defaultOpen={true} />);
+
+    expect(devtoolsStoreApi.getState().events).toHaveLength(0);
+    expect(screen.getByText("No events recorded yet.")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Active Blockers" }));
+
+    expect(screen.getByText("pre-existing-blocker")).toBeInTheDocument();
+    expect(devtoolsStoreApi.getState().events).toHaveLength(0);
   });
 
   it("should preserve caller-owned manual middleware during automatic observation", () => {

@@ -1,6 +1,6 @@
+import { ActionGuardDevtoolsProvider } from "@devtools/components/actionGuardDevtools";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement } from "react";
-import ActionGuardDevtoolsProvider from "../../ActionGuardDevtoolsProvider";
 import DevtoolsStoreConsumer from "./DevtoolsStoreConsumer";
 
 interface ProductionObservationTestAppProps {

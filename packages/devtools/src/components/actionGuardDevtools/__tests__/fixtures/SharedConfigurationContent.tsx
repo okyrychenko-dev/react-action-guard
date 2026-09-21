@@ -1,6 +1,9 @@
+import {
+  ActionGuardDevtools,
+  ActionGuardDevtoolsProvider,
+} from "@devtools/components/actionGuardDevtools";
 import { useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement } from "react";
-import { ActionGuardDevtools, ActionGuardDevtoolsProvider } from "../..";
 import DevtoolsStoreConsumer from "./DevtoolsStoreConsumer";
 
 function SharedConfigurationContent(): ReactElement {

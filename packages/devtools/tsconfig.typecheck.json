@@ -3,6 +3,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
+      "@devtools/*": ["src/*"],
       "@okyrychenko-dev/react-action-guard": ["../core/src/index.ts"]
     },
     "rootDir": ".."

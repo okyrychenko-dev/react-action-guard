@@ -1,12 +1,13 @@
+import { DEVTOOLS_STORAGE_KEY, devtoolsStoreApi } from "@devtools/store";
+import { renderWithProviders } from "@devtools/test/utils";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { fireEvent, screen } from "@testing-library/react";
+import { fireEvent, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { DEVTOOLS_STORAGE_KEY, devtoolsStoreApi } from "../../../store";
-import { renderWithProviders } from "../../../test/utils";
 import {
   CustomObservationTestApp,
   ProductionObservationTestApp,
   SharedConfigurationTestApp,
+  SwitchingObservationTestApp,
 } from "./fixtures";
 
 describe("ActionGuardDevtoolsProvider", () => {
@@ -64,18 +65,73 @@ describe("ActionGuardDevtoolsProvider", () => {
     const persistedPreferences = window.localStorage.getItem(DEVTOOLS_STORAGE_KEY);
 
     expect(persistedPreferences).toContain('"activeTab":"stats"');
-    expect(persistedPreferences).toContain('"search":"persisted custom search"');
+    expect(persistedPreferences).toContain('"search":"provider-blocker"');
     expect(persistedPreferences).toContain('"isMinimized":true');
 
     firstObservation.unmount();
     renderWithProviders(<CustomObservationTestApp />);
 
     expect(screen.getByText("Active preference: stats")).toBeInTheDocument();
-    expect(screen.getByText("Search preference: persisted custom search")).toBeInTheDocument();
+    expect(screen.getByText("Search preference: provider-blocker")).toBeInTheDocument();
     expect(screen.getByText("Minimized preference: minimized")).toBeInTheDocument();
     expect(screen.getByText("Observed events:")).toBeInTheDocument();
     expect(screen.getByText("Configured open state: closed")).toBeInTheDocument();
     expect(screen.getByText("Configured maximum: 200")).toBeInTheDocument();
+  });
+
+  it("should isolate runtime viewing state between custom stores", () => {
+    renderWithProviders(
+      <>
+        <CustomObservationTestApp
+          label="first custom observation"
+          defaultOpen={true}
+          maxEvents={1}
+        />
+        <CustomObservationTestApp
+          label="second custom observation"
+          defaultOpen={false}
+          maxEvents={2}
+        />
+      </>
+    );
+
+    const first = within(screen.getByRole("region", { name: "first custom observation" }));
+    const second = within(screen.getByRole("region", { name: "second custom observation" }));
+
+    fireEvent.click(first.getByRole("button", { name: "Add provider blocker" }));
+    fireEvent.click(second.getByRole("button", { name: "Add provider blocker" }));
+    fireEvent.click(first.getByRole("button", { name: "Set search preference" }));
+    fireEvent.click(first.getByRole("button", { name: "Select first event" }));
+    fireEvent.click(first.getByRole("button", { name: "Pause consumer" }));
+
+    expect(first.getByText("Configured open state: open")).toBeInTheDocument();
+    expect(first.getByText("Configured maximum: 1")).toBeInTheDocument();
+    expect(first.getByText("Search preference: provider-blocker")).toBeInTheDocument();
+    expect(first.getByText("Selected event: selected")).toBeInTheDocument();
+    expect(first.getByRole("button", { name: "Resume consumer" })).toBeInTheDocument();
+
+    expect(second.getByText("Configured open state: closed")).toBeInTheDocument();
+    expect(second.getByText("Configured maximum: 2")).toBeInTheDocument();
+    expect(second.getByText("Search preference:")).toBeInTheDocument();
+    expect(second.getByText("Selected event: none")).toBeInTheDocument();
+    expect(second.getByRole("button", { name: "Pause consumer" })).toBeInTheDocument();
+  });
+
+  it("should release the old session when the observed store changes", () => {
+    renderWithProviders(<SwitchingObservationTestApp />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Add first-store blocker" }));
+    expect(screen.getByText("Observed events: first-store-blocker")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Switch observed store" }));
+    expect(screen.getByText("Observed events:")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Add first-store blocker" }));
+    expect(screen.getByText("Observed events:")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Add second-store blocker" }));
+    expect(screen.getByText("Observed events: second-store-blocker")).toBeInTheDocument();
+    expect(screen.queryByText(/Observed events:.*first-store-blocker/)).not.toBeInTheDocument();
   });
 
   it("should not observe events in production by default", () => {

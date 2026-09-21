@@ -1,10 +1,19 @@
+import {
+  ActionGuardDevtools,
+  ActionGuardDevtoolsProvider,
+} from "@devtools/components/actionGuardDevtools";
 import { useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement, useRef } from "react";
-import ActionGuardDevtools from "../../ActionGuardDevtools";
-import ActionGuardDevtoolsProvider from "../../ActionGuardDevtoolsProvider";
 import DevtoolsStoreConsumer from "./DevtoolsStoreConsumer";
 
-function CustomObservationContent(): ReactElement {
+interface CustomObservationContentProps {
+  defaultOpen?: boolean;
+  maxEvents?: number;
+}
+
+function CustomObservationContent(props: CustomObservationContentProps): ReactElement {
+  const { defaultOpen, maxEvents } = props;
+
   const store = useUIBlockingContext();
   const blockerNumberRef = useRef(0);
 
@@ -19,7 +28,7 @@ function CustomObservationContent(): ReactElement {
   return (
     <ActionGuardDevtoolsProvider store={store}>
       <button onClick={addBlocker}>Add provider blocker</button>
-      <ActionGuardDevtools store={store} />
+      <ActionGuardDevtools store={store} defaultOpen={defaultOpen} maxEvents={maxEvents} />
       <DevtoolsStoreConsumer />
     </ActionGuardDevtoolsProvider>
   );
