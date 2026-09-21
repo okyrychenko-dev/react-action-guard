@@ -18,6 +18,7 @@ import { ReactElement, StrictMode, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ActionGuardDevtools from "../ActionGuardDevtools";
 import ActionGuardDevtoolsContent from "../ActionGuardDevtoolsContent";
+import { ManualCustomObservationContent } from "./fixtures";
 import type { DevtoolsEvent } from "@devtools/types";
 
 function resetDevtoolsStore(): void {
@@ -374,6 +375,37 @@ describe("ActionGuardDevtools", () => {
     ).toBe(true);
 
     unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+  });
+
+  it("should record custom-store events when caller-owned middleware is already registered", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    renderWithProviders(
+      <UIBlockingProvider>
+        <ManualCustomObservationContent />
+      </UIBlockingProvider>
+    );
+
+    await screen.findByText("Action Guard");
+    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("manual-custom-blocker")).toBeInTheDocument();
+    });
+    expect(warn).toHaveBeenCalledWith(
+      "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
+        "Devtools middleware and added a session-specific registration for the custom store."
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Toggle manual custom observation" }));
+    const { clearEvents } = devtoolsStoreApi.getState();
+
+    clearEvents();
+    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
+
+    const { events } = devtoolsStoreApi.getState();
+
+    expect(events.some((event) => event.blockerId === "manual-custom-blocker")).toBe(true);
   });
 
   it("should isolate observation sessions for different custom stores", async () => {
