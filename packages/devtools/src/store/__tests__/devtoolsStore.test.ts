@@ -6,19 +6,23 @@ import type { DevtoolsEvent, DevtoolsStore } from "../../types";
 
 describe("devtoolsStore", () => {
   beforeEach(() => {
-    // Reset store completely before each test
-    const store = devtoolsStoreApi.getState();
-    store.clearEvents();
-    store.setOpen(false);
-    store.resetFilter();
-    store.setActiveTab("timeline");
-    // Ensure pause is off
-    const currentState = devtoolsStoreApi.getState();
-    if (currentState.isPaused) {
-      store.togglePause();
+    window.localStorage.clear();
+
+    const { clearEvents, resetFilter, setActiveTab, setOpen, toggleMinimized, togglePause } =
+      devtoolsStoreApi.getState();
+
+    clearEvents();
+    setOpen(false);
+    resetFilter();
+    setActiveTab("timeline");
+
+    const { isMinimized, isPaused } = devtoolsStoreApi.getState();
+
+    if (isPaused) {
+      togglePause();
     }
-    if (currentState.isMinimized) {
-      store.toggleMinimized();
+    if (isMinimized) {
+      toggleMinimized();
     }
   });
 
@@ -577,12 +581,34 @@ describe("devtoolsStore", () => {
   });
 
   describe("persistence", () => {
+    it("should preserve the latest preference when another session records an event", () => {
+      window.localStorage.clear();
+
+      const { store: firstSessionStore } = createDevtoolsStoreBindings();
+      const { store: secondSessionStore } = createDevtoolsStoreBindings();
+      const { setActiveTab } = firstSessionStore.getState();
+      const { addEvent } = secondSessionStore.getState();
+
+      setActiveTab("stats");
+      const { activeTab: secondSessionActiveTab } = secondSessionStore.getState();
+
+      expect(secondSessionActiveTab).toBe("timeline");
+
+      addEvent({ action: "add", blockerId: "second-session-blocker", timestamp: 1_000 });
+
+      const { store: reloadedStore } = createDevtoolsStoreBindings();
+      const { activeTab } = reloadedStore.getState();
+
+      expect(activeTab).toBe("stats");
+    });
+
     it("should persist UI preferences but never events, open state, or maxEvents", () => {
-      const store = devtoolsStoreApi.getState();
-      store.setOpen(true);
-      store.toggleMinimized();
-      store.setMaxEvents(50);
-      store.addEvent({ action: "add", blockerId: "persist-blocker", timestamp: 1_000 });
+      const { addEvent, setMaxEvents, setOpen, toggleMinimized } = devtoolsStoreApi.getState();
+
+      setOpen(true);
+      toggleMinimized();
+      setMaxEvents(50);
+      addEvent({ action: "add", blockerId: "persist-blocker", timestamp: 1_000 });
 
       const raw = window.localStorage.getItem(DEVTOOLS_STORAGE_KEY);
       expect(raw).not.toBeNull();
