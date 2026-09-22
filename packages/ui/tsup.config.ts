@@ -1,13 +1,6 @@
-import { defineConfig } from "tsup";
+import { createTsupConfig } from "../../config/tsup/config";
 
-export default defineConfig({
+export default createTsupConfig({
   entry: ["src/index.ts"],
-  format: ["cjs", "esm"],
-  dts: true,
-  splitting: false,
-  sourcemap: true,
-  clean: true,
   external: ["@okyrychenko-dev/react-action-guard", "react"],
-  treeshake: true,
-  minify: false,
 });
