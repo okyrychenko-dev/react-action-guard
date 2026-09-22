@@ -1,3 +1,5 @@
+import { execFileSync } from "node:child_process";
+
 import { describe, expect, it } from "vitest";
 import { resolveConfig } from "prettier";
 
@@ -51,6 +53,22 @@ const packageConfigs = [
   },
 ];
 
+const typescriptConfigs = [
+  "packages/core/tsconfig.json",
+  "packages/core/tsconfig.test.json",
+  "packages/devtools/tsconfig.json",
+  "packages/devtools/tsconfig.test.json",
+  "packages/devtools/tsconfig.typecheck.json",
+  "packages/router/tsconfig.json",
+  "packages/router/tsconfig.test.json",
+  "packages/router/tsconfig.typecheck.json",
+  "packages/tanstack/tsconfig.json",
+  "packages/tanstack/tsconfig.test.json",
+  "packages/tanstack/tsconfig.typecheck.json",
+  "packages/ui/tsconfig.json",
+  "packages/ui/tsconfig.typecheck.json",
+];
+
 describe.each(packageConfigs)("$name configuration adapters", ({ eslint, tsup, vitest }) => {
   it("should load the ESLint adapter", () => {
     expect(eslint.length).toBeGreaterThan(0);
@@ -73,5 +91,15 @@ describe("Prettier configuration", () => {
     "examples/enterprise-demo/src/main.tsx",
   ])("should resolve the root policy for %s", async (filePath) => {
     await expect(resolveConfig(filePath)).resolves.toEqual(prettierConfig);
+  });
+});
+
+describe("TypeScript configuration adapters", () => {
+  it.each(typescriptConfigs)("should load %s", (configPath) => {
+    expect(() => {
+      execFileSync("pnpm", ["exec", "tsc", "--showConfig", "--project", configPath], {
+        stdio: "pipe",
+      });
+    }).not.toThrow();
   });
 });
