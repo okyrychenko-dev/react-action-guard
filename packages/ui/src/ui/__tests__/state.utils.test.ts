@@ -1,11 +1,19 @@
 import { describe, expect, it } from "vitest";
 import {
+  normalizeGuardedScope,
   resolveGuardedActionState,
   resolveGuardedFieldState,
   resolveGuardedLinkState,
 } from "../utils";
 
 describe("ui state utils", () => {
+  it("should preserve the guarded scope normalization compatibility export", () => {
+    expect(normalizeGuardedScope(["profile", "billing", "profile"])).toEqual([
+      "billing",
+      "profile",
+    ]);
+  });
+
   it("should resolve blocked action state as disabled", () => {
     expect(
       resolveGuardedActionState({
