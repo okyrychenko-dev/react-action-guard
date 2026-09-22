@@ -7,8 +7,11 @@ import {
 } from "../utils";
 
 describe("ui state utils", () => {
-  it("should default an undefined scope to global", () => {
-    expect(normalizeGuardedScope()).toEqual(["global"]);
+  it("should preserve the guarded scope normalization compatibility export", () => {
+    expect(normalizeGuardedScope(["profile", "billing", "profile"])).toEqual([
+      "billing",
+      "profile",
+    ]);
   });
 
   it("should resolve blocked action state as disabled", () => {

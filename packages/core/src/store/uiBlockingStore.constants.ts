@@ -2,10 +2,7 @@
  * Default values and constants for UI Blocking Store
  */
 
-/**
- * Default scope for blockers
- */
-export const DEFAULT_SCOPE = "global" as const;
+export { DEFAULT_SCOPE } from "./scope";
 
 /**
  * Default reason when none is provided

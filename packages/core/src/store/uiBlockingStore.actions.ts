@@ -1,5 +1,5 @@
+import { scopeAffectsObservation, scopeMatchesTarget } from "./scope";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
-import { matchesScope } from "./uiBlockingStore.utils";
 import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { StateCreator } from "zustand";
 import type { BlockingAction, Middleware, MiddlewareContext } from "../middleware";
@@ -358,7 +358,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     const { activeBlockers } = get();
 
     for (const [, blocker] of activeBlockers) {
-      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: true })) {
+      if (scopeAffectsObservation(blocker.scope, scope)) {
         return true;
       }
     }
@@ -404,7 +404,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     const blockers: Array<BlockerInfo> = [];
 
     for (const [id, blocker] of activeBlockers) {
-      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: true })) {
+      if (scopeAffectsObservation(blocker.scope, scope)) {
         const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
         blockers.push({ id, ...publicBlocker });
       }
@@ -481,7 +481,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     // Clear timeouts for blockers that will be removed
     for (const [, blocker] of activeBlockers) {
-      if (matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: false })) {
+      if (scopeMatchesTarget(blocker.scope, scope)) {
         if (blocker.timeoutId) {
           clearTimeout(blocker.timeoutId);
         }
@@ -493,7 +493,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       const newBlockers = new Map();
 
       for (const [id, blocker] of state.activeBlockers) {
-        if (!matchesScope(blocker.scope, scope, { treatGlobalAsWildcard: false })) {
+        if (!scopeMatchesTarget(blocker.scope, scope)) {
           newBlockers.set(id, blocker);
         }
       }

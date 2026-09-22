@@ -5,6 +5,7 @@ export {
   DEFAULT_SCOPE,
 } from "./uiBlockingStore.constants";
 export { useUIBlockingStore, uiBlockingStoreApi } from "./uiBlockingStore.store";
+export { normalizeScope } from "./scope";
 export type {
   BlockerConfig,
   BlockerInfo,

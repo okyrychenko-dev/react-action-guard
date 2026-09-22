@@ -1,1 +1,1 @@
-export const DEFAULT_GUARDED_SCOPE = "global";
+export { DEFAULT_SCOPE as DEFAULT_GUARDED_SCOPE } from "@okyrychenko-dev/react-action-guard";

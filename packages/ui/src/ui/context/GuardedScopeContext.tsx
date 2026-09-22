@@ -1,5 +1,6 @@
-import { type Optional, isArray } from "@okyrychenko-dev/type-utils";
+import { resolveScope } from "@okyrychenko-dev/react-action-guard";
 import { createContext, useContext, useMemo } from "react";
+import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { ReactNode } from "react";
 import type { GuardedScope } from "../types";
 
@@ -28,10 +29,5 @@ export function useGuardedScope(): Optional<GuardedScope> {
 
 export function useResolvedGuardedScope(explicitScope?: GuardedScope): Optional<GuardedScope> {
   const contextScope = useGuardedScope();
-
-  if (isArray(explicitScope) && explicitScope.length === 0) {
-    return contextScope;
-  }
-
-  return explicitScope ?? contextScope;
+  return resolveScope(explicitScope, contextScope);
 }

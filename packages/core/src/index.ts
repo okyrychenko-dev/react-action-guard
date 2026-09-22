@@ -70,6 +70,14 @@ export {
 // Type-safe scope utilities
 export { createTypedHooks, type TypedHooks } from "./createTypedHooks";
 export type { BlockerConfigTyped, DefaultScopes, ScopeValue } from "./types";
+export {
+  DEFAULT_SCOPE,
+  normalizeScope,
+  resolveScope,
+  scopeAffectsObservation,
+  scopeMatchesTarget,
+} from "./store/scope";
+export type { Scope } from "./store/scope";
 
 // Context / Provider
 export {

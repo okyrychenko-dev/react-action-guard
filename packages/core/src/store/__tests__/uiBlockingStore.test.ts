@@ -191,6 +191,14 @@ describe("uiBlockingStore", () => {
       expect(isBlocked("any-scope")).toBe(true);
     });
 
+    it("should return false for an empty observed scope when global blocker exists", () => {
+      const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
+
+      addBlocker("test-blocker", { scope: DEFAULT_SCOPE });
+
+      expect(isBlocked([])).toBe(false);
+    });
+
     it("should return true for any scope when an array-form global blocker exists", () => {
       const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
 

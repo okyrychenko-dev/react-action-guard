@@ -1,6 +1,5 @@
-import { isString } from "@okyrychenko-dev/type-utils";
 import { shallow } from "zustand/shallow";
-import { DEFAULT_SCOPE } from "../../store";
+import { normalizeScope } from "../../store";
 import type { BlockerConfig } from "../../store";
 
 type BlockerConfigSnapshotValue = string | number | BlockerConfig["onTimeout"] | undefined;
@@ -25,20 +24,8 @@ export function createBlockerConfig(config: {
   };
 }
 
-function normalizeScopeSnapshot(scope?: string | ReadonlyArray<string>): ReadonlyArray<string> {
-  if (scope === undefined) {
-    return [DEFAULT_SCOPE];
-  }
-
-  if (isString(scope)) {
-    return [scope];
-  }
-
-  return scope;
-}
-
 function getScopeSnapshotKey(scope?: string | ReadonlyArray<string>): string {
-  return JSON.stringify(normalizeScopeSnapshot(scope));
+  return JSON.stringify(normalizeScope(scope));
 }
 
 function toBlockerConfigSnapshot(config: BlockerConfig): ReadonlyArray<BlockerConfigSnapshotValue> {
