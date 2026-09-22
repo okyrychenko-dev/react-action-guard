@@ -1,20 +1,18 @@
 import { fileURLToPath } from "node:url";
-import { defineConfig } from "vitest/config";
 
-export default defineConfig({
+import { createVitestConfig } from "../../config/vitest/config.ts";
+
+export default createVitestConfig({
   resolve: {
     alias: {
       "@devtools": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   test: {
-    globals: true,
-    environment: "happy-dom",
     setupFiles: ["./src/test/setup.ts"],
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
     exclude: ["node_modules", "dist", ".storybook"],
     coverage: {
-      provider: "v8",
       reporter: ["text", "json", "html", "lcov"],
       exclude: [
         "node_modules/",
