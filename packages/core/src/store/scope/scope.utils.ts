@@ -87,13 +87,17 @@ export function resolveScope(explicitScope?: Scope, inheritedScope?: Scope): Opt
  * A global blocker affects every observed scope and otherwise any shared scope is a match.
  */
 export function scopeAffectsObservation(blockerScope: Scope, observedScope: Scope): boolean {
+  const observedScopes = normalizeScope(observedScope);
+
+  if (!isNonEmptyArray(observedScopes)) {
+    return false;
+  }
+
   const blockerScopes = normalizeScope(blockerScope);
 
   if (blockerScopes.includes(DEFAULT_SCOPE)) {
     return true;
   }
-
-  const observedScopes = normalizeScope(observedScope);
 
   return observedScopes.some((scope) => blockerScopes.includes(scope));
 }

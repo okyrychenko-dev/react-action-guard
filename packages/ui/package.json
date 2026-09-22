@@ -60,7 +60,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@okyrychenko-dev/react-action-guard": "^1.0.4",
+    "@okyrychenko-dev/react-action-guard": "workspace:^",
     "react": "^18.0.0 || ^19.0.0"
   },
   "devDependencies": {

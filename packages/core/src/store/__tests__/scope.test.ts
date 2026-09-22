@@ -74,6 +74,12 @@ describe("scope", () => {
       observed: ["settings", "profile"],
       expected: true,
     },
+    {
+      label: "global for an empty observed list",
+      blocker: "global",
+      observed: [],
+      expected: false,
+    },
     { label: "an empty observed list", blocker: "profile", observed: [], expected: false },
   ])("$label", ({ blocker, expected, observed }) => {
     it("should apply ordinary observation semantics", () => {
