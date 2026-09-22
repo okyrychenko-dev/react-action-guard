@@ -59,6 +59,7 @@ const typescriptConfigs = [
   "packages/devtools/tsconfig.json",
   "packages/devtools/tsconfig.test.json",
   "packages/devtools/tsconfig.typecheck.json",
+  "packages/docs/tsconfig.typedoc.json",
   "packages/router/tsconfig.json",
   "packages/router/tsconfig.test.json",
   "packages/router/tsconfig.typecheck.json",
