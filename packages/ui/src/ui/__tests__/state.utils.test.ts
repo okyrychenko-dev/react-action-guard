@@ -1,16 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
-  normalizeGuardedScope,
   resolveGuardedActionState,
   resolveGuardedFieldState,
   resolveGuardedLinkState,
 } from "../utils";
 
 describe("ui state utils", () => {
-  it("should default an undefined scope to global", () => {
-    expect(normalizeGuardedScope()).toEqual(["global"]);
-  });
-
   it("should resolve blocked action state as disabled", () => {
     expect(
       resolveGuardedActionState({

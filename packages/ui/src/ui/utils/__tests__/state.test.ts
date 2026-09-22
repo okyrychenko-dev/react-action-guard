@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import {
-  normalizeGuardedScope,
   resolveGuardedActionState,
   resolveGuardedFieldState,
   resolveGuardedGroupState,
@@ -8,38 +7,6 @@ import {
 } from "../state";
 
 describe("state utils", () => {
-  it("should normalize an undefined scope to global", () => {
-    expect(normalizeGuardedScope()).toEqual(["global"]);
-  });
-
-  it("should normalize a string scope", () => {
-    expect(normalizeGuardedScope("profile")).toEqual(["profile"]);
-  });
-
-  it("should remove duplicate scopes and sort them", () => {
-    expect(normalizeGuardedScope(["profile", "billing", "profile"])).toEqual([
-      "billing",
-      "profile",
-    ]);
-  });
-
-  it("should reuse normalized scope references for equivalent scope arrays", () => {
-    const firstScope = normalizeGuardedScope(["profile", "billing"]);
-    const secondScope = normalizeGuardedScope(["billing", "profile"]);
-
-    expect(secondScope).toBe(firstScope);
-  });
-
-  it("should evict the oldest normalized scope when the cache is full", () => {
-    const firstScope = normalizeGuardedScope("cache-scope-0");
-
-    for (let index = 1; index <= 256; index += 1) {
-      normalizeGuardedScope(["cache-scope", String(index)].join("-"));
-    }
-
-    expect(normalizeGuardedScope("cache-scope-0")).not.toBe(firstScope);
-  });
-
   it("should resolve each blocked action state", () => {
     expect(resolveGuardedActionState({ blockedState: "disabled", isBlocked: true })).toEqual({
       disabled: true,

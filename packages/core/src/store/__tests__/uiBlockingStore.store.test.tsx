@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { uiBlockingStoreApi, useUIBlockingStore } from "../uiBlockingStore.store";
-import { createShallowStore, normalizeScopeToArray } from "../uiBlockingStore.utils";
+import { createShallowStore } from "../uiBlockingStore.utils";
 
 interface TestStoreState {
   count: number;
@@ -98,19 +98,5 @@ describe("createShallowStore", () => {
     });
 
     expect(result.current.count).toBe(1);
-  });
-});
-
-describe("normalizeScopeToArray", () => {
-  it("wraps a single scope into an array", () => {
-    expect(normalizeScopeToArray("global")).toEqual(["global"]);
-  });
-
-  it("returns a copied array for readonly scope arrays", () => {
-    const scopes = ["a", "b"] as const;
-    const normalized = normalizeScopeToArray(scopes);
-
-    expect(normalized).toEqual(["a", "b"]);
-    expect(normalized).not.toBe(scopes);
   });
 });

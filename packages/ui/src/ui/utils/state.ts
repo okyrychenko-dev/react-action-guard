@@ -1,5 +1,5 @@
-import { type Optional, assertNever, isString } from "@okyrychenko-dev/type-utils";
-import { DEFAULT_GUARDED_SCOPE } from "../constants";
+import { normalizeScope } from "@okyrychenko-dev/react-action-guard";
+import { type Optional, assertNever } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedActionBlockedState,
   GuardedActionState,
@@ -9,9 +9,6 @@ import type {
   GuardedLinkState,
   GuardedScope,
 } from "../types";
-
-const normalizedScopeCache = new Map<string, ReadonlyArray<string>>();
-const NORMALIZED_SCOPE_CACHE_MAX_SIZE = 256;
 
 function mergeWithBlockedFlag(value: Optional<boolean>, isBlocked: boolean): boolean {
   return (value ?? false) || isBlocked;
@@ -33,59 +30,8 @@ function blockedLinkTabIndex(isDisabled: boolean, removeFromTabOrder?: boolean):
   return undefined;
 }
 
-function getNormalizedScopeCacheKey(scopes: ReadonlyArray<string>): string {
-  return JSON.stringify([...scopes].sort());
-}
-
-function normalizeScopeList(scopes: ReadonlyArray<string>): ReadonlyArray<string> {
-  return [...new Set(scopes)].sort();
-}
-
-function refreshNormalizedScopeCacheEntry(
-  cacheKey: string,
-  scopes: ReadonlyArray<string>
-): ReadonlyArray<string> {
-  normalizedScopeCache.delete(cacheKey);
-  normalizedScopeCache.set(cacheKey, scopes);
-  return scopes;
-}
-
-function evictOldestNormalizedScopeCacheEntry(): void {
-  for (const cacheKey of normalizedScopeCache.keys()) {
-    normalizedScopeCache.delete(cacheKey);
-    break;
-  }
-}
-
-function getCachedNormalizedScope(scopes: ReadonlyArray<string>): ReadonlyArray<string> {
-  const cacheKey = getNormalizedScopeCacheKey(scopes);
-  const cachedScope = normalizedScopeCache.get(cacheKey);
-
-  if (cachedScope !== undefined) {
-    return refreshNormalizedScopeCacheEntry(cacheKey, cachedScope);
-  }
-
-  const normalizedScope = normalizeScopeList(scopes);
-
-  normalizedScopeCache.set(cacheKey, normalizedScope);
-
-  if (normalizedScopeCache.size > NORMALIZED_SCOPE_CACHE_MAX_SIZE) {
-    evictOldestNormalizedScopeCacheEntry();
-  }
-
-  return normalizedScope;
-}
-
 export function normalizeGuardedScope(scope?: GuardedScope): ReadonlyArray<string> {
-  if (scope === undefined) {
-    return getCachedNormalizedScope([DEFAULT_GUARDED_SCOPE]);
-  }
-
-  if (isString(scope)) {
-    return getCachedNormalizedScope([scope]);
-  }
-
-  return getCachedNormalizedScope(scope);
+  return normalizeScope(scope);
 }
 
 export function resolveGuardedActionState(params: {

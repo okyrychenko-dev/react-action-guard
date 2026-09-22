@@ -1,12 +1,6 @@
-import { isString } from "@okyrychenko-dev/type-utils";
 import { StateCreator, StoreApi, StoreMutators, createStore, useStore } from "zustand";
 import { useShallow } from "zustand/react/shallow";
-import { DEFAULT_SCOPE } from "./uiBlockingStore.constants";
 import { ShallowStoreBindings } from "./uiBlockingStore.types";
-
-interface MatchesScopeOptions {
-  treatGlobalAsWildcard: boolean;
-}
 
 /**
  * Creates a Zustand store with automatic shallow comparison for all selectors
@@ -45,35 +39,4 @@ export function createShallowStore<
   }
 
   return { useStore: useScopedStore, useStoreApi: storeApi };
-}
-
-/**
- * Normalize scope to array format
- *
- * @param scope - Single scope or array of scopes
- * @returns Array of scopes
- *
- * @internal
- */
-export function normalizeScopeToArray(scope: string | ReadonlyArray<string>): Array<string> {
-  if (isString(scope)) {
-    return [scope];
-  }
-  return Array.from(scope);
-}
-
-export function matchesScope(
-  blockerScope: string | ReadonlyArray<string>,
-  queryScope: string | ReadonlyArray<string>,
-  options: MatchesScopeOptions
-): boolean {
-  const blockerScopes = normalizeScopeToArray(blockerScope);
-  const queryScopes = normalizeScopeToArray(queryScope);
-  const { treatGlobalAsWildcard } = options;
-
-  if (blockerScopes.includes(DEFAULT_SCOPE)) {
-    return treatGlobalAsWildcard;
-  }
-
-  return queryScopes.some((scope) => blockerScopes.includes(scope));
 }
