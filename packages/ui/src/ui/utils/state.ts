@@ -45,6 +45,7 @@ export function resolveGuardedActionState(params: {
   switch (blockedState) {
     case "disabled": {
       const resolvedDisabled = mergeWithBlockedFlag(disabled, isBlocked);
+
       return {
         disabled: resolvedDisabled,
         loading: loading === true,
@@ -55,6 +56,7 @@ export function resolveGuardedActionState(params: {
     case "loading": {
       const resolvedLoading = mergeWithBlockedFlag(loading, isBlocked);
       const resolvedDisabled = mergeWithBlockedFlag(disabled, isBlocked);
+
       return {
         disabled: resolvedDisabled,
         loading: resolvedLoading,
@@ -86,6 +88,7 @@ export function resolveGuardedFieldState(params: {
   switch (blockedState) {
     case "disabled": {
       const resolvedDisabled = mergeWithBlockedFlag(disabled, isBlocked);
+
       return {
         disabled: resolvedDisabled,
         readOnly: readOnly === true,
@@ -97,6 +100,7 @@ export function resolveGuardedFieldState(params: {
     }
     case "readOnly": {
       const resolvedReadOnly = mergeWithBlockedFlag(readOnly, isBlocked);
+
       return {
         disabled: disabled === true,
         readOnly: resolvedReadOnly,
@@ -109,6 +113,7 @@ export function resolveGuardedFieldState(params: {
     case "loading": {
       const resolvedDisabled = mergeWithBlockedFlag(disabled, isBlocked);
       const resolvedLoading = mergeWithBlockedFlag(loading, isBlocked);
+
       return {
         disabled: resolvedDisabled,
         readOnly: readOnly === true,

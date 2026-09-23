@@ -43,6 +43,7 @@ describe("Shared components", () => {
     renderWithProviders(<EventBadge action="add">add</EventBadge>);
 
     const badge = screen.getByText("add");
+
     expect(badge).toHaveAttribute("data-action", "add");
   });
 

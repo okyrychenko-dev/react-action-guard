@@ -10,6 +10,7 @@ import type { GuardedScope, UseTopBlockerReturn } from "../../types";
 
 function toBlockerInfo(id: string, blocker: StoredBlocker): BlockerInfo {
   const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
+
   return { id, ...publicBlocker };
 }
 
@@ -27,6 +28,7 @@ export function useTopBlocker(scope?: GuardedScope): UseTopBlockerReturn {
     }
 
     scopedBlockers.sort((first, second) => second.priority - first.priority);
+
     return scopedBlockers;
   }, [activeBlockers, checkedScopes]);
 

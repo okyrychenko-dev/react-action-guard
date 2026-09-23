@@ -85,20 +85,25 @@ export function handleConfirmation(
     // Sync: immediate result
     if (result) {
       onConfirm?.();
+
       return "confirmed";
     } else {
       onCancel?.();
+
       return "cancelled";
     }
   }
 
   // Default window.confirm (always synchronous)
   const confirmed = window.confirm(message);
+
   if (confirmed) {
     onConfirm?.();
+
     return "confirmed";
   } else {
     onCancel?.();
+
     return "cancelled";
   }
 }

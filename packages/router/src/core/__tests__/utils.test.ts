@@ -9,6 +9,7 @@ describe("utils", () => {
   describe("isThenable", () => {
     it("should return true for thenable objects", () => {
       const thenable = { then: () => undefined };
+
       expect(isThenable(thenable)).toBe(true);
     });
 
@@ -23,6 +24,7 @@ describe("utils", () => {
   describe("resolveConfirmResult", () => {
     it("should use fallback when no custom handler is provided", () => {
       const result = resolveConfirmResult("Leave?", undefined, () => true);
+
       expect(result).toEqual({ kind: "sync", confirmed: true });
     });
 
@@ -32,6 +34,7 @@ describe("utils", () => {
         () => false,
         () => true
       );
+
       expect(result).toEqual({ kind: "sync", confirmed: false });
     });
 
@@ -41,6 +44,7 @@ describe("utils", () => {
         () => Promise.resolve(true),
         () => false
       );
+
       expect(result.kind).toBe("async");
       if (result.kind === "async") {
         await expect(result.promise).resolves.toBe(true);

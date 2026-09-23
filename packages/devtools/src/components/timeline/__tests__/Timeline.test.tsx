@@ -55,6 +55,7 @@ describe("Timeline", () => {
     renderWithProviders(<Timeline />);
 
     const input = screen.getByPlaceholderText("Search by ID or reason...");
+
     fireEvent.change(input, { target: { value: "blocker-2" } });
 
     const { filter } = devtoolsStoreApi.getState();

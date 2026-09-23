@@ -134,6 +134,7 @@ export function createDevtoolsPreferenceStorage(
     value: PersistedStorageValue | null
   ): PersistedStorageValue | null => {
     previousPreferences = getPersistedPreferences(value);
+
     return value;
   };
 
@@ -187,6 +188,7 @@ export function createDevtoolsPreferenceStorage(
     },
     removeItem: (name) => {
       previousPreferences = createDefaultPreferences();
+
       return storage.removeItem(name);
     },
   };

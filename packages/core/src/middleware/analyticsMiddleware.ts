@@ -21,12 +21,15 @@ function trackEvent(
     switch (config.provider) {
       case "ga":
         trackGoogleAnalytics(context.action, eventData);
+
         return;
       case "mixpanel":
         trackMixpanel(context.action, eventData);
+
         return;
       case "amplitude":
         trackAmplitude(context.action, eventData);
+
         return;
     }
   }

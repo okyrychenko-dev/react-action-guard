@@ -15,23 +15,27 @@ describe("useScheduledBlocker.utils", () => {
     it("should parse ISO string to timestamp", () => {
       const isoString = "2024-01-15T10:00:00Z";
       const result = parseDate(isoString);
+
       expect(result).toBe(new Date(isoString).getTime());
     });
 
     it("should parse Date object to timestamp", () => {
       const date = new Date("2024-01-15T10:00:00Z");
       const result = parseDate(date);
+
       expect(result).toBe(date.getTime());
     });
 
     it("should return timestamp as is", () => {
       const timestamp = 1705315200000;
       const result = parseDate(timestamp);
+
       expect(result).toBe(timestamp);
     });
 
     it("should return NaN for invalid date string", () => {
       const result = parseDate("invalid-date");
+
       expect(Number.isNaN(result)).toBe(true);
     });
   });
@@ -60,6 +64,7 @@ describe("useScheduledBlocker.utils", () => {
       };
 
       const result = calculateEndTime(schedule, startTime);
+
       expect(result).toBe(startTime + 3600000);
     });
 
@@ -71,6 +76,7 @@ describe("useScheduledBlocker.utils", () => {
       };
 
       const result = calculateEndTime(schedule, startTime);
+
       expect(result).toBe(endTime);
     });
 
@@ -82,6 +88,7 @@ describe("useScheduledBlocker.utils", () => {
       };
 
       const result = calculateEndTime(schedule, startTime);
+
       expect(result).toBe(startTime + 3600000);
     });
 
@@ -91,6 +98,7 @@ describe("useScheduledBlocker.utils", () => {
       };
 
       const result = calculateEndTime(schedule, startTime);
+
       expect(result).toBeUndefined();
     });
 
@@ -101,6 +109,7 @@ describe("useScheduledBlocker.utils", () => {
       };
 
       const result = calculateEndTime(schedule, startTime);
+
       expect(result).toBeUndefined();
     });
   });

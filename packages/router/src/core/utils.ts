@@ -24,6 +24,7 @@ export function isThenable<T>(value: unknown): value is PromiseLike<T> {
   if (!hasThen(value)) {
     return false;
   }
+
   return isFunction(value.then);
 }
 
@@ -52,6 +53,7 @@ export function resolveConfirmResult(
   }
 
   const result = onConfirm(message);
+
   if (isThenable<boolean>(result)) {
     return { kind: "async", promise: Promise.resolve(result) };
   }
@@ -69,6 +71,7 @@ export function resolveConfirmResult(
 export function createBlockerId(prefix: string, scope?: string | Array<string>): string {
   const scopePart = scope ? `-${isArray(scope) ? scope.join("-") : scope}` : "";
   const timestamp = String(Date.now());
+
   return `${prefix}${scopePart}-${timestamp}`;
 }
 
@@ -90,5 +93,6 @@ export function normalizeScope(scope: Optional<string | Array<string>>): Array<s
   if (!scope) {
     return [];
   }
+
   return isArray(scope) ? scope : [scope];
 }

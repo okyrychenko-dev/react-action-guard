@@ -13,6 +13,7 @@ vi.mock("react-router-dom", () => ({
 
 vi.mock("../../core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../core")>();
+
   return {
     ...actual,
     useShouldBlock: vi.fn(),
@@ -161,6 +162,7 @@ describe("useNavigationBlocker (React Router)", () => {
     it("should proceed after async confirmation resolves true", async () => {
       mockUseShouldBlock.mockReturnValue(true);
       const blocker = createBlockerMock("blocked");
+
       mockUseBlocker.mockReturnValue(blocker);
 
       let resolveConfirm: (value: boolean) => void = () => undefined;
@@ -178,10 +180,12 @@ describe("useNavigationBlocker (React Router)", () => {
       );
 
       const blockerFn = mockUseBlocker.mock.calls[0][0];
+
       if (!isNoArgBlocker(blockerFn)) {
         throw new Error("Expected no-arg blocker function");
       }
       let result = false;
+
       act(() => {
         result = blockerFn();
       });
@@ -199,6 +203,7 @@ describe("useNavigationBlocker (React Router)", () => {
     it("should reset after async confirmation resolves false", async () => {
       mockUseShouldBlock.mockReturnValue(true);
       const blocker = createBlockerMock("blocked");
+
       mockUseBlocker.mockReturnValue(blocker);
 
       let resolveConfirm: (value: boolean) => void = () => undefined;
@@ -216,11 +221,13 @@ describe("useNavigationBlocker (React Router)", () => {
       );
 
       const blockerFn = mockUseBlocker.mock.calls[0][0];
+
       if (!isNoArgBlocker(blockerFn)) {
         throw new Error("Expected no-arg blocker function");
       }
 
       let result = false;
+
       act(() => {
         result = blockerFn();
       });
@@ -239,6 +246,7 @@ describe("useNavigationBlocker (React Router)", () => {
     it("should reset after async confirmation rejects", async () => {
       mockUseShouldBlock.mockReturnValue(true);
       const blocker = createBlockerMock("blocked");
+
       mockUseBlocker.mockReturnValue(blocker);
 
       let rejectConfirm: (value: Error) => void = () => undefined;
@@ -256,11 +264,13 @@ describe("useNavigationBlocker (React Router)", () => {
       );
 
       const blockerFn = mockUseBlocker.mock.calls[0][0];
+
       if (!isNoArgBlocker(blockerFn)) {
         throw new Error("Expected no-arg blocker function");
       }
 
       let result = false;
+
       act(() => {
         result = blockerFn();
       });
@@ -283,6 +293,7 @@ describe("useNavigationBlocker (React Router)", () => {
     it("should block when sync confirmation returns false", () => {
       mockUseShouldBlock.mockReturnValue(true);
       const blocker = createBlockerMock("blocked");
+
       mockUseBlocker.mockReturnValue(blocker);
 
       const onConfirm = vi.fn(() => false);
@@ -298,11 +309,13 @@ describe("useNavigationBlocker (React Router)", () => {
       );
 
       const blockerFn = mockUseBlocker.mock.calls[0][0];
+
       if (!isNoArgBlocker(blockerFn)) {
         throw new Error("Expected no-arg blocker function");
       }
 
       let result = false;
+
       act(() => {
         result = blockerFn();
       });

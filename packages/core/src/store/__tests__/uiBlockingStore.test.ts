@@ -35,6 +35,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker", { scope: "test", priority: 100 });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.priority).toBe(100);
     });
@@ -45,6 +46,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker", { scope: "test", reason: "Custom reason" });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Custom reason");
     });
@@ -66,6 +68,7 @@ describe("uiBlockingStore", () => {
       addBlocker("blocker2", { scope: "test" });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(2);
     });
 
@@ -75,6 +78,7 @@ describe("uiBlockingStore", () => {
       addBlocker("negative-priority", { scope: "test", priority: -100 });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(0);
     });
 
@@ -84,6 +88,7 @@ describe("uiBlockingStore", () => {
       addBlocker("positive-priority", { scope: "test", priority: 250 });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(250);
     });
 
@@ -93,6 +98,7 @@ describe("uiBlockingStore", () => {
       addBlocker("zero-priority", { scope: "test", priority: 0 });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(0);
     });
   });
@@ -105,6 +111,7 @@ describe("uiBlockingStore", () => {
       updateBlocker("test-blocker", { reason: "Updated", priority: 50 });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Updated");
       expect(info[0]?.priority).toBe(50);
@@ -125,6 +132,7 @@ describe("uiBlockingStore", () => {
       updateBlocker("test-blocker", { priority: -200 });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(0);
     });
 
@@ -135,6 +143,7 @@ describe("uiBlockingStore", () => {
       updateBlocker("test-blocker", { priority: 300 });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(300);
     });
   });
@@ -231,6 +240,7 @@ describe("uiBlockingStore", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(0);
     });
 
@@ -244,6 +254,7 @@ describe("uiBlockingStore", () => {
       });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]).toMatchObject({
         id: "test-blocker",
@@ -259,6 +270,7 @@ describe("uiBlockingStore", () => {
       addBlocker("global-blocker", { scope: DEFAULT_SCOPE });
 
       const info = getBlockingInfo("any-scope");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.id).toBe("global-blocker");
     });
@@ -269,6 +281,7 @@ describe("uiBlockingStore", () => {
       addBlocker("global-blocker", { scope: [DEFAULT_SCOPE] });
 
       const info = getBlockingInfo("any-scope");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.id).toBe("global-blocker");
     });
@@ -281,6 +294,7 @@ describe("uiBlockingStore", () => {
       addBlocker("medium-priority", { scope: "test", priority: 50 });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(3);
       expect(info[0]?.id).toBe("high-priority");
       expect(info[1]?.id).toBe("medium-priority");
@@ -308,6 +322,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker", { scope: "test" });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.timestamp).toBeGreaterThanOrEqual(now);
     });
@@ -425,6 +440,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker");
 
       const info = getBlockingInfo(DEFAULT_SCOPE);
+
       expect(info).toHaveLength(1);
       expect(info[0]?.scope).toBe(DEFAULT_SCOPE);
     });
@@ -435,6 +451,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker", { scope: "test" });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.reason).toBe(DEFAULT_REASON);
     });
 
@@ -444,6 +461,7 @@ describe("uiBlockingStore", () => {
       addBlocker("test-blocker", { scope: "test" });
 
       const info = getBlockingInfo("test");
+
       expect(info[0]?.priority).toBe(DEFAULT_PRIORITY);
     });
   });
@@ -472,6 +490,7 @@ describe("uiBlockingStore", () => {
       addBlocker("duplicate", { scope: "test", priority: 20 });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.priority).toBe(20);
     });
@@ -672,7 +691,9 @@ describe("uiBlockingStore", () => {
 
       uiBlockingStoreApi.setState((state) => {
         const activeBlockers = new Map(state.activeBlockers);
+
         activeBlockers.delete("timeout-blocker");
+
         return { activeBlockers };
       });
 
@@ -744,7 +765,9 @@ describe("uiBlockingStore", () => {
 
       uiBlockingStoreApi.setState((state) => {
         const activeBlockers = new Map(state.activeBlockers);
+
         activeBlockers.delete("timeout-blocker");
+
         return { activeBlockers };
       });
 
@@ -759,6 +782,7 @@ describe("uiBlockingStore", () => {
       addBlocker("timeout-blocker", { scope: "test", timeout: 5000 });
 
       const info = getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.timeout).toBe(5000);
     });

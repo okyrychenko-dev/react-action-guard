@@ -102,7 +102,9 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
   registerMiddleware: (name: string, middleware: Middleware) => {
     set((state) => {
       const newMiddlewares = new Map(state.middlewares);
+
       newMiddlewares.set(name, middleware);
+
       return { middlewares: newMiddlewares };
     });
   },
@@ -110,7 +112,9 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
   unregisterMiddleware: (name: string) => {
     set((state) => {
       const newMiddlewares = new Map(state.middlewares);
+
       newMiddlewares.delete(name);
+
       return { middlewares: newMiddlewares };
     });
   },
@@ -165,6 +169,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
   addBlocker: (id: string, config: BlockerConfig = {}): void => {
     // Clear existing timeout if blocker is being overwritten
     const existingBlocker = get().activeBlockers.get(id);
+
     if (existingBlocker?.timeoutId) {
       clearTimeout(existingBlocker.timeoutId);
     }
@@ -182,6 +187,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
         timeoutId,
         onTimeout: config.onTimeout,
       };
+
       newBlockers.set(id, storedBlocker);
 
       return { activeBlockers: newBlockers };
@@ -229,6 +235,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     if (!existingBlocker) {
       get().addBlocker(id, config);
+
       return;
     }
 
@@ -259,6 +266,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
+
       newBlockers.set(id, updatedBlocker);
 
       return { activeBlockers: newBlockers };
@@ -317,6 +325,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
+
       newBlockers.delete(id);
 
       return { activeBlockers: newBlockers };
@@ -324,6 +333,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     if (prevBlocker) {
       const publicConfig = toPublicBlockerConfig(prevBlocker);
+
       void get().runMiddlewares(createMiddlewareContext("remove", id, publicConfig, publicConfig));
     }
   },
@@ -406,6 +416,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
     for (const [id, blocker] of activeBlockers) {
       if (scopeAffectsObservation(blocker.scope, scope)) {
         const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
+
         blockers.push({ id, ...publicBlocker });
       }
     }

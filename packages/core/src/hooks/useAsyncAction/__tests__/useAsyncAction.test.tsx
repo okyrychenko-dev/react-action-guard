@@ -34,6 +34,7 @@ describe("useAsyncAction", () => {
 
       await waitFor(() => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("test-scope")).toBe(true);
       });
 
@@ -54,6 +55,7 @@ describe("useAsyncAction", () => {
 
     await actAsync(async () => {
       const promise = result.current(asyncFn);
+
       await expect(promise).rejects.toThrow("Test error");
     });
 
@@ -87,6 +89,7 @@ describe("useAsyncAction", () => {
 
       await waitFor(() => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked()).toBe(true);
       });
 
@@ -94,6 +97,7 @@ describe("useAsyncAction", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked()).toBe(false);
   });
 
@@ -112,6 +116,7 @@ describe("useAsyncAction", () => {
 
       await waitFor(() => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("scope1")).toBe(true);
         expect(isBlocked("scope2")).toBe(true);
       });
@@ -120,6 +125,7 @@ describe("useAsyncAction", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("scope1")).toBe(false);
     expect(isBlocked("scope2")).toBe(false);
   });
@@ -140,6 +146,7 @@ describe("useAsyncAction", () => {
       await waitFor(() => {
         const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
+
         expect(info.length).toBeGreaterThan(0);
         expect(info[0]?.priority).toBe(ASYNC_ACTION_PRIORITY);
       });
@@ -164,6 +171,7 @@ describe("useAsyncAction", () => {
       await waitFor(() => {
         const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
+
         expect(info.length).toBeGreaterThan(0);
         expect(info[0]?.reason).toContain("fetch-user");
       });
@@ -190,12 +198,14 @@ describe("useAsyncAction", () => {
 
     await actAsync(async () => {
       const promise1 = result.current(asyncFn1);
+
       await new Promise((resolve) => setTimeout(resolve, 10));
       const promise2 = result.current(asyncFn2);
 
       await waitFor(() => {
         const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test-scope");
+
         expect(info.length).toBe(2);
         expect(info[0]?.id).not.toBe(info[1]?.id);
       });
@@ -350,6 +360,7 @@ describe("useAsyncAction", () => {
 
     // All should be unblocked
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test-scope")).toBe(false);
   });
 
@@ -402,11 +413,13 @@ describe("useAsyncAction", () => {
 
     await actAsync(async () => {
       const promise = result.current(asyncFn);
+
       await expect(promise).rejects.toThrow(error);
     });
 
     // Should be unblocked after error
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test-scope")).toBe(false);
   });
 
@@ -414,6 +427,7 @@ describe("useAsyncAction", () => {
     const { result, rerender } = renderHook(() => useAsyncAction("test-action", "test-scope"));
 
     const firstRef = result.current;
+
     rerender();
     const secondRef = result.current;
 

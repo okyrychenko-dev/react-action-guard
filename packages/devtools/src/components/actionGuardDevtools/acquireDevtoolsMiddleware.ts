@@ -92,6 +92,7 @@ export function getDevtoolsObservationSession(
   };
 
   observationSessions.set(store, session);
+
   return session;
 }
 
@@ -99,6 +100,7 @@ export function resolveDevtoolsObservationSession(
   customStore?: UIBlockingStoreApi
 ): ObservationSession {
   const targetStore = customStore ?? uiBlockingStoreApi;
+
   return getDevtoolsObservationSession(
     targetStore,
     targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
@@ -125,6 +127,7 @@ export function configureDevtoolsObservationSession(
       maxEvents: configuredMaxEvents,
       owner,
     };
+
     return;
   }
 
@@ -138,6 +141,7 @@ export function configureDevtoolsObservationSession(
 
       configuration.maxEvents = configuredMaxEvents;
     }
+
     return;
   }
 

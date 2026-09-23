@@ -27,6 +27,7 @@ function ToggleButton(props: ToggleButtonProps): ReactElement | null {
   const activeBlockers = useStore(targetStore, (state) => state.activeBlockers);
 
   const activeCount = activeBlockers.size;
+
   if (isOpen) {
     return null;
   }

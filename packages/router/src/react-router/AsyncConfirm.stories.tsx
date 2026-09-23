@@ -33,6 +33,7 @@ const AsyncConfirmDemo = (): ReactElement => {
 
   const handleAsyncConfirm = async (message: string): Promise<boolean> => {
     const accepted = await confirm(message);
+
     if (!accepted) {
       return false;
     }

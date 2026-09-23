@@ -63,6 +63,7 @@ function normalizeScopes(scope: ScopeValue): ReadonlyArray<string> {
 
 function getEventScopes(event: DevtoolsEvent): ReadonlyArray<string> {
   const configScopes = normalizeScopes(event.config?.scope);
+
   if (configScopes.length > 0) {
     return configScopes;
   }
@@ -83,6 +84,7 @@ function matchesScopeFilter(event: DevtoolsEvent, scopes: Array<string>): boolea
   }
 
   const eventScopes = getEventScopes(event);
+
   if (eventScopes.length === 0) {
     return false;
   }

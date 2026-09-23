@@ -20,6 +20,7 @@ describe("DevtoolsPanelTabs", () => {
     renderWithProviders(<DevtoolsPanelTabs activeTab="blockers" onSelectTab={vi.fn()} />);
 
     const activeTab = screen.getByText("Active Blockers");
+
     expect(activeTab).toHaveClass(styles.tabActive);
   });
 });

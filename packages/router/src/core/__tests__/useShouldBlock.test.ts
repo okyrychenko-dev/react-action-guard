@@ -25,16 +25,19 @@ describe("useShouldBlock", () => {
   describe("Condition-based blocking", () => {
     it("should return false when no conditions are provided", () => {
       const { result } = renderHook(() => useShouldBlock(undefined, undefined));
+
       expect(result.current).toBe(false);
     });
 
     it('should return true when "when" is true', () => {
       const { result } = renderHook(() => useShouldBlock(true));
+
       expect(result.current).toBe(true);
     });
 
     it('should return false when "when" is false', () => {
       const { result } = renderHook(() => useShouldBlock(false));
+
       expect(result.current).toBe(false);
     });
 
@@ -52,6 +55,7 @@ describe("useShouldBlock", () => {
       const condition = (): boolean => true;
 
       const { rerender } = renderHook(() => useShouldBlock(condition));
+
       rerender();
 
       expect(warnSpy).toHaveBeenCalledOnce();
@@ -134,6 +138,7 @@ describe("useShouldBlock", () => {
       const { result, rerender } = renderHook(() => useShouldBlock(undefined, scope));
 
       const firstResult = result.current;
+
       rerender();
       const secondResult = result.current;
 
@@ -159,11 +164,13 @@ describe("useShouldBlock", () => {
   describe("Edge cases", () => {
     it("should handle undefined scope gracefully", () => {
       const { result } = renderHook(() => useShouldBlock(true, undefined));
+
       expect(result.current).toBe(true);
     });
 
     it("should handle empty array scope", () => {
       const { result } = renderHook(() => useShouldBlock(undefined, []));
+
       expect(result.current).toBe(false);
     });
 

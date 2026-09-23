@@ -22,6 +22,7 @@ describe("UIBlockingProvider", () => {
   describe("useIsInsideUIBlockingProvider", () => {
     it("should return false when outside provider", () => {
       const { result } = renderHook(() => useIsInsideUIBlockingProvider());
+
       expect(result.current).toBe(false);
     });
 
@@ -30,6 +31,7 @@ describe("UIBlockingProvider", () => {
         <UIBlockingProvider>{children}</UIBlockingProvider>
       );
       const { result } = renderHook(() => useIsInsideUIBlockingProvider(), { wrapper });
+
       expect(result.current).toBe(true);
     });
   });
@@ -52,6 +54,7 @@ describe("UIBlockingProvider", () => {
         <UIBlockingProvider>{children}</UIBlockingProvider>
       );
       const { result } = renderHook(() => useUIBlockingContext(), { wrapper });
+
       expect(result.current).toBeDefined();
       expect(result.current.getState).toBeDefined();
       expect(result.current.getState().addBlocker).toBeDefined();
@@ -79,6 +82,7 @@ describe("UIBlockingProvider", () => {
   describe("useResolvedStoreApi", () => {
     it("should return global store when outside provider", () => {
       const { result } = renderHook(() => useResolvedStoreApi());
+
       expect(result.current).toBe(uiBlockingStoreApi);
     });
 
@@ -87,6 +91,7 @@ describe("UIBlockingProvider", () => {
         <UIBlockingProvider>{children}</UIBlockingProvider>
       );
       const { result } = renderHook(() => useResolvedStoreApi(), { wrapper });
+
       // Context store should be different from global store
       expect(result.current).not.toBe(uiBlockingStoreApi);
       expect(result.current.getState).toBeDefined();
@@ -98,6 +103,7 @@ describe("UIBlockingProvider", () => {
       const TestComponent = () => {
         useActionBlocker("provider-blocker", { scope: "test", reason: "Provider test" });
         const isBlocked = useIsBlocked("test");
+
         return <div data-testid="blocked">{isBlocked ? "blocked" : "not-blocked"}</div>;
       };
 
@@ -129,11 +135,13 @@ describe("UIBlockingProvider", () => {
     it("should isolate state between multiple providers", () => {
       const BlockerDisplay = ({ testId }: { testId: string }) => {
         const isBlocked = useIsBlocked("shared-scope");
+
         return <div data-testid={testId}>{isBlocked ? "blocked" : "not-blocked"}</div>;
       };
 
       const Provider1Content = () => {
         useActionBlocker("blocker-1", { scope: "shared-scope", reason: "Provider 1" });
+
         return <BlockerDisplay testId="provider-1" />;
       };
 
@@ -160,6 +168,7 @@ describe("UIBlockingProvider", () => {
 
       function StoreCapture(): null {
         stores.push(useResolvedStoreApi());
+
         return null;
       }
 
@@ -317,7 +326,9 @@ describe("UIBlockingProvider", () => {
 
       const StoreCapture = () => {
         const store = useResolvedStoreApi();
+
         stores.push(store);
+
         return null;
       };
 
@@ -342,6 +353,7 @@ describe("UIBlockingProvider", () => {
 // Helper component for middleware test
 function TestBlockerComponent() {
   useActionBlocker("test-blocker", { scope: "test", reason: "Test" });
+
   return <div data-testid="blocker-test">Test</div>;
 }
 

@@ -27,10 +27,11 @@
     "prepare": "husky"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.11",
     "@eslint/js": "^9.39.1",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "@vitest/coverage-v8": "^4.0.9",
     "@vitest/ui": "^4.0.9",
-    "@changesets/cli": "^2.27.11",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",

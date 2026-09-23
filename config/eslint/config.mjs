@@ -1,4 +1,5 @@
 import eslint from "@eslint/js";
+import stylistic from "@stylistic/eslint-plugin";
 import prettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
 import react from "eslint-plugin-react";
@@ -100,6 +101,7 @@ export function createEslintConfig({ parserOptions, extensions = [] }) {
     },
     {
       plugins: {
+        "@stylistic": stylistic,
         react,
         "react-hooks": reactHooks,
         import: importPlugin,
@@ -120,6 +122,25 @@ export function createEslintConfig({ parserOptions, extensions = [] }) {
     prettier,
     {
       rules: {
+        "@stylistic/padding-line-between-statements": [
+          "error",
+          {
+            blankLine: "always",
+            prev: ["const", "let", "var"],
+            next: "*",
+          },
+          {
+            blankLine: "any",
+            prev: ["const", "let", "var"],
+            next: ["const", "let", "var"],
+          },
+          {
+            blankLine: "always",
+            prev: "*",
+            next: "return",
+          },
+        ],
+        "@stylistic/padded-blocks": ["error", "never"],
         curly: ["error", "all"],
       },
     },

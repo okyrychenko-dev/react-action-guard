@@ -6,8 +6,10 @@ import { act } from "@testing-library/react";
  */
 export async function actAsync<T>(fn: () => Promise<T>): Promise<T> {
   let result!: T;
+
   await act(async () => {
     result = await fn();
   });
+
   return result;
 }

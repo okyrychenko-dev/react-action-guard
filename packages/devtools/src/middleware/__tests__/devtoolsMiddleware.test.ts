@@ -6,6 +6,7 @@ import type { MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 describe("devtoolsMiddleware", () => {
   beforeEach(() => {
     const store = devtoolsStoreApi.getState();
+
     store.clearEvents();
   });
 
@@ -26,6 +27,7 @@ describe("devtoolsMiddleware", () => {
     void middleware(context);
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(1);
     expect(store.events[0].action).toBe("add");
     expect(store.events[0].blockerId).toBe("test-blocker");
@@ -55,10 +57,12 @@ describe("devtoolsMiddleware", () => {
     });
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(2);
 
     // Events are prepended, so remove event is first (index 0)
     const removeEvent = store.events[0];
+
     expect(removeEvent.action).toBe("remove");
     expect(removeEvent.duration).toBe(1000);
   });
@@ -82,6 +86,7 @@ describe("devtoolsMiddleware", () => {
     void middleware(context);
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(1);
     expect(store.events[0].action).toBe("update");
     expect(store.events[0].prevState).toEqual({
@@ -119,11 +124,13 @@ describe("devtoolsMiddleware", () => {
     });
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(3);
 
     const removeEvent = store.events.find(
       (e) => e.action === "remove" && e.blockerId === "blocker-1"
     );
+
     expect(removeEvent?.duration).toBe(500);
   });
 
@@ -139,6 +146,7 @@ describe("devtoolsMiddleware", () => {
     });
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(1);
     expect(store.events[0].duration).toBeUndefined();
   });
@@ -155,6 +163,7 @@ describe("devtoolsMiddleware", () => {
     void middleware(context);
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(1);
     expect(store.events[0].action).toBe("clear");
     expect(store.events[0].blockerId).toBe("*");
@@ -174,6 +183,7 @@ describe("devtoolsMiddleware", () => {
     void middleware(context);
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events).toHaveLength(1);
     expect(store.events[0].action).toBe("clear_scope");
     expect(store.events[0].blockerId).toBe("*");
@@ -209,6 +219,7 @@ describe("devtoolsMiddleware", () => {
     });
 
     const store = devtoolsStoreApi.getState();
+
     expect(store.events[0].action).toBe("remove");
     expect(store.events[0].duration).toBeUndefined();
   });

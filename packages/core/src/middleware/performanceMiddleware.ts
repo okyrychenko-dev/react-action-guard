@@ -23,6 +23,7 @@ function handleRemoveAction(
   }
 
   const duration = context.timestamp - startTime;
+
   blockStartTimes.delete(context.blockerId);
 
   if (duration >= slowBlockThreshold) {

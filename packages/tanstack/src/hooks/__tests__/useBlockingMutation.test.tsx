@@ -58,6 +58,7 @@ describe("useBlockingMutation", () => {
     // Should block during mutation
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -65,6 +66,7 @@ describe("useBlockingMutation", () => {
     await waitFor(
       () => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("test")).toBe(false);
       },
       { timeout: 2000 }
@@ -98,6 +100,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       if (info.length > 0) {
         expect(info[0]?.reason).toBe("Custom mutation message");
       }
@@ -128,6 +131,7 @@ describe("useBlockingMutation", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -139,9 +143,11 @@ describe("useBlockingMutation", () => {
 
     expect(onTimeout).toHaveBeenCalledTimes(1);
     const timedOutId = onTimeout.mock.calls[0]?.[0];
+
     expect(typeof timedOutId).toBe("string");
     expect(timedOutId).toContain('mutation-["save"]-');
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -172,6 +178,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       if (info.length > 0) {
         expect(info[0]?.priority).toBe(50);
       }
@@ -204,6 +211,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       if (info.length > 0) {
         expect(info[0]?.reason).toBe("Saving changes...");
       }
@@ -236,6 +244,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       if (info.length > 0) {
         expect(info[0]?.priority).toBe(30);
       }
@@ -267,6 +276,7 @@ describe("useBlockingMutation", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("scope1")).toBe(true);
       expect(isBlocked("scope2")).toBe(true);
     });
@@ -298,6 +308,7 @@ describe("useBlockingMutation", () => {
     // Wait for blocker to be added
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -305,6 +316,7 @@ describe("useBlockingMutation", () => {
     unmount();
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -363,6 +375,7 @@ describe("useBlockingMutation", () => {
     expect(result.current.data).toBe("data-42");
     expect(mutationFn).toHaveBeenCalledTimes(1);
     const callArgs = mutationFn.mock.calls[0];
+
     expect(callArgs[0]).toEqual({ id: 42 });
   });
 
@@ -392,6 +405,7 @@ describe("useBlockingMutation", () => {
     // Should block during mutation
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -401,6 +415,7 @@ describe("useBlockingMutation", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -437,6 +452,7 @@ describe("useBlockingMutation", () => {
     expect(result.current.data).toBe("data-1");
 
     const { isBlocked: isBlocked1 } = uiBlockingStoreApi.getState();
+
     expect(isBlocked1("test")).toBe(false);
 
     // Second mutation
@@ -444,6 +460,7 @@ describe("useBlockingMutation", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -452,6 +469,7 @@ describe("useBlockingMutation", () => {
     });
 
     const { isBlocked: isBlocked2 } = uiBlockingStoreApi.getState();
+
     expect(isBlocked2("test")).toBe(false);
   });
 
@@ -498,6 +516,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       // Both mutations should create separate blockers
       expect(info.length).toBe(2);
     });
@@ -530,6 +549,7 @@ describe("useBlockingMutation", () => {
     // Should block during mutation
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -541,6 +561,7 @@ describe("useBlockingMutation", () => {
     // Should unblock after mutation completes
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(false);
     });
   });
@@ -571,6 +592,7 @@ describe("useBlockingMutation", () => {
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
     const callArgs = onSuccess.mock.calls[0];
+
     expect(callArgs[0]).toBe("test-data");
     expect(callArgs[1]).toBeUndefined();
     expect(callArgs[2]).toBeUndefined();
@@ -603,6 +625,7 @@ describe("useBlockingMutation", () => {
 
     expect(onError).toHaveBeenCalledTimes(1);
     const callArgs = onError.mock.calls[0];
+
     expect(callArgs[0]).toBe(error);
     expect(callArgs[1]).toBeUndefined();
     expect(callArgs[2]).toBeUndefined();
@@ -635,9 +658,11 @@ describe("useBlockingMutation", () => {
     });
 
     const { isBlocked, getBlockingInfo } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
 
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("Error occurred");
   });
 
@@ -667,6 +692,7 @@ describe("useBlockingMutation", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -698,6 +724,7 @@ describe("useBlockingMutation", () => {
     // Should block during pending
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
       expect(result.current.isPending).toBe(true);
     });
@@ -708,6 +735,7 @@ describe("useBlockingMutation", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -737,15 +765,18 @@ describe("useBlockingMutation", () => {
     // Should block during mutation
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
     const data = await promise;
+
     expect(data).toBe("test-data");
 
     // Should unblock after mutation completes
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(false);
     });
   });
@@ -778,6 +809,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       if (info.length > 0) {
         expect(info[0]?.reason).toBe("Saving user data...");
       }
@@ -818,6 +850,7 @@ describe("useBlockingMutation", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("Failed to save data");
   });
 
@@ -859,6 +892,7 @@ describe("useBlockingMutation", () => {
       if (result.current.isPending) {
         const { getBlockingInfo } = uiBlockingStoreApi.getState();
         const info = getBlockingInfo("test");
+
         if (info.length > 0) {
           expect(info[0]?.reason).toBe("Saving changes...");
         }
@@ -880,6 +914,7 @@ describe("useBlockingMutation", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("Error occurred while saving");
   });
 
@@ -922,6 +957,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       // Same mutationKey still creates per-instance blocker IDs
       expect(info.length).toBe(2);
     });
@@ -964,12 +1000,14 @@ describe("useBlockingMutation", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
     first.unmount();
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -1012,6 +1050,7 @@ describe("useBlockingMutation", () => {
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
+
       // Different keys should create different blockers
       expect(info.length).toBe(2);
     });

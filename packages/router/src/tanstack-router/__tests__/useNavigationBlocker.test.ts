@@ -18,6 +18,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 vi.mock("../../core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../core")>();
+
   return {
     ...actual,
     useShouldBlock: vi.fn(),
@@ -210,6 +211,7 @@ describe("useNavigationBlocker (TanStack Router)", () => {
       );
 
       const blockerFn = mockBlock.mock.calls[0]?.[0];
+
       expect(blockerFn).toBeTypeOf("function");
 
       blockerFn?.({ retry });

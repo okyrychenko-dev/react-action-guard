@@ -50,6 +50,7 @@ describe("devtoolsStore", () => {
       });
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.events).toHaveLength(1);
       expect(state.events[0].blockerId).toBe("test-blocker");
       expect(state.events[0].action).toBe("add");
@@ -72,6 +73,7 @@ describe("devtoolsStore", () => {
 
       const state = devtoolsStoreApi.getState();
       const ids = state.events.map((e) => e.id);
+
       expect(new Set(ids).size).toBe(2);
     });
 
@@ -85,6 +87,7 @@ describe("devtoolsStore", () => {
       });
 
       let state = devtoolsStoreApi.getState();
+
       expect(state.events).toHaveLength(1);
 
       store.clearEvents();
@@ -95,6 +98,7 @@ describe("devtoolsStore", () => {
 
     it("should respect maxEvents limit", () => {
       const store = devtoolsStoreApi.getState();
+
       store.setMaxEvents(3);
 
       for (let i = 0; i < 5; i++) {
@@ -106,6 +110,7 @@ describe("devtoolsStore", () => {
       }
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.events).toHaveLength(3);
       // Should keep the most recent events (prepended)
       expect(state.events[0].blockerId).toBe("blocker-4");
@@ -114,6 +119,7 @@ describe("devtoolsStore", () => {
 
     it("should deselect event when addEvent trims it from the buffer", () => {
       const store = devtoolsStoreApi.getState();
+
       store.setMaxEvents(2);
 
       store.addEvent({
@@ -129,6 +135,7 @@ describe("devtoolsStore", () => {
 
       const { events } = devtoolsStoreApi.getState();
       const selectedEventId = events[1].id;
+
       store.selectEvent(selectedEventId);
 
       store.addEvent({
@@ -177,6 +184,7 @@ describe("devtoolsStore", () => {
 
       const { events } = devtoolsStoreApi.getState();
       const selectedEventId = events[1].id;
+
       store.selectEvent(selectedEventId);
 
       store.setMaxEvents(1);
@@ -188,6 +196,7 @@ describe("devtoolsStore", () => {
 
     it("should not add events when paused", () => {
       const store = devtoolsStoreApi.getState();
+
       store.togglePause();
 
       store.addEvent({
@@ -197,6 +206,7 @@ describe("devtoolsStore", () => {
       });
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.events).toHaveLength(0);
     });
   });
@@ -222,6 +232,7 @@ describe("devtoolsStore", () => {
 
       store.setOpen(true);
       let state = devtoolsStoreApi.getState();
+
       expect(state.isOpen).toBe(true);
 
       store.setOpen(false);
@@ -261,6 +272,7 @@ describe("devtoolsStore", () => {
       });
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.filter.search).toBe("test");
     });
 
@@ -275,6 +287,7 @@ describe("devtoolsStore", () => {
       store.resetFilter();
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.filter.search).toBe("");
       expect(state.filter.scopes).toEqual([]);
       expect(state.filter.actions).toEqual([
@@ -299,6 +312,7 @@ describe("devtoolsStore", () => {
 
       const { events } = devtoolsStoreApi.getState();
       const selectedEventId = events[0].id;
+
       store.selectEvent(selectedEventId);
       store.setFilter({ scopes: ["profile"] });
 
@@ -315,6 +329,7 @@ describe("devtoolsStore", () => {
       store.selectEvent("event-123");
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.selectedEventId).toBe("event-123");
     });
 
@@ -325,6 +340,7 @@ describe("devtoolsStore", () => {
       store.selectEvent(null);
 
       const state = devtoolsStoreApi.getState();
+
       expect(state.selectedEventId).toBe(null);
     });
   });
@@ -406,6 +422,7 @@ describe("devtoolsStore", () => {
       };
 
       const filtered = selectFilteredEvents(state);
+
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe("1");
     });
@@ -448,6 +465,7 @@ describe("devtoolsStore", () => {
       };
 
       const filtered = selectFilteredEvents(state);
+
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe("1");
     });
@@ -497,6 +515,7 @@ describe("devtoolsStore", () => {
       };
 
       const filtered = selectFilteredEvents(state);
+
       expect(filtered).toHaveLength(1);
       expect(filtered[0].id).toBe("1");
     });
@@ -540,6 +559,7 @@ describe("devtoolsStore", () => {
       };
 
       const filtered = selectFilteredEvents(state);
+
       expect(filtered).toHaveLength(1);
       expect(filtered[0].scope).toBe("checkout");
     });
@@ -583,6 +603,7 @@ describe("devtoolsStore", () => {
       };
 
       const filtered = selectFilteredEvents(state);
+
       expect(filtered).toHaveLength(1);
       expect(filtered[0].scope).toBe("checkout");
     });
@@ -642,9 +663,11 @@ describe("devtoolsStore", () => {
       addEvent({ action: "add", blockerId: "persist-blocker", timestamp: 1_000 });
 
       const raw = window.localStorage.getItem(DEVTOOLS_STORAGE_KEY);
+
       expect(raw).not.toBeNull();
 
       const serialized = raw ?? "";
+
       // UI preferences are persisted.
       expect(serialized).toContain('"isMinimized":true');
       expect(serialized).toContain('"activeTab":"timeline"');
@@ -740,6 +763,7 @@ describe("devtoolsStore", () => {
           config: { scope: "global" },
         },
       ];
+
       devtoolsStoreApi.setState({ events });
 
       const stats = selectEventStats(devtoolsStoreApi.getState());

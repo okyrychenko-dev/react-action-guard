@@ -84,11 +84,13 @@ export function createDevtoolsMiddlewareForStore(
     }
 
     const trackedBlocker = activeBlockers.get(blockerId);
+
     if (isUndefined(trackedBlocker)) {
       return undefined;
     }
 
     activeBlockers.delete(blockerId);
+
     return timestamp - trackedBlocker.timestamp;
   };
 
@@ -133,6 +135,7 @@ export function createDevtoolsMiddlewareForStore(
 
     // Calculate duration for terminal events
     const duration = getDuration(context.action, context.blockerId, context.timestamp);
+
     clearTrackedBlockers(context);
 
     // Record the event

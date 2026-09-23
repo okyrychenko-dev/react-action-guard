@@ -11,6 +11,7 @@ describe("handleConfirmation", () => {
   it("should use window.confirm when no custom handler is provided", () => {
     const onConfirm = vi.fn();
     const onCancel = vi.fn();
+
     window.confirm = vi.fn(() => true);
 
     const result = handleConfirmation("Leave?", undefined, { onConfirm, onCancel });
@@ -24,6 +25,7 @@ describe("handleConfirmation", () => {
   it("should return cancelled when window.confirm is false", () => {
     const onConfirm = vi.fn();
     const onCancel = vi.fn();
+
     window.confirm = vi.fn(() => false);
 
     const result = handleConfirmation("Leave?", undefined, { onConfirm, onCancel });

@@ -31,6 +31,7 @@ describe("useScheduledBlocker", () => {
     );
 
     const { isBlocked: isBlockedBefore } = uiBlockingStoreApi.getState();
+
     expect(isBlockedBefore("test")).toBe(false);
 
     act(() => {
@@ -38,6 +39,7 @@ describe("useScheduledBlocker", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
     expect(onScheduleStart).toHaveBeenCalledTimes(1);
   });
@@ -63,6 +65,7 @@ describe("useScheduledBlocker", () => {
     });
 
     let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     act(() => {
@@ -124,6 +127,7 @@ describe("useScheduledBlocker", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -147,6 +151,7 @@ describe("useScheduledBlocker", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -169,6 +174,7 @@ describe("useScheduledBlocker", () => {
     });
 
     let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     act(() => {
@@ -194,12 +200,14 @@ describe("useScheduledBlocker", () => {
     );
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
   it("should keep blocking when end time is no longer in the future during scheduling", () => {
     const now = Date.now();
     const dateNowSpy = vi.spyOn(Date, "now");
+
     dateNowSpy.mockReturnValueOnce(now).mockReturnValue(now + 1);
 
     renderHook(() =>
@@ -304,6 +312,7 @@ describe("useScheduledBlocker", () => {
     expect(onScheduleEnd).not.toHaveBeenCalled();
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -326,6 +335,7 @@ describe("useScheduledBlocker", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("scope1")).toBe(true);
     expect(isBlocked("scope2")).toBe(true);
   });
@@ -351,6 +361,7 @@ describe("useScheduledBlocker", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.priority).toBe(100);
   });
 
@@ -375,6 +386,7 @@ describe("useScheduledBlocker", () => {
     });
 
     const isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     unmount();
@@ -404,6 +416,7 @@ describe("useScheduledBlocker", () => {
     });
 
     let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     // Should remain blocked indefinitely
@@ -435,6 +448,7 @@ describe("useScheduledBlocker", () => {
     });
 
     let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     // Should unblock after duration (2000ms), not end time (4000ms)
@@ -465,6 +479,7 @@ describe("useScheduledBlocker", () => {
     });
 
     let isBlocked = uiBlockingStoreApi.getState().isBlocked("test");
+
     expect(isBlocked).toBe(true);
 
     unmount();
@@ -493,6 +508,7 @@ describe("useScheduledBlocker", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("System maintenance window");
   });
 });

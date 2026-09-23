@@ -22,6 +22,7 @@ describe("useBlockingQueries", () => {
           ],
           { scope: "provider-queries" }
         );
+
         return useIsBlocked("provider-queries");
       },
       { wrapper: createWrapper({ blockingProvider: true }) }
@@ -68,6 +69,7 @@ describe("useBlockingQueries", () => {
     // Should block during loading
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -75,6 +77,7 @@ describe("useBlockingQueries", () => {
     await waitFor(
       () => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("test")).toBe(false);
       },
       { timeout: 2000 }
@@ -103,6 +106,7 @@ describe("useBlockingQueries", () => {
     );
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -129,6 +133,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -168,6 +173,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -197,6 +203,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -235,6 +242,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -273,6 +281,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("scope1")).toBe(true);
       expect(isBlocked("scope2")).toBe(true);
     });
@@ -314,6 +323,7 @@ describe("useBlockingQueries", () => {
     // Should block during loading (priority is internal implementation detail)
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -353,6 +363,7 @@ describe("useBlockingQueries", () => {
     // Wait for blocker to be added
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -361,6 +372,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(false);
     });
   });
@@ -379,6 +391,7 @@ describe("useBlockingQueries", () => {
     expect(result.current).toEqual([]);
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -412,6 +425,7 @@ describe("useBlockingQueries", () => {
     // Should block while at least one query is loading
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -419,6 +433,7 @@ describe("useBlockingQueries", () => {
     await waitFor(
       () => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("test")).toBe(false);
       },
       { timeout: 2000 }
@@ -463,6 +478,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const info = uiBlockingStoreApi.getState().getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Loading A");
     });
@@ -471,6 +487,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const info = uiBlockingStoreApi.getState().getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Loading B");
     });
@@ -518,6 +535,7 @@ describe("useBlockingQueries", () => {
 
     await waitFor(() => {
       const info = uiBlockingStoreApi.getState().getBlockingInfo("test");
+
       expect(info).toHaveLength(1);
       expect(info[0]?.reason).toBe("Strict mode load");
     });

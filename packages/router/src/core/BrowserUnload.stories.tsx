@@ -23,8 +23,10 @@ const BrowserUnloadDemo = (): ReactElement => {
         if (prev >= 100) {
           clearInterval(interval);
           setIsUploading(false);
+
           return 100;
         }
+
         return prev + 10;
       });
     }, 500);

@@ -23,12 +23,14 @@ const hasBlockingHistory = (value: unknown): value is SafeTanStackRouter => {
     return false;
   }
   const history = value.history;
+
   if (!isObject(history)) {
     return false;
   }
   if (!("block" in history)) {
     return false;
   }
+
   return isFunction(history.block);
 };
 
@@ -154,6 +156,7 @@ export function useNavigationBlocker(
               console.error("[react-action-guard-router] Confirmation error:", error);
             }
           });
+
         return;
       }
 

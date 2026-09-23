@@ -13,5 +13,6 @@ export function allocateBlockerId(store: StoreApi<UIBlockingStore>, prefix: stri
   } while (store.getState().activeBlockers.has(blockerId));
 
   storeSequences.set(store, sequence);
+
   return blockerId;
 }

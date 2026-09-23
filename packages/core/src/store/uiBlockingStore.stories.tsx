@@ -46,12 +46,15 @@ export const DynamicTimeoutUpdate: Story = {
     useEffect(() => {
       const interval = setInterval(() => {
         const info = getBlockingInfo("demo");
+
         if (info.length === 0 || deadline === null) {
           setTimeLeft(null);
+
           return;
         }
 
         const remaining = Math.max(0, deadline - Date.now());
+
         setTimeLeft(remaining);
       }, 100);
 
@@ -269,6 +272,7 @@ export const ClearOperations: Story = {
 
     const addCheckoutBlocker = (): void => {
       const id = `checkout-${Date.now().toString()}`;
+
       addBlocker(id, {
         scope: "checkout",
         reason: "Processing payment",
@@ -279,6 +283,7 @@ export const ClearOperations: Story = {
 
     const addFormBlocker = (): void => {
       const id = `form-${Date.now().toString()}`;
+
       addBlocker(id, {
         scope: "form",
         reason: "Saving form data",
@@ -289,6 +294,7 @@ export const ClearOperations: Story = {
 
     const addGlobalBlocker = (): void => {
       const id = `global-${Date.now().toString()}`;
+
       addBlocker(id, {
         scope: "global",
         reason: "System update",
@@ -299,18 +305,21 @@ export const ClearOperations: Story = {
 
     const clearCheckout = (): void => {
       const count = checkoutBlockers;
+
       clearBlockersForScope("checkout");
       addLog(`🧹 Cleared checkout scope (${count.toString()} blocker${count !== 1 ? "s" : ""})`);
     };
 
     const clearForm = (): void => {
       const count = formBlockers;
+
       clearBlockersForScope("form");
       addLog(`🧹 Cleared form scope (${count.toString()} blocker${count !== 1 ? "s" : ""})`);
     };
 
     const clearAll = (): void => {
       const total = checkoutBlockers + formBlockers + globalBlockers;
+
       clearAllBlockers();
       addLog(`🧹 Cleared all blockers (${total.toString()} total)`);
     };
@@ -456,6 +465,7 @@ export const PriorityValidation: Story = {
 
     const addBlockerWithPriority = (priority: number): void => {
       const id = `blocker-${Date.now().toString()}`;
+
       addBlocker(id, {
         scope: "demo",
         reason: `Priority ${priority.toString()}`,
@@ -465,6 +475,7 @@ export const PriorityValidation: Story = {
       // Read back the actual priority from the store
       setTimeout(() => {
         const info = getBlockingInfo("demo");
+
         setBlockers(info.map((b) => ({ id: b.id, priority: b.priority })));
       }, 10);
     };
