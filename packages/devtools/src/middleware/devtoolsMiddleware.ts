@@ -90,6 +90,7 @@ export function createDevtoolsMiddlewareForStore(
     }
 
     activeBlockers.delete(blockerId);
+
     return timestamp - trackedBlocker.timestamp;
   };
 

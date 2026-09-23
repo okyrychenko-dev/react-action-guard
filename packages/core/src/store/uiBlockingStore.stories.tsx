@@ -49,6 +49,7 @@ export const DynamicTimeoutUpdate: Story = {
 
         if (info.length === 0 || deadline === null) {
           setTimeLeft(null);
+
           return;
         }
 

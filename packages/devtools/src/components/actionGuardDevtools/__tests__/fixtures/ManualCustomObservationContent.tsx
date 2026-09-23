@@ -33,6 +33,7 @@ function ManualCustomObservationContent(props: ManualCustomObservationContentPro
           registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
           registerMiddleware(RESERVED_SESSION_MIDDLEWARE_NAME, onReservedMiddlewareCall);
         }
+
         return;
       }
 

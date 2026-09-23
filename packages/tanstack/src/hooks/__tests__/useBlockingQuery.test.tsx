@@ -25,6 +25,7 @@ describe("useBlockingQuery", () => {
         queryFn: () => new Promise(() => undefined),
         blockingConfig: { scope: "provider-isolation" },
       });
+
       return null;
     }
 

@@ -33,6 +33,7 @@ export function getDevtoolsKeyboardAction(
       if (!event.metaKey && !event.ctrlKey) {
         return { action: "clearEvents", preventDefault: false };
       }
+
       return null;
     default:
       return null;

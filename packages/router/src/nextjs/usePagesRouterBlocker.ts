@@ -87,6 +87,7 @@ export function useNavigationBlocker(
       if (allowNextUrlRef.current === url) {
         allowNextUrlRef.current = null;
         onAllow?.();
+
         return;
       }
 
@@ -110,6 +111,7 @@ export function useNavigationBlocker(
 
       if (confirmation.kind === "sync") {
         onAllow?.();
+
         return;
       }
 

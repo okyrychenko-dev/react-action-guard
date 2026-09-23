@@ -113,11 +113,13 @@ export function useNavigationBlocker(
         const id = ++confirmSeqRef.current;
 
         setPendingConfirm({ id, promise: confirmation.promise });
+
         return true;
       }
 
       if (confirmation.confirmed) {
         onAllow?.();
+
         return false;
       }
 

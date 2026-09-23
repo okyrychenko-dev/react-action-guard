@@ -85,9 +85,11 @@ export function handleConfirmation(
     // Sync: immediate result
     if (result) {
       onConfirm?.();
+
       return "confirmed";
     } else {
       onCancel?.();
+
       return "cancelled";
     }
   }
@@ -97,9 +99,11 @@ export function handleConfirmation(
 
   if (confirmed) {
     onConfirm?.();
+
     return "confirmed";
   } else {
     onCancel?.();
+
     return "cancelled";
   }
 }

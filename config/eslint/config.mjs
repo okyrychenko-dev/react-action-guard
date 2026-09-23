@@ -134,7 +134,13 @@ export function createEslintConfig({ parserOptions, extensions = [] }) {
             prev: ["const", "let", "var"],
             next: ["const", "let", "var"],
           },
+          {
+            blankLine: "always",
+            prev: "*",
+            next: "return",
+          },
         ],
+        "@stylistic/padded-blocks": ["error", "never"],
         curly: ["error", "all"],
       },
     },

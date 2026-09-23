@@ -41,6 +41,7 @@ describe("useBeforeUnload", () => {
   const expectReturnValue = (event: BeforeUnloadEvent, expected: string) => {
     if (hasReturnValue(event)) {
       expect(event.returnValue).toBe(expected);
+
       return;
     }
 

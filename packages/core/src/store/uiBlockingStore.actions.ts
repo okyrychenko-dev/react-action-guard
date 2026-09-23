@@ -104,6 +104,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       const newMiddlewares = new Map(state.middlewares);
 
       newMiddlewares.set(name, middleware);
+
       return { middlewares: newMiddlewares };
     });
   },
@@ -113,6 +114,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       const newMiddlewares = new Map(state.middlewares);
 
       newMiddlewares.delete(name);
+
       return { middlewares: newMiddlewares };
     });
   },
@@ -233,6 +235,7 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
     if (!existingBlocker) {
       get().addBlocker(id, config);
+
       return;
     }
 

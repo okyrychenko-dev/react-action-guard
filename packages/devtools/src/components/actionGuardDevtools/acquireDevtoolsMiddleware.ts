@@ -92,6 +92,7 @@ export function getDevtoolsObservationSession(
   };
 
   observationSessions.set(store, session);
+
   return session;
 }
 
@@ -126,6 +127,7 @@ export function configureDevtoolsObservationSession(
       maxEvents: configuredMaxEvents,
       owner,
     };
+
     return;
   }
 
@@ -139,6 +141,7 @@ export function configureDevtoolsObservationSession(
 
       configuration.maxEvents = configuredMaxEvents;
     }
+
     return;
   }
 

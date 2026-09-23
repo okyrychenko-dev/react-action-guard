@@ -22,6 +22,7 @@ describe("useBlockingQueries", () => {
           ],
           { scope: "provider-queries" }
         );
+
         return useIsBlocked("provider-queries");
       },
       { wrapper: createWrapper({ blockingProvider: true }) }

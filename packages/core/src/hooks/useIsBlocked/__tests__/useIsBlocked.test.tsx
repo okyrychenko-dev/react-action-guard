@@ -291,6 +291,7 @@ describe("useIsBlocked", () => {
     let renderCount = 0;
     const { result } = renderHook(() => {
       renderCount++;
+
       return useIsBlocked("scope2");
     });
 

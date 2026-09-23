@@ -693,6 +693,7 @@ describe("uiBlockingStore", () => {
         const activeBlockers = new Map(state.activeBlockers);
 
         activeBlockers.delete("timeout-blocker");
+
         return { activeBlockers };
       });
 
@@ -766,6 +767,7 @@ describe("uiBlockingStore", () => {
         const activeBlockers = new Map(state.activeBlockers);
 
         activeBlockers.delete("timeout-blocker");
+
         return { activeBlockers };
       });
 

@@ -62,6 +62,7 @@ describe("useConfirmableBlocker", () => {
 
     await actAsync(async () => {
       result.current.execute();
+
       return result.current.onConfirm();
     });
 
@@ -120,6 +121,7 @@ describe("useConfirmableBlocker", () => {
 
     await actAsync(async () => {
       result.current.execute();
+
       return result.current.onConfirm();
     });
 

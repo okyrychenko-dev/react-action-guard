@@ -10,5 +10,6 @@ export async function actAsync<T>(fn: () => Promise<T>): Promise<T> {
   await act(async () => {
     result = await fn();
   });
+
   return result;
 }

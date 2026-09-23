@@ -24,6 +24,7 @@ export function isThenable<T>(value: unknown): value is PromiseLike<T> {
   if (!hasThen(value)) {
     return false;
   }
+
   return isFunction(value.then);
 }
 
@@ -92,5 +93,6 @@ export function normalizeScope(scope: Optional<string | Array<string>>): Array<s
   if (!scope) {
     return [];
   }
+
   return isArray(scope) ? scope : [scope];
 }

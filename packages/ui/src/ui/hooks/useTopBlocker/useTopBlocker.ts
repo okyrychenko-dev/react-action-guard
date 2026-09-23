@@ -28,6 +28,7 @@ export function useTopBlocker(scope?: GuardedScope): UseTopBlockerReturn {
     }
 
     scopedBlockers.sort((first, second) => second.priority - first.priority);
+
     return scopedBlockers;
   }, [activeBlockers, checkedScopes]);
 

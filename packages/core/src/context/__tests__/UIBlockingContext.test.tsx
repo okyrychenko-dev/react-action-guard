@@ -141,6 +141,7 @@ describe("UIBlockingProvider", () => {
 
       const Provider1Content = () => {
         useActionBlocker("blocker-1", { scope: "shared-scope", reason: "Provider 1" });
+
         return <BlockerDisplay testId="provider-1" />;
       };
 
@@ -167,6 +168,7 @@ describe("UIBlockingProvider", () => {
 
       function StoreCapture(): null {
         stores.push(useResolvedStoreApi());
+
         return null;
       }
 
@@ -326,6 +328,7 @@ describe("UIBlockingProvider", () => {
         const store = useResolvedStoreApi();
 
         stores.push(store);
+
         return null;
       };
 
@@ -350,6 +353,7 @@ describe("UIBlockingProvider", () => {
 // Helper component for middleware test
 function TestBlockerComponent() {
   useActionBlocker("test-blocker", { scope: "test", reason: "Test" });
+
   return <div data-testid="blocker-test">Test</div>;
 }
 

@@ -20,6 +20,7 @@ describe("useBlockingInfiniteQuery", () => {
           getNextPageParam: () => undefined,
           blockingConfig: { scope: "provider-infinite-query" },
         });
+
         return useIsBlocked("provider-infinite-query");
       },
       { wrapper: createWrapper({ blockingProvider: true }) }
