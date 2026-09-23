@@ -2,7 +2,7 @@ import type { Middleware, MiddlewareContext } from "../../middleware";
 import type { BlockerConfig, BlockerInfo } from "../uiBlockingStore.types";
 
 /** An immutable point-in-time blocker projection. */
-export type BlockingLifecycleSnapshot = ReadonlyArray<BlockerInfo>;
+export type BlockingLifecycleSnapshot = ReadonlyArray<Readonly<BlockerInfo>>;
 
 /** Read snapshots and observe lifecycle changes without transition authority. */
 export interface BlockingLifecycleObservation {
