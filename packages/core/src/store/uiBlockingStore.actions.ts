@@ -1,103 +1,19 @@
-import { scopeAffectsObservation, scopeMatchesTarget } from "./scope";
-import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "./uiBlockingStore.constants";
-import type { Optional } from "@okyrychenko-dev/type-utils";
+import { createBlockingLifecycle } from "./blockingLifecycle";
 import type { StateCreator } from "zustand";
-import type { BlockingAction, Middleware, MiddlewareContext } from "../middleware";
-import type {
-  BlockerConfig,
-  BlockerInfo,
-  StoredBlocker,
-  UIBlockingStore,
-} from "./uiBlockingStore.types";
+import type { Middleware, MiddlewareContext } from "../middleware";
+import type { BlockingLifecycleSnapshot } from "./blockingLifecycle";
+import type { BlockerConfig, StoredBlocker, UIBlockingStore } from "./uiBlockingStore.types";
 
 /**
- * Normalize priority value to ensure it's non-negative
- */
-function normalizePriority(priority?: number, fallback: number = DEFAULT_PRIORITY): number {
-  return priority !== undefined ? Math.max(0, priority) : fallback;
-}
-
-/**
- * Create middleware context object
- */
-function createMiddlewareContext(
-  action: BlockingAction,
-  blockerId: string,
-  config?: Partial<BlockerConfig>,
-  prevState?: Partial<BlockerConfig>
-): MiddlewareContext {
-  return {
-    action,
-    blockerId,
-    config,
-    timestamp: Date.now(),
-    ...(prevState && { prevState }),
-  };
-}
-
-function toPublicBlockerConfig(blocker: StoredBlocker): BlockerConfig {
-  const { scope, reason, priority, timestamp, timeout, onTimeout } = blocker;
-
-  return {
-    scope,
-    reason,
-    priority,
-    timestamp,
-    timeout,
-    onTimeout,
-  };
-}
-
-function handleBlockerTimeout(blockerId: string, get: () => UIBlockingStore): void {
-  const blocker = get().activeBlockers.get(blockerId);
-
-  if (!blocker) {
-    return;
-  }
-
-  const { onTimeout, scope, reason, priority, timeout } = blocker;
-
-  onTimeout?.(blockerId);
-
-  void get().runMiddlewares(
-    createMiddlewareContext("timeout", blockerId, {
-      scope,
-      reason,
-      priority,
-      timeout,
-    })
-  );
-
-  get().removeBlocker(blockerId);
-}
-
-function scheduleBlockerTimeout(
-  blockerId: string,
-  timeout: number | undefined,
-  get: () => UIBlockingStore
-): Optional<ReturnType<typeof setTimeout>> {
-  if (!timeout || timeout <= 0) {
-    return undefined;
-  }
-
-  return setTimeout(() => {
-    handleBlockerTimeout(blockerId, get);
-  }, timeout);
-}
-
-/**
- * UI Blocking Store Slice
- *
- * Implements the state and actions for UI blocking management.
- * This slice follows the Zustand slice pattern for better code organization.
+ * Zustand compatibility adapter. The lifecycle owns transitions and timers; this
+ * slice publishes its snapshots for existing selectors and retains named middleware
+ * registration until callers migrate to anonymous observation.
  */
 export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (
   set,
   get
-) => ({
-  // State
-  activeBlockers: new Map(),
-  middlewares: new Map(),
+) => {
+  const lifecycle = createBlockingLifecycle();
 
   registerMiddleware: (name: string, middleware: Middleware) => {
     set((state) => {
@@ -174,7 +90,8 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       clearTimeout(existingBlocker.timeoutId);
     }
 
-    const timeoutId = scheduleBlockerTimeout(id, config.timeout, get);
+    set({ activeBlockers });
+  }
 
     set((state) => {
       const newBlockers = new Map(state.activeBlockers);
@@ -190,18 +107,14 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
 
       newBlockers.set(id, storedBlocker);
 
-      return { activeBlockers: newBlockers };
-    });
+  lifecycle.observe((context) => {
+    const { runMiddlewares } = get();
+    void runMiddlewares(context);
+  });
 
-    void get().runMiddlewares(
-      createMiddlewareContext("add", id, {
-        scope: config.scope,
-        reason: config.reason,
-        priority: config.priority,
-        timeout: config.timeout,
-      })
-    );
-  },
+  return {
+    activeBlockers: new Map(),
+    middlewares: new Map(),
 
   /**
    * Updates an existing blocker or creates it if it doesn't exist.
@@ -459,68 +372,43 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
         timestamp: Date.now(),
         count,
       });
-    }
-  },
+    },
 
-  /**
-   * Removes all blockers that affect a specific scope.
-   *
-   * Clears timeouts for removed blockers and triggers middleware with
-   * 'clear_scope' action. Global scope blockers are NOT cleared by this method.
-   *
-   * @param scope - Scope to clear blockers for
-   *
-   * @example
-   * Clear form blockers
-   * ```ts
-   * // Clear all blockers affecting 'form' scope
-   * store.getState().clearBlockersForScope('form');
-   * ```
-   *
-   * @example
-   * Clear on navigation
-   * ```ts
-   * // Clear navigation blockers when user navigates away
-   * store.getState().clearBlockersForScope('navigation');
-   * ```
-   *
-   * @see {@link clearAllBlockers} to clear all blockers
-   */
-  clearBlockersForScope: (scope: string): void => {
-    const { activeBlockers } = get();
-    let count = 0;
-
-    // Clear timeouts for blockers that will be removed
-    for (const [, blocker] of activeBlockers) {
-      if (scopeMatchesTarget(blocker.scope, scope)) {
-        if (blocker.timeoutId) {
-          clearTimeout(blocker.timeoutId);
-        }
-        count++;
-      }
-    }
-
-    set((state) => {
-      const newBlockers = new Map();
-
-      for (const [id, blocker] of state.activeBlockers) {
-        if (!scopeMatchesTarget(blocker.scope, scope)) {
-          newBlockers.set(id, blocker);
-        }
-      }
-
-      return { activeBlockers: newBlockers };
-    });
-
-    // Notify middleware about clear_scope action
-    if (count > 0) {
-      void get().runMiddlewares({
-        action: "clear_scope",
-        blockerId: "*",
-        timestamp: Date.now(),
-        scope,
-        count,
+    unregisterMiddleware: (name: string) => {
+      set((state) => {
+        const middlewares = new Map(state.middlewares);
+        middlewares.delete(name);
+        return { middlewares };
       });
-    }
-  },
-});
+    },
+
+    runMiddlewares: async (context: MiddlewareContext) => {
+      const { middlewares } = get();
+      for (const middleware of middlewares.values()) {
+        try {
+          await middleware(context);
+        } catch {
+          // Compatibility observers cannot interrupt blocker transitions.
+        }
+      }
+    },
+
+    addBlocker: (id: string, config: BlockerConfig = {}) => {
+      lifecycle.add(id, config);
+    },
+    updateBlocker: (id: string, config: Partial<BlockerConfig> = {}) => {
+      lifecycle.update(id, config);
+    },
+    removeBlocker: (id: string) => {
+      lifecycle.remove(id);
+    },
+    clearAllBlockers: () => {
+      lifecycle.clear();
+    },
+    clearBlockersForScope: (scope: string) => {
+      lifecycle.clearScope(scope);
+    },
+    isBlocked: (scope) => lifecycle.isBlocked(scope),
+    getBlockingInfo: (scope) => lifecycle.getBlockingInfo(scope),
+  };
+};

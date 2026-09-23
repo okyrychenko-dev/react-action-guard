@@ -35,6 +35,13 @@ export type {
 } from "./hooks";
 
 // Store
+export { createBlockingLifecycle } from "./store/blockingLifecycle";
+export type {
+  BlockingEvent,
+  BlockingLifecycle,
+  BlockingLifecycleObservation,
+  BlockingLifecycleSnapshot,
+} from "./store/blockingLifecycle";
 export { useUIBlockingStore, uiBlockingStoreApi } from "./store/uiBlockingStore.store";
 export type { ShallowStoreBindings } from "./store/uiBlockingStore.types";
 

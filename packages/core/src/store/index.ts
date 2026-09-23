@@ -6,6 +6,13 @@ export {
 } from "./uiBlockingStore.constants";
 export { useUIBlockingStore, uiBlockingStoreApi } from "./uiBlockingStore.store";
 export { normalizeScope } from "./scope";
+export { createBlockingLifecycle } from "./blockingLifecycle";
+export type {
+  BlockingEvent,
+  BlockingLifecycle,
+  BlockingLifecycleObservation,
+  BlockingLifecycleSnapshot,
+} from "./blockingLifecycle";
 export type {
   BlockerConfig,
   BlockerInfo,

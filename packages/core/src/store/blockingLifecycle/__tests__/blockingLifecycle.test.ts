@@ -1,0 +1,153 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { createBlockingLifecycle } from "..";
+import type { BlockingLifecycleObservation } from "..";
+
+describe("Blocking lifecycle", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  it("should expose synchronous immutable reads across transitions", () => {
+    const lifecycle = createBlockingLifecycle();
+    const observation: BlockingLifecycleObservation = lifecycle;
+    const observed: Array<ReadonlyArray<string>> = [];
+    observation.subscribe((snapshot) => observed.push(snapshot.map(({ id }) => id)));
+
+    lifecycle.add("first", { scope: "form", priority: 10 });
+    const earlier = observation.getSnapshot();
+    lifecycle.add("second", { scope: "form", priority: 20 });
+    lifecycle.update("first", { reason: "Updated" });
+    lifecycle.clearScope("form");
+
+    expect(earlier.map(({ id }) => id)).toEqual(["first"]);
+    expect(Object.isFrozen(earlier)).toBe(true);
+    expect(Object.isFrozen(earlier[0])).toBe(true);
+    expect(lifecycle.getBlockingInfo("form")).toEqual([]);
+    expect(observed).toEqual([["first"], ["first", "second"], ["first", "second"], []]);
+  });
+
+  it("should preserve update-as-upsert and ordered timeout then removal events", () => {
+    vi.useFakeTimers();
+    const lifecycle = createBlockingLifecycle();
+    const events: Array<string> = [];
+    lifecycle.observe(({ action }) => {
+      events.push(action);
+    });
+
+    lifecycle.update("first", {
+      scope: "form",
+      timeout: 10,
+      onTimeout: () => {
+        throw Error("callback");
+      },
+    });
+    expect(lifecycle.isBlocked("form")).toBe(true);
+    expect(() => vi.advanceTimersByTime(10)).not.toThrow();
+
+    expect(lifecycle.isBlocked("form")).toBe(false);
+    expect(events).toEqual(["add", "timeout", "remove"]);
+  });
+
+  it("should ignore a replaced blocker's stale timeout", () => {
+    vi.useFakeTimers();
+    vi.spyOn(globalThis, "clearTimeout").mockImplementation(() => undefined);
+    const lifecycle = createBlockingLifecycle();
+    const oldTimeout = vi.fn();
+    lifecycle.add("first", { timeout: 10, onTimeout: oldTimeout });
+    vi.advanceTimersByTime(5);
+    lifecycle.add("first", { reason: "replacement", timeout: 20 });
+    vi.advanceTimersByTime(5);
+
+    expect(oldTimeout).not.toHaveBeenCalled();
+    expect(lifecycle.getSnapshot()[0]?.reason).toBe("replacement");
+    vi.advanceTimersByTime(15);
+    expect(lifecycle.getSnapshot()).toEqual([]);
+  });
+
+  it("should preserve a timer when metadata changes and use the latest callback", () => {
+    vi.useFakeTimers();
+    const lifecycle = createBlockingLifecycle();
+    const initial = vi.fn();
+    const latest = vi.fn();
+
+    lifecycle.add("first", { timeout: 10, onTimeout: initial });
+    vi.advanceTimersByTime(5);
+    lifecycle.update("first", { onTimeout: latest });
+    vi.advanceTimersByTime(5);
+
+    expect(initial).not.toHaveBeenCalled();
+    expect(latest).toHaveBeenCalledWith("first");
+    expect(lifecycle.getSnapshot()).toEqual([]);
+  });
+
+  it("should clear targeted blockers while preserving global blockers", () => {
+    const lifecycle = createBlockingLifecycle();
+    const events: Array<string> = [];
+    lifecycle.observe(({ action }) => {
+      events.push(action);
+    });
+
+    lifecycle.add("global");
+    lifecycle.add("form", { scope: "form" });
+    lifecycle.clearScope("form");
+
+    expect(lifecycle.getSnapshot().map(({ id }) => id)).toEqual(["global"]);
+    lifecycle.clear();
+    expect(lifecycle.getSnapshot()).toEqual([]);
+    expect(events).toEqual(["add", "add", "clear_scope", "clear"]);
+  });
+
+  it("should preserve a replacement created by a timeout callback", () => {
+    vi.useFakeTimers();
+    const lifecycle = createBlockingLifecycle();
+    lifecycle.add("first", {
+      timeout: 10,
+      onTimeout: () => {
+        lifecycle.add("first", { reason: "replacement" });
+      },
+    });
+
+    vi.advanceTimersByTime(10);
+    expect(lifecycle.getSnapshot()[0]?.reason).toBe("replacement");
+  });
+
+  it("should release only the matching observer registration", () => {
+    const lifecycle = createBlockingLifecycle();
+    const observation: BlockingLifecycleObservation = lifecycle;
+    const observer = vi.fn();
+    const releaseFirst = observation.observe(observer);
+    const releaseSecond = observation.observe(observer);
+
+    lifecycle.add("first");
+    expect(observer).toHaveBeenCalledTimes(2);
+
+    releaseFirst();
+    releaseFirst();
+    lifecycle.remove("first");
+    expect(observer).toHaveBeenCalledTimes(3);
+
+    releaseSecond();
+    lifecycle.add("second");
+    expect(observer).toHaveBeenCalledTimes(3);
+  });
+
+  it("should isolate observer failures from transitions and later observers", async () => {
+    const lifecycle = createBlockingLifecycle();
+    const events: Array<string> = [];
+    lifecycle.observe(() => {
+      throw Error("observer");
+    });
+    lifecycle.observe(() => Promise.reject(Error("async observer")));
+    lifecycle.observe(({ action }) => {
+      events.push(action);
+    });
+
+    lifecycle.add("first");
+    lifecycle.remove("first");
+    await Promise.resolve();
+
+    expect(events).toEqual(["add", "remove"]);
+    expect(lifecycle.getSnapshot()).toEqual([]);
+  });
+});
