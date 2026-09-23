@@ -6,6 +6,7 @@ import { useNavigationBlocker } from "../useAppRouterBlocker";
 // Mock dependencies
 vi.mock("../../core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../core")>();
+
   return {
     ...actual,
     useShouldBlock: vi.fn(),
@@ -104,6 +105,7 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
   describe("Development warnings", () => {
     it("should warn in development when blocking is active", () => {
       const originalEnv = process.env.NODE_ENV;
+
       process.env.NODE_ENV = "development";
 
       mockUseShouldBlock.mockReturnValue(true);
@@ -123,6 +125,7 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
 
     it("should not warn when not blocking", () => {
       const originalEnv = process.env.NODE_ENV;
+
       process.env.NODE_ENV = "development";
 
       mockUseShouldBlock.mockReturnValue(false);
@@ -142,6 +145,7 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
   describe("Callbacks", () => {
     it("should not call onBlock without observable navigation interception", () => {
       const onBlock = vi.fn();
+
       mockUseShouldBlock.mockReturnValue(false);
 
       const { rerender } = renderHook(() =>
@@ -161,6 +165,7 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
 
     it("should not call onAllow (limitation of App Router)", () => {
       const onAllow = vi.fn();
+
       mockUseShouldBlock.mockReturnValue(true);
 
       renderHook(() =>
@@ -219,6 +224,7 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
 
     it("should warn developers about limitations", () => {
       const originalEnv = process.env.NODE_ENV;
+
       process.env.NODE_ENV = "development";
 
       mockUseShouldBlock.mockReturnValue(true);

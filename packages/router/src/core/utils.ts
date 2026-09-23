@@ -52,6 +52,7 @@ export function resolveConfirmResult(
   }
 
   const result = onConfirm(message);
+
   if (isThenable<boolean>(result)) {
     return { kind: "async", promise: Promise.resolve(result) };
   }
@@ -69,6 +70,7 @@ export function resolveConfirmResult(
 export function createBlockerId(prefix: string, scope?: string | Array<string>): string {
   const scopePart = scope ? `-${isArray(scope) ? scope.join("-") : scope}` : "";
   const timestamp = String(Date.now());
+
   return `${prefix}${scopePart}-${timestamp}`;
 }
 

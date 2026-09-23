@@ -77,6 +77,7 @@ export function configureMiddleware(middlewares: ReadonlyArray<Middleware>): voi
   middlewares.forEach((middleware, index) => {
     // Generate a unique name for each middleware
     const name = `${CONFIGURE_MIDDLEWARE_PREFIX}${index.toString()}`;
+
     store.registerMiddleware(name, middleware);
   });
 }

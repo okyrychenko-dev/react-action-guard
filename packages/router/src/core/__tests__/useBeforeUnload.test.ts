@@ -9,11 +9,13 @@ describe("useBeforeUnload", () => {
 
   const getBeforeUnloadHandler = (): EventListener => {
     const call = addEventListenerSpy.mock.calls[0];
+
     if (!call) {
       throw new Error("Expected spy to be called");
     }
 
     const handler = call[1];
+
     if (!handler) {
       throw new Error("Expected handler");
     }
@@ -71,6 +73,7 @@ describe("useBeforeUnload", () => {
 
     it("should handle function condition", () => {
       const condition = vi.fn(() => true);
+
       renderHook(() => useBeforeUnload(condition));
 
       expect(condition).toHaveBeenCalled();
@@ -83,6 +86,7 @@ describe("useBeforeUnload", () => {
       const handler = getBeforeUnloadHandler();
       const event = createBeforeUnloadEvent();
       const preventDefaultSpy = vi.spyOn(event, "preventDefault");
+
       handler(event);
 
       expect(preventDefaultSpy).toHaveBeenCalled();
@@ -91,6 +95,7 @@ describe("useBeforeUnload", () => {
 
     it("should use custom message when provided", () => {
       const customMessage = "Custom warning message";
+
       renderHook(() => useBeforeUnload(true, customMessage));
 
       const handler = getBeforeUnloadHandler();
@@ -161,6 +166,7 @@ describe("useBeforeUnload", () => {
 
     it("should prevent default even with custom message", () => {
       const message = "Test message";
+
       renderHook(() => useBeforeUnload(true, message));
 
       const handler = getBeforeUnloadHandler();

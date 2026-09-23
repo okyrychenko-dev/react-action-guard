@@ -28,6 +28,7 @@ it("preserves query select inference", () => {
 
   const queryResultCheck: IsEqual<QueryResult, UseQueryResult<string>> = true;
   const queryDataCheck: IsEqual<QueryResult["data"], string | undefined> = true;
+
   expect(queryResultCheck).toBe(true);
   expect(queryDataCheck).toBe(true);
 });
@@ -56,6 +57,7 @@ it("preserves infinite query data shape", () => {
 
   const infiniteDataCheck: IsEqual<InfiniteResult["data"], InfiniteData<PageData> | undefined> =
     true;
+
   expect(infiniteDataCheck).toBe(true);
 });
 
@@ -84,6 +86,7 @@ it("preserves mutation variable and result inference", () => {
   const mutationDataCheck: IsEqual<MutationResult["data"], { ok: true; id: string } | undefined> =
     true;
   const mutationStateCheck: IsEqual<MutationResult["variables"], { id: string } | undefined> = true;
+
   expect(mutationVariablesCheck).toBe(true);
   expect(mutationDataCheck).toBe(true);
   expect(mutationStateCheck).toBe(true);

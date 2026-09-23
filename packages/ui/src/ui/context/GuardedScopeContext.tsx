@@ -29,5 +29,6 @@ export function useGuardedScope(): Optional<GuardedScope> {
 
 export function useResolvedGuardedScope(explicitScope?: GuardedScope): Optional<GuardedScope> {
   const contextScope = useGuardedScope();
+
   return resolveScope(explicitScope, contextScope);
 }

@@ -9,6 +9,7 @@ describe("Middleware Integration", () => {
     uiBlockingStoreApi.getState().clearAllBlockers();
     // Clear all middleware
     const state = uiBlockingStoreApi.getState();
+
     state.middlewares.forEach((_, name) => {
       state.unregisterMiddleware(name);
     });
@@ -21,6 +22,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
@@ -49,6 +51,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("test-middleware", middleware);
 
     const { unmount } = renderHook(() =>
@@ -73,6 +76,7 @@ describe("Middleware Integration", () => {
   it("should not expose internal timeout id to remove middleware", () => {
     let removeContext: MiddlewareContext | undefined;
     const { addBlocker, registerMiddleware, removeBlocker } = uiBlockingStoreApi.getState();
+
     registerMiddleware("remove-context", (context) => {
       if (context.action === "remove") {
         removeContext = context;
@@ -102,6 +106,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("middleware1", middleware1);
     registerMiddleware("middleware2", middleware2);
     registerMiddleware("middleware3", middleware3);
@@ -125,6 +130,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("async-middleware", asyncMiddleware);
 
     renderHook(() =>
@@ -136,6 +142,7 @@ describe("Middleware Integration", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -148,6 +155,7 @@ describe("Middleware Integration", () => {
     const successMiddleware = vi.fn();
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("error-middleware", errorMiddleware);
     registerMiddleware("success-middleware", successMiddleware);
 
@@ -217,6 +225,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("test-middleware", middleware);
 
     renderHook(() =>
@@ -250,6 +259,7 @@ describe("Middleware Integration", () => {
     ).not.toThrow();
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -306,6 +316,7 @@ describe("Middleware Integration", () => {
     };
 
     const { registerMiddleware } = uiBlockingStoreApi.getState();
+
     registerMiddleware("logging", loggingMiddleware);
     registerMiddleware("analytics", analyticsMiddleware);
 

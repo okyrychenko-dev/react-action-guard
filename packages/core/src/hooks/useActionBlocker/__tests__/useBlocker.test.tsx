@@ -221,6 +221,7 @@ describe("useBlocker", () => {
 
     const { getBlockingInfo: getInitialInfo } = uiBlockingStoreApi.getState();
     const initialInfo = getInitialInfo("test");
+
     expect(initialInfo[0]?.reason).toBe("Initial reason");
     expect(initialInfo[0]?.priority).toBe(10);
 
@@ -373,11 +374,13 @@ describe("useBlocker", () => {
     const { unmount: unmount1 } = renderHook(() => {
       useActionBlocker(blockerId, config);
     });
+
     unmount1();
 
     const { unmount: unmount2 } = renderHook(() => {
       useActionBlocker(blockerId, config);
     });
+
     unmount2();
 
     renderHook(() => {

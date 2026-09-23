@@ -172,11 +172,13 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
     const scheduleEnd = (): void => {
       const endTime = calculateEndTime(currentConfig.schedule, startTime);
+
       if (!endTime) {
         return;
       }
 
       const remainingTime = endTime - Date.now();
+
       if (remainingTime > 0) {
         timeoutsRef.current.end = setTimeout(() => {
           configRef.current.onScheduleEnd?.();
@@ -187,6 +189,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
     const startBlocking = (): void => {
       const cfg = configRef.current;
+
       addBlocker(blockerId, createBlockerConfig(cfg));
       cfg.onScheduleStart?.();
       scheduleEnd();

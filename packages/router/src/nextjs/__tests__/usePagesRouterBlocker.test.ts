@@ -14,6 +14,7 @@ vi.mock("next/router", () => ({
 
 vi.mock("../../core", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../core")>();
+
   return {
     ...actual,
     useShouldBlock: vi.fn(),

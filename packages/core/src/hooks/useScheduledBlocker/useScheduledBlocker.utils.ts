@@ -42,6 +42,7 @@ export function calculateEndTime(schedule: BlockingSchedule, startTime: number):
 
   if (schedule.end) {
     const endTime = parseDate(schedule.end);
+
     return isValidTimestamp(endTime) ? endTime : undefined;
   }
 

@@ -23,6 +23,7 @@ const hasBlockingHistory = (value: unknown): value is SafeTanStackRouter => {
     return false;
   }
   const history = value.history;
+
   if (!isObject(history)) {
     return false;
   }

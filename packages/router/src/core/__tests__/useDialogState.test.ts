@@ -37,6 +37,7 @@ describe("useDialogState", () => {
       const { result } = renderHook(() => useDialogState());
 
       let promise: Promise<boolean>;
+
       act(() => {
         promise = result.current.confirm("Test");
       });
@@ -50,6 +51,7 @@ describe("useDialogState", () => {
       const { result } = renderHook(() => useDialogState());
 
       let promise: Promise<boolean>;
+
       act(() => {
         promise = result.current.confirm("Test message");
       });
@@ -95,6 +97,7 @@ describe("useDialogState", () => {
       const { result } = renderHook(() => useDialogState());
 
       let promise: Promise<boolean>;
+
       act(() => {
         promise = result.current.confirm("Test message");
       });
@@ -180,6 +183,7 @@ describe("useDialogState", () => {
 
       // First dialog
       let promise1: Promise<boolean>;
+
       act(() => {
         promise1 = result.current.confirm("First");
       });
@@ -194,6 +198,7 @@ describe("useDialogState", () => {
 
       // Second dialog
       let promise2: Promise<boolean>;
+
       act(() => {
         promise2 = result.current.confirm("Second");
       });
@@ -211,11 +216,13 @@ describe("useDialogState", () => {
       const { result } = renderHook(() => useDialogState());
 
       let firstPromise: Promise<boolean>;
+
       act(() => {
         firstPromise = result.current.confirm("First");
       });
 
       let secondPromise: Promise<boolean>;
+
       act(() => {
         secondPromise = result.current.confirm("Second");
       });

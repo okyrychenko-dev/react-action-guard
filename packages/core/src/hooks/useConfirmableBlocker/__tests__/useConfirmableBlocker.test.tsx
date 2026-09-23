@@ -19,6 +19,7 @@ describe("useConfirmableBlocker", () => {
     );
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -39,6 +40,7 @@ describe("useConfirmableBlocker", () => {
 
     expect(result.current.isDialogOpen).toBe(true);
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(true);
   });
 
@@ -209,6 +211,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     let promise: Promise<void>;
+
     act(() => {
       promise = result.current.onConfirm();
     });
@@ -267,6 +270,7 @@ describe("useConfirmableBlocker", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("Delete this item?");
   });
 
@@ -286,6 +290,7 @@ describe("useConfirmableBlocker", () => {
 
     const { getBlockingInfo } = uiBlockingStoreApi.getState();
     const info = getBlockingInfo("test");
+
     expect(info[0]?.reason).toBe("Deleting item");
   });
 
@@ -303,6 +308,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     const { isBlocked: isBlockedDuring } = uiBlockingStoreApi.getState();
+
     expect(isBlockedDuring("test")).toBe(true);
 
     await actAsync(async () => {
@@ -311,6 +317,7 @@ describe("useConfirmableBlocker", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(false);
     });
   });
@@ -329,6 +336,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     const { isBlocked: isBlockedDuring } = uiBlockingStoreApi.getState();
+
     expect(isBlockedDuring("test")).toBe(true);
 
     act(() => {
@@ -336,6 +344,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 });

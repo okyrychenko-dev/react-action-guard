@@ -24,6 +24,7 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
 
   // Tick while blockers are present so ages (and the stuck flag) stay fresh.
   const [now, setNow] = useState(() => Date.now());
+
   useEffect(() => {
     if (blockers.length === 0) {
       return;

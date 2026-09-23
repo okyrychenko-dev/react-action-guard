@@ -7,6 +7,7 @@ describe("configureMiddleware", () => {
   beforeEach(() => {
     // Clear all middleware before each test
     const state = uiBlockingStoreApi.getState();
+
     state.middlewares.forEach((_, name) => {
       state.unregisterMiddleware(name);
     });

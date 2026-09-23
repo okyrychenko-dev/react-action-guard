@@ -116,6 +116,7 @@ export function useDialogState<T = string>(): UseDialogStateReturn<T> {
 
   const closeDialog = useCallback((confirmed: boolean) => {
     const resolve = resolveRef.current;
+
     if (resolve) {
       resolve(confirmed);
     }

@@ -50,6 +50,7 @@ describe("serializeEvents", () => {
 describe("copyEventsToClipboard", () => {
   it("should write serialized events and resolve true on success", async () => {
     const writeText = vi.fn<(text: string) => Promise<void>>().mockResolvedValue(undefined);
+
     vi.stubGlobal("navigator", { clipboard: { writeText } });
 
     const result = await copyEventsToClipboard(sampleEvents);
@@ -63,6 +64,7 @@ describe("copyEventsToClipboard", () => {
 
   it("should resolve false when the clipboard write rejects", async () => {
     const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+
     vi.stubGlobal("navigator", { clipboard: { writeText } });
 
     const result = await copyEventsToClipboard(sampleEvents);

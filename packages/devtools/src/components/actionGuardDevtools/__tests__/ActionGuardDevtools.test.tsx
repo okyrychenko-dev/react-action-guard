@@ -153,6 +153,7 @@ describe("ActionGuardDevtools", () => {
         timestamp: Date.now(),
       },
     ];
+
     devtoolsStoreApi.setState({ events });
 
     renderWithProviders(<ActionGuardDevtools defaultOpen={true} />);
@@ -238,6 +239,7 @@ describe("ActionGuardDevtools", () => {
 
   it("should record each event once and keep middleware alive across instances", () => {
     const first = renderWithProviders(<ActionGuardDevtools />);
+
     renderWithProviders(<ActionGuardDevtools />);
     const { addBlocker } = uiBlockingStoreApi.getState();
 

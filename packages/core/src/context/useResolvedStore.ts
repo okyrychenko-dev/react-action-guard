@@ -26,6 +26,7 @@ function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
  */
 export function useResolvedStoreApi(): StoreApi<UIBlockingStore> {
   const contextStore = useOptionalContextStore();
+
   // Return context store if inside Provider, otherwise global store
   return contextStore ?? uiBlockingStoreApi;
 }
@@ -40,6 +41,7 @@ export function useResolvedStoreApi(): StoreApi<UIBlockingStore> {
  */
 export function useResolvedValue<T>(selector: (state: UIBlockingStore) => T): T {
   const store = useResolvedStoreApi();
+
   return useStore(store, useShallow(selector));
 }
 

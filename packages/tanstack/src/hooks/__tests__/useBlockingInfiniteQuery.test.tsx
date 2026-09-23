@@ -60,6 +60,7 @@ describe("useBlockingInfiniteQuery", () => {
     // Should block during loading
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -67,6 +68,7 @@ describe("useBlockingInfiniteQuery", () => {
     await waitFor(
       () => {
         const { isBlocked } = uiBlockingStoreApi.getState();
+
         expect(isBlocked("test")).toBe(false);
       },
       { timeout: 2000 }
@@ -94,6 +96,7 @@ describe("useBlockingInfiniteQuery", () => {
     );
 
     const { isBlocked } = uiBlockingStoreApi.getState();
+
     expect(isBlocked("test")).toBe(false);
   });
 
@@ -120,6 +123,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -154,6 +158,7 @@ describe("useBlockingInfiniteQuery", () => {
     // Should block during loading
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -183,6 +188,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -215,6 +221,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -247,6 +254,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("scope1")).toBe(true);
       expect(isBlocked("scope2")).toBe(true);
     });
@@ -282,6 +290,7 @@ describe("useBlockingInfiniteQuery", () => {
     // Should block during loading (priority is internal implementation detail)
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
   });
@@ -315,6 +324,7 @@ describe("useBlockingInfiniteQuery", () => {
     // Wait for blocker to be added
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(true);
     });
 
@@ -323,6 +333,7 @@ describe("useBlockingInfiniteQuery", () => {
 
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
+
       expect(isBlocked("test")).toBe(false);
     });
   });

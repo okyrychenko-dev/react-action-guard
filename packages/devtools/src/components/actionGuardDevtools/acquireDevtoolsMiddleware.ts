@@ -99,6 +99,7 @@ export function resolveDevtoolsObservationSession(
   customStore?: UIBlockingStoreApi
 ): ObservationSession {
   const targetStore = customStore ?? uiBlockingStoreApi;
+
   return getDevtoolsObservationSession(
     targetStore,
     targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined

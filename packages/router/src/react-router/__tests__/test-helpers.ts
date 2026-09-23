@@ -50,6 +50,7 @@ export function getMockCall<TArgs extends Array<unknown>>(
   index: number
 ): TArgs | undefined {
   const calls = mock.mock.calls;
+
   return calls[index];
 }
 

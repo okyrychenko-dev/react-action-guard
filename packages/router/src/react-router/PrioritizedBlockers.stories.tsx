@@ -94,6 +94,7 @@ const PrioritizedBlockersDemo = (): ReactElement => {
         <div className="grid">
           {blockers.map(({ id, label, priority }) => {
             const isActive = activeIds.includes(id);
+
             return (
               <div key={id} className={clsx("card", { "animate-pulse": isActive })}>
                 <div className="flex-row">

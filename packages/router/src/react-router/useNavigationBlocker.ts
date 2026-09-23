@@ -111,6 +111,7 @@ export function useNavigationBlocker(
 
       if (confirmation.kind === "async") {
         const id = ++confirmSeqRef.current;
+
         setPendingConfirm({ id, promise: confirmation.promise });
         return true;
       }

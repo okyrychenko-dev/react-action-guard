@@ -94,6 +94,7 @@ export function handleConfirmation(
 
   // Default window.confirm (always synchronous)
   const confirmed = window.confirm(message);
+
   if (confirmed) {
     onConfirm?.();
     return "confirmed";
