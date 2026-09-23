@@ -8,6 +8,38 @@ describe("Blocking lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it("should reuse its snapshot until a transition publishes new state", () => {
+    const lifecycle = createBlockingLifecycle();
+    const initial = lifecycle.getSnapshot();
+
+    expect(lifecycle.getSnapshot()).toBe(initial);
+
+    lifecycle.add("first");
+    const added = lifecycle.getSnapshot();
+
+    expect(added).not.toBe(initial);
+    expect(lifecycle.getSnapshot()).toBe(added);
+  });
+
+  it("should release only the matching snapshot subscription", () => {
+    const lifecycle = createBlockingLifecycle();
+    const listener = vi.fn();
+    const releaseFirst = lifecycle.subscribe(listener);
+    const releaseSecond = lifecycle.subscribe(listener);
+
+    lifecycle.add("first");
+    expect(listener).toHaveBeenCalledTimes(2);
+
+    releaseFirst();
+    releaseFirst();
+    lifecycle.remove("first");
+    expect(listener).toHaveBeenCalledTimes(3);
+
+    releaseSecond();
+    lifecycle.add("second");
+    expect(listener).toHaveBeenCalledTimes(3);
+  });
+
   it("should expose synchronous immutable reads across transitions", () => {
     const lifecycle = createBlockingLifecycle();
     const observation: BlockingLifecycleObservation = lifecycle;

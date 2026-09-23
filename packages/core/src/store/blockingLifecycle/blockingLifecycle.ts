@@ -28,20 +28,33 @@ function freezeBlocker(blocker: BlockerInfo): BlockerInfo {
   return Object.freeze({ ...blocker, scope: copyScope(blocker.scope) });
 }
 
+function normalizeBlocker(id: string, config: BlockerConfig): BlockerInfo {
+  return {
+    id,
+    scope: copyScope(config.scope ?? DEFAULT_SCOPE),
+    reason: config.reason ?? DEFAULT_REASON,
+    priority: Math.max(0, config.priority ?? DEFAULT_PRIORITY),
+    timestamp: config.timestamp ?? Date.now(),
+    timeout: config.timeout,
+    onTimeout: config.onTimeout,
+  };
+}
+
 /** Owns one independent store's blockers, timers, snapshots, and transition events. */
 export function createBlockingLifecycle(): BlockingLifecycle {
   const blockers = new Map<string, ActiveBlocker>();
-  const subscribers = new Set<(snapshot: BlockingLifecycleSnapshot) => void>();
+  const subscribers = new Map<symbol, (snapshot: BlockingLifecycleSnapshot) => void>();
   const observers = new Map<symbol, Middleware>();
+  let snapshot: BlockingLifecycleSnapshot = Object.freeze([]);
 
   function getSnapshot(): BlockingLifecycleSnapshot {
-    return Object.freeze(Array.from(blockers.values(), ({ config }) => freezeBlocker(config)));
+    return snapshot;
   }
 
   function publish(): void {
-    const snapshot = getSnapshot();
+    snapshot = Object.freeze(Array.from(blockers.values(), ({ config }) => freezeBlocker(config)));
 
-    for (const subscriber of subscribers) {
+    for (const subscriber of subscribers.values()) {
       try {
         subscriber(snapshot);
       } catch {
@@ -113,16 +126,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       cancelTimeout(previous);
     }
 
-    const stored: BlockerInfo = {
-      id,
-      scope: copyScope(config.scope ?? DEFAULT_SCOPE),
-      reason: config.reason ?? DEFAULT_REASON,
-      priority: Math.max(0, config.priority ?? DEFAULT_PRIORITY),
-      timestamp: config.timestamp ?? Date.now(),
-      timeout: config.timeout,
-      onTimeout: config.onTimeout,
-    };
-    const blocker: ActiveBlocker = { config: stored };
+    const blocker: ActiveBlocker = { config: normalizeBlocker(id, config) };
 
     blockers.set(id, blocker);
 
@@ -139,6 +143,42 @@ export function createBlockingLifecycle(): BlockingLifecycle {
         timeout: config.timeout,
       },
     });
+  }
+
+  function restore(nextBlockers: ReadonlyMap<string, BlockerConfig>): void {
+    const restored = new Map<string, ActiveBlocker>();
+
+    for (const [id, config] of nextBlockers) {
+      const previous = blockers.get(id);
+      const nextConfig = normalizeBlocker(id, config);
+
+      if (!previous || previous.config.timeout !== nextConfig.timeout) {
+        if (previous) {
+          cancelTimeout(previous);
+        }
+
+        const blocker: ActiveBlocker = { config: nextConfig };
+        restored.set(id, blocker);
+        scheduleTimeout(id, blocker);
+        continue;
+      }
+
+      previous.config = nextConfig;
+      restored.set(id, previous);
+    }
+
+    for (const [id, blocker] of blockers) {
+      if (!restored.has(id)) {
+        cancelTimeout(blocker);
+      }
+    }
+
+    blockers.clear();
+    for (const [id, blocker] of restored) {
+      blockers.set(id, blocker);
+    }
+
+    publish();
   }
 
   function update(id: string, config: Partial<BlockerConfig> = {}): void {
@@ -254,10 +294,11 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   }
 
   function subscribe(listener: (snapshot: BlockingLifecycleSnapshot) => void): VoidFunction {
-    subscribers.add(listener);
+    const registration = Symbol();
+    subscribers.set(registration, listener);
 
     return () => {
-      subscribers.delete(listener);
+      subscribers.delete(registration);
     };
   }
 
@@ -271,6 +312,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   }
 
   return {
+    restore,
     add,
     update,
     remove,

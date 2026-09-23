@@ -1,3 +1,4 @@
+import { isMap } from "@okyrychenko-dev/type-utils";
 import { createBlockingLifecycle } from "./blockingLifecycle";
 import type { StateCreator } from "zustand";
 import type { Middleware, MiddlewareContext } from "../middleware";
@@ -11,9 +12,11 @@ import type { BlockerConfig, StoredBlocker, UIBlockingStore } from "./uiBlocking
  */
 export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBlockingStore> = (
   set,
-  get
+  get,
+  api
 ) => {
   const lifecycle = createBlockingLifecycle();
+  let publishedBlockers = new Map<string, StoredBlocker>();
 
   registerMiddleware: (name: string, middleware: Middleware) => {
     set((state) => {
@@ -90,6 +93,8 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       clearTimeout(existingBlocker.timeoutId);
     }
 
+    publishedBlockers = activeBlockers;
+
     set({ activeBlockers });
   }
 
@@ -106,6 +111,16 @@ export const createUIBlockingActions: StateCreator<UIBlockingStore, [], [], UIBl
       };
 
       newBlockers.set(id, storedBlocker);
+
+  api.subscribe((state, previousState) => {
+    const { activeBlockers } = state;
+
+    if (activeBlockers === previousState.activeBlockers || activeBlockers === publishedBlockers) {
+      return;
+    }
+
+    lifecycle.restore(isMap(activeBlockers) ? activeBlockers : new Map());
+  });
 
   lifecycle.observe((context) => {
     const { runMiddlewares } = get();

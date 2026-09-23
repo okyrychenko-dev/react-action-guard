@@ -12,6 +12,7 @@ export interface BlockingLifecycleObservation {
 }
 
 export interface BlockingLifecycle extends BlockingLifecycleObservation {
+  restore: (blockers: ReadonlyMap<string, BlockerConfig>) => void;
   add: (id: string, config?: BlockerConfig) => void;
   update: (id: string, config?: Partial<BlockerConfig>) => void;
   remove: (id: string) => void;
