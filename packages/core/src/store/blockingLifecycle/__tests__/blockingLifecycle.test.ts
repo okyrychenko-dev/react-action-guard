@@ -40,6 +40,66 @@ describe("Blocking lifecycle", () => {
     expect(listener).toHaveBeenCalledTimes(3);
   });
 
+  it("should deliver each snapshot to all subscribers before a reentrant publication", () => {
+    const lifecycle = createBlockingLifecycle();
+    const received: Array<string> = [];
+
+    lifecycle.subscribe((snapshot) => {
+      const ids = snapshot.map(({ id }) => id).join(",");
+
+      received.push(`first:${ids}`);
+
+      if (ids === "first") {
+        lifecycle.clear();
+      }
+    });
+    lifecycle.subscribe((snapshot) => {
+      received.push(`second:${snapshot.map(({ id }) => id).join(",")}`);
+    });
+
+    lifecycle.add("first");
+
+    expect(received).toEqual(["first:first", "second:first", "first:", "second:"]);
+    expect(lifecycle.getSnapshot()).toEqual([]);
+  });
+
+  it("should drain chained reentrant publications in transition order", () => {
+    const lifecycle = createBlockingLifecycle();
+    const received: Array<string> = [];
+
+    lifecycle.subscribe((snapshot) => {
+      const ids = snapshot.map(({ id }) => id).join(",");
+
+      received.push(`first:${ids}`);
+
+      if (ids === "first") {
+        lifecycle.add("second");
+        throw Error("subscriber");
+      }
+    });
+    lifecycle.subscribe((snapshot) => {
+      const ids = snapshot.map(({ id }) => id).join(",");
+
+      received.push(`second:${ids}`);
+
+      if (ids === "first,second") {
+        lifecycle.remove("first");
+      }
+    });
+
+    lifecycle.add("first");
+
+    expect(received).toEqual([
+      "first:first",
+      "second:first",
+      "first:first,second",
+      "second:first,second",
+      "first:second",
+      "second:second",
+    ]);
+    expect(lifecycle.getSnapshot().map(({ id }) => id)).toEqual(["second"]);
+  });
+
   it("should expose synchronous immutable reads across transitions", () => {
     const lifecycle = createBlockingLifecycle();
     const observation: BlockingLifecycleObservation = lifecycle;

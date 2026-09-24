@@ -45,7 +45,9 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   const blockers = new Map<string, ActiveBlocker>();
   const subscribers = new Map<symbol, (snapshot: BlockingLifecycleSnapshot) => void>();
   const observers = new Map<symbol, Middleware>();
+  const pendingSnapshots: Array<BlockingLifecycleSnapshot> = [];
   let snapshot: BlockingLifecycleSnapshot = Object.freeze([]);
+  let isPublishing = false;
 
   function getSnapshot(): BlockingLifecycleSnapshot {
     return snapshot;
@@ -53,13 +55,28 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
   function publish(): void {
     snapshot = Object.freeze(Array.from(blockers.values(), ({ config }) => freezeBlocker(config)));
+    // Keep reads current while delivering each queued transition to subscribers in order.
+    pendingSnapshots.push(snapshot);
 
-    for (const subscriber of subscribers.values()) {
-      try {
-        subscriber(snapshot);
-      } catch {
-        // A subscriber cannot interrupt lifecycle transitions.
+    if (isPublishing) {
+      return;
+    }
+
+    isPublishing = true;
+
+    try {
+      for (const publishedSnapshot of pendingSnapshots) {
+        for (const subscriber of subscribers.values()) {
+          try {
+            subscriber(publishedSnapshot);
+          } catch {
+            // A subscriber cannot interrupt lifecycle transitions.
+          }
+        }
       }
+    } finally {
+      pendingSnapshots.length = 0;
+      isPublishing = false;
     }
   }
 
