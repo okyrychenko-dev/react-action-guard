@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createStore } from "zustand";
-import { devtools } from "zustand/middleware";
-import { createUIBlockingActions } from "../uiBlockingStore.actions";
+import { createUIBlockingActionsWithDevtools } from "../uiBlockingStore.actions";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
 import { uiBlockingStoreApi } from "../uiBlockingStore.store";
 import type { MiddlewareContext } from "../../middleware";
@@ -15,8 +14,95 @@ describe("uiBlockingStore", () => {
     uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
+  it("should notify subscribers once with the current state after external blocker replacement", () => {
+    const received: Array<UIBlockingStore["activeBlockers"]> = [];
+    const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
+      received.push(activeBlockers);
+    });
+
+    try {
+      uiBlockingStoreApi.setState({
+        activeBlockers: new Map([
+          ["external", { scope: "form", reason: "External", priority: -10, timestamp: 1 }],
+        ]),
+      });
+
+      const { activeBlockers } = uiBlockingStoreApi.getState();
+
+      expect(received).toHaveLength(1);
+      expect(received[0]).toBe(activeBlockers);
+      expect(received[0]?.get("external")?.priority).toBe(0);
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it("should normalize frozen replacement state before subscribers observe it", () => {
+    const previous = uiBlockingStoreApi.getState();
+    const replacement = Object.freeze({
+      ...previous,
+      activeBlockers: new Map([
+        ["frozen", { scope: "form", reason: "Frozen", priority: -10, timestamp: 1 }],
+      ]),
+    });
+    const received: Array<UIBlockingStore["activeBlockers"]> = [];
+    const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
+      received.push(activeBlockers);
+    });
+
+    try {
+      uiBlockingStoreApi.setState(replacement, true);
+
+      const { activeBlockers, getBlockingInfo } = uiBlockingStoreApi.getState();
+
+      expect(received).toHaveLength(1);
+      expect(received[0]).toBe(activeBlockers);
+      expect(activeBlockers.get("frozen")?.priority).toBe(0);
+      expect(getBlockingInfo("form")[0]?.priority).toBe(0);
+      expect(replacement.activeBlockers.get("frozen")?.priority).toBe(-10);
+      expect(activeBlockers).not.toBe(replacement.activeBlockers);
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it("should evaluate functional external updates once before publishing", () => {
+    const update = vi.fn(() => ({
+      activeBlockers: new Map([
+        ["functional", { scope: "form", reason: "Functional", priority: -10, timestamp: 1 }],
+      ]),
+    }));
+    const received: Array<UIBlockingStore["activeBlockers"]> = [];
+    const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
+      received.push(activeBlockers);
+    });
+
+    try {
+      uiBlockingStoreApi.setState(update);
+
+      const { activeBlockers } = uiBlockingStoreApi.getState();
+
+      expect(update).toHaveBeenCalledTimes(1);
+      expect(received).toHaveLength(1);
+      expect(received[0]).toBe(activeBlockers);
+      expect(activeBlockers.get("functional")?.priority).toBe(0);
+    } finally {
+      unsubscribe();
+    }
+  });
+
+  it("should preserve replace-state identity when blockers do not change", () => {
+    const previous = uiBlockingStoreApi.getState();
+    const replacement = { ...previous, middlewares: new Map(previous.middlewares) };
+
+    uiBlockingStoreApi.setState(replacement, true);
+
+    expect(uiBlockingStoreApi.getState()).toBe(replacement);
+  });
+
   it("should synchronize direct Zustand blocker replacements with lifecycle reads", () => {
     const { addBlocker, isBlocked, getBlockingInfo } = uiBlockingStoreApi.getState();
+
     addBlocker("old", { scope: "form" });
 
     uiBlockingStoreApi.setState({
@@ -31,6 +117,7 @@ describe("uiBlockingStore", () => {
     expect(uiBlockingStoreApi.getState().activeBlockers.has("restored")).toBe(true);
 
     const state = uiBlockingStoreApi.getState();
+
     uiBlockingStoreApi.setState({ ...state, activeBlockers: new Map() }, true);
 
     expect(isBlocked("navigation")).toBe(false);
@@ -43,10 +130,12 @@ describe("uiBlockingStore", () => {
       | ((message: { type: "DISPATCH"; payload: { type: "JUMP_TO_STATE" }; state: string }) => void)
       | undefined;
 
+    const send = vi.fn();
+
     vi.stubGlobal("__REDUX_DEVTOOLS_EXTENSION__", {
       connect: () => ({
         init: vi.fn(),
-        send: vi.fn(),
+        send,
         subscribe: (
           listener: (message: {
             type: "DISPATCH";
@@ -55,6 +144,7 @@ describe("uiBlockingStore", () => {
           }) => void
         ) => {
           receiveMessage = listener;
+
           return () => undefined;
         },
       }),
@@ -62,11 +152,19 @@ describe("uiBlockingStore", () => {
 
     try {
       const store = createStore<UIBlockingStore>()(
-        devtools(createUIBlockingActions, { enabled: true, name: "lifecycle-restore-test" })
+        createUIBlockingActionsWithDevtools({ enabled: true, name: "lifecycle-restore-test" })
       );
       const { addBlocker, isBlocked } = store.getState();
       const onTimeout = vi.fn();
+
       addBlocker("timed", { scope: "form", timeout: 1000, onTimeout });
+      expect(send).toHaveBeenCalledTimes(1);
+
+      const received: Array<UIBlockingStore["activeBlockers"]> = [];
+
+      store.subscribe(({ activeBlockers }) => {
+        received.push(activeBlockers);
+      });
 
       if (!receiveMessage) {
         throw new Error("Redux DevTools did not subscribe");
@@ -80,7 +178,11 @@ describe("uiBlockingStore", () => {
 
       expect(isBlocked("form")).toBe(false);
       expect(onTimeout).not.toHaveBeenCalled();
-      expect(store.getState().activeBlockers.size).toBe(0);
+      const { activeBlockers } = store.getState();
+
+      expect(activeBlockers.size).toBe(0);
+      expect(received).toHaveLength(1);
+      expect(received[0]).toBe(activeBlockers);
     } finally {
       vi.unstubAllGlobals();
       vi.useRealTimers();
@@ -636,6 +738,7 @@ describe("uiBlockingStore", () => {
     it("should cancel a timeout when setState removes its blocker", () => {
       const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
       const onTimeout = vi.fn();
+
       addBlocker("removed-externally", { scope: "form", timeout: 1000, onTimeout });
 
       uiBlockingStoreApi.setState({ activeBlockers: new Map() });
@@ -675,11 +778,13 @@ describe("uiBlockingStore", () => {
     it("should preserve an existing timeout when setState changes only metadata", () => {
       const { addBlocker, isBlocked } = uiBlockingStoreApi.getState();
       const onTimeout = vi.fn();
+
       addBlocker("retained", { scope: "form", timeout: 1000, onTimeout });
 
       vi.advanceTimersByTime(500);
       const { activeBlockers } = uiBlockingStoreApi.getState();
       const current = activeBlockers.get("retained");
+
       if (!current) {
         throw new Error("Blocker was not added");
       }

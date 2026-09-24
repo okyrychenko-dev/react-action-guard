@@ -97,6 +97,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     }
 
     const { scope, reason, priority, timeout: duration } = blocker.config;
+
     emit({
       ...event("timeout", id),
       config: { scope, reason, priority, timeout: duration },
@@ -158,6 +159,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
         }
 
         const blocker: ActiveBlocker = { config: nextConfig };
+
         restored.set(id, blocker);
         scheduleTimeout(id, blocker);
         continue;
@@ -186,6 +188,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     if (!previous) {
       add(id, config);
+
       return;
     }
 
@@ -282,10 +285,11 @@ export function createBlockingLifecycle(): BlockingLifecycle {
         return true;
       }
     }
+
     return false;
   }
 
-  function getBlockingInfo(scope: string): ReadonlyArray<BlockerInfo> {
+  function getBlockingInfo(scope: string): BlockingLifecycleSnapshot {
     return Object.freeze(
       getSnapshot()
         .filter((blocker) => scopeAffectsObservation(blocker.scope, scope))
@@ -295,6 +299,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
   function subscribe(listener: (snapshot: BlockingLifecycleSnapshot) => void): VoidFunction {
     const registration = Symbol();
+
     subscribers.set(registration, listener);
 
     return () => {
@@ -304,6 +309,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
   function observe(observer: Middleware): VoidFunction {
     const registration = Symbol();
+
     observers.set(registration, observer);
 
     return () => {

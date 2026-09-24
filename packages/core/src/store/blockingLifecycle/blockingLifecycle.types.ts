@@ -19,7 +19,7 @@ export interface BlockingLifecycle extends BlockingLifecycleObservation {
   clear: () => void;
   clearScope: (scope: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;
-  getBlockingInfo: (scope: string) => ReadonlyArray<BlockerInfo>;
+  getBlockingInfo: (scope: string) => BlockingLifecycleSnapshot;
 }
 
 export type BlockingEvent = MiddlewareContext;

@@ -1,6 +1,6 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { createBlockingLifecycle } from "..";
-import type { BlockingLifecycleObservation } from "..";
+import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
+import { createBlockingLifecycle } from "../blockingLifecycle";
+import type { BlockingLifecycleObservation } from "../blockingLifecycle.types";
 
 describe("Blocking lifecycle", () => {
   afterEach(() => {
@@ -44,10 +44,12 @@ describe("Blocking lifecycle", () => {
     const lifecycle = createBlockingLifecycle();
     const observation: BlockingLifecycleObservation = lifecycle;
     const observed: Array<ReadonlyArray<string>> = [];
+
     observation.subscribe((snapshot) => observed.push(snapshot.map(({ id }) => id)));
 
     lifecycle.add("first", { scope: "form", priority: 10 });
     const earlier = observation.getSnapshot();
+
     lifecycle.add("second", { scope: "form", priority: 20 });
     lifecycle.update("first", { reason: "Updated" });
     lifecycle.clearScope("form");
@@ -59,10 +61,23 @@ describe("Blocking lifecycle", () => {
     expect(observed).toEqual([["first"], ["first", "second"], ["first", "second"], []]);
   });
 
+  it("should expose readonly entries from scoped blocker reads", () => {
+    const lifecycle = createBlockingLifecycle();
+
+    lifecycle.add("first", { scope: "form" });
+
+    const info = lifecycle.getBlockingInfo("form");
+
+    expectTypeOf(info).toEqualTypeOf<ReturnType<typeof lifecycle.getSnapshot>>();
+    expect(Object.isFrozen(info)).toBe(true);
+    expect(Object.isFrozen(info[0])).toBe(true);
+  });
+
   it("should preserve update-as-upsert and ordered timeout then removal events", () => {
     vi.useFakeTimers();
     const lifecycle = createBlockingLifecycle();
     const events: Array<string> = [];
+
     lifecycle.observe(({ action }) => {
       events.push(action);
     });
@@ -86,6 +101,7 @@ describe("Blocking lifecycle", () => {
     vi.spyOn(globalThis, "clearTimeout").mockImplementation(() => undefined);
     const lifecycle = createBlockingLifecycle();
     const oldTimeout = vi.fn();
+
     lifecycle.add("first", { timeout: 10, onTimeout: oldTimeout });
     vi.advanceTimersByTime(5);
     lifecycle.add("first", { reason: "replacement", timeout: 20 });
@@ -116,6 +132,7 @@ describe("Blocking lifecycle", () => {
   it("should clear targeted blockers while preserving global blockers", () => {
     const lifecycle = createBlockingLifecycle();
     const events: Array<string> = [];
+
     lifecycle.observe(({ action }) => {
       events.push(action);
     });
@@ -133,6 +150,7 @@ describe("Blocking lifecycle", () => {
   it("should preserve a replacement created by a timeout callback", () => {
     vi.useFakeTimers();
     const lifecycle = createBlockingLifecycle();
+
     lifecycle.add("first", {
       timeout: 10,
       onTimeout: () => {
@@ -167,6 +185,7 @@ describe("Blocking lifecycle", () => {
   it("should isolate observer failures from transitions and later observers", async () => {
     const lifecycle = createBlockingLifecycle();
     const events: Array<string> = [];
+
     lifecycle.observe(() => {
       throw Error("observer");
     });

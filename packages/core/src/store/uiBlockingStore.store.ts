@@ -1,6 +1,5 @@
 import { createShallowStore } from "@okyrychenko-dev/react-zustand-toolkit";
-import { devtools } from "zustand/middleware";
-import { createUIBlockingActions } from "./uiBlockingStore.actions";
+import { createUIBlockingActionsWithDevtools } from "./uiBlockingStore.actions";
 import { devtoolsConfig } from "./uiBlockingStore.config";
 import type { UIBlockingStore } from "./uiBlockingStore.types";
 
@@ -18,7 +17,7 @@ import type { UIBlockingStore } from "./uiBlockingStore.types";
  *
  */
 const storeBindings = createShallowStore<UIBlockingStore, [["zustand/devtools", never]]>(
-  devtools(createUIBlockingActions, devtoolsConfig)
+  createUIBlockingActionsWithDevtools(devtoolsConfig)
 );
 
 const uiBlockingStoreApi = storeBindings.store;
