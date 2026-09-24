@@ -608,6 +608,23 @@ Middleware receives events for the following actions:
 }
 ```
 
+### Lifecycle notification order
+
+Lifecycle actions update the current state immediately. `getSnapshot()` and `isBlocked()` therefore
+read the latest state even while an earlier snapshot is being delivered. Snapshot subscribers receive
+immutable snapshots in transition order. For a transition with an event, all snapshot subscribers are
+called before its observers; that event reaches every observer before notifications from actions started
+by those callbacks. Reentrant notifications are queued and drained synchronously.
+
+`restore()` publishes a snapshot without an action event. The Zustand compatibility store publishes an
+external `setState({ activeBlockers })` replacement once and keeps lifecycle reads synchronized. A
+subscriber or observer throwing does not interrupt delivery to the others. Events are passed to
+`runMiddlewares` in delivery order; asynchronous middleware may finish in a different order.
+
+When changing lifecycle delivery or its Zustand adapter, cover nested actions from a snapshot
+subscriber, an event observer, and a Zustand subscriber. Verify snapshot and event order, one
+publication per external replacement, timer behavior, and delivery after a listener throws.
+
 ### Built-in Middleware
 
 These are extensions around the blocker lifecycle, not the primary onboarding path for the library.

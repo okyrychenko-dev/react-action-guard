@@ -79,7 +79,9 @@ import type { BlockerInfo } from "../../store";
  * @public
  * @since 0.6.0
  */
-export function useBlockingInfo(scope: string = DEFAULT_SCOPE): ReadonlyArray<BlockerInfo> {
+export function useBlockingInfo(
+  scope: string = DEFAULT_SCOPE
+): ReadonlyArray<Readonly<BlockerInfo>> {
   const store = useResolvedStoreApi();
 
   // Subscribe to the activeBlockers Map to detect changes

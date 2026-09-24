@@ -84,7 +84,8 @@ export interface StoredBlocker {
  * @example
  * Accessing blocker info
  * ```ts
- * const blockers: BlockerInfo[] = store.getState().getBlockingInfo('form');
+ * const { getBlockingInfo } = store.getState();
+ * const blockers: ReadonlyArray<Readonly<BlockerInfo>> = getBlockingInfo('form');
  * blockers.forEach(blocker => {
  *   console.log(`${blocker.id}: ${blocker.reason} (priority: ${blocker.priority})`);
  * });
@@ -147,7 +148,7 @@ export interface UIBlockingStoreActions {
   updateBlocker: (id: string, config?: Partial<BlockerConfig>) => void;
   removeBlocker: (id: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;
-  getBlockingInfo: (scope: string) => ReadonlyArray<BlockerInfo>;
+  getBlockingInfo: (scope: string) => ReadonlyArray<Readonly<BlockerInfo>>;
   clearAllBlockers: VoidFunction;
   clearBlockersForScope: (scope: string) => void;
   registerMiddleware: (name: string, middleware: Middleware) => void;
