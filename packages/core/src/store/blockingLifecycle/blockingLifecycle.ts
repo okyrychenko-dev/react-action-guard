@@ -7,6 +7,7 @@ import type {
   BlockingEvent,
   BlockingLifecycle,
   BlockingLifecycleSnapshot,
+  PendingPublication,
 } from "./blockingLifecycle.types";
 
 interface ActiveBlocker {
@@ -45,42 +46,15 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   const blockers = new Map<string, ActiveBlocker>();
   const subscribers = new Map<symbol, (snapshot: BlockingLifecycleSnapshot) => void>();
   const observers = new Map<symbol, Middleware>();
-  const pendingSnapshots: Array<BlockingLifecycleSnapshot> = [];
+  const pendingPublications: Array<PendingPublication> = [];
   let snapshot: BlockingLifecycleSnapshot = Object.freeze([]);
-  let isPublishing = false;
+  let isDelivering = false;
 
   function getSnapshot(): BlockingLifecycleSnapshot {
     return snapshot;
   }
 
-  function publish(): void {
-    snapshot = Object.freeze(Array.from(blockers.values(), ({ config }) => freezeBlocker(config)));
-    // Keep reads current while delivering each queued transition to subscribers in order.
-    pendingSnapshots.push(snapshot);
-
-    if (isPublishing) {
-      return;
-    }
-
-    isPublishing = true;
-
-    try {
-      for (const publishedSnapshot of pendingSnapshots) {
-        for (const subscriber of subscribers.values()) {
-          try {
-            subscriber(publishedSnapshot);
-          } catch {
-            // A subscriber cannot interrupt lifecycle transitions.
-          }
-        }
-      }
-    } finally {
-      pendingSnapshots.length = 0;
-      isPublishing = false;
-    }
-  }
-
-  function emit(event: BlockingEvent): void {
+  function deliverEvent(event: BlockingEvent): void {
     for (const observer of observers.values()) {
       try {
         void Promise.resolve(observer(event)).catch(() => undefined);
@@ -88,6 +62,49 @@ export function createBlockingLifecycle(): BlockingLifecycle {
         // Diagnostics must never interrupt a lifecycle transition.
       }
     }
+  }
+
+  function drainPublications(): void {
+    if (isDelivering) {
+      return;
+    }
+
+    isDelivering = true;
+
+    try {
+      for (const publication of pendingPublications) {
+        if (publication.kind === "snapshot") {
+          for (const subscriber of subscribers.values()) {
+            try {
+              subscriber(publication.snapshot);
+            } catch {
+              // A subscriber cannot interrupt lifecycle transitions.
+            }
+          }
+
+          if (publication.event) {
+            deliverEvent(publication.event);
+          }
+        } else {
+          deliverEvent(publication.event);
+        }
+      }
+    } finally {
+      pendingPublications.length = 0;
+      isDelivering = false;
+    }
+  }
+
+  function publish(transitionEvent?: BlockingEvent): void {
+    snapshot = Object.freeze(Array.from(blockers.values(), ({ config }) => freezeBlocker(config)));
+    // Keep reads current while delivering each transition's snapshot and event in order.
+    pendingPublications.push({ kind: "snapshot", snapshot, event: transitionEvent });
+    drainPublications();
+  }
+
+  function emit(event: BlockingEvent): void {
+    pendingPublications.push({ kind: "event", event });
+    drainPublications();
   }
 
   function event(action: BlockingEvent["action"], blockerId: string): BlockingEvent {
@@ -150,9 +167,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     scheduleTimeout(id, blocker);
 
-    publish();
-
-    emit({
+    publish({
       ...event("add", id),
       config: {
         scope: config.scope,
@@ -235,9 +250,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       scheduleTimeout(id, blocker);
     }
 
-    publish();
-
-    emit({
+    publish({
       ...event("update", id),
       config: publicConfig(nextConfig),
       prevState: publicConfig(oldConfig),
@@ -253,12 +266,12 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     blockers.delete(id);
 
-    publish();
-
     if (previous) {
       const config = publicConfig(previous.config);
 
-      emit({ ...event("remove", id), config, prevState: config });
+      publish({ ...event("remove", id), config, prevState: config });
+    } else {
+      publish();
     }
   }
 
@@ -271,10 +284,10 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     blockers.clear();
 
-    publish();
-
     if (count > 0) {
-      emit({ ...event("clear", "*"), count });
+      publish({ ...event("clear", "*"), count });
+    } else {
+      publish();
     }
   }
 
@@ -289,10 +302,10 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       }
     }
 
-    publish();
-
     if (count > 0) {
-      emit({ ...event("clear_scope", "*"), scope, count });
+      publish({ ...event("clear_scope", "*"), scope, count });
+    } else {
+      publish();
     }
   }
 

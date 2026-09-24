@@ -100,6 +100,44 @@ describe("Blocking lifecycle", () => {
     expect(lifecycle.getSnapshot().map(({ id }) => id)).toEqual(["second"]);
   });
 
+  it("should emit transition events in snapshot order across reentrant actions", () => {
+    const lifecycle = createBlockingLifecycle();
+    const events: Array<string> = [];
+
+    lifecycle.subscribe((snapshot) => {
+      if (snapshot.some(({ id }) => id === "first")) {
+        lifecycle.clear();
+      }
+    });
+    lifecycle.observe(({ action }) => {
+      events.push(action);
+    });
+
+    lifecycle.add("first");
+
+    expect(events).toEqual(["add", "clear"]);
+  });
+
+  it("should finish an event before delivering actions started by its observers", () => {
+    const lifecycle = createBlockingLifecycle();
+    const received: Array<string> = [];
+
+    lifecycle.observe(({ action }) => {
+      received.push(`first:${action}`);
+
+      if (action === "add") {
+        lifecycle.clear();
+      }
+    });
+    lifecycle.observe(({ action }) => {
+      received.push(`second:${action}`);
+    });
+
+    lifecycle.add("first");
+
+    expect(received).toEqual(["first:add", "second:add", "first:clear", "second:clear"]);
+  });
+
   it("should expose synchronous immutable reads across transitions", () => {
     const lifecycle = createBlockingLifecycle();
     const observation: BlockingLifecycleObservation = lifecycle;

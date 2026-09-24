@@ -67,6 +67,30 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should run compatibility middleware in transition order across reentrant actions", () => {
+    const events: Array<string> = [];
+    const { addBlocker, clearAllBlockers, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+
+    registerMiddleware("reentrant-order", ({ action }) => {
+      events.push(action);
+    });
+    const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
+      if (activeBlockers.has("first")) {
+        clearAllBlockers();
+      }
+    });
+
+    try {
+      addBlocker("first");
+
+      expect(events).toEqual(["add", "clear"]);
+    } finally {
+      unsubscribe();
+      unregisterMiddleware("reentrant-order");
+    }
+  });
+
   it("should normalize frozen replacement state before subscribers observe it", () => {
     const previous = uiBlockingStoreApi.getState();
     const replacement = Object.freeze({

@@ -23,3 +23,16 @@ export interface BlockingLifecycle extends BlockingLifecycleObservation {
 }
 
 export type BlockingEvent = MiddlewareContext;
+
+export interface SnapshotPublication {
+  kind: "snapshot";
+  snapshot: BlockingLifecycleSnapshot;
+  event?: BlockingEvent;
+}
+
+export interface EventPublication {
+  kind: "event";
+  event: BlockingEvent;
+}
+
+export type PendingPublication = SnapshotPublication | EventPublication;
