@@ -107,6 +107,7 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
   return (set, get, api) => {
     const lifecycle = createBlockingLifecycle();
     let restoring = false;
+    const externallyPublishedSnapshots = new WeakSet<BlockingLifecycleSnapshot>();
     // Track the current lifecycle projection to distinguish its writes from external replacements.
     let publishedBlockers: ActiveBlockers = new Map();
 
@@ -131,7 +132,11 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
         restoring = false;
       }
 
-      publishedBlockers = blockersFromSnapshot(lifecycle.getSnapshot());
+      const restoredSnapshot = lifecycle.getSnapshot();
+
+      // A reentrant restore may be delivered after this external write has already published it.
+      externallyPublishedSnapshots.add(restoredSnapshot);
+      publishedBlockers = blockersFromSnapshot(restoredSnapshot);
 
       return publishedBlockers;
     }
@@ -169,7 +174,7 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
     api.setState = setWithLifecycle;
 
     lifecycle.subscribe((snapshot) => {
-      if (restoring) {
+      if (restoring || externallyPublishedSnapshots.delete(snapshot)) {
         return;
       }
 

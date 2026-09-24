@@ -37,6 +37,36 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should publish a reentrant external blocker replacement only once", () => {
+    const received: Array<ReadonlyArray<string>> = [];
+    let replaced = false;
+    const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
+      received.push([...activeBlockers.keys()]);
+
+      if (!replaced && activeBlockers.has("first")) {
+        replaced = true;
+        uiBlockingStoreApi.setState({
+          activeBlockers: new Map([
+            ["second", { scope: "form", reason: "Second", priority: 0, timestamp: 1 }],
+          ]),
+        });
+      }
+    });
+
+    try {
+      const { addBlocker } = uiBlockingStoreApi.getState();
+
+      addBlocker("first");
+
+      expect(received).toEqual([["first"], ["second"]]);
+      const { activeBlockers } = uiBlockingStoreApi.getState();
+
+      expect([...activeBlockers.keys()]).toEqual(["second"]);
+    } finally {
+      unsubscribe();
+    }
+  });
+
   it("should normalize frozen replacement state before subscribers observe it", () => {
     const previous = uiBlockingStoreApi.getState();
     const replacement = Object.freeze({
@@ -114,9 +144,10 @@ describe("uiBlockingStore", () => {
     expect(isBlocked("form")).toBe(false);
     expect(isBlocked("navigation")).toBe(true);
     expect(getBlockingInfo("navigation")[0]?.reason).toBe("Restored");
-    expect(uiBlockingStoreApi.getState().activeBlockers.has("restored")).toBe(true);
 
     const state = uiBlockingStoreApi.getState();
+
+    expect(state.activeBlockers.has("restored")).toBe(true);
 
     uiBlockingStoreApi.setState({ ...state, activeBlockers: new Map() }, true);
 
@@ -746,7 +777,9 @@ describe("uiBlockingStore", () => {
 
       expect(onTimeout).not.toHaveBeenCalled();
       expect(isBlocked("form")).toBe(false);
-      expect(uiBlockingStoreApi.getState().activeBlockers.size).toBe(0);
+      const { activeBlockers } = uiBlockingStoreApi.getState();
+
+      expect(activeBlockers.size).toBe(0);
     });
 
     it("should schedule a timeout for a blocker added through setState", () => {
