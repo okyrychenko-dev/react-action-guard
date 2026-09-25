@@ -514,8 +514,9 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 - `getBlockingInfo(scope)` - Get detailed blocking information
 - `clearAllBlockers()` - Remove all blockers (emits `"clear"` middleware event)
 - `clearBlockersForScope(scope)` - Remove blockers for specific scope (emits `"clear_scope"` middleware event)
-- `registerMiddleware(name, middleware)` - Register middleware manually
-- `unregisterMiddleware(name)` - Unregister middleware manually
+- `observeBlockingEvents(observer)` - Observe lifecycle events; returns an idempotent release function
+- `registerMiddleware(name, middleware)` - Deprecated named registration for compatibility
+- `unregisterMiddleware(name)` - Deprecated named unregistration for compatibility
 
 **Note about `updateBlocker` and timeouts:**
 - If you pass a **new** `timeout` value, the timer will be **restarted**
@@ -618,8 +619,10 @@ by those callbacks. Reentrant notifications are queued and drained synchronously
 
 `restore()` publishes a snapshot without an action event. The Zustand compatibility store publishes an
 external `setState({ activeBlockers })` replacement once and keeps lifecycle reads synchronized. A
-subscriber or observer throwing does not interrupt delivery to the others. Events are passed to
-`runMiddlewares` in delivery order; asynchronous middleware may finish in a different order.
+subscriber or observer throwing does not interrupt delivery to the others. Legacy named middleware
+receives events in registration order without waiting for asynchronous completion. Asynchronous
+observers may finish in a different order. Use `observeBlockingEvents()`
+for new integrations; each call owns only its own registration and returns a release function.
 
 When changing lifecycle delivery or its Zustand adapter, cover nested actions from a snapshot
 subscriber, an event observer, and a Zustand subscriber. Verify snapshot and event order, one

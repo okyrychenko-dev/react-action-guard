@@ -154,8 +154,13 @@ export interface UIBlockingStoreActions {
   getBlockingInfo: (scope: string) => ReadonlyArray<Readonly<BlockerInfo>>;
   clearAllBlockers: VoidFunction;
   clearBlockersForScope: (scope: string) => void;
+  /** Observe lifecycle transitions through an anonymous, ownership-safe lease. */
+  observeBlockingEvents: (observer: Middleware) => VoidFunction;
+  /** Legacy named registration for compatibility. Prefer `observeBlockingEvents`. */
   registerMiddleware: (name: string, middleware: Middleware) => void;
+  /** Legacy named unregistration for compatibility. */
   unregisterMiddleware: (name: string) => void;
+  /** Legacy direct dispatch for compatibility. */
   runMiddlewares: (context: MiddlewareContext) => Promise<void>;
 }
 

@@ -1,4 +1,3 @@
-import { DEVTOOLS_MIDDLEWARE_NAME } from "@devtools/middleware";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { describe, expect, it } from "vitest";
 import {
@@ -11,11 +10,21 @@ describe("acquireDevtoolsMiddleware", () => {
     const session = resolveDevtoolsObservationSession();
     const release = acquireDevtoolsMiddleware(session);
 
+    const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("observed");
+    const { events: observedEvents } = session.devtoolsStore.getState();
+
+    expect(observedEvents.some(({ blockerId }) => blockerId === "observed")).toBe(true);
+
     release();
     release();
+    addBlocker("after-release");
 
-    const { middlewares } = uiBlockingStoreApi.getState();
+    const { events: eventsAfterRelease } = session.devtoolsStore.getState();
 
-    expect(middlewares.has(DEVTOOLS_MIDDLEWARE_NAME)).toBe(false);
+    expect(eventsAfterRelease).toEqual([]);
+    removeBlocker("observed");
+    removeBlocker("after-release");
   });
 });

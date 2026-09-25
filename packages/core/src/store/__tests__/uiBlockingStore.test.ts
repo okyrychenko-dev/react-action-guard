@@ -14,6 +14,68 @@ describe("uiBlockingStore", () => {
     uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
+  it("should observe transitions through independent ownership leases", () => {
+    const { addBlocker, observeBlockingEvents, removeBlocker } = uiBlockingStoreApi.getState();
+    const events: Array<string> = [];
+    const observer = ({ action }: MiddlewareContext): void => {
+      events.push(action);
+    };
+    const releaseFirst = observeBlockingEvents(observer);
+    const releaseSecond = observeBlockingEvents(observer);
+
+    addBlocker("first");
+    releaseFirst();
+    releaseFirst();
+    removeBlocker("first");
+    releaseSecond();
+    addBlocker("second");
+
+    expect(events).toEqual(["add", "add", "remove"]);
+  });
+
+  it("should invoke named and anonymous observers in registration order", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+    const release = observeBlockingEvents(() => {
+      calls.push("anonymous");
+    });
+
+    registerMiddleware("named", () => {
+      calls.push("named");
+    });
+
+    try {
+      addBlocker("mixed-observers");
+      expect(calls).toEqual(["anonymous", "named"]);
+    } finally {
+      release();
+      unregisterMiddleware("named");
+    }
+  });
+
+  it("should invoke legacy middleware in registration order without awaiting completion", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("slow", () => {
+      calls.push("slow");
+
+      return new Promise<void>(() => undefined);
+    });
+    registerMiddleware("later", () => {
+      calls.push("later");
+    });
+
+    try {
+      addBlocker("ordered");
+      expect(calls).toEqual(["slow", "later"]);
+    } finally {
+      unregisterMiddleware("slow");
+      unregisterMiddleware("later");
+    }
+  });
+
   it("should notify subscribers once with the current state after external blocker replacement", () => {
     const received: Array<UIBlockingStore["activeBlockers"]> = [];
     const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {

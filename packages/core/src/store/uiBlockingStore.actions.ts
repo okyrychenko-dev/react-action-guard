@@ -34,18 +34,18 @@ function blockersFromSnapshot(snapshot: BlockingLifecycleSnapshot): ActiveBlocke
 
 function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
   return (set, get) => {
-    lifecycle.observe((context) => {
-      const { runMiddlewares } = get();
-
-      void runMiddlewares(context);
-    });
+    const namedObservations = new Map<string, VoidFunction>();
 
     return {
       activeBlockers: new Map(),
       blockingSnapshot: lifecycle.getSnapshot(),
       middlewares: new Map(),
+      observeBlockingEvents: (observer: Middleware) => lifecycle.observe(observer),
 
       registerMiddleware: (name: string, middleware: Middleware) => {
+        namedObservations.get(name)?.();
+        namedObservations.set(name, lifecycle.observe(middleware));
+
         set((state) => {
           const middlewares = new Map(state.middlewares);
 
@@ -56,6 +56,9 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
       },
 
       unregisterMiddleware: (name: string) => {
+        namedObservations.get(name)?.();
+        namedObservations.delete(name);
+
         set((state) => {
           const middlewares = new Map(state.middlewares);
 
@@ -65,16 +68,18 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
         });
       },
 
-      runMiddlewares: async (context: MiddlewareContext) => {
+      runMiddlewares: (context: MiddlewareContext) => {
         const { middlewares } = get();
 
         for (const middleware of middlewares.values()) {
           try {
-            await middleware(context);
+            void Promise.resolve(middleware(context)).catch(() => undefined);
           } catch {
             // Compatibility observers cannot interrupt blocker transitions.
           }
         }
+
+        return Promise.resolve();
       },
 
       addBlocker: (id: string, config: BlockerConfig = {}) => {

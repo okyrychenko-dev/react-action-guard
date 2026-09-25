@@ -379,28 +379,41 @@ describe("ActionGuardDevtools", () => {
     unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
   });
 
-  it("should preserve caller middleware that replaces an automatic registration", () => {
+  it("should preserve caller middleware registered during automatic observation", () => {
     const devtools = renderWithProviders(<ActionGuardDevtools />);
     const replacementMiddleware = createDevtoolsMiddleware();
-    const { middlewares, registerMiddleware } = uiBlockingStoreApi.getState();
-    const automaticMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
-
-    assertDefined(automaticMiddleware, "Automatic Devtools middleware should be registered");
-    expect(automaticMiddleware).not.toBe(replacementMiddleware);
-
-    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, replacementMiddleware);
-    devtools.unmount();
-
-    const {
-      addBlocker,
-      middlewares: middlewaresAfterUnmount,
-      unregisterMiddleware,
-    } = uiBlockingStoreApi.getState();
-
-    expect(middlewaresAfterUnmount.get(DEVTOOLS_MIDDLEWARE_NAME)).toBe(replacementMiddleware);
+    const { addBlocker, registerMiddleware } = uiBlockingStoreApi.getState();
 
     act(() => {
-      addBlocker("replacement-after-automatic-blocker");
+      addBlocker("automatically-observed-blocker");
+    });
+    const { events: automaticallyObservedEvents } = devtoolsStoreApi.getState();
+
+    expect(
+      automaticallyObservedEvents.some(
+        (event) => event.blockerId === "automatically-observed-blocker"
+      )
+    ).toBe(true);
+
+    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, replacementMiddleware);
+    act(() => {
+      addBlocker("manual-during-automatic-blocker");
+    });
+    const { events: eventsDuringManualObservation } = devtoolsStoreApi.getState();
+
+    expect(
+      eventsDuringManualObservation.filter(
+        (event) => event.blockerId === "manual-during-automatic-blocker"
+      )
+    ).toHaveLength(1);
+
+    devtools.unmount();
+
+    const { addBlocker: addBlockerAfterUnmount, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+
+    act(() => {
+      addBlockerAfterUnmount("replacement-after-automatic-blocker");
     });
 
     const { events } = devtoolsStoreApi.getState();
@@ -431,7 +444,7 @@ describe("ActionGuardDevtools", () => {
     expect(reservedMiddleware).toHaveBeenCalledOnce();
     expect(warn).toHaveBeenCalledWith(
       "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
-        "Devtools middleware and added a session-specific registration for the custom store."
+        "Devtools middleware and added an observation lease for the custom store."
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle manual custom observation" }));

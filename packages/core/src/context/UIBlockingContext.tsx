@@ -146,9 +146,10 @@ export function UIBlockingProvider({
   middlewares = [],
 }: UIBlockingProviderProps): ReactNode {
   const handleStoreInit = (store: StoreApi<UIBlockingStore>): void => {
-    // Register initial middlewares
-    middlewares.forEach((mw, index) => {
-      store.getState().registerMiddleware(`provider-middleware-${index.toString()}`, mw);
+    const { observeBlockingEvents } = store.getState();
+
+    middlewares.forEach((middleware) => {
+      observeBlockingEvents(middleware);
     });
   };
 
