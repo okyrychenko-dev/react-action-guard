@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0
+
+### Patch Changes
+
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [d07b65a]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@1.1.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
