@@ -43,8 +43,17 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
       observeBlockingEvents: (observer: Middleware) => lifecycle.observe(observer),
 
       registerMiddleware: (name: string, middleware: Middleware) => {
-        namedObservations.get(name)?.();
-        namedObservations.set(name, lifecycle.observe(middleware));
+        if (!namedObservations.has(name)) {
+          const release = lifecycle.observe((context) => {
+            const { middlewares } = get();
+
+            const middleware = middlewares.get(name);
+
+            return middleware?.(context);
+          });
+
+          namedObservations.set(name, release);
+        }
 
         set((state) => {
           const middlewares = new Map(state.middlewares);

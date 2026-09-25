@@ -54,6 +54,52 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should retain a named middleware's delivery position when replaced", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("first", () => {
+      calls.push("first");
+    });
+    registerMiddleware("second", () => {
+      calls.push("second");
+    });
+
+    try {
+      addBlocker("before-replacement");
+      registerMiddleware("first", () => {
+        calls.push("replacement");
+      });
+      addBlocker("after-replacement");
+
+      expect(calls).toEqual(["first", "second", "replacement", "second"]);
+    } finally {
+      unregisterMiddleware("first");
+      unregisterMiddleware("second");
+    }
+  });
+
+  it("should skip named middleware unregistered earlier in the same event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("first", () => {
+      calls.push("first");
+      unregisterMiddleware("second");
+    });
+    registerMiddleware("second", () => {
+      calls.push("second");
+    });
+
+    try {
+      addBlocker("unregister-during-delivery");
+      expect(calls).toEqual(["first"]);
+    } finally {
+      unregisterMiddleware("first");
+      unregisterMiddleware("second");
+    }
+  });
+
   it("should defer a named middleware replacement until the next event", () => {
     const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
     const calls: Array<string> = [];
