@@ -84,12 +84,11 @@ export function useBlockingInfo(
 ): ReadonlyArray<Readonly<BlockerInfo>> {
   const store = useResolvedStoreApi();
 
-  // Subscribe to the activeBlockers Map to detect changes
-  const activeBlockers = useStore(store, (state) => state.activeBlockers);
+  const blockingSnapshot = useStore(store, (state) => state.blockingSnapshot);
 
-  // Recompute blockers only when activeBlockers or scope changes
+  // Recompute only when the immutable lifecycle projection or scope changes
   return useMemo(() => {
     return store.getState().getBlockingInfo(scope);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeBlockers, scope, store]);
+  }, [blockingSnapshot, scope, store]);
 }

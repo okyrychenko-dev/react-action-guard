@@ -2,6 +2,7 @@ import { act, render, renderHook, screen } from "@testing-library/react";
 import { type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useActionBlocker } from "../../hooks/useActionBlocker";
+import { useBlockingInfo } from "../../hooks/useBlockingInfo";
 import { useIsBlocked } from "../../hooks/useIsBlocked";
 import { uiBlockingStoreApi } from "../../store/uiBlockingStore.store";
 import {
@@ -186,6 +187,128 @@ describe("UIBlockingProvider", () => {
       expect(stores[0]).not.toBe(uiBlockingStoreApi);
       expect(stores[1]).not.toBe(uiBlockingStoreApi);
     });
+  });
+
+  it("should publish isolated immutable snapshots to provider React hooks", () => {
+    const providerStores: Array<ReturnType<typeof useResolvedStoreApi>> = [];
+
+    function Capture(): null {
+      providerStores.push(useResolvedStoreApi());
+
+      return null;
+    }
+
+    function Info({ testId }: { testId: string }) {
+      const blockers = useBlockingInfo("form");
+
+      return <div data-testid={testId}>{blockers.map(({ reason }) => reason).join(",")}</div>;
+    }
+
+    render(
+      <>
+        <Info testId="global-info" />
+        <UIBlockingProvider>
+          <Capture />
+          <Info testId="provider-info" />
+        </UIBlockingProvider>
+      </>
+    );
+
+    const providerStore = providerStores[0];
+
+    expect(providerStore).toBeDefined();
+    act(() => {
+      const { addBlocker } = providerStore.getState();
+
+      addBlocker("provider", { scope: "form", reason: "Provider" });
+    });
+
+    expect(screen.getByTestId("provider-info")).toHaveTextContent("Provider");
+    expect(screen.getByTestId("global-info")).toBeEmptyDOMElement();
+    const { blockingSnapshot: providerSnapshot } = providerStore.getState();
+    const { blockingSnapshot: globalSnapshot } = uiBlockingStoreApi.getState();
+
+    expect(Object.isFrozen(providerSnapshot)).toBe(true);
+    expect(globalSnapshot).toHaveLength(0);
+  });
+
+  it("should publish equivalent global and provider snapshots", () => {
+    const { result } = renderHook(() => useUIBlockingContext(), {
+      wrapper: ({ children }: { children: ReactNode }) => (
+        <UIBlockingProvider>{children}</UIBlockingProvider>
+      ),
+    });
+    const providerStore = result.current;
+    const globalStore = uiBlockingStoreApi;
+
+    act(() => {
+      const { addBlocker: addGlobal } = globalStore.getState();
+      const { addBlocker: addProvider } = providerStore.getState();
+      const config = { scope: "form", reason: "Saving", timestamp: 1 };
+
+      addGlobal("same", config);
+      addProvider("same", config);
+    });
+
+    const { blockingSnapshot: globalAdded } = globalStore.getState();
+    const { blockingSnapshot: providerAdded } = providerStore.getState();
+
+    expect(providerAdded).toEqual(globalAdded);
+    expect(providerAdded).not.toBe(globalAdded);
+
+    act(() => {
+      const { updateBlocker: updateGlobal } = globalStore.getState();
+      const { updateBlocker: updateProvider } = providerStore.getState();
+
+      updateGlobal("same", { reason: "Finishing" });
+      updateProvider("same", { reason: "Finishing" });
+    });
+
+    const { blockingSnapshot: globalUpdated } = globalStore.getState();
+    const { blockingSnapshot: providerUpdated } = providerStore.getState();
+
+    expect(providerUpdated).toEqual(globalUpdated);
+  });
+
+  it("should start a new lifecycle when provider identity changes", () => {
+    function Info() {
+      const blockers = useBlockingInfo("form");
+
+      return (
+        <div data-testid="provider-info">{blockers.map(({ reason }) => reason).join(",")}</div>
+      );
+    }
+
+    function AddButton() {
+      const store = useUIBlockingContext();
+
+      function handleClick(): void {
+        const { addBlocker } = store.getState();
+
+        addBlocker("owned", { scope: "form", reason: "Old provider" });
+      }
+
+      return <button onClick={handleClick}>Add</button>;
+    }
+
+    const { rerender } = render(
+      <UIBlockingProvider key="old">
+        <AddButton />
+        <Info />
+      </UIBlockingProvider>
+    );
+
+    act(() => screen.getByRole("button", { name: "Add" }).click());
+    expect(screen.getByTestId("provider-info")).toHaveTextContent("Old provider");
+
+    rerender(
+      <UIBlockingProvider key="new">
+        <AddButton />
+        <Info />
+      </UIBlockingProvider>
+    );
+
+    expect(screen.getByTestId("provider-info")).toBeEmptyDOMElement();
   });
 
   describe("useUIBlockingStoreFromContext", () => {

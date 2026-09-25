@@ -18,9 +18,9 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
 
   // Single subscription - use provided store or fall back to global
   const targetStore = store ?? uiBlockingStoreApi;
-  const activeBlockers = useStore(targetStore, (state) => state.activeBlockers);
+  const blockingSnapshot = useStore(targetStore, (state) => state.blockingSnapshot);
 
-  const blockers = useMemo(() => getSortedBlockers(activeBlockers), [activeBlockers]);
+  const blockers = useMemo(() => getSortedBlockers(blockingSnapshot), [blockingSnapshot]);
 
   // Tick while blockers are present so ages (and the stuck flag) stay fresh.
   const [now, setNow] = useState(() => Date.now());

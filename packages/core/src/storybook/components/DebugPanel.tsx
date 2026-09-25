@@ -11,10 +11,11 @@ interface DebugPanelProps {
 function DebugPanel(props: DebugPanelProps): ReactElement {
   const { title = "🔍 Debug Panel", showEmpty = true } = props;
 
-  const activeBlockers = useUIBlockingStore((state) => state.activeBlockers);
-  const blockerEntries: Array<BlockerEntry> = Array.from(activeBlockers.entries()).map(
-    ([id, blocker]): BlockerEntry => ({ id, blocker })
-  );
+  const blockingSnapshot = useUIBlockingStore((state) => state.blockingSnapshot);
+  const blockerEntries: Array<BlockerEntry> = blockingSnapshot.map((blocker) => ({
+    id: blocker.id,
+    blocker,
+  }));
 
   return (
     <div className="container">

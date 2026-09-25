@@ -22,11 +22,11 @@ function ToggleButton(props: ToggleButtonProps): ReactElement | null {
     isPaused: state.isPaused,
   }));
 
-  // Read active blockers count directly from the blocking store
+  // Read the immutable lifecycle projection from the blocking store
   const targetStore = store ?? uiBlockingStoreApi;
-  const activeBlockers = useStore(targetStore, (state) => state.activeBlockers);
+  const blockingSnapshot = useStore(targetStore, (state) => state.blockingSnapshot);
 
-  const activeCount = activeBlockers.size;
+  const activeCount = blockingSnapshot.length;
 
   if (isOpen) {
     return null;

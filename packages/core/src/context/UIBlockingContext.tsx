@@ -175,7 +175,7 @@ export function UIBlockingProvider({
  *   useEffect(() => {
  *     // Subscribe to changes
  *     const unsubscribe = storeApi.subscribe((state) => {
- *       console.log('Blockers:', state.activeBlockers.size);
+ *       console.log('Blockers:', state.blockingSnapshot.length);
  *     });
  *     return unsubscribe;
  *   }, [storeApi]);
@@ -214,7 +214,7 @@ export function UIBlockingProvider({
  * ```tsx
  * function BlockerCount() {
  *   const count = useUIBlockingStoreFromContext(
- *     (state) => state.activeBlockers.size
+ *     (state) => state.blockingSnapshot.length
  *   );
  *   return <div>{count} active blockers</div>;
  * }

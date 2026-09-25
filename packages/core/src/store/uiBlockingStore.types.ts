@@ -1,5 +1,6 @@
 import { StoreApi } from "zustand";
 import { Middleware, MiddlewareContext } from "../middleware";
+import type { BlockingLifecycleSnapshot } from "./blockingLifecycle";
 
 /**
  * Configuration options for creating or updating a blocker.
@@ -109,6 +110,8 @@ export interface BlockerInfo extends Omit<StoredBlocker, "timeoutId"> {
  * @since 0.6.0
  */
 export interface UIBlockingStoreState {
+  /** Immutable lifecycle projection for React selectors. */
+  blockingSnapshot: BlockingLifecycleSnapshot;
   activeBlockers: Map<string, StoredBlocker>;
   middlewares: Map<string, Middleware>;
 }
