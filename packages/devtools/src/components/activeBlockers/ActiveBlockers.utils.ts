@@ -1,4 +1,8 @@
-import type { BlockerInfo, BlockingLifecycleSnapshot, StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import type {
+  BlockerInfo,
+  BlockingLifecycleSnapshot,
+  StoredBlocker,
+} from "@okyrychenko-dev/react-action-guard";
 
 export function getSortedBlockers(
   blockingSnapshot: BlockingLifecycleSnapshot

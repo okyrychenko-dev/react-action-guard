@@ -274,7 +274,9 @@ describe("UIBlockingProvider", () => {
     function Info() {
       const blockers = useBlockingInfo("form");
 
-      return <div data-testid="provider-info">{blockers.map(({ reason }) => reason).join(",")}</div>;
+      return (
+        <div data-testid="provider-info">{blockers.map(({ reason }) => reason).join(",")}</div>
+      );
     }
 
     function AddButton() {

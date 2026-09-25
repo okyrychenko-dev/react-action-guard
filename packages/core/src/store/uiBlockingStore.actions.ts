@@ -163,11 +163,14 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
           return;
         }
 
-        set({
-          ...next,
-          ...(isDefined(activeBlockers) ? { activeBlockers } : {}),
-          blockingSnapshot,
-        }, true);
+        set(
+          {
+            ...next,
+            ...(isDefined(activeBlockers) ? { activeBlockers } : {}),
+            blockingSnapshot,
+          },
+          true
+        );
 
         return;
       }
