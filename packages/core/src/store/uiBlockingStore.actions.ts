@@ -46,7 +46,6 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
         if (!namedObservations.has(name)) {
           const release = lifecycle.observe((context) => {
             const { middlewares } = get();
-
             const middleware = middlewares.get(name);
 
             return middleware?.(context);

@@ -144,6 +144,38 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should deliver directly dispatched legacy contexts in order despite middleware failures", async () => {
+    const { registerMiddleware, runMiddlewares, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const context: MiddlewareContext = { action: "add", blockerId: "direct", timestamp: 1 };
+    const calls: Array<string> = [];
+    const received = vi.fn();
+
+    registerMiddleware("throws", () => {
+      calls.push("throws");
+      throw Error("observer failure");
+    });
+    registerMiddleware("rejects", () => {
+      calls.push("rejects");
+
+      return Promise.reject(Error("async observer failure"));
+    });
+    registerMiddleware("receives", (event) => {
+      calls.push("receives");
+      received(event);
+    });
+
+    try {
+      await expect(runMiddlewares(context)).resolves.toBeUndefined();
+      expect(calls).toEqual(["throws", "rejects", "receives"]);
+      expect(received).toHaveBeenCalledWith(context);
+    } finally {
+      unregisterMiddleware("throws");
+      unregisterMiddleware("rejects");
+      unregisterMiddleware("receives");
+    }
+  });
+
   it("should notify subscribers once with the current state after external blocker replacement", () => {
     const received: Array<UIBlockingStore["activeBlockers"]> = [];
     const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
