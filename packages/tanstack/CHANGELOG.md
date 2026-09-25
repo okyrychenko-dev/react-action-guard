@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.0.0
+
+### Patch Changes
+
+- 583ec47: Route TanStack blocking hooks through the nearest `UIBlockingProvider` store while preserving the global-store fallback when no provider is present.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [d07b65a]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@1.1.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
