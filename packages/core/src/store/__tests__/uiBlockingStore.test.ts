@@ -86,6 +86,37 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should not fall back after named middleware unregisters itself during delivery", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    function manualObserver(): void {
+      calls.push("manual");
+      unregisterMiddleware("manual");
+    }
+
+    function fallbackObserver(): void {
+      calls.push("fallback");
+    }
+
+    registerMiddleware("manual", manualObserver);
+    const releaseFallback = observeBlockingEvents(fallbackObserver, {
+      skipWhenNamedMiddlewareActive: "manual",
+    });
+
+    try {
+      addBlocker("self-unregister");
+      expect(calls).toEqual(["manual"]);
+
+      addBlocker("after-unregister");
+      expect(calls).toEqual(["manual", "fallback"]);
+    } finally {
+      releaseFallback();
+      unregisterMiddleware("manual");
+    }
+  });
+
   it("should invoke named and anonymous observers in registration order", () => {
     const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
       uiBlockingStoreApi.getState();

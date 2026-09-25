@@ -1,4 +1,4 @@
-import { isDefined, isFunction, isMap } from "@okyrychenko-dev/type-utils";
+import { isDefined, isFunction, isMap, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtools } from "zustand/middleware";
 import { createBlockingLifecycle } from "./blockingLifecycle/blockingLifecycle";
 import type { DevtoolsOptions } from "zustand/middleware";
@@ -44,6 +44,7 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
       MiddlewareContext,
       ReadonlyMap<string, VoidFunction>
     >();
+    const invokedNamedMiddlewares = new WeakMap<MiddlewareContext, Set<string>>();
 
     function captureEventMiddlewares(context: MiddlewareContext): void {
       const { middlewares } = get();
@@ -52,24 +53,15 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
       eventNamedObservations.set(context, new Map(namedObservations));
     }
 
-    function observeBlockingEvents(
-      observer: Middleware,
-      options?: BlockingObservationOptions
-    ): VoidFunction {
-      const name = options?.skipWhenNamedMiddlewareActive;
-
-      if (name === undefined) {
-        return lifecycle.observe(observer);
-      }
-
-      const namedMiddlewareName: string = name;
-
+    function observeWithNamedFallback(observer: Middleware, name: string): VoidFunction {
       function observeUnlessNamedMiddleware(context: MiddlewareContext): ReturnType<Middleware> {
-        const registrationAtStart = eventNamedObservations.get(context)?.get(namedMiddlewareName);
+        const registrationAtStart = eventNamedObservations.get(context)?.get(name);
+
+        const alreadyInvoked = invokedNamedMiddlewares.get(context)?.has(name);
 
         if (
-          registrationAtStart !== undefined &&
-          namedObservations.get(namedMiddlewareName) === registrationAtStart
+          isDefined(registrationAtStart) &&
+          (namedObservations.get(name) === registrationAtStart || alreadyInvoked)
         ) {
           return;
         }
@@ -80,13 +72,35 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
       return lifecycle.observe(observeUnlessNamedMiddleware);
     }
 
+    function observeBlockingEvents(
+      observer: Middleware,
+      options?: BlockingObservationOptions
+    ): VoidFunction {
+      const { skipWhenNamedMiddlewareActive } = options ?? {};
+
+      if (isUndefined(skipWhenNamedMiddlewareActive)) {
+        return lifecycle.observe(observer);
+      }
+
+      return observeWithNamedFallback(observer, skipWhenNamedMiddlewareActive);
+    }
+
     function registerMiddleware(name: string, middleware: Middleware): void {
       if (!namedObservations.has(name)) {
         function observeNamedMiddleware(context: MiddlewareContext): ReturnType<Middleware> {
           const eventMiddleware = eventMiddlewares.get(context);
           const currentMiddleware = eventMiddleware?.get(name);
 
-          return currentMiddleware?.(context);
+          if (isUndefined(currentMiddleware)) {
+            return;
+          }
+
+          const invoked = invokedNamedMiddlewares.get(context) ?? new Set<string>();
+
+          invoked.add(name);
+          invokedNamedMiddlewares.set(context, invoked);
+
+          return currentMiddleware(context);
         }
 
         const release = lifecycle.observe(observeNamedMiddleware);

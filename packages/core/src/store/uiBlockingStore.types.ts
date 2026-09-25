@@ -116,7 +116,7 @@ export interface UIBlockingStoreState {
   middlewares: Map<string, Middleware>;
 }
 
-/** Suppress an observation only when this named middleware can receive the same event. */
+/** Suppress observation when named middleware is still scheduled for or already handled this event. */
 export interface BlockingObservationOptions {
   skipWhenNamedMiddlewareActive?: string;
 }
