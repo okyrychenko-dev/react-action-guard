@@ -514,7 +514,7 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 - `getBlockingInfo(scope)` - Get detailed blocking information
 - `clearAllBlockers()` - Remove all blockers (emits `"clear"` middleware event)
 - `clearBlockersForScope(scope)` - Remove blockers for specific scope (emits `"clear_scope"` middleware event)
-- `observeBlockingEvents(observer)` - Observe lifecycle events; returns an idempotent release function
+- `observeBlockingEvents(observer, options?)` - Observe lifecycle events; returns an idempotent release function. During migration from named middleware, `skipWhenNamedMiddlewareActive` suppresses the observer only when that named registration can receive the current event.
 - `registerMiddleware(name, middleware)` - Deprecated named registration for compatibility
 - `unregisterMiddleware(name)` - Deprecated named unregistration for compatibility
 

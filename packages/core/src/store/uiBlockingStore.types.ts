@@ -116,6 +116,11 @@ export interface UIBlockingStoreState {
   middlewares: Map<string, Middleware>;
 }
 
+/** Suppress an observation only when this named middleware can receive the same event. */
+export interface BlockingObservationOptions {
+  skipWhenNamedMiddlewareActive?: string;
+}
+
 /**
  * All available actions for managing UI blocking state.
  *
@@ -155,7 +160,10 @@ export interface UIBlockingStoreActions {
   clearAllBlockers: VoidFunction;
   clearBlockersForScope: (scope: string) => void;
   /** Observe lifecycle transitions through an anonymous, ownership-safe lease. */
-  observeBlockingEvents: (observer: Middleware) => VoidFunction;
+  observeBlockingEvents: (
+    observer: Middleware,
+    options?: BlockingObservationOptions
+  ) => VoidFunction;
   /** Legacy named registration for compatibility. Prefer `observeBlockingEvents`. */
   registerMiddleware: (name: string, middleware: Middleware) => void;
   /** Legacy named unregistration for compatibility. */

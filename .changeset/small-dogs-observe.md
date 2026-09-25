@@ -10,3 +10,5 @@ Observers registered while an event is being delivered begin receiving events wi
 Observers released before their turn in an event are skipped, and replacing named middleware keeps its original delivery position.
 
 Named middleware replacements made during an event take effect on the next event. Direct compatibility calls to `runMiddlewares` invoke middleware concurrently and settle after all complete.
+
+Global Devtools observation keeps the current event when manual Devtools middleware registers during delivery, while manual registrations already participating in that event remain authoritative.

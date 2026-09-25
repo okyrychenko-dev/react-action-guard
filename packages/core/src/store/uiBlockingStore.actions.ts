@@ -18,7 +18,11 @@ import type {
   StoreStateChange,
   StoreUpdateArgs,
 } from "./uiBlockingStore.actions.types";
-import type { BlockerConfig, UIBlockingStore } from "./uiBlockingStore.types";
+import type {
+  BlockerConfig,
+  BlockingObservationOptions,
+  UIBlockingStore,
+} from "./uiBlockingStore.types";
 
 function blockersFromSnapshot(snapshot: BlockingLifecycleSnapshot): ActiveBlockers {
   const activeBlockers: ActiveBlockers = new Map();
@@ -36,15 +40,44 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
   return (set, get) => {
     const namedObservations = new Map<string, VoidFunction>();
     const eventMiddlewares = new WeakMap<MiddlewareContext, ReadonlyMap<string, Middleware>>();
+    const eventNamedObservations = new WeakMap<
+      MiddlewareContext,
+      ReadonlyMap<string, VoidFunction>
+    >();
 
     function captureEventMiddlewares(context: MiddlewareContext): void {
       const { middlewares } = get();
 
       eventMiddlewares.set(context, new Map(middlewares));
+      eventNamedObservations.set(context, new Map(namedObservations));
     }
 
-    function observeBlockingEvents(observer: Middleware): VoidFunction {
-      return lifecycle.observe(observer);
+    function observeBlockingEvents(
+      observer: Middleware,
+      options?: BlockingObservationOptions
+    ): VoidFunction {
+      const name = options?.skipWhenNamedMiddlewareActive;
+
+      if (name === undefined) {
+        return lifecycle.observe(observer);
+      }
+
+      const namedMiddlewareName: string = name;
+
+      function observeUnlessNamedMiddleware(context: MiddlewareContext): ReturnType<Middleware> {
+        const registrationAtStart = eventNamedObservations.get(context)?.get(namedMiddlewareName);
+
+        if (
+          registrationAtStart !== undefined &&
+          namedObservations.get(namedMiddlewareName) === registrationAtStart
+        ) {
+          return;
+        }
+
+        return observer(context);
+      }
+
+      return lifecycle.observe(observeUnlessNamedMiddleware);
     }
 
     function registerMiddleware(name: string, middleware: Middleware): void {

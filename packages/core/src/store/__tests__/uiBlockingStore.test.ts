@@ -33,6 +33,59 @@ describe("uiBlockingStore", () => {
     expect(events).toEqual(["add", "add", "remove"]);
   });
 
+  it("should suppress an observer only for a named middleware active in that delivery", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    function manualMiddleware({ blockerId }: MiddlewareContext): void {
+      calls.push(`manual:${blockerId}`);
+    }
+
+    function changeManualRegistration({ blockerId }: MiddlewareContext): void {
+      if (blockerId === "register-during-event") {
+        registerMiddleware("manual", manualMiddleware);
+      }
+
+      if (blockerId === "replace-during-event") {
+        registerMiddleware("manual", () => {
+          calls.push("replacement");
+        });
+      }
+
+      if (blockerId === "unregister-during-event") {
+        unregisterMiddleware("manual");
+      }
+    }
+
+    function automaticObserver({ blockerId }: MiddlewareContext): void {
+      calls.push(`automatic:${blockerId}`);
+    }
+
+    const releaseEarlierObserver = observeBlockingEvents(changeManualRegistration);
+    const releaseAutomaticObserver = observeBlockingEvents(automaticObserver, {
+      skipWhenNamedMiddlewareActive: "manual",
+    });
+
+    try {
+      addBlocker("register-during-event");
+      addBlocker("manual-at-start");
+      addBlocker("replace-during-event");
+      addBlocker("unregister-during-event");
+
+      expect(calls).toEqual([
+        "automatic:register-during-event",
+        "manual:manual-at-start",
+        "manual:replace-during-event",
+        "automatic:unregister-during-event",
+      ]);
+    } finally {
+      releaseAutomaticObserver();
+      releaseEarlierObserver();
+      unregisterMiddleware("manual");
+    }
+  });
+
   it("should invoke named and anonymous observers in registration order", () => {
     const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
       uiBlockingStoreApi.getState();

@@ -2,7 +2,6 @@ import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
-import type { Middleware } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../../store";
 import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 
@@ -38,19 +37,16 @@ function observeSession(session: ObservationSession): void {
   const { devtoolsStore, targetStore } = session;
   const { observeBlockingEvents } = targetStore.getState();
   const middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
-  const observer: Middleware = (event) => {
-    if (targetStore === uiBlockingStoreApi) {
-      const { middlewares } = targetStore.getState();
 
-      if (middlewares.has(DEVTOOLS_MIDDLEWARE_NAME)) {
-        return;
-      }
-    }
+  if (targetStore === uiBlockingStoreApi) {
+    session.releaseObservation = observeBlockingEvents(middleware, {
+      skipWhenNamedMiddlewareActive: DEVTOOLS_MIDDLEWARE_NAME,
+    });
 
-    return middleware(event);
-  };
+    return;
+  }
 
-  session.releaseObservation = observeBlockingEvents(observer);
+  session.releaseObservation = observeBlockingEvents(middleware);
 }
 
 function resetObservationSession(devtoolsStore: DevtoolsStoreApi): void {
