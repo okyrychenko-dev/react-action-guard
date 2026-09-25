@@ -49,6 +49,7 @@ export type { ShallowStoreBindings } from "./store/uiBlockingStore.types";
 export type {
   BlockerConfig,
   BlockerInfo,
+  BlockingObservationOptions,
   StoredBlocker,
   UIBlockingStore,
   UIBlockingStoreActions,

@@ -260,6 +260,41 @@ describe("Blocking lifecycle", () => {
     expect(lifecycle.getSnapshot()[0]?.reason).toBe("replacement");
   });
 
+  it("should defer observers registered during delivery until the next event", () => {
+    const lifecycle = createBlockingLifecycle();
+    const received: Array<string> = [];
+
+    lifecycle.observe(() => {
+      received.push("first");
+      lifecycle.observe(() => {
+        received.push("later");
+      });
+    });
+
+    lifecycle.add("first");
+    expect(received).toEqual(["first"]);
+
+    lifecycle.add("second");
+    expect(received).toEqual(["first", "first", "later"]);
+  });
+
+  it("should skip an observer released before its turn in the current event", () => {
+    const lifecycle = createBlockingLifecycle();
+    const received: Array<string> = [];
+    const laterLease: { release?: VoidFunction } = {};
+
+    lifecycle.observe(() => {
+      received.push("first");
+      laterLease.release?.();
+    });
+    laterLease.release = lifecycle.observe(() => {
+      received.push("later");
+    });
+
+    lifecycle.add("first");
+    expect(received).toEqual(["first"]);
+  });
+
   it("should release only the matching observer registration", () => {
     const lifecycle = createBlockingLifecycle();
     const observation: BlockingLifecycleObservation = lifecycle;

@@ -1,4 +1,4 @@
-import { isDefined, isFunction, isMap } from "@okyrychenko-dev/type-utils";
+import { isDefined, isFunction, isMap, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtools } from "zustand/middleware";
 import { createBlockingLifecycle } from "./blockingLifecycle/blockingLifecycle";
 import type { DevtoolsOptions } from "zustand/middleware";
@@ -18,7 +18,11 @@ import type {
   StoreStateChange,
   StoreUpdateArgs,
 } from "./uiBlockingStore.actions.types";
-import type { BlockerConfig, UIBlockingStore } from "./uiBlockingStore.types";
+import type {
+  BlockerConfig,
+  BlockingObservationOptions,
+  UIBlockingStore,
+} from "./uiBlockingStore.types";
 
 function blockersFromSnapshot(snapshot: BlockingLifecycleSnapshot): ActiveBlockers {
   const activeBlockers: ActiveBlockers = new Map();
@@ -34,66 +38,158 @@ function blockersFromSnapshot(snapshot: BlockingLifecycleSnapshot): ActiveBlocke
 
 function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
   return (set, get) => {
-    lifecycle.observe((context) => {
-      const { runMiddlewares } = get();
+    const namedObservations = new Map<string, VoidFunction>();
+    const eventMiddlewares = new WeakMap<MiddlewareContext, ReadonlyMap<string, Middleware>>();
+    const eventNamedObservations = new WeakMap<
+      MiddlewareContext,
+      ReadonlyMap<string, VoidFunction>
+    >();
+    const invokedNamedMiddlewares = new WeakMap<MiddlewareContext, Set<string>>();
 
-      void runMiddlewares(context);
-    });
+    function captureEventMiddlewares(context: MiddlewareContext): void {
+      const { middlewares } = get();
+
+      eventMiddlewares.set(context, new Map(middlewares));
+      eventNamedObservations.set(context, new Map(namedObservations));
+    }
+
+    function observeWithNamedFallback(observer: Middleware, name: string): VoidFunction {
+      function observeUnlessNamedMiddleware(context: MiddlewareContext): ReturnType<Middleware> {
+        const registrationAtStart = eventNamedObservations.get(context)?.get(name);
+
+        const alreadyInvoked = invokedNamedMiddlewares.get(context)?.has(name);
+
+        if (
+          isDefined(registrationAtStart) &&
+          (namedObservations.get(name) === registrationAtStart || alreadyInvoked)
+        ) {
+          return;
+        }
+
+        return observer(context);
+      }
+
+      return lifecycle.observe(observeUnlessNamedMiddleware);
+    }
+
+    function observeBlockingEvents(
+      observer: Middleware,
+      options?: BlockingObservationOptions
+    ): VoidFunction {
+      const { skipWhenNamedMiddlewareActive } = options ?? {};
+
+      if (isUndefined(skipWhenNamedMiddlewareActive)) {
+        return lifecycle.observe(observer);
+      }
+
+      return observeWithNamedFallback(observer, skipWhenNamedMiddlewareActive);
+    }
+
+    function registerMiddleware(name: string, middleware: Middleware): void {
+      if (!namedObservations.has(name)) {
+        function observeNamedMiddleware(context: MiddlewareContext): ReturnType<Middleware> {
+          const eventMiddleware = eventMiddlewares.get(context);
+          const currentMiddleware = eventMiddleware?.get(name);
+
+          if (isUndefined(currentMiddleware)) {
+            return;
+          }
+
+          const invoked = invokedNamedMiddlewares.get(context) ?? new Set<string>();
+
+          invoked.add(name);
+          invokedNamedMiddlewares.set(context, invoked);
+
+          return currentMiddleware(context);
+        }
+
+        const release = lifecycle.observe(observeNamedMiddleware);
+
+        namedObservations.set(name, release);
+      }
+
+      set((state) => {
+        const middlewares = new Map(state.middlewares);
+
+        middlewares.set(name, middleware);
+
+        return { middlewares };
+      });
+    }
+
+    function unregisterMiddleware(name: string): void {
+      namedObservations.get(name)?.();
+      namedObservations.delete(name);
+
+      set((state) => {
+        const middlewares = new Map(state.middlewares);
+
+        middlewares.delete(name);
+
+        return { middlewares };
+      });
+    }
+
+    function runMiddlewares(context: MiddlewareContext): Promise<void> {
+      const { middlewares } = get();
+      const completions: Array<Promise<void>> = [];
+
+      for (const middleware of middlewares.values()) {
+        try {
+          completions.push(Promise.resolve(middleware(context)));
+        } catch {
+          // Compatibility observers cannot interrupt blocker transitions.
+        }
+      }
+
+      return Promise.allSettled(completions).then(() => undefined);
+    }
+
+    function addBlocker(id: string, config: BlockerConfig = {}): void {
+      lifecycle.add(id, config);
+    }
+
+    function updateBlocker(id: string, config: Partial<BlockerConfig> = {}): void {
+      lifecycle.update(id, config);
+    }
+
+    function removeBlocker(id: string): void {
+      lifecycle.remove(id);
+    }
+
+    function clearAllBlockers(): void {
+      lifecycle.clear();
+    }
+
+    function clearBlockersForScope(scope: string): void {
+      lifecycle.clearScope(scope);
+    }
+
+    function isBlocked(scope?: string | ReadonlyArray<string>): boolean {
+      return lifecycle.isBlocked(scope);
+    }
+
+    function getBlockingInfo(scope: string): BlockingLifecycleSnapshot {
+      return lifecycle.getBlockingInfo(scope);
+    }
+
+    lifecycle.observe(captureEventMiddlewares);
 
     return {
       activeBlockers: new Map(),
       blockingSnapshot: lifecycle.getSnapshot(),
       middlewares: new Map(),
-
-      registerMiddleware: (name: string, middleware: Middleware) => {
-        set((state) => {
-          const middlewares = new Map(state.middlewares);
-
-          middlewares.set(name, middleware);
-
-          return { middlewares };
-        });
-      },
-
-      unregisterMiddleware: (name: string) => {
-        set((state) => {
-          const middlewares = new Map(state.middlewares);
-
-          middlewares.delete(name);
-
-          return { middlewares };
-        });
-      },
-
-      runMiddlewares: async (context: MiddlewareContext) => {
-        const { middlewares } = get();
-
-        for (const middleware of middlewares.values()) {
-          try {
-            await middleware(context);
-          } catch {
-            // Compatibility observers cannot interrupt blocker transitions.
-          }
-        }
-      },
-
-      addBlocker: (id: string, config: BlockerConfig = {}) => {
-        lifecycle.add(id, config);
-      },
-      updateBlocker: (id: string, config: Partial<BlockerConfig> = {}) => {
-        lifecycle.update(id, config);
-      },
-      removeBlocker: (id: string) => {
-        lifecycle.remove(id);
-      },
-      clearAllBlockers: () => {
-        lifecycle.clear();
-      },
-      clearBlockersForScope: (scope: string) => {
-        lifecycle.clearScope(scope);
-      },
-      isBlocked: (scope) => lifecycle.isBlocked(scope),
-      getBlockingInfo: (scope) => lifecycle.getBlockingInfo(scope),
+      observeBlockingEvents,
+      registerMiddleware,
+      unregisterMiddleware,
+      runMiddlewares,
+      addBlocker,
+      updateBlocker,
+      removeBlocker,
+      clearAllBlockers,
+      clearBlockersForScope,
+      isBlocked,
+      getBlockingInfo,
     };
   };
 }

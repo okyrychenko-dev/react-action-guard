@@ -14,6 +14,314 @@ describe("uiBlockingStore", () => {
     uiBlockingStoreApi.getState().clearAllBlockers();
   });
 
+  it("should observe transitions through independent ownership leases", () => {
+    const { addBlocker, observeBlockingEvents, removeBlocker } = uiBlockingStoreApi.getState();
+    const events: Array<string> = [];
+    const observer = ({ action }: MiddlewareContext): void => {
+      events.push(action);
+    };
+    const releaseFirst = observeBlockingEvents(observer);
+    const releaseSecond = observeBlockingEvents(observer);
+
+    addBlocker("first");
+    releaseFirst();
+    releaseFirst();
+    removeBlocker("first");
+    releaseSecond();
+    addBlocker("second");
+
+    expect(events).toEqual(["add", "add", "remove"]);
+  });
+
+  it("should suppress an observer only for a named middleware active in that delivery", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    function manualMiddleware({ blockerId }: MiddlewareContext): void {
+      calls.push(`manual:${blockerId}`);
+    }
+
+    function changeManualRegistration({ blockerId }: MiddlewareContext): void {
+      if (blockerId === "register-during-event") {
+        registerMiddleware("manual", manualMiddleware);
+      }
+
+      if (blockerId === "replace-during-event") {
+        registerMiddleware("manual", () => {
+          calls.push("replacement");
+        });
+      }
+
+      if (blockerId === "unregister-during-event") {
+        unregisterMiddleware("manual");
+      }
+    }
+
+    function automaticObserver({ blockerId }: MiddlewareContext): void {
+      calls.push(`automatic:${blockerId}`);
+    }
+
+    const releaseEarlierObserver = observeBlockingEvents(changeManualRegistration);
+    const releaseAutomaticObserver = observeBlockingEvents(automaticObserver, {
+      skipWhenNamedMiddlewareActive: "manual",
+    });
+
+    try {
+      addBlocker("register-during-event");
+      addBlocker("manual-at-start");
+      addBlocker("replace-during-event");
+      addBlocker("unregister-during-event");
+
+      expect(calls).toEqual([
+        "automatic:register-during-event",
+        "manual:manual-at-start",
+        "manual:replace-during-event",
+        "automatic:unregister-during-event",
+      ]);
+    } finally {
+      releaseAutomaticObserver();
+      releaseEarlierObserver();
+      unregisterMiddleware("manual");
+    }
+  });
+
+  it("should not fall back after named middleware unregisters itself during delivery", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    function manualObserver(): void {
+      calls.push("manual");
+      unregisterMiddleware("manual");
+    }
+
+    function fallbackObserver(): void {
+      calls.push("fallback");
+    }
+
+    registerMiddleware("manual", manualObserver);
+    const releaseFallback = observeBlockingEvents(fallbackObserver, {
+      skipWhenNamedMiddlewareActive: "manual",
+    });
+
+    try {
+      addBlocker("self-unregister");
+      expect(calls).toEqual(["manual"]);
+
+      addBlocker("after-unregister");
+      expect(calls).toEqual(["manual", "fallback"]);
+    } finally {
+      releaseFallback();
+      unregisterMiddleware("manual");
+    }
+  });
+
+  it("should invoke named and anonymous observers in registration order", () => {
+    const { addBlocker, observeBlockingEvents, registerMiddleware, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+    const release = observeBlockingEvents(() => {
+      calls.push("anonymous");
+    });
+
+    registerMiddleware("named", () => {
+      calls.push("named");
+    });
+
+    try {
+      addBlocker("mixed-observers");
+      expect(calls).toEqual(["anonymous", "named"]);
+    } finally {
+      release();
+      unregisterMiddleware("named");
+    }
+  });
+
+  it("should retain a named middleware's delivery position when replaced", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("first", () => {
+      calls.push("first");
+    });
+    registerMiddleware("second", () => {
+      calls.push("second");
+    });
+
+    try {
+      addBlocker("before-replacement");
+      registerMiddleware("first", () => {
+        calls.push("replacement");
+      });
+      addBlocker("after-replacement");
+
+      expect(calls).toEqual(["first", "second", "replacement", "second"]);
+    } finally {
+      unregisterMiddleware("first");
+      unregisterMiddleware("second");
+    }
+  });
+
+  it("should defer a cross-name middleware replacement until the next event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("A", () => {
+      calls.push("A");
+      registerMiddleware("B", () => {
+        calls.push("B replacement");
+      });
+    });
+    registerMiddleware("B", () => {
+      calls.push("B original");
+    });
+
+    try {
+      addBlocker("first");
+      expect(calls).toEqual(["A", "B original"]);
+
+      addBlocker("second");
+      expect(calls).toEqual(["A", "B original", "A", "B replacement"]);
+    } finally {
+      unregisterMiddleware("A");
+      unregisterMiddleware("B");
+    }
+  });
+
+  it("should skip named middleware unregistered earlier in the same event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("first", () => {
+      calls.push("first");
+      unregisterMiddleware("second");
+    });
+    registerMiddleware("second", () => {
+      calls.push("second");
+    });
+
+    try {
+      addBlocker("unregister-during-delivery");
+      expect(calls).toEqual(["first"]);
+    } finally {
+      unregisterMiddleware("first");
+      unregisterMiddleware("second");
+    }
+  });
+
+  it("should defer a named middleware replacement until the next event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("replacing", () => {
+      calls.push("original");
+      registerMiddleware("replacing", () => {
+        calls.push("replacement");
+      });
+    });
+
+    try {
+      addBlocker("first");
+      expect(calls).toEqual(["original"]);
+
+      addBlocker("second");
+      expect(calls).toEqual(["original", "replacement"]);
+    } finally {
+      unregisterMiddleware("replacing");
+    }
+  });
+
+  it("should invoke legacy middleware in registration order without awaiting completion", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("slow", () => {
+      calls.push("slow");
+
+      return new Promise<void>(() => undefined);
+    });
+    registerMiddleware("later", () => {
+      calls.push("later");
+    });
+
+    try {
+      addBlocker("ordered");
+      expect(calls).toEqual(["slow", "later"]);
+    } finally {
+      unregisterMiddleware("slow");
+      unregisterMiddleware("later");
+    }
+  });
+
+  it("should deliver directly dispatched legacy contexts in order despite middleware failures", async () => {
+    const { registerMiddleware, runMiddlewares, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const context: MiddlewareContext = { action: "add", blockerId: "direct", timestamp: 1 };
+    const calls: Array<string> = [];
+    const received = vi.fn();
+
+    registerMiddleware("throws", () => {
+      calls.push("throws");
+      throw Error("observer failure");
+    });
+    registerMiddleware("rejects", () => {
+      calls.push("rejects");
+
+      return Promise.reject(Error("async observer failure"));
+    });
+    registerMiddleware("receives", (event) => {
+      calls.push("receives");
+      received(event);
+    });
+
+    try {
+      await expect(runMiddlewares(context)).resolves.toBeUndefined();
+      expect(calls).toEqual(["throws", "rejects", "receives"]);
+      expect(received).toHaveBeenCalledWith(context);
+    } finally {
+      unregisterMiddleware("throws");
+      unregisterMiddleware("rejects");
+      unregisterMiddleware("receives");
+    }
+  });
+
+  it("should wait for concurrent legacy middleware before resolving direct dispatch", async () => {
+    const { registerMiddleware, runMiddlewares, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const context: MiddlewareContext = { action: "add", blockerId: "direct", timestamp: 1 };
+    const pending: { resolve: VoidFunction } = { resolve: () => undefined };
+    const slow = new Promise<void>((resolve) => {
+      pending.resolve = () => resolve();
+    });
+    const calls: Array<string> = [];
+    const completed = vi.fn();
+
+    registerMiddleware("slow", () => {
+      calls.push("slow");
+
+      return slow;
+    });
+    registerMiddleware("fast", () => {
+      calls.push("fast");
+    });
+
+    try {
+      const dispatch = runMiddlewares(context).then(completed);
+
+      expect(calls).toEqual(["slow", "fast"]);
+      await Promise.resolve();
+      expect(completed).not.toHaveBeenCalled();
+
+      pending.resolve();
+      await dispatch;
+      expect(completed).toHaveBeenCalledOnce();
+    } finally {
+      unregisterMiddleware("slow");
+      unregisterMiddleware("fast");
+    }
+  });
+
   it("should notify subscribers once with the current state after external blocker replacement", () => {
     const received: Array<UIBlockingStore["activeBlockers"]> = [];
     const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {

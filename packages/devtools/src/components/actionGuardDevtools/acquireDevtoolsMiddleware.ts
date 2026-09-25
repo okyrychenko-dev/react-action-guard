@@ -2,33 +2,21 @@ import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
-import type { Middleware } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../../store";
 import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 
 /**
- * Ref-counts devtools-middleware registration per blocking store.
+ * Shares one Devtools observation lease per blocking store while participants are active.
  *
- * Several `<ActionGuardDevtools />` instances may observe the same store and share its observation
- * session. Registering one middleware per instance would record every event multiple times, while
- * unregistering on each unmount would tear the middleware down for still-mounted instances. So we
- * register exactly one middleware on the first acquire and only unregister once the last consumer
- * releases it.
- *
- * @param store - The blocking store to attach the middleware to
- * @returns A release function to call on unmount (idempotent)
+ * Several `<ActionGuardDevtools />` instances may observe the same store. The first participant
+ * attaches the observer; the last participant releases it and resets the session.
  */
 export interface ObservationSession {
   configuration: Optional<ObservationSessionConfiguration>;
   devtoolsStore: DevtoolsStoreApi;
-  middlewareRegistration: Optional<ObservationSessionMiddlewareRegistration>;
+  releaseObservation: Optional<VoidFunction>;
   observerCount: number;
   targetStore: UIBlockingStoreApi;
-}
-
-interface ObservationSessionMiddlewareRegistration {
-  middleware: Middleware;
-  name: string;
 }
 
 interface ObservationSessionConfiguration {
@@ -44,27 +32,21 @@ interface ConfigureObservationSessionOptions {
 }
 
 const observationSessions = new WeakMap<UIBlockingStoreApi, ObservationSession>();
-const OBSERVATION_SESSION_MIDDLEWARE_NAME = `${DEVTOOLS_MIDDLEWARE_NAME}-observation-session`;
 
-function getAvailableMiddlewareName(middlewares: ReadonlyMap<string, Middleware>): string {
-  let middlewareName = OBSERVATION_SESSION_MIDDLEWARE_NAME;
-  let suffix = 1;
+function observeSession(session: ObservationSession): void {
+  const { devtoolsStore, targetStore } = session;
+  const { observeBlockingEvents } = targetStore.getState();
+  const middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
 
-  while (middlewares.has(middlewareName)) {
-    middlewareName = `${OBSERVATION_SESSION_MIDDLEWARE_NAME}-${suffix.toString()}`;
-    suffix += 1;
+  if (targetStore === uiBlockingStoreApi) {
+    session.releaseObservation = observeBlockingEvents(middleware, {
+      skipWhenNamedMiddlewareActive: DEVTOOLS_MIDDLEWARE_NAME,
+    });
+
+    return;
   }
 
-  return middlewareName;
-}
-
-function registerSessionMiddleware(session: ObservationSession, name: string): void {
-  const { devtoolsStore, targetStore } = session;
-  const { registerMiddleware } = targetStore.getState();
-  const middleware: Middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
-
-  registerMiddleware(name, middleware);
-  session.middlewareRegistration = { middleware, name };
+  session.releaseObservation = observeBlockingEvents(middleware);
 }
 
 function resetObservationSession(devtoolsStore: DevtoolsStoreApi): void {
@@ -86,7 +68,7 @@ export function getDevtoolsObservationSession(
   const session: ObservationSession = {
     configuration: undefined,
     devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
-    middlewareRegistration: undefined,
+    releaseObservation: undefined,
     observerCount: 0,
     targetStore: store,
   };
@@ -168,12 +150,10 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
 
     if (isGlobalSession) {
       if (isUndefined(existingMiddleware)) {
-        registerSessionMiddleware(session, DEVTOOLS_MIDDLEWARE_NAME);
+        observeSession(session);
       }
     } else {
-      const middlewareName = getAvailableMiddlewareName(middlewares);
-
-      registerSessionMiddleware(session, middlewareName);
+      observeSession(session);
     }
 
     if (isDefined(existingMiddleware)) {
@@ -186,7 +166,7 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
         } else {
           console.warn(
             "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
-              "Devtools middleware and added a session-specific registration for the custom store."
+              "Devtools middleware and added an observation lease for the custom store."
           );
         }
       }
@@ -212,16 +192,8 @@ export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunc
       }
       session.configuration = undefined;
 
-      if (isDefined(session.middlewareRegistration)) {
-        const { middleware, name } = session.middlewareRegistration;
-        const { middlewares, unregisterMiddleware } = targetStore.getState();
-        const currentMiddleware = middlewares.get(name);
-
-        if (currentMiddleware === middleware) {
-          unregisterMiddleware(name);
-        }
-        session.middlewareRegistration = undefined;
-      }
+      session.releaseObservation?.();
+      session.releaseObservation = undefined;
 
       resetObservationSession(session.devtoolsStore);
     }
