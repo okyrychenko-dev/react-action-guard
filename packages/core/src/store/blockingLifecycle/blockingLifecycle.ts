@@ -55,7 +55,9 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   }
 
   function deliverEvent(event: BlockingEvent): void {
-    for (const observer of observers.values()) {
+    const eventObservers = [...observers.values()];
+
+    for (const observer of eventObservers) {
       try {
         void Promise.resolve(observer(event)).catch(() => undefined);
       } catch {

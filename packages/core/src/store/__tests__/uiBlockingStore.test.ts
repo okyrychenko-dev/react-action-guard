@@ -54,6 +54,28 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should defer a named middleware replacement until the next event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("replacing", () => {
+      calls.push("original");
+      registerMiddleware("replacing", () => {
+        calls.push("replacement");
+      });
+    });
+
+    try {
+      addBlocker("first");
+      expect(calls).toEqual(["original"]);
+
+      addBlocker("second");
+      expect(calls).toEqual(["original", "replacement"]);
+    } finally {
+      unregisterMiddleware("replacing");
+    }
+  });
+
   it("should invoke legacy middleware in registration order without awaiting completion", () => {
     const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
     const calls: Array<string> = [];
