@@ -28,11 +28,11 @@ describe("isBlockerStuck", () => {
 
 describe("getSortedBlockers", () => {
   it("should sort by priority descending", () => {
-    const map = new Map<string, StoredBlocker>([
-      ["low", makeBlocker(0, 1)],
-      ["high", makeBlocker(0, 10)],
-    ]);
+    const snapshot = [
+      { id: "low", ...makeBlocker(0, 1) },
+      { id: "high", ...makeBlocker(0, 10) },
+    ];
 
-    expect(getSortedBlockers(map).map(([id]) => id)).toEqual(["high", "low"]);
+    expect(getSortedBlockers(snapshot).map(([id]) => id)).toEqual(["high", "low"]);
   });
 });

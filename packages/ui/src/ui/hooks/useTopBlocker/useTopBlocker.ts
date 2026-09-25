@@ -1,6 +1,5 @@
 import {
   type BlockerInfo,
-  type StoredBlocker,
   normalizeScope,
   scopeAffectsObservation,
   useResolvedValue,
@@ -8,29 +7,23 @@ import {
 import { useMemo } from "react";
 import type { GuardedScope, UseTopBlockerReturn } from "../../types";
 
-function toBlockerInfo(id: string, blocker: StoredBlocker): BlockerInfo {
-  const { timeoutId: _timeoutId, ...publicBlocker } = blocker;
-
-  return { id, ...publicBlocker };
-}
-
 export function useTopBlocker(scope?: GuardedScope): UseTopBlockerReturn {
-  const activeBlockers = useResolvedValue((state) => state.activeBlockers);
+  const blockingSnapshot = useResolvedValue((state) => state.blockingSnapshot);
   const checkedScopes = useMemo(() => normalizeScope(scope), [scope]);
 
   const blockers = useMemo(() => {
     const scopedBlockers: Array<BlockerInfo> = [];
 
-    for (const [id, blocker] of activeBlockers) {
+    for (const blocker of blockingSnapshot) {
       if (scopeAffectsObservation(blocker.scope, checkedScopes)) {
-        scopedBlockers.push(toBlockerInfo(id, blocker));
+        scopedBlockers.push(blocker);
       }
     }
 
     scopedBlockers.sort((first, second) => second.priority - first.priority);
 
     return scopedBlockers;
-  }, [activeBlockers, checkedScopes]);
+  }, [blockingSnapshot, checkedScopes]);
 
   return useMemo(() => {
     const topBlocker = blockers.length === 0 ? null : blockers[0];

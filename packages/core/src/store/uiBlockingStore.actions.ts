@@ -42,6 +42,7 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
 
     return {
       activeBlockers: new Map(),
+      blockingSnapshot: lifecycle.getSnapshot(),
       middlewares: new Map(),
 
       registerMiddleware: (name: string, middleware: Middleware) => {
@@ -154,7 +155,19 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
 
         const activeBlockers = normalizedBlockersFor(next, current);
 
-        set(isDefined(activeBlockers) ? { ...next, activeBlockers } : next, true);
+        const blockingSnapshot = lifecycle.getSnapshot();
+
+        if (!isDefined(activeBlockers) && next.blockingSnapshot === blockingSnapshot) {
+          set(next, true);
+
+          return;
+        }
+
+        set({
+          ...next,
+          ...(isDefined(activeBlockers) ? { activeBlockers } : {}),
+          blockingSnapshot,
+        }, true);
 
         return;
       }
@@ -168,7 +181,17 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
 
       const activeBlockers = normalizedBlockersFor(next, current);
 
-      set(isDefined(activeBlockers) ? { ...next, activeBlockers } : next);
+      if (!isDefined(activeBlockers) && !("blockingSnapshot" in next)) {
+        set(next);
+
+        return;
+      }
+
+      set({
+        ...next,
+        ...(isDefined(activeBlockers) ? { activeBlockers } : {}),
+        blockingSnapshot: lifecycle.getSnapshot(),
+      });
     }
 
     api.setState = setWithLifecycle;
@@ -179,7 +202,7 @@ function createLifecycleStateCreator<TMutators extends StoreMutatorStack>(
       }
 
       publishedBlockers = blockersFromSnapshot(snapshot);
-      api.setState({ activeBlockers: publishedBlockers });
+      api.setState({ activeBlockers: publishedBlockers, blockingSnapshot: snapshot });
     });
 
     return enhance(lifecycle)(setWithLifecycle, get, api);

@@ -48,6 +48,28 @@ describe("uiBlockingStore.store", () => {
 
     expect(result.current).toBe(1);
   });
+
+  it("should publish immutable blocker snapshots synchronously", () => {
+    const { result } = renderHook(() => useUIBlockingStore((state) => state.blockingSnapshot));
+    const initial = result.current;
+    const { addBlocker, updateBlocker, clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    act(() => addBlocker("snapshot", { scope: ["form"], reason: "Saving" }));
+
+    expect(result.current).not.toBe(initial);
+    expect(Object.isFrozen(result.current)).toBe(true);
+    expect(Object.isFrozen(result.current[0])).toBe(true);
+    expect(Object.isFrozen(result.current[0]?.scope)).toBe(true);
+    expect(result.current[0]?.reason).toBe("Saving");
+
+    act(() => updateBlocker("snapshot", { reason: "Saved" }));
+
+    expect(result.current[0]?.reason).toBe("Saved");
+
+    act(clearAllBlockers);
+
+    expect(result.current).toEqual([]);
+  });
 });
 
 describe("createShallowStore", () => {
