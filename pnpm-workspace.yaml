@@ -1,6 +1,16 @@
 packages:
   - "packages/*"
 
+pmOnFail: ignore
+
+allowBuilds:
+  esbuild@0.21.5: true
+  esbuild@0.27.0: true
+  esbuild@0.27.2: true
+  esbuild@0.27.7: true
+  esbuild@0.28.2: true
+  sharp@0.34.5: true
+
 overrides:
   postcss: ">=8.5.10"
   brace-expansion: "5.0.8"
