@@ -8,3 +8,5 @@ Expose anonymous, ownership-safe lifecycle event observation through global and 
 Observers registered while an event is being delivered begin receiving events with the next delivery, preventing self-replacing named middleware from processing the same event twice.
 
 Observers released before their turn in an event are skipped, and replacing named middleware keeps its original delivery position.
+
+Named middleware replacements made during an event take effect on the next event. Direct compatibility calls to `runMiddlewares` invoke middleware concurrently and settle after all complete.

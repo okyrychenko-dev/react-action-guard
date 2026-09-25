@@ -79,6 +79,32 @@ describe("uiBlockingStore", () => {
     }
   });
 
+  it("should defer a cross-name middleware replacement until the next event", () => {
+    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
+    const calls: Array<string> = [];
+
+    registerMiddleware("A", () => {
+      calls.push("A");
+      registerMiddleware("B", () => {
+        calls.push("B replacement");
+      });
+    });
+    registerMiddleware("B", () => {
+      calls.push("B original");
+    });
+
+    try {
+      addBlocker("first");
+      expect(calls).toEqual(["A", "B original"]);
+
+      addBlocker("second");
+      expect(calls).toEqual(["A", "B original", "A", "B replacement"]);
+    } finally {
+      unregisterMiddleware("A");
+      unregisterMiddleware("B");
+    }
+  });
+
   it("should skip named middleware unregistered earlier in the same event", () => {
     const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
     const calls: Array<string> = [];
@@ -173,6 +199,42 @@ describe("uiBlockingStore", () => {
       unregisterMiddleware("throws");
       unregisterMiddleware("rejects");
       unregisterMiddleware("receives");
+    }
+  });
+
+  it("should wait for concurrent legacy middleware before resolving direct dispatch", async () => {
+    const { registerMiddleware, runMiddlewares, unregisterMiddleware } =
+      uiBlockingStoreApi.getState();
+    const context: MiddlewareContext = { action: "add", blockerId: "direct", timestamp: 1 };
+    const pending: { resolve: VoidFunction } = { resolve: () => undefined };
+    const slow = new Promise<void>((resolve) => {
+      pending.resolve = () => resolve();
+    });
+    const calls: Array<string> = [];
+    const completed = vi.fn();
+
+    registerMiddleware("slow", () => {
+      calls.push("slow");
+
+      return slow;
+    });
+    registerMiddleware("fast", () => {
+      calls.push("fast");
+    });
+
+    try {
+      const dispatch = runMiddlewares(context).then(completed);
+
+      expect(calls).toEqual(["slow", "fast"]);
+      await Promise.resolve();
+      expect(completed).not.toHaveBeenCalled();
+
+      pending.resolve();
+      await dispatch;
+      expect(completed).toHaveBeenCalledOnce();
+    } finally {
+      unregisterMiddleware("slow");
+      unregisterMiddleware("fast");
     }
   });
 

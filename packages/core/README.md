@@ -623,6 +623,8 @@ subscriber or observer throwing does not interrupt delivery to the others. Legac
 receives events in registration order without waiting for asynchronous completion. Asynchronous
 observers may finish in a different order. Use `observeBlockingEvents()`
 for new integrations; each call owns only its own registration and returns a release function.
+Direct compatibility calls to `runMiddlewares()` start every middleware without serial waiting; the
+returned promise settles after all asynchronous middleware completes.
 
 When changing lifecycle delivery or its Zustand adapter, cover nested actions from a snapshot
 subscriber, an event observer, and a Zustand subscriber. Verify snapshot and event order, one
