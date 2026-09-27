@@ -3,56 +3,175 @@ import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-uti
 import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
 import type { DevtoolsStoreApi } from "../../store";
+import type {
+  ObservationParticipation,
+  ObservationSession,
+  ObservationSessionConfiguration,
+} from "./acquireDevtoolsMiddleware.types";
 import type { UIBlockingStoreApi } from "./ActionGuardDevtools.types";
 
-/**
- * Shares one Devtools observation lease per blocking store while participants are active.
- *
- * Several `<ActionGuardDevtools />` instances may observe the same store. The first participant
- * attaches the observer; the last participant releases it and resets the session.
- */
-export interface ObservationSession {
-  configuration: Optional<ObservationSessionConfiguration>;
-  devtoolsStore: DevtoolsStoreApi;
-  releaseObservation: Optional<VoidFunction>;
-  observerCount: number;
-  targetStore: UIBlockingStoreApi;
-}
-
-interface ObservationSessionConfiguration {
-  defaultOpen: boolean;
-  maxEvents: number;
-  owner: object;
-}
-
-interface ConfigureObservationSessionOptions {
-  defaultOpen: boolean;
-  maxEvents: number;
-  owner: object;
+interface Participant {
+  configuration?: ObservationSessionConfiguration;
 }
 
 const observationSessions = new WeakMap<UIBlockingStoreApi, ObservationSession>();
-
-function observeSession(session: ObservationSession): void {
-  const { devtoolsStore, targetStore } = session;
-  const { observeBlockingEvents } = targetStore.getState();
-  const middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
-
-  if (targetStore === uiBlockingStoreApi) {
-    session.releaseObservation = observeBlockingEvents(middleware, {
-      skipWhenNamedMiddlewareActive: DEVTOOLS_MIDDLEWARE_NAME,
-    });
-
-    return;
-  }
-
-  session.releaseObservation = observeBlockingEvents(middleware);
-}
 
 function resetObservationSession(devtoolsStore: DevtoolsStoreApi): void {
   const { events, isOpen, isPaused, maxEvents, selectedEventId } = devtoolsStore.getInitialState();
 
   devtoolsStore.setState({ events, isOpen, isPaused, maxEvents, selectedEventId });
+}
+
+function createObservationSession(
+  targetStore: UIBlockingStoreApi,
+  devtoolsStore: DevtoolsStoreApi
+): ObservationSession {
+  const participants = new Map<object, Participant>();
+  let configurationOwner: Optional<object>;
+  let appliedConfiguration: Optional<ObservationSessionConfiguration>;
+  let releaseObservation: Optional<VoidFunction>;
+  let epoch = 0;
+
+  function attachObservation(): void {
+    const { middlewares, observeBlockingEvents } = targetStore.getState();
+    const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
+    const isGlobalSession = targetStore === uiBlockingStoreApi;
+
+    if (!isGlobalSession || isUndefined(existingMiddleware)) {
+      const middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
+
+      let options = undefined;
+
+      if (isGlobalSession) {
+        options = {
+          skipWhenNamedMiddlewareActive: DEVTOOLS_MIDDLEWARE_NAME,
+        };
+      }
+
+      releaseObservation = observeBlockingEvents(middleware, options);
+    }
+
+    if (isDefined(existingMiddleware) && process.env.NODE_ENV !== "production") {
+      let message =
+        "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
+        "Devtools middleware and added an observation lease for the custom store.";
+
+      if (isGlobalSession) {
+        message =
+          "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
+          "middleware registration. The manual registration remains authoritative.";
+      }
+
+      console.warn(message);
+    }
+  }
+
+  function applyConfiguration(
+    configuration: ObservationSessionConfiguration,
+    initialConfiguration: boolean
+  ): void {
+    const { setMaxEvents, setOpen } = devtoolsStore.getState();
+
+    if (initialConfiguration) {
+      setOpen(configuration.defaultOpen);
+    }
+
+    if (initialConfiguration || appliedConfiguration?.maxEvents !== configuration.maxEvents) {
+      setMaxEvents(configuration.maxEvents);
+    }
+
+    const { maxEvents } = devtoolsStore.getState();
+
+    appliedConfiguration = { defaultOpen: configuration.defaultOpen, maxEvents };
+  }
+
+  function warnOnConflict(configuration: ObservationSessionConfiguration): void {
+    if (
+      process.env.NODE_ENV !== "production" &&
+      (appliedConfiguration?.defaultOpen !== configuration.defaultOpen ||
+        appliedConfiguration.maxEvents !== configuration.maxEvents)
+    ) {
+      console.warn(
+        "[ActionGuardDevtools] Ignored conflicting observation-session configuration. " +
+          "The first panel for a blocking store controls defaultOpen and maxEvents."
+      );
+    }
+  }
+
+  function configureParticipant(
+    participant: object,
+    configuration: ObservationSessionConfiguration
+  ): void {
+    const record = participants.get(participant);
+
+    if (isUndefined(record)) {
+      return;
+    }
+
+    record.configuration = configuration;
+
+    if (isUndefined(configurationOwner)) {
+      configurationOwner = participant;
+      applyConfiguration(configuration, isUndefined(appliedConfiguration));
+    } else if (configurationOwner === participant) {
+      applyConfiguration(configuration, false);
+    } else {
+      warnOnConflict(configuration);
+    }
+  }
+
+  function participate(configuration?: ObservationSessionConfiguration): ObservationParticipation {
+    if (participants.size === 0) {
+      attachObservation();
+    }
+
+    const participant = {};
+    const joinedEpoch = epoch;
+
+    participants.set(participant, {});
+
+    if (isDefined(configuration)) {
+      configureParticipant(participant, configuration);
+    }
+
+    function updateConfiguration(nextConfiguration: ObservationSessionConfiguration): void {
+      if (joinedEpoch !== epoch) {
+        return;
+      }
+
+      configureParticipant(participant, nextConfiguration);
+    }
+
+    function release(): void {
+      if (joinedEpoch !== epoch || !participants.delete(participant)) {
+        return;
+      }
+
+      if (configurationOwner === participant) {
+        configurationOwner = undefined;
+
+        for (const [candidate, record] of participants) {
+          if (isDefined(record.configuration)) {
+            configurationOwner = candidate;
+            break;
+          }
+        }
+      }
+
+      if (participants.size === 0) {
+        releaseObservation?.();
+        releaseObservation = undefined;
+        configurationOwner = undefined;
+        appliedConfiguration = undefined;
+        epoch += 1;
+        resetObservationSession(devtoolsStore);
+      }
+    }
+
+    return { updateConfiguration, release };
+  }
+
+  return { devtoolsStore, participate };
 }
 
 export function getDevtoolsObservationSession(
@@ -65,13 +184,10 @@ export function getDevtoolsObservationSession(
     return existingSession;
   }
 
-  const session: ObservationSession = {
-    configuration: undefined,
-    devtoolsStore: initialDevtoolsStore ?? createDevtoolsStoreBindings().store,
-    releaseObservation: undefined,
-    observerCount: 0,
-    targetStore: store,
-  };
+  const session = createObservationSession(
+    store,
+    initialDevtoolsStore ?? createDevtoolsStoreBindings().store
+  );
 
   observationSessions.set(store, session);
 
@@ -83,119 +199,11 @@ export function resolveDevtoolsObservationSession(
 ): ObservationSession {
   const targetStore = customStore ?? uiBlockingStoreApi;
 
-  return getDevtoolsObservationSession(
-    targetStore,
-    targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
-  );
-}
+  let initialDevtoolsStore = undefined;
 
-export function configureDevtoolsObservationSession(
-  session: ObservationSession,
-  options: ConfigureObservationSessionOptions
-): void {
-  const { configuration, devtoolsStore } = session;
-  const { defaultOpen, maxEvents, owner } = options;
-
-  if (isUndefined(configuration)) {
-    const { setMaxEvents, setOpen } = devtoolsStore.getState();
-
-    setOpen(defaultOpen);
-    setMaxEvents(maxEvents);
-
-    const { maxEvents: configuredMaxEvents } = devtoolsStore.getState();
-
-    session.configuration = {
-      defaultOpen,
-      maxEvents: configuredMaxEvents,
-      owner,
-    };
-
-    return;
+  if (targetStore === uiBlockingStoreApi) {
+    initialDevtoolsStore = devtoolsStoreApi;
   }
 
-  if (configuration.owner === owner) {
-    if (configuration.maxEvents !== maxEvents) {
-      const { setMaxEvents } = devtoolsStore.getState();
-
-      setMaxEvents(maxEvents);
-
-      const { maxEvents: configuredMaxEvents } = devtoolsStore.getState();
-
-      configuration.maxEvents = configuredMaxEvents;
-    }
-
-    return;
-  }
-
-  const hasConflict =
-    configuration.defaultOpen !== defaultOpen || configuration.maxEvents !== maxEvents;
-
-  if (process.env.NODE_ENV !== "production" && hasConflict) {
-    console.warn(
-      "[ActionGuardDevtools] Ignored conflicting observation-session configuration. " +
-        "The first panel for a blocking store controls defaultOpen and maxEvents."
-    );
-  }
-}
-
-export function acquireDevtoolsMiddleware(session: ObservationSession): VoidFunction {
-  const { observerCount, targetStore } = session;
-
-  if (observerCount === 0) {
-    observationSessions.set(targetStore, session);
-
-    const { middlewares } = targetStore.getState();
-    const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
-    const isGlobalSession = targetStore === uiBlockingStoreApi;
-
-    if (isGlobalSession) {
-      if (isUndefined(existingMiddleware)) {
-        observeSession(session);
-      }
-    } else {
-      observeSession(session);
-    }
-
-    if (isDefined(existingMiddleware)) {
-      if (process.env.NODE_ENV !== "production") {
-        if (isGlobalSession) {
-          console.warn(
-            "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
-              "middleware registration. The manual registration remains authoritative."
-          );
-        } else {
-          console.warn(
-            "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
-              "Devtools middleware and added an observation lease for the custom store."
-          );
-        }
-      }
-    }
-  }
-
-  session.observerCount += 1;
-
-  let released = false;
-
-  return () => {
-    if (released) {
-      return;
-    }
-
-    released = true;
-
-    session.observerCount -= 1;
-
-    if (session.observerCount === 0) {
-      if (targetStore !== uiBlockingStoreApi) {
-        observationSessions.delete(targetStore);
-      }
-      session.configuration = undefined;
-
-      session.releaseObservation?.();
-      session.releaseObservation = undefined;
-
-      resetObservationSession(session.devtoolsStore);
-    }
-  };
+  return getDevtoolsObservationSession(targetStore, initialDevtoolsStore);
 }
