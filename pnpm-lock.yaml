@@ -276,6 +276,10 @@ importers:
         version: 5.0.15(@types/react@19.2.18)(react@19.2.8)(use-sync-external-store@1.6.0(react@19.2.8))
 
   packages/tanstack:
+    dependencies:
+      '@okyrychenko-dev/type-utils':
+        specifier: ^0.1.2
+        version: 0.1.2
     devDependencies:
       '@okyrychenko-dev/react-action-guard':
         specifier: workspace:*

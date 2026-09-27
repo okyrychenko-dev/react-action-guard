@@ -1,31 +1,7 @@
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
-import { hashKey } from "@tanstack/react-query";
 import { useEffect, useId, useRef } from "react";
-import type {
-  BlockingCoordinationOptions,
-  BlockingPolicy,
-  BlockingState,
-} from "./useBlockingCoordination.types";
-
-function resolveReason(
-  state: BlockingState,
-  config: BlockingPolicy,
-  defaultReason: string
-): string {
-  const { reason = defaultReason, reasonOnLoading, reasonOnFetching, reasonOnError } = config;
-
-  if (state.loading && reasonOnLoading !== undefined) {
-    return reasonOnLoading;
-  }
-  if (state.fetching && reasonOnFetching !== undefined) {
-    return reasonOnFetching;
-  }
-  if (state.error && reasonOnError !== undefined) {
-    return reasonOnError;
-  }
-
-  return reason;
-}
+import { resolveBlockerId, resolveReason, shouldBlock } from "./useBlockingCoordination.utils";
+import type { BlockingCoordinationOptions } from "./useBlockingCoordination.types";
 
 /** Owns one blocker and interprets the shared TanStack blocking policy. */
 export function useBlockingCoordination({
@@ -37,27 +13,14 @@ export function useBlockingCoordination({
   defaultPriority,
 }: BlockingCoordinationOptions): void {
   const instanceId = useId();
-  const blockerId = key
-    ? `${kind}-${hashKey(key)}-${instanceId}`
-    : kind === "queries"
-      ? instanceId
-      : `${kind}-${instanceId}`;
+  const blockerId = resolveBlockerId(kind, key, instanceId);
   const store = useResolvedStoreApi();
   const { addBlocker, updateBlocker, removeBlocker } = store.getState();
   const registered = useRef(false);
 
-  const {
-    scope,
-    priority = defaultPriority,
-    timeout,
-    onTimeout,
-    onLoading = true,
-    onFetching = false,
-    onError = false,
-  } = config;
+  const { scope, priority = defaultPriority, timeout, onTimeout } = config;
 
-  const shouldBlock =
-    (onLoading && state.loading) || (onFetching && state.fetching) || (onError && state.error);
+  const blocking = shouldBlock(state, config);
   const currentReason = resolveReason(state, config, defaultReason);
 
   useEffect(() => {
@@ -72,7 +35,7 @@ export function useBlockingCoordination({
   useEffect(() => {
     const blockerConfig = { scope, reason: currentReason, priority, timeout, onTimeout };
 
-    if (shouldBlock) {
+    if (blocking) {
       if (registered.current) {
         updateBlocker(blockerId, blockerConfig);
       } else {
@@ -88,7 +51,7 @@ export function useBlockingCoordination({
     updateBlocker,
     removeBlocker,
     blockerId,
-    shouldBlock,
+    blocking,
     scope,
     currentReason,
     priority,

@@ -16,8 +16,10 @@ export interface BlockingPolicy extends BaseBlockingConfig {
   reasonOnError?: string;
 }
 
+export type BlockingKind = "query" | "infinite-query" | "mutation" | "queries";
+
 export interface BlockingCoordinationOptions {
-  kind: "query" | "infinite-query" | "mutation" | "queries";
+  kind: BlockingKind;
   key?: QueryKey;
   state: BlockingState;
   config: BlockingPolicy;
