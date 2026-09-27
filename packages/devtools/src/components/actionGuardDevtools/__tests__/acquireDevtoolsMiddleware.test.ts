@@ -32,6 +32,7 @@ describe("Observation session participation", () => {
     const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
 
     addBlocker("shared-event");
+
     const { events, isOpen } = session.devtoolsStore.getState();
 
     expect(events.filter((event) => event.blockerId === "shared-event")).toHaveLength(1);
@@ -39,10 +40,12 @@ describe("Observation session participation", () => {
 
     first.release();
     first.release();
+
     addBlocker("second-event");
     expect(eventsOf(session).some((event) => event.blockerId === "second-event")).toBe(true);
 
     second.release();
+
     removeBlocker("shared-event");
     removeBlocker("second-event");
     expect(eventsOf(session)).toEqual([]);
@@ -62,8 +65,10 @@ describe("Observation session participation", () => {
     addBlocker("first-only");
     expect(eventsOf(firstSession)).toHaveLength(1);
     expect(eventsOf(secondSession)).toHaveLength(0);
+
     first.release();
     second.release();
+
     expect(resolveDevtoolsObservationSession(firstStore)).toBe(firstSession);
   });
 
@@ -78,12 +83,20 @@ describe("Observation session participation", () => {
 
     expect(maxEventsOf(session)).toBe(10);
     expect(warn).toHaveBeenCalled();
+
     first.release();
+    first.updateConfiguration({ defaultOpen: true, maxEvents: 50 });
+
     expect(maxEventsOf(session)).toBe(10);
+
     later.updateConfiguration({ defaultOpen: true, maxEvents: 30 });
+
     expect(maxEventsOf(session)).toBe(10);
+
     successor.updateConfiguration({ defaultOpen: true, maxEvents: 20 });
+
     expect(maxEventsOf(session)).toBe(20);
+
     successor.release();
     later.release();
   });
@@ -99,7 +112,9 @@ describe("Observation session participation", () => {
 
     previous.release();
     previous.updateConfiguration({ defaultOpen: true, maxEvents: 50 });
+
     expect(maxEventsOf(session)).toBe(25);
+
     current.release();
   });
 
@@ -111,10 +126,12 @@ describe("Observation session participation", () => {
     const { addBlocker, removeBlocker } = store.getState();
 
     addBlocker("before-reset");
+
     const { events: recordedEvents, selectEvent, togglePause } = session.devtoolsStore.getState();
     const recordedEvent = recordedEvents.find((event) => event.blockerId === "before-reset");
 
     expect(recordedEvent).toBeDefined();
+
     selectEvent(recordedEvent?.id ?? null);
     togglePause();
 
@@ -139,7 +156,9 @@ describe("Observation session participation", () => {
       maxEvents: 200,
       selectedEventId: null,
     });
+
     unsubscribe();
+
     removeBlocker("before-reset");
     removeBlocker("during-reset");
   });
@@ -154,6 +173,7 @@ describe("Observation session participation", () => {
       store.getState();
 
     registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manual);
+
     const participant = session.participate();
 
     addBlocker("custom-manual-event");
@@ -165,7 +185,9 @@ describe("Observation session participation", () => {
     expect(warn).toHaveBeenCalled();
 
     participant.release();
+
     unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+
     removeBlocker("custom-manual-event");
   });
 
@@ -194,6 +216,7 @@ describe("Observation session participation", () => {
 
       participant.release();
       addBlocker("after-release-event");
+
       expect(
         eventsOf(session).filter((event) => event.blockerId === "after-release-event")
       ).toHaveLength(1);
@@ -211,11 +234,13 @@ describe("Observation session participation", () => {
       uiBlockingStoreApi.getState();
 
     registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware());
+
     const session = resolveDevtoolsObservationSession();
     const participant = session.participate();
 
     try {
       addBlocker("manual-event");
+
       expect(eventsOf(session).filter((event) => event.blockerId === "manual-event")).toHaveLength(
         1
       );
