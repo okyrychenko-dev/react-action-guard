@@ -1,10 +1,7 @@
 import { ReactElement } from "react";
 import { useIsomorphicLayoutEffect } from "../../hooks";
 import { DevtoolsStoreProvider } from "../../store";
-import {
-  acquireDevtoolsMiddleware,
-  resolveDevtoolsObservationSession,
-} from "./acquireDevtoolsMiddleware";
+import { resolveDevtoolsObservationSession } from "./acquireDevtoolsMiddleware";
 import type { ActionGuardDevtoolsProviderProps } from "./ActionGuardDevtools.types";
 
 function ActionGuardDevtoolsProviderInternal(
@@ -13,10 +10,11 @@ function ActionGuardDevtoolsProviderInternal(
   const { children, store: customStore } = props;
   const observationSession = resolveDevtoolsObservationSession(customStore);
 
-  useIsomorphicLayoutEffect(
-    () => acquireDevtoolsMiddleware(observationSession),
-    [observationSession]
-  );
+  useIsomorphicLayoutEffect(() => {
+    const { release } = observationSession.participate();
+
+    return release;
+  }, [observationSession]);
 
   return (
     <DevtoolsStoreProvider store={observationSession.devtoolsStore}>

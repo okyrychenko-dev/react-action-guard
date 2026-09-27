@@ -1,12 +1,12 @@
 import { ReactElement, useEffect, useRef } from "react";
 import { DEFAULT_MAX_EVENTS, useDevtoolsStore } from "../../store";
-import {
-  acquireDevtoolsMiddleware,
-  configureDevtoolsObservationSession,
-} from "./acquireDevtoolsMiddleware";
 import { getDevtoolsKeyboardAction } from "./ActionGuardDevtools.utils";
 import ActionGuardDevtoolsContent from "./ActionGuardDevtoolsContent";
-import type { ObservationSession } from "./acquireDevtoolsMiddleware";
+import type { Optional } from "@okyrychenko-dev/type-utils";
+import type {
+  ObservationParticipation,
+  ObservationSession,
+} from "./acquireDevtoolsMiddleware.types";
 import type { ActionGuardDevtoolsProps } from "./ActionGuardDevtools.types";
 
 interface ActionGuardDevtoolsSessionProps extends Omit<
@@ -26,7 +26,7 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     store: customStore,
   } = props;
 
-  const configurationOwnerRef = useRef({});
+  const participationRef = useRef<Optional<ObservationParticipation>>(undefined);
 
   const { isOpen, setOpen, togglePause, clearEvents } = useDevtoolsStore((state) => ({
     isOpen: state.isOpen,
@@ -35,14 +35,19 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     clearEvents: state.clearEvents,
   }));
 
-  useEffect(() => acquireDevtoolsMiddleware(observationSession), [observationSession]);
+  useEffect(() => {
+    const participation = observationSession.participate();
+
+    participationRef.current = participation;
+
+    return () => {
+      participationRef.current = undefined;
+      participation.release();
+    };
+  }, [observationSession]);
 
   useEffect(() => {
-    configureDevtoolsObservationSession(observationSession, {
-      defaultOpen,
-      maxEvents,
-      owner: configurationOwnerRef.current,
-    });
+    participationRef.current?.updateConfiguration({ defaultOpen, maxEvents });
   }, [defaultOpen, maxEvents, observationSession]);
 
   const stateRef = useRef({ isOpen, setOpen, togglePause, clearEvents });
