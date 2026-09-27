@@ -1,7 +1,9 @@
 # Changesets
 
-Run `pnpm changeset` to describe a change before merging a PR. Each package keeps
-its own independent version; `updateInternalDependencies: "patch"` bumps a
+Every PR that changes a published package must include a changeset. Run
+`pnpm changeset` before handoff and verify coverage with
+`pnpm exec changeset status --since=main`. Each package keeps its own
+independent version; `updateInternalDependencies: "patch"` bumps a
 dependent package's `peerDependencies`/`dependencies` range whenever a
 workspace package it depends on is released.
 
