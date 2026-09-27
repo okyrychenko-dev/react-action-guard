@@ -101,6 +101,31 @@ describe("Observation session participation", () => {
     later.release();
   });
 
+  it("preserves the current open state when a successor updates maxEvents", () => {
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const owner = session.participate({ defaultOpen: false, maxEvents: 10 });
+    const successor = session.participate({ defaultOpen: true, maxEvents: 20 });
+    const { setOpen } = session.devtoolsStore.getState();
+
+    setOpen(true);
+    setOpen(false);
+
+    owner.release();
+    successor.updateConfiguration({ defaultOpen: true, maxEvents: 30 });
+
+    const { isOpen, maxEvents } = session.devtoolsStore.getState();
+
+    expect(isOpen).toBe(false);
+    expect(maxEvents).toBe(30);
+
+    successor.release();
+  });
+
   it("ignores stale releases and updates after a new epoch begins", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
@@ -108,6 +133,7 @@ describe("Observation session participation", () => {
     const previous = session.participate({ defaultOpen: true, maxEvents: 10 });
 
     previous.release();
+
     const current = session.participate({ defaultOpen: false, maxEvents: 25 });
 
     previous.release();

@@ -28,7 +28,6 @@ function createObservationSession(
   const participants = new Map<object, Participant>();
   let configurationOwner: Optional<object>;
   let appliedConfiguration: Optional<ObservationSessionConfiguration>;
-  let ownerNeedsInitialApply = false;
   let releaseObservation: Optional<VoidFunction>;
   let epoch = 0;
 
@@ -68,15 +67,15 @@ function createObservationSession(
 
   function applyConfiguration(
     configuration: ObservationSessionConfiguration,
-    newlyOwned: boolean
+    initialConfiguration: boolean
   ): void {
     const { setMaxEvents, setOpen } = devtoolsStore.getState();
 
-    if (newlyOwned) {
+    if (initialConfiguration) {
       setOpen(configuration.defaultOpen);
     }
 
-    if (newlyOwned || appliedConfiguration?.maxEvents !== configuration.maxEvents) {
+    if (initialConfiguration || appliedConfiguration?.maxEvents !== configuration.maxEvents) {
       setMaxEvents(configuration.maxEvents);
     }
 
@@ -112,14 +111,9 @@ function createObservationSession(
 
     if (isUndefined(configurationOwner)) {
       configurationOwner = participant;
-      applyConfiguration(
-        configuration,
-        isUndefined(appliedConfiguration) || ownerNeedsInitialApply
-      );
-      ownerNeedsInitialApply = false;
+      applyConfiguration(configuration, isUndefined(appliedConfiguration));
     } else if (configurationOwner === participant) {
-      applyConfiguration(configuration, ownerNeedsInitialApply);
-      ownerNeedsInitialApply = false;
+      applyConfiguration(configuration, false);
     } else {
       warnOnConflict(configuration);
     }
@@ -156,7 +150,6 @@ function createObservationSession(
 
           if (configurationOwner === participant) {
             configurationOwner = undefined;
-            ownerNeedsInitialApply = true;
 
             for (const [candidate, record] of participants) {
               if (isDefined(record.configuration)) {
@@ -171,7 +164,6 @@ function createObservationSession(
             releaseObservation = undefined;
             configurationOwner = undefined;
             appliedConfiguration = undefined;
-            ownerNeedsInitialApply = false;
             epoch += 1;
             resetObservationSession(devtoolsStore);
           }
