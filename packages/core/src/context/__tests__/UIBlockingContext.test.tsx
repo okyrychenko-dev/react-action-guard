@@ -103,6 +103,7 @@ describe("UIBlockingProvider", () => {
     it("should isolate state between provider and global store", () => {
       const TestComponent = () => {
         useActionBlocker("provider-blocker", { scope: "test", reason: "Provider test" });
+
         const isBlocked = useIsBlocked("test");
 
         return <div data-testid="blocked">{isBlocked ? "blocked" : "not-blocked"}</div>;
@@ -225,6 +226,7 @@ describe("UIBlockingProvider", () => {
 
     expect(screen.getByTestId("provider-info")).toHaveTextContent("Provider");
     expect(screen.getByTestId("global-info")).toBeEmptyDOMElement();
+
     const { blockingSnapshot: providerSnapshot } = providerStore.getState();
     const { blockingSnapshot: globalSnapshot } = uiBlockingStoreApi.getState();
 

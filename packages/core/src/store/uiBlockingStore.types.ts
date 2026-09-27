@@ -5,36 +5,6 @@ import type { BlockingLifecycleSnapshot } from "./blockingLifecycle";
 /**
  * Configuration options for creating or updating a blocker.
  *
- * All fields are optional. Defaults will be applied for any missing values:
- * - `scope`: "global"
- * - `reason`: "Blocking UI"
- * - `priority`: 50
- * - `timestamp`: Current time
- *
- * @example
- * Basic configuration
- * ```ts
- * const config: BlockerConfig = {
- *   scope: 'form',
- *   reason: 'Submitting data...',
- *   priority: 70
- * };
- * ```
- *
- * @example
- * With timeout and callback
- * ```ts
- * const config: BlockerConfig = {
- *   scope: ['form', 'navigation'],
- *   reason: 'Critical operation in progress',
- *   priority: 90,
- *   timeout: 30000, // 30 seconds
- *   onTimeout: (id) => {
- *     console.warn(`Blocker ${id} timed out`);
- *   }
- * };
- * ```
- *
  * @public
  * @since 0.6.0
  */
@@ -78,20 +48,6 @@ export interface StoredBlocker {
 /**
  * Complete blocker information including its unique identifier.
  *
- * This type extends {@link StoredBlocker} with the blocker's ID, making it
- * suitable for reading and displaying blocker information. Returned by
- * {@link UIBlockingStoreActions.getBlockingInfo} and used by {@link useBlockingInfo}.
- *
- * @example
- * Accessing blocker info
- * ```ts
- * const { getBlockingInfo } = store.getState();
- * const blockers: ReadonlyArray<Readonly<BlockerInfo>> = getBlockingInfo('form');
- * blockers.forEach(blocker => {
- *   console.log(`${blocker.id}: ${blocker.reason} (priority: ${blocker.priority})`);
- * });
- * ```
- *
  * @public
  * @since 0.6.0
  */
@@ -124,30 +80,6 @@ export interface BlockingObservationOptions {
 /**
  * All available actions for managing UI blocking state.
  *
- * These methods allow adding, removing, updating blockers, checking blocking status,
- * and managing middleware. Combined with {@link UIBlockingStoreState} to form
- * the complete {@link UIBlockingStore} type.
- *
- * All actions are safe to call multiple times and handle edge cases gracefully.
- *
- * @example
- * Using store actions directly
- * ```ts
- * import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
- *
- * // Add a blocker
- * uiBlockingStoreApi.getState().addBlocker('my-blocker', {
- *   scope: 'form',
- *   reason: 'Processing...'
- * });
- *
- * // Check if blocked
- * const isBlocked = uiBlockingStoreApi.getState().isBlocked('form');
- *
- * // Remove blocker
- * uiBlockingStoreApi.getState().removeBlocker('my-blocker');
- * ```
- *
  * @public
  * @since 0.6.0
  */
@@ -174,28 +106,6 @@ export interface UIBlockingStoreActions {
 
 /**
  * Complete UI blocking store type combining state and actions.
- *
- * This is the full store interface used by hooks like {@link useUIBlockingStore}
- * and accessible via {@link uiBlockingStoreApi}. It combines all state properties
- * from {@link UIBlockingStoreState} with all action methods from {@link UIBlockingStoreActions}.
- *
- * @example
- * Using the complete store
- * ```ts
- * import { useUIBlockingStore } from '@okyrychenko-dev/react-action-guard';
- *
- * function MyComponent() {
- *   const store = useUIBlockingStore();
- *
- *   // Access state
- *   console.log(store.activeBlockers.size);
- *
- *   // Call actions
- *   store.addBlocker('my-blocker', { scope: 'form' });
- *
- *   return <div>...</div>;
- * }
- * ```
  *
  * @public
  * @since 0.6.0

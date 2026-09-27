@@ -22,7 +22,7 @@ function trueOrUndefined(value: boolean): Optional<true> {
   return undefined;
 }
 
-function blockedLinkTabIndex(isDisabled: boolean, removeFromTabOrder?: boolean): -1 | undefined {
+function blockedLinkTabIndex(isDisabled: boolean, removeFromTabOrder?: boolean): Optional<-1> {
   if (isDisabled && removeFromTabOrder === true) {
     return -1;
   }

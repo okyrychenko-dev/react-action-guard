@@ -7,6 +7,7 @@ import type { Middleware, MiddlewareContext } from "../middleware.types";
 describe("Middleware Integration", () => {
   beforeEach(() => {
     uiBlockingStoreApi.getState().clearAllBlockers();
+
     // Clear all middleware
     const state = uiBlockingStoreApi.getState();
 

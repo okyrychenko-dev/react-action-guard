@@ -6,64 +6,12 @@ import {
   useBeforeUnload,
   useShouldBlock,
 } from "../core";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { NavigationBlockerReturn } from "../core/types";
 import type { UseNavigationBlockerOptions } from "./types";
 
 /**
  * Blocks navigation in React Router v6+ applications based on conditions or scope state.
- *
- * This hook integrates React Router's `useBlocker` with react-action-guard's scope system,
- * allowing you to prevent navigation when certain conditions are met or when specific
- * scopes are blocked.
- *
- * **Features:**
- * - Block navigation based on boolean condition or function
- * - Automatically block when react-action-guard scopes are active
- * - Support for browser `beforeunload` event (tab close/refresh)
- * - Customizable confirmation dialog configuration
- * - Callbacks for block/allow events
- *
- * @param options - Configuration options
- * @returns Object with `isBlocking` state
- *
- * @example
- * ```tsx
- * // Block based on scope
- * function EditForm() {
- *   useNavigationBlocker({
- *     scope: 'form',
- *     message: 'You have unsaved changes. Leave anyway?',
- *   });
- *
- *   return <form>...</form>;
- * }
- * ```
- *
- * @example
- * ```tsx
- * // Block based on condition
- * function UnsavedChanges() {
- *   const [hasChanges, setHasChanges] = useState(false);
- *
- *   useNavigationBlocker({
- *     when: hasChanges,
- *     message: 'Discard changes?',
- *     onBlock: () => console.log('Navigation blocked'),
- *   });
- * }
- * ```
- *
- * @example
- * ```tsx
- * // Block with custom dialog
- * function CheckoutFlow() {
- *   useNavigationBlocker({
- *     scope: 'checkout',
- *     message: 'Your items will still be in your cart.',
- *     blockBrowserUnload: true,
- *   });
- * }
- * ```
  */
 export function useNavigationBlocker(
   options: UseNavigationBlockerOptions
@@ -81,10 +29,12 @@ export function useNavigationBlocker(
   } = options;
 
   const confirmSeqRef = useRef(0);
-  const [pendingConfirm, setPendingConfirm] = useState<{
-    id: number;
-    promise: Promise<boolean>;
-  } | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<
+    Nullable<{
+      id: number;
+      promise: Promise<boolean>;
+    }>
+  >(null);
 
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when ?? block, scope);

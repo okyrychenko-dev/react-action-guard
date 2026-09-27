@@ -1,4 +1,4 @@
-import { isArray, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
+import { type Optional, isArray, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../store";
@@ -20,53 +20,8 @@ const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>([
 /**
  * Creates the devtools middleware that captures and records UI blocking events.
  *
- * This middleware intercepts all blocking events (add, remove, timeout, clear) and
- * forwards them to the devtools store for visualization in the ActionGuardDevtools panel.
- *
- * The middleware calculates the duration of each blocker by tracking when it was added
- * and when it was removed/timed out, providing insights into how long UI was blocked.
- *
- * **Note:** This middleware is automatically registered when you use the `ActionGuardDevtools`
- * component. You typically don't need to call this function directly unless you're manually
- * managing middleware registration.
- *
- * @returns Middleware function that can be registered with `configureMiddleware` or `registerMiddleware`
- *
- * @example
- * Manual middleware registration (advanced usage)
- * ```tsx
- * import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
- * import { createDevtoolsMiddleware, DEVTOOLS_MIDDLEWARE_NAME } from '@okyrychenko-dev/react-action-guard-devtools';
- *
- * // Register manually
- * const middleware = createDevtoolsMiddleware();
- * const { registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
- * registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
- *
- * // Cleanup
- * unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
- * ```
- *
- * @example
- * Automatic registration (recommended)
- * ```tsx
- * import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
- *
- * // Middleware registered automatically when component mounts
- * function App() {
- *   return (
- *     <>
- *       <YourApp />
- *       <ActionGuardDevtools />
- *     </>
- *   );
- * }
- * ```
- *
- * @see {@link ActionGuardDevtools} for automatic middleware registration
- * @see {@link https://github.com/okyrychenko-dev/react-action-guard#middleware | Middleware documentation}
- *
  * @public
+ * @see {@link ActionGuardDevtools} for automatic middleware registration
  */
 export function createDevtoolsMiddlewareForStore(
   targetDevtoolsStore: DevtoolsStoreApi
@@ -78,7 +33,7 @@ export function createDevtoolsMiddlewareForStore(
     action: MiddlewareContext["action"],
     blockerId: string,
     timestamp: number
-  ): number | undefined => {
+  ): Optional<number> => {
     if (!TERMINAL_ACTIONS.has(action)) {
       return undefined;
     }

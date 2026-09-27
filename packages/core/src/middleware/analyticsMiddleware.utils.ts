@@ -1,4 +1,4 @@
-import { type Optional, isArray } from "@okyrychenko-dev/type-utils";
+import { type Optional, isArray, isUndefined } from "@okyrychenko-dev/type-utils";
 import { AnalyticsEventData } from "./analyticsMiddleware.types";
 import { MiddlewareContext } from "./middleware.types";
 
@@ -20,15 +20,15 @@ export function buildEventData(context: MiddlewareContext): AnalyticsEventData {
   };
   const { scope, reason, priority } = context.config ?? {};
 
-  if (scope !== undefined) {
+  if (!isUndefined(scope)) {
     eventData.scope = isArray(scope) ? scope.join(",") : scope;
   }
 
-  if (reason !== undefined) {
+  if (!isUndefined(reason)) {
     eventData.reason = reason;
   }
 
-  if (priority !== undefined) {
+  if (!isUndefined(priority)) {
     eventData.priority = priority;
   }
 

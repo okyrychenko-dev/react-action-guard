@@ -1,3 +1,4 @@
+import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { ReasonConfig } from "../types";
 
 /**
@@ -12,7 +13,7 @@ export function resolveBlockingReason(config: ReasonConfig): string {
   const { defaultReason, stateReasons } = config;
 
   for (const { condition, reason } of stateReasons) {
-    if (condition && reason !== undefined) {
+    if (condition && !isUndefined(reason)) {
       return reason;
     }
   }

@@ -1,8 +1,9 @@
 import { shallow } from "zustand/shallow";
 import { normalizeScope } from "../../store";
+import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { BlockerConfig } from "../../store";
 
-type BlockerConfigSnapshotValue = string | number | BlockerConfig["onTimeout"] | undefined;
+type BlockerConfigSnapshotValue = Optional<string | number | BlockerConfig["onTimeout"]>;
 
 /**
  * Creates a blocker configuration object from partial config.

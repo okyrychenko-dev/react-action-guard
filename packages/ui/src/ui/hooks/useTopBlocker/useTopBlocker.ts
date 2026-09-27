@@ -4,6 +4,7 @@ import {
   scopeAffectsObservation,
   useResolvedValue,
 } from "@okyrychenko-dev/react-action-guard";
+import { isNonEmptyArray, isNull } from "@okyrychenko-dev/type-utils";
 import { useMemo } from "react";
 import type { GuardedScope, UseTopBlockerReturn } from "../../types";
 
@@ -26,8 +27,8 @@ export function useTopBlocker(scope?: GuardedScope): UseTopBlockerReturn {
   }, [blockingSnapshot, checkedScopes]);
 
   return useMemo(() => {
-    const topBlocker = blockers.length === 0 ? null : blockers[0];
-    const isBlocked = topBlocker !== null;
+    const topBlocker = isNonEmptyArray(blockers) ? blockers[0] : null;
+    const isBlocked = !isNull(topBlocker);
 
     return {
       status: isBlocked ? "blocked" : "idle",

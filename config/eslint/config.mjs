@@ -130,9 +130,19 @@ export function createEslintConfig({ parserOptions, extensions = [] }) {
             next: "*",
           },
           {
+            blankLine: "always",
+            prev: "*",
+            next: ["const", "let"],
+          },
+          {
             blankLine: "any",
             prev: ["const", "let", "var"],
             next: ["const", "let", "var"],
+          },
+          {
+            blankLine: "any",
+            prev: "import",
+            next: ["const", "let"],
           },
           {
             blankLine: "always",

@@ -1,4 +1,5 @@
 import { isThenable } from "../utils";
+import type { Optional } from "@okyrychenko-dev/type-utils";
 
 /**
  * Result of a confirmation action
@@ -24,50 +25,10 @@ export interface ConfirmationCallbacks {
 
 /**
  * Handles confirmation dialog logic with support for sync/async handlers.
- *
- * This utility centralizes the confirmation logic that was duplicated across
- * all router adapters. It handles:
- * - Custom confirmation handlers (sync or async)
- * - Fallback to window.confirm
- * - Thenable detection and normalization
- * - Callback invocation at appropriate times
- *
- * **Important:** For async confirmations, this function returns 'pending' and
- * does NOT invoke onConfirm/onCancel. The caller must handle the async result
- * in their own Promise chain to perform router-specific actions.
- *
- * @param message - Message to show in confirmation dialog
- * @param customHandler - Optional custom confirmation handler
- * @param callbacks - Callbacks for sync confirm/cancel events
- * @returns 'confirmed', 'cancelled', or 'pending' (for async)
- *
- * @example
- * ```typescript
- * // Synchronous confirmation with window.confirm
- * const result = handleConfirmation('Leave page?', undefined, {
- *   onConfirm: () => console.log('Confirmed'),
- *   onCancel: () => console.log('Cancelled'),
- * });
- * // result is 'confirmed' or 'cancelled'
- * ```
- *
- * @example
- * ```typescript
- * // Async confirmation - handle in Promise chain
- * const result = handleConfirmation('Save changes?', showCustomDialog, {});
- * if (result === 'pending') {
- *   const asyncResult = showCustomDialog('Save changes?');
- *   Promise.resolve(asyncResult).then((confirmed) => {
- *     if (confirmed) {
- *       // Perform router-specific action
- *     }
- *   });
- * }
- * ```
  */
 export function handleConfirmation(
   message: string,
-  customHandler: ((message: string) => boolean | PromiseLike<boolean>) | undefined,
+  customHandler: Optional<(message: string) => boolean | PromiseLike<boolean>>,
   callbacks: ConfirmationCallbacks
 ): ConfirmationResult {
   const { onConfirm, onCancel } = callbacks;

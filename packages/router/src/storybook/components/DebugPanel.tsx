@@ -1,4 +1,5 @@
 import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ReactElement } from "react";
 import "./DebugPanel.css";
 import BlockerItem, { BlockerEntry } from "./BlockerItem";
@@ -25,7 +26,7 @@ function DebugPanel(props: DebugPanelProps): ReactElement {
         <strong>Active Blockers:</strong> {blockerEntries.length}
       </div>
 
-      {blockerEntries.length > 0 ? (
+      {isNonEmptyArray(blockerEntries) ? (
         <div>
           {blockerEntries.map((entry) => (
             <BlockerItem key={entry.id} {...entry} />

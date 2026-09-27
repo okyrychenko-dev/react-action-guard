@@ -1,3 +1,4 @@
+import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { ReactElement } from "react";
 import { formatDuration, formatFullTimestamp, formatRelativeTime, formatScope } from "../../utils";
 import styles from "./EventDetails.module.css";
@@ -25,7 +26,7 @@ function EventDetailsContent(props: EventDetailsContentProps): ReactElement {
         </div>
       </div>
 
-      {event.duration !== undefined && (
+      {!isUndefined(event.duration) && (
         <div className={styles.section}>
           <div className={styles.label}>Duration</div>
           <div className={styles.value}>{formatDuration(event.duration)}</div>
@@ -36,19 +37,19 @@ function EventDetailsContent(props: EventDetailsContentProps): ReactElement {
         <div className={styles.section}>
           <div className={styles.label}>Config</div>
           <div className={styles.config}>
-            {event.config.scope !== undefined && (
+            {!isUndefined(event.config.scope) && (
               <div>
                 <span className={styles.mutedLabel}>scope: </span>
                 {formatScope(event.config.scope)}
               </div>
             )}
-            {event.config.reason !== undefined && (
+            {!isUndefined(event.config.reason) && (
               <div>
                 <span className={styles.mutedLabel}>reason: </span>
                 {event.config.reason}
               </div>
             )}
-            {event.config.priority !== undefined && (
+            {!isUndefined(event.config.priority) && (
               <div>
                 <span className={styles.mutedLabel}>priority: </span>
                 {event.config.priority}
@@ -58,14 +59,14 @@ function EventDetailsContent(props: EventDetailsContentProps): ReactElement {
         </div>
       )}
 
-      {!event.config?.scope && event.scope !== undefined && (
+      {!event.config?.scope && !isUndefined(event.scope) && (
         <div className={styles.section}>
           <div className={styles.label}>Scope</div>
           <div className={styles.value}>{formatScope(event.scope)}</div>
         </div>
       )}
 
-      {event.count !== undefined && (
+      {!isUndefined(event.count) && (
         <div className={styles.section}>
           <div className={styles.label}>Affected Count</div>
           <div className={styles.value}>{event.count}</div>
@@ -76,19 +77,19 @@ function EventDetailsContent(props: EventDetailsContentProps): ReactElement {
         <div className={styles.section}>
           <div className={styles.label}>Previous State</div>
           <div className={styles.config}>
-            {event.prevState.scope !== undefined && (
+            {!isUndefined(event.prevState.scope) && (
               <div>
                 <span className={styles.mutedLabel}>scope: </span>
                 {formatScope(event.prevState.scope)}
               </div>
             )}
-            {event.prevState.reason !== undefined && (
+            {!isUndefined(event.prevState.reason) && (
               <div>
                 <span className={styles.mutedLabel}>reason: </span>
                 {event.prevState.reason}
               </div>
             )}
-            {event.prevState.priority !== undefined && (
+            {!isUndefined(event.prevState.priority) && (
               <div>
                 <span className={styles.mutedLabel}>priority: </span>
                 {event.prevState.priority}

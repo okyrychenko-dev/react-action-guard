@@ -101,6 +101,7 @@ describe("uiBlockingStore", () => {
     }
 
     registerMiddleware("manual", manualObserver);
+
     const releaseFallback = observeBlockingEvents(fallbackObserver, {
       skipWhenNamedMiddlewareActive: "manual",
     });
@@ -367,6 +368,7 @@ describe("uiBlockingStore", () => {
       addBlocker("first");
 
       expect(received).toEqual([["first"], ["second"]]);
+
       const { activeBlockers } = uiBlockingStoreApi.getState();
 
       expect([...activeBlockers.keys()]).toEqual(["second"]);
@@ -383,6 +385,7 @@ describe("uiBlockingStore", () => {
     registerMiddleware("reentrant-order", ({ action }) => {
       events.push(action);
     });
+
     const unsubscribe = uiBlockingStoreApi.subscribe(({ activeBlockers }) => {
       if (activeBlockers.has("first")) {
         clearAllBlockers();
@@ -489,6 +492,7 @@ describe("uiBlockingStore", () => {
 
   it("should synchronize Redux DevTools time travel and cancel stale timers", () => {
     vi.useFakeTimers();
+
     let receiveMessage:
       | ((message: { type: "DISPATCH"; payload: { type: "JUMP_TO_STATE" }; state: string }) => void)
       | undefined;
@@ -541,6 +545,7 @@ describe("uiBlockingStore", () => {
 
       expect(isBlocked("form")).toBe(false);
       expect(onTimeout).not.toHaveBeenCalled();
+
       const { activeBlockers } = store.getState();
 
       expect(activeBlockers.size).toBe(0);
@@ -1109,6 +1114,7 @@ describe("uiBlockingStore", () => {
 
       expect(onTimeout).not.toHaveBeenCalled();
       expect(isBlocked("form")).toBe(false);
+
       const { activeBlockers } = uiBlockingStoreApi.getState();
 
       expect(activeBlockers.size).toBe(0);
@@ -1147,6 +1153,7 @@ describe("uiBlockingStore", () => {
       addBlocker("retained", { scope: "form", timeout: 1000, onTimeout });
 
       vi.advanceTimersByTime(500);
+
       const { activeBlockers } = uiBlockingStoreApi.getState();
       const current = activeBlockers.get("retained");
 

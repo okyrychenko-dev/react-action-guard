@@ -200,6 +200,7 @@ describe("useAsyncAction", () => {
       const promise1 = result.current(asyncFn1);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
+
       const promise2 = result.current(asyncFn2);
 
       await waitFor(() => {
@@ -429,6 +430,7 @@ describe("useAsyncAction", () => {
     const firstRef = result.current;
 
     rerender();
+
     const secondRef = result.current;
 
     expect(firstRef).toBe(secondRef);

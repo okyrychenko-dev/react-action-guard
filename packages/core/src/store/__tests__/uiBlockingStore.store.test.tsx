@@ -29,7 +29,7 @@ describe("uiBlockingStore.store", () => {
     });
   });
 
-  it("returns the entire store when used without a selector", () => {
+  it("should return the entire store when used without a selector", () => {
     const { result } = renderHook(() => useUIBlockingStore());
 
     expect(result.current.activeBlockers).toBeInstanceOf(Map);
@@ -37,7 +37,7 @@ describe("uiBlockingStore.store", () => {
     expect(result.current.removeBlocker).toBeTypeOf("function");
   });
 
-  it("supports selecting state from the wrapped store hook", () => {
+  it("should support selecting state from the wrapped store hook", () => {
     const { result } = renderHook(() => useUIBlockingStore((state) => state.activeBlockers.size));
 
     expect(result.current).toBe(0);
@@ -73,7 +73,7 @@ describe("uiBlockingStore.store", () => {
 });
 
 describe("createShallowStore", () => {
-  it("returns the full state when used without a selector", () => {
+  it("should return the full state when used without a selector", () => {
     const { useStore, useStoreApi } = createShallowStore<TestStoreState>((set) => ({
       count: 0,
       label: "initial",
@@ -92,7 +92,7 @@ describe("createShallowStore", () => {
     expect(result.current.count).toBe(1);
   });
 
-  it("supports selectors with shallow comparison", () => {
+  it("should support selectors with shallow comparison", () => {
     const { useStore, useStoreApi } = createShallowStore<TestSelectableStoreState>((set) => ({
       count: 0,
       untouched: "stable",

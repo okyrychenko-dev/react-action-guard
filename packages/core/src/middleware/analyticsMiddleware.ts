@@ -42,75 +42,10 @@ function trackEvent(
 /**
  * Creates middleware for tracking blocker events to analytics platforms.
  *
- * Automatically tracks all blocker actions (add, remove, update, timeout, clear)
- * to your analytics platform. Supports Google Analytics, Mixpanel, Amplitude,
- * and custom analytics providers.
- *
- * Event data includes: blockerId, action, scope, reason, priority, timestamp,
- * and duration (for remove events).
- *
- * @param config - Analytics configuration specifying provider and credentials
- *
- * @example
- * Google Analytics integration
- * ```ts
- * import { configureMiddleware, createAnalyticsMiddleware } from '@okyrychenko-dev/react-action-guard';
- *
- * const analyticsMiddleware = createAnalyticsMiddleware({
- *   provider: 'ga',
- *   trackingId: 'GA-XXXXX-Y'
- * });
- *
- * configureMiddleware([analyticsMiddleware]);
- * ```
- *
- * @example
- * Mixpanel integration
- * ```ts
- * const analyticsMiddleware = createAnalyticsMiddleware({
- *   provider: 'mixpanel',
- *   token: 'your_mixpanel_token',
- *   options: {
- *     debug: true
- *   }
- * });
- *
- * configureMiddleware([analyticsMiddleware]);
- * ```
- *
- * @example
- * Custom analytics provider
- * ```ts
- * const analyticsMiddleware = createAnalyticsMiddleware({
- *   track: (eventName, eventData) => {
- *     // Send to your custom analytics
- *     myAnalytics.track(eventName, {
- *       ...eventData,
- *       userId: getCurrentUserId()
- *     });
- *   }
- * });
- * ```
- *
- * @example
- * Amplitude with user properties
- * ```ts
- * const analyticsMiddleware = createAnalyticsMiddleware({
- *   provider: 'amplitude',
- *   apiKey: 'your_amplitude_key',
- *   userId: 'user-123',
- *   userProperties: {
- *     plan: 'premium',
- *     role: 'admin'
- *   }
- * });
- * ```
- *
- * @see {@link AnalyticsConfig} for configuration options
- * @see {@link configureMiddleware} for registering middleware
- *
  * @public
  * @since 0.6.0
+ * @see {@link AnalyticsConfig} for configuration options
+ * @see {@link configureMiddleware} for registering middleware
  */
 export function createAnalyticsMiddleware(config: AnalyticsConfig): Middleware {
   return (context) => {

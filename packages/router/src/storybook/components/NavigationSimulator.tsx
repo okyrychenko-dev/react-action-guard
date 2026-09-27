@@ -1,3 +1,4 @@
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import { ReactElement, useState } from "react";
 import "./NavigationSimulator.css";
 
@@ -14,7 +15,7 @@ function NavigationSimulator(props: NavigationSimulatorProps): ReactElement {
     onNavigate,
   } = props;
 
-  const [lastAttempt, setLastAttempt] = useState<string | null>(null);
+  const [lastAttempt, setLastAttempt] = useState<Nullable<string>>(null);
   const [attemptCount, setAttemptCount] = useState(0);
 
   const handleNavigate = (path: string) => {

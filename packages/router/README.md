@@ -45,22 +45,26 @@ This package requires the following peer dependencies:
 The most powerful pattern - synchronize navigation blocking with UI blocking:
 
 ```tsx
-import { useBlocker } from '@okyrychenko-dev/react-action-guard';
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function PaymentForm() {
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Block UI during payment processing
-  useBlocker('payment-processing', {
-    scope: 'checkout',
-    reason: 'Processing payment...',
-  }, isProcessing);
+  useActionBlocker(
+    "payment-processing",
+    {
+      scope: "checkout",
+      reason: "Processing payment...",
+    },
+    isProcessing
+  );
 
   // Block navigation when the same scope is active
   useNavigationBlocker({
-    scope: 'checkout',
-    message: 'Payment is processing. Please wait.',
+    scope: "checkout",
+    message: "Payment is processing. Please wait.",
   });
 
   // When isProcessing = true, both UI and navigation are blocked
@@ -72,14 +76,14 @@ function PaymentForm() {
 For basic usage without react-action-guard scopes:
 
 ```tsx
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function EditForm() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useNavigationBlocker({
     when: hasUnsavedChanges,
-    message: 'You have unsaved changes. Leave anyway?',
+    message: "You have unsaved changes. Leave anyway?",
   });
 }
 ```
@@ -109,6 +113,7 @@ Blocks navigation in router applications based on conditions or scope state.
 - `isIntercepting?: boolean` - Active interception state when the router can expose it
 
 **Available in:**
+
 - `@okyrychenko-dev/react-action-guard-router/react-router` - React Router v6+ & Remix
 - `@okyrychenko-dev/react-action-guard-router/tanstack-router` - TanStack Router
 - `@okyrychenko-dev/react-action-guard-router/nextjs` - Next.js Pages & App Router
@@ -118,28 +123,28 @@ Blocks navigation in router applications based on conditions or scope state.
 ```tsx
 // Scope-based blocking
 useNavigationBlocker({
-  scope: 'form',
-  message: 'You have unsaved changes',
+  scope: "form",
+  message: "You have unsaved changes",
 });
 
 // Condition-based blocking
 useNavigationBlocker({
   when: hasChanges,
-  message: 'Discard changes?',
-  onBlock: () => console.log('Navigation blocked'),
-  onAllow: () => console.log('Navigation allowed'),
+  message: "Discard changes?",
+  onBlock: () => console.log("Navigation blocked"),
+  onAllow: () => console.log("Navigation allowed"),
 });
 
 // Multiple scopes
 useNavigationBlocker({
-  scope: ['form', 'validation'],
-  message: 'Form is being validated',
+  scope: ["form", "validation"],
+  message: "Form is being validated",
 });
 
 // Function condition
 useNavigationBlocker({
   when: () => formIsDirty() || hasUnsavedData(),
-  message: 'You have unsaved work',
+  message: "You have unsaved work",
 });
 ```
 
@@ -150,6 +155,7 @@ Helper hook for managing custom confirmation dialogs.
 **Parameters:** None
 
 **Returns:**
+
 - `dialogState: DialogState<TMessage> | null` - Current dialog state
   - `message: TMessage` - The message passed to confirm
   - `isOpen: boolean` - Whether dialog is open
@@ -161,7 +167,10 @@ Helper hook for managing custom confirmation dialogs.
 **Example:**
 
 ```tsx
-import { useNavigationBlocker, useDialogState } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import {
+  useNavigationBlocker,
+  useDialogState,
+} from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function MyComponent() {
   const [hasChanges, setHasChanges] = useState(false);
@@ -169,18 +178,14 @@ function MyComponent() {
 
   useNavigationBlocker({
     when: hasChanges,
-    onConfirm: confirm,  // Returns Promise<boolean>
+    onConfirm: confirm, // Returns Promise<boolean>
   });
 
   return (
     <>
       <form>...</form>
       {dialogState && (
-        <CustomDialog
-          message={dialogState.message}
-          onConfirm={onConfirm}
-          onCancel={onCancel}
-        />
+        <CustomDialog message={dialogState.message} onConfirm={onConfirm} onCancel={onCancel} />
       )}
     </>
   );
@@ -193,18 +198,19 @@ function MyComponent() {
 interface CustomMessage {
   title: string;
   body: string;
-  severity: 'warning' | 'error';
+  severity: "warning" | "error";
 }
 
 const { dialogState, confirm } = useDialogState<CustomMessage>();
 
 useNavigationBlocker({
   when: isDirty,
-  onConfirm: () => confirm({
-    title: 'Unsaved Changes',
-    body: 'Your work will be lost',
-    severity: 'warning',
-  }),
+  onConfirm: () =>
+    confirm({
+      title: "Unsaved Changes",
+      body: "Your work will be lost",
+      severity: "warning",
+    }),
 });
 ```
 
@@ -213,17 +219,18 @@ useNavigationBlocker({
 Simple API similar to React Router v5's `usePrompt`.
 
 **Parameters:**
+
 - `message: string` - Confirmation message
 - `when: boolean` - Condition to activate blocking
 
 **Example:**
 
 ```tsx
-import { usePrompt } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { usePrompt } from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function MyForm() {
   const [hasChanges, setHasChanges] = useState(false);
-  usePrompt('You have unsaved changes', hasChanges);
+  usePrompt("You have unsaved changes", hasChanges);
 }
 ```
 
@@ -232,17 +239,18 @@ function MyForm() {
 Standalone hook for blocking browser unload events (tab close, refresh).
 
 **Parameters:**
+
 - `when: boolean` - Condition to activate blocking
 - `message?: string` - Optional custom message (default: "Are you sure you want to leave?")
 
 **Example:**
 
 ```tsx
-import { useBeforeUnload } from '@okyrychenko-dev/react-action-guard-router';
+import { useBeforeUnload } from "@okyrychenko-dev/react-action-guard-router";
 
 function MyComponent() {
   const [hasUnsavedWork, setHasUnsavedWork] = useState(false);
-  useBeforeUnload(hasUnsavedWork, 'You have unsaved work');
+  useBeforeUnload(hasUnsavedWork, "You have unsaved work");
 }
 ```
 
@@ -257,12 +265,12 @@ This utility works independently of any router and can be used in any React appl
 Full support with React Router v6's `useBlocker` hook.
 
 ```tsx
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function MyComponent() {
   useNavigationBlocker({
     when: isDirty,
-    message: 'Discard changes?',
+    message: "Discard changes?",
   });
 }
 ```
@@ -275,12 +283,12 @@ function MyComponent() {
 Full support with TanStack Router's history blocking.
 
 ```tsx
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/tanstack-router';
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/tanstack-router";
 
 function MyComponent() {
   useNavigationBlocker({
     when: isDirty,
-    message: 'Discard changes?',
+    message: "Discard changes?",
   });
 }
 ```
@@ -293,12 +301,12 @@ Full support with Next.js router events.
 
 ```tsx
 // pages/edit.tsx
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/nextjs';
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/nextjs";
 
 function EditPage() {
   useNavigationBlocker({
     when: isDirty,
-    message: 'Discard changes?',
+    message: "Discard changes?",
   });
 }
 ```
@@ -312,19 +320,25 @@ Best-effort support only. Browser unload protection works, but App Router does n
 
 ```tsx
 // app/edit/page.tsx
-'use client';
+"use client";
 
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/nextjs';
+import { useState } from "react";
+import { useAppRouterBlocker } from "@okyrychenko-dev/react-action-guard-router/nextjs";
 
-function EditPage() {
-  useNavigationBlocker({
+export default function EditPage() {
+  const [isDirty, setIsDirty] = useState(false);
+
+  useAppRouterBlocker({
     when: isDirty,
-    message: 'You have unsaved changes',
+    message: "You have unsaved changes",
   });
+
+  return <input onChange={() => setIsDirty(true)} />;
 }
 ```
 
 **App Router Limitations:**
+
 - ✅ Browser back/forward/close/refresh are blocked
 - ❌ `<Link>` component navigation is NOT blocked
 - ❌ `router.push()` is NOT blocked
@@ -333,12 +347,12 @@ For full navigation blocking support, use Pages Router.
 
 ## Adapter Capabilities
 
-| Adapter | `isBlocking` meaning | `isIntercepting` | Async `onConfirm` | Caveats |
-| --- | --- | --- | --- | --- |
-| React Router | Blocking condition is armed | Yes | Yes | Best semantic fidelity |
-| TanStack Router | Blocking condition is armed | No | Yes | Depends on history.block integration |
-| Next.js Pages Router | Blocking condition is armed | No | Yes | Re-attempts confirmed navigation with `router.push(url)` |
-| Next.js App Router | Blocking condition is armed | No | Best effort only | No official blocker API from Next.js |
+| Adapter              | `isBlocking` meaning        | `isIntercepting` | Async `onConfirm` | Caveats                                                  |
+| -------------------- | --------------------------- | ---------------- | ----------------- | -------------------------------------------------------- |
+| React Router         | Blocking condition is armed | Yes              | Yes               | Best semantic fidelity                                   |
+| TanStack Router      | Blocking condition is armed | No               | Yes               | Depends on history.block integration                     |
+| Next.js Pages Router | Blocking condition is armed | No               | Yes               | Re-attempts confirmed navigation with `router.push(url)` |
+| Next.js App Router   | Blocking condition is armed | No               | Best effort only  | No official blocker API from Next.js                     |
 
 ---
 
@@ -353,7 +367,7 @@ function SignupForm() {
 
   useNavigationBlocker({
     when: isDirty,
-    message: 'Your signup progress will be lost. Continue?',
+    message: "Your signup progress will be lost. Continue?",
   });
 }
 ```
@@ -366,14 +380,18 @@ function MultiStepWizard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Block UI during submission
-  useBlocker('wizard-submit', {
-    scope: 'wizard',
-    reason: 'Submitting form...',
-  }, isSubmitting);
+  useActionBlocker(
+    "wizard-submit",
+    {
+      scope: "wizard",
+      reason: "Submitting form...",
+    },
+    isSubmitting
+  );
 
   // Block navigation during submission OR if wizard incomplete
   useNavigationBlocker({
-    scope: 'wizard',
+    scope: "wizard",
     when: currentStep < 5,
     message: `You're on step ${currentStep}/5. Exit wizard?`,
   });
@@ -383,18 +401,18 @@ function MultiStepWizard() {
 ### E-Commerce Checkout
 
 ```tsx
-import { useBlockingMutation } from '@okyrychenko-dev/react-action-guard-tanstack';
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { useBlockingMutation } from "@okyrychenko-dev/react-action-guard-tanstack";
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 
 function CheckoutPage() {
   const paymentMutation = useBlockingMutation({
     mutationFn: processPayment,
-    blockingConfig: { scope: 'checkout' },
+    blockingConfig: { scope: "checkout" },
   });
 
   useNavigationBlocker({
-    scope: 'checkout',
-    message: 'Payment is processing. Leaving will cancel the transaction.',
+    scope: "checkout",
+    message: "Payment is processing. Leaving will cancel the transaction.",
   });
 }
 ```
@@ -428,26 +446,26 @@ import type {
   DialogState,
   ConfirmationResult,
   ConfirmationCallbacks,
-} from '@okyrychenko-dev/react-action-guard-router';
+} from "@okyrychenko-dev/react-action-guard-router";
 
 // Router-specific types
-import type { UseNavigationBlockerOptions } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import type { UseNavigationBlockerOptions } from "@okyrychenko-dev/react-action-guard-router/react-router";
 ```
 
 **Typed scopes with `react-action-guard`:**
 
 ```tsx
-import { createTypedHooks } from '@okyrychenko-dev/react-action-guard';
+import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
-type AppScopes = 'form' | 'checkout' | 'navigation';
+type AppScopes = "form" | "checkout" | "navigation";
 const { useBlocker } = createTypedHooks<AppScopes>();
 
 function MyComponent() {
-  useBlocker('id', { scope: 'form' });  // ✅ Typed in the core package
+  useBlocker("id", { scope: "form" }); // ✅ Typed in the core package
 
   useNavigationBlocker({
-    scope: 'form',  // ✅ Reuses the same scope values cleanly
-    message: 'Leave form?',
+    scope: "form", // ✅ Reuses the same scope values cleanly
+    message: "Leave form?",
   });
 }
 ```
@@ -460,10 +478,11 @@ Tree-shakeable by router adapter. Import only what you need:
 
 ```tsx
 // Only React Router code is bundled
-import { useNavigationBlocker } from '@okyrychenko-dev/react-action-guard-router/react-router';
+import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 ```
 
 **Approximate sizes (minified):**
+
 - Core utilities: ~2 KB
 - React Router adapter: ~2.5 KB
 - TanStack Router adapter: ~2.5 KB
@@ -481,7 +500,7 @@ This package lives in the [react-action-guard monorepo](https://github.com/okyry
 pnpm install
 
 # Run this package's scripts with --filter
-pnpm --filter @okyrychenko-dev/react-action-guard-router run test
+pnpm --filter @okyrychenko-dev/react-action-guard-router run test:run
 pnpm --filter @okyrychenko-dev/react-action-guard-router run build
 pnpm --filter @okyrychenko-dev/react-action-guard-router run typecheck
 pnpm --filter @okyrychenko-dev/react-action-guard-router run lint
@@ -489,7 +508,7 @@ pnpm --filter @okyrychenko-dev/react-action-guard-router run lint:fix
 
 # Or cd into the package and run scripts directly
 cd packages/router
-pnpm run test
+pnpm run test:run
 ```
 
 ---

@@ -22,6 +22,7 @@ const hasBlockingHistory = (value: unknown): value is SafeTanStackRouter => {
   if (!("history" in value)) {
     return false;
   }
+
   const history = value.history;
 
   if (!isObject(history)) {
@@ -49,65 +50,6 @@ const attemptRetry = (update: Record<string, unknown>): void => {
 
 /**
  * Blocks navigation in TanStack Router applications based on conditions or scope state.
- *
- * This hook integrates with TanStack Router's history blocking mechanism and
- * react-action-guard's scope system to prevent navigation when certain conditions
- * are met or when specific scopes are blocked.
- *
- * **Features:**
- * - Block navigation based on boolean condition or function
- * - Automatically block when react-action-guard scopes are active
- * - Support for browser `beforeunload` event (tab close/refresh)
- * - Customizable confirmation dialog
- * - Callbacks for block/allow events
- *
- * @param options - Configuration options
- * @returns Object with `isBlocking` state
- *
- * @example
- * ```tsx
- * // Block based on scope
- * function EditForm() {
- *   useNavigationBlocker({
- *     scope: 'form',
- *     message: 'You have unsaved changes. Leave anyway?',
- *   });
- *
- *   return <form>...</form>;
- * }
- * ```
- *
- * @example
- * ```tsx
- * // Block based on condition
- * function UnsavedChanges() {
- *   const [hasChanges, setHasChanges] = useState(false);
- *
- *   useNavigationBlocker({
- *     when: hasChanges,
- *     message: 'Discard changes?',
- *     onBlock: () => console.log('Navigation blocked'),
- *   });
- * }
- * ```
- *
- * @example
- * ```tsx
- * // Type-safe with scopes
- * import { createTypedHooks } from '@okyrychenko-dev/react-action-guard';
- *
- * type AppScopes = 'global' | 'form' | 'checkout';
- * const { useBlocker } = createTypedHooks<AppScopes>();
- *
- * function MyComponent() {
- *   useBlocker('blocker-id', { scope: 'form' });
- *
- *   useNavigationBlocker({
- *     scope: 'form', // Type-safe!
- *     message: 'Leave?',
- *   });
- * }
- * ```
  */
 export function useNavigationBlocker(
   options: UseNavigationBlockerOptions
@@ -127,6 +69,7 @@ export function useNavigationBlocker(
 
     // Block navigation with properly typed update parameter
     type NavigationUpdate = Record<string, unknown> & { retry?: () => void };
+
     const unblock = router.history.block((update: NavigationUpdate) => {
       // Early return if no message
       if (!message) {

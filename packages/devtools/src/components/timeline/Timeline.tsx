@@ -1,3 +1,4 @@
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ChangeEvent, ReactElement, useCallback, useEffect, useState } from "react";
 import { selectFilteredEvents, useDevtoolsStore } from "../../store";
 import { copyEventsToClipboard, downloadEventsAsJson } from "../../utils";
@@ -63,7 +64,7 @@ function Timeline(): ReactElement {
     downloadEventsAsJson(events);
   }, [events]);
 
-  if (events.length === 0 && !isFilterActive(filter)) {
+  if (!isNonEmptyArray(events) && !isFilterActive(filter)) {
     return <TimelineEmptyState />;
   }
 
@@ -71,7 +72,7 @@ function Timeline(): ReactElement {
     <>
       <TimelineToolbar
         search={filter.search}
-        hasEvents={events.length > 0}
+        hasEvents={isNonEmptyArray(events)}
         copyStatus={copyStatus}
         onSearchChange={handleSearchChange}
         onCopy={handleCopy}

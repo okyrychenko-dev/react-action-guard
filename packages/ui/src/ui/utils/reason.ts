@@ -1,4 +1,4 @@
-import type { Nullable } from "@okyrychenko-dev/type-utils";
+import { type Nullable, isNull, isUndefined } from "@okyrychenko-dev/type-utils";
 import type {
   GuardedFieldReasonMode,
   GuardedReasonBlocker,
@@ -21,7 +21,7 @@ function getRequiredReasonId(
   mode: GuardedReasonMode | GuardedFieldReasonMode,
   reasonId?: string
 ): string {
-  if (reasonId === undefined || reasonId.trim().length === 0) {
+  if (isUndefined(reasonId) || reasonId.trim().length === 0) {
     throw new Error(`reasonId is required when reasonMode is "${mode}"`);
   }
 
@@ -36,7 +36,7 @@ function resolveGuardedReason(params: {
 }): GuardedReasonResult {
   const reason = getGuardedReason(params.blocker, params.fallback);
 
-  if (!params.blocker.isBlocked || reason === null || params.mode === "hidden") {
+  if (!params.blocker.isBlocked || isNull(reason) || params.mode === "hidden") {
     return { ariaDescribedBy: undefined, reasonContent: null };
   }
 

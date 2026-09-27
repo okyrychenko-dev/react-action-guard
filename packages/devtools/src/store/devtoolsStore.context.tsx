@@ -1,10 +1,11 @@
 import { createResolvedStoreHooks } from "@okyrychenko-dev/react-zustand-toolkit";
 import { ReactElement, ReactNode, createContext, useContext } from "react";
 import { devtoolsStoreApi } from "./devtoolsStore.store";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsStore } from "../types";
 import type { DevtoolsStoreApi } from "./devtoolsStore.store";
 
-const DevtoolsStoreContext = createContext<DevtoolsStoreApi | null>(null);
+const DevtoolsStoreContext = createContext<Nullable<DevtoolsStoreApi>>(null);
 
 const { useResolvedValue: useDevtoolsStore } = createResolvedStoreHooks<DevtoolsStore>(
   devtoolsStoreApi,

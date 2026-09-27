@@ -29,13 +29,13 @@ describe("useShouldBlock", () => {
       expect(result.current).toBe(false);
     });
 
-    it('should return true when "when" is true', () => {
+    it("should return true when the when option is true", () => {
       const { result } = renderHook(() => useShouldBlock(true));
 
       expect(result.current).toBe(true);
     });
 
-    it('should return false when "when" is false', () => {
+    it("should return false when the when option is false", () => {
       const { result } = renderHook(() => useShouldBlock(false));
 
       expect(result.current).toBe(false);
@@ -51,6 +51,7 @@ describe("useShouldBlock", () => {
 
     it("should warn about function conditions in development", () => {
       vi.stubEnv("NODE_ENV", "development");
+
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
       const condition = (): boolean => true;
 
@@ -140,6 +141,7 @@ describe("useShouldBlock", () => {
       const firstResult = result.current;
 
       rerender();
+
       const secondResult = result.current;
 
       // Results should be referentially stable

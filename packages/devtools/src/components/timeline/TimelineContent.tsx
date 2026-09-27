@@ -1,8 +1,8 @@
+import { type Nullable, isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ReactElement } from "react";
 import { EventItem } from "../eventItem";
 import { Content, EmptyState } from "../shared";
 import styles from "./Timeline.module.css";
-import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent } from "../../types";
 
 interface TimelineContentProps {
@@ -16,8 +16,8 @@ function TimelineContent(props: TimelineContentProps): ReactElement {
 
   return (
     <Content>
-      {events.length === 0 && <EmptyState>No matching events</EmptyState>}
-      {events.length > 0 && (
+      {!isNonEmptyArray(events) && <EmptyState>No matching events</EmptyState>}
+      {isNonEmptyArray(events) && (
         <ul className={styles.eventList}>
           {events.map((event) => (
             <EventItem

@@ -1,3 +1,4 @@
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ReactElement, ReactNode } from "react";
 import styles from "./StatsSection.module.css";
 
@@ -13,8 +14,8 @@ function StatsSection(props: StatsSectionProps): ReactElement {
   return (
     <section className={styles.section}>
       <h4 className={styles.sectionTitle}>{title}</h4>
-      {rows.length === 0 && <p className={styles.muted}>{emptyMessage}</p>}
-      {rows.length > 0 && (
+      {!isNonEmptyArray(rows) && <p className={styles.muted}>{emptyMessage}</p>}
+      {isNonEmptyArray(rows) && (
         <ul className={styles.list}>
           {rows.map((row) => (
             <li key={row.id} className={styles.row}>

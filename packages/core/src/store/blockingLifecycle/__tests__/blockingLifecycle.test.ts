@@ -15,6 +15,7 @@ describe("Blocking lifecycle", () => {
     expect(lifecycle.getSnapshot()).toBe(initial);
 
     lifecycle.add("first");
+
     const added = lifecycle.getSnapshot();
 
     expect(added).not.toBe(initial);
@@ -146,6 +147,7 @@ describe("Blocking lifecycle", () => {
     observation.subscribe((snapshot) => observed.push(snapshot.map(({ id }) => id)));
 
     lifecycle.add("first", { scope: "form", priority: 10 });
+
     const earlier = observation.getSnapshot();
 
     lifecycle.add("second", { scope: "form", priority: 20 });
@@ -173,6 +175,7 @@ describe("Blocking lifecycle", () => {
 
   it("should preserve update-as-upsert and ordered timeout then removal events", () => {
     vi.useFakeTimers();
+
     const lifecycle = createBlockingLifecycle();
     const events: Array<string> = [];
 
@@ -197,6 +200,7 @@ describe("Blocking lifecycle", () => {
   it("should ignore a replaced blocker's stale timeout", () => {
     vi.useFakeTimers();
     vi.spyOn(globalThis, "clearTimeout").mockImplementation(() => undefined);
+
     const lifecycle = createBlockingLifecycle();
     const oldTimeout = vi.fn();
 
@@ -213,6 +217,7 @@ describe("Blocking lifecycle", () => {
 
   it("should preserve a timer when metadata changes and use the latest callback", () => {
     vi.useFakeTimers();
+
     const lifecycle = createBlockingLifecycle();
     const initial = vi.fn();
     const latest = vi.fn();
@@ -247,6 +252,7 @@ describe("Blocking lifecycle", () => {
 
   it("should preserve a replacement created by a timeout callback", () => {
     vi.useFakeTimers();
+
     const lifecycle = createBlockingLifecycle();
 
     lifecycle.add("first", {

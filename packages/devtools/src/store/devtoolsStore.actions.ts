@@ -1,6 +1,6 @@
+import { type Nullable, isNull } from "@okyrychenko-dev/type-utils";
 import { DEFAULT_MAX_EVENTS, DEFAULT_TAB, createDefaultFilter } from "./devtoolsStore.constants";
 import { matchesEventFilter } from "./devtoolsStore.selectors";
-import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { StateCreator } from "zustand";
 import type { DevtoolsEvent, DevtoolsFilter, DevtoolsStore } from "../types";
 
@@ -35,7 +35,7 @@ export const createDevtoolsActions: StateCreator<DevtoolsStore, [], [], Devtools
     filter: DevtoolsFilter,
     selectedEventId: Nullable<string>
   ): Nullable<string> => {
-    if (selectedEventId === null) {
+    if (isNull(selectedEventId)) {
       return null;
     }
 
@@ -55,7 +55,7 @@ export const createDevtoolsActions: StateCreator<DevtoolsStore, [], [], Devtools
     maxEvents: number,
     selectedEventId: Nullable<string>
   ): Nullable<string> => {
-    if (selectedEventId === null) {
+    if (isNull(selectedEventId)) {
       return null;
     }
 

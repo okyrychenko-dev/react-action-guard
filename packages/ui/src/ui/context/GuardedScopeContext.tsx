@@ -1,6 +1,6 @@
 import { resolveScope } from "@okyrychenko-dev/react-action-guard";
 import { createContext, useContext, useMemo } from "react";
-import type { Optional } from "@okyrychenko-dev/type-utils";
+import type { Nullable, Optional } from "@okyrychenko-dev/type-utils";
 import type { ReactNode } from "react";
 import type { GuardedScope } from "../types";
 
@@ -13,7 +13,7 @@ export interface GuardedScopeProviderProps {
   children: ReactNode;
 }
 
-const GuardedScopeContext = createContext<GuardedScopeContextValue | null>(null);
+const GuardedScopeContext = createContext<Nullable<GuardedScopeContextValue>>(null);
 
 export function GuardedScopeProvider({ children, scope }: GuardedScopeProviderProps): ReactNode {
   const value = useMemo(() => ({ scope }), [scope]);

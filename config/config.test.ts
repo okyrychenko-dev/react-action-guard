@@ -1,5 +1,8 @@
 import { execFileSync } from "node:child_process";
 
+import stylistic from "@stylistic/eslint-plugin";
+import { Linter } from "eslint";
+
 import { describe, expect, it } from "vitest";
 import { resolveConfig } from "prettier";
 
@@ -92,6 +95,39 @@ describe("Prettier configuration", () => {
     "examples/enterprise-demo/src/main.tsx",
   ])("should resolve the root policy for %s", async (filePath) => {
     await expect(resolveConfig(filePath)).resolves.toEqual(prettierConfig);
+  });
+});
+
+describe("shared ESLint declaration spacing", () => {
+  const linter = new Linter();
+  const spacingConfig = coreEslintConfig.find((entry) =>
+    Object.hasOwn(entry.rules ?? {}, "@stylistic/padding-line-between-statements")
+  );
+  const rule = spacingConfig?.rules?.["@stylistic/padding-line-between-statements"];
+
+  function lint(code: string): Array<string> {
+    return linter
+      .verify(code, [
+        {
+          plugins: { "@stylistic": stylistic },
+          rules: { "@stylistic/padding-line-between-statements": rule },
+        },
+      ])
+      .map(({ message }) => message);
+  }
+
+  it("should separate a declaration group from preceding executable code", () => {
+    expect(lint("run();\nconst result = 1;\nlet next = 2;\n")).toContain(
+      "Expected blank line before this statement."
+    );
+  });
+
+  it("should keep adjacent declarations in one group", () => {
+    expect(lint("const first = 1;\nlet second = 2;\n")).toEqual([]);
+  });
+
+  it("should keep imports next to the first declaration", () => {
+    expect(lint('import value from "value";\nconst result = value;\n')).toEqual([]);
   });
 });
 

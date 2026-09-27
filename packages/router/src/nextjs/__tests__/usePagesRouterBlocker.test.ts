@@ -193,6 +193,7 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
   describe("Custom confirmation", () => {
     it("should re-attempt navigation after async confirmation", async () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const onAllow = vi.fn();
       let resolveConfirm: (value: boolean) => void = () => undefined;
       const confirmPromise = new Promise<boolean>((resolve) => {
@@ -229,6 +230,7 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
   describe("Performance", () => {
     it("should update listener when message changes", () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       let message = "Message 1";
 
       const { rerender } = renderHook(() =>

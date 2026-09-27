@@ -4,6 +4,7 @@ import {
   useScheduledBlocker,
 } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement } from "react";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 interface InitialPassiveEffectBlockersProps {
   isActionBlockerActive: boolean;
@@ -11,7 +12,7 @@ interface InitialPassiveEffectBlockersProps {
 
 function InitialPassiveEffectBlockers(
   props: InitialPassiveEffectBlockersProps
-): ReactElement | null {
+): Nullable<ReactElement> {
   const { isActionBlockerActive } = props;
 
   useActionBlocker(

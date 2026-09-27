@@ -142,10 +142,12 @@ describe("useBlockingMutation", () => {
     });
 
     expect(onTimeout).toHaveBeenCalledTimes(1);
+
     const timedOutId = onTimeout.mock.calls[0]?.[0];
 
     expect(typeof timedOutId).toBe("string");
     expect(timedOutId).toContain('mutation-["save"]-');
+
     const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(false);
@@ -374,6 +376,7 @@ describe("useBlockingMutation", () => {
 
     expect(result.current.data).toBe("data-42");
     expect(mutationFn).toHaveBeenCalledTimes(1);
+
     const callArgs = mutationFn.mock.calls[0];
 
     expect(callArgs[0]).toEqual({ id: 42 });
@@ -591,6 +594,7 @@ describe("useBlockingMutation", () => {
     });
 
     expect(onSuccess).toHaveBeenCalledTimes(1);
+
     const callArgs = onSuccess.mock.calls[0];
 
     expect(callArgs[0]).toBe("test-data");
@@ -624,6 +628,7 @@ describe("useBlockingMutation", () => {
     });
 
     expect(onError).toHaveBeenCalledTimes(1);
+
     const callArgs = onError.mock.calls[0];
 
     expect(callArgs[0]).toBe(error);

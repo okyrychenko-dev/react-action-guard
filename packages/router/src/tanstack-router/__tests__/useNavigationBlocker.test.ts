@@ -192,6 +192,7 @@ describe("useNavigationBlocker (TanStack Router)", () => {
 
     it("should call async onConfirm only once", async () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const retry = vi.fn();
 
       let resolveConfirm: (value: boolean) => void = () => undefined;
@@ -272,6 +273,7 @@ describe("useNavigationBlocker (TanStack Router)", () => {
 
     it("should update blocking when message changes", () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       let message = "Message 1";
 
       const { rerender } = renderHook(() =>
