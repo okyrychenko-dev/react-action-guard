@@ -7,8 +7,7 @@ import {
   type UseInfiniteQueryResult,
   useInfiniteQuery,
 } from "@tanstack/react-query";
-import { useBlockingManager, useQueryBlockerId } from "../internal";
-import { resolveBlockingReason } from "../utils";
+import { useBlockingCoordination } from "../internal";
 import type {
   DefinedInitialDataBlockingInfiniteQueryOptions,
   UndefinedInitialDataBlockingInfiniteQueryOptions,
@@ -222,47 +221,17 @@ export function useBlockingInfiniteQuery<
   const { blockingConfig, ...queryOptions } = options;
   const query = useInfiniteQuery(queryOptions, queryClient);
 
-  const blockerId = useQueryBlockerId("infinite-query", options.queryKey);
-
-  const {
-    scope,
-    reason = "Loading more data...",
-    reasonOnLoading,
-    reasonOnFetching,
-    reasonOnError,
-    priority = 10,
-    timeout,
-    onTimeout,
-    onLoading = true,
-    onFetching = false,
-    onError = false,
-  } = blockingConfig;
-
-  const isFetchingButNotLoading =
-    query.isRefetching || query.isFetchingNextPage || query.isFetchingPreviousPage;
-
-  const shouldBlock =
-    (onLoading && query.isPending) ||
-    (onFetching && isFetchingButNotLoading) ||
-    (onError && query.isError);
-
-  const currentReason = resolveBlockingReason({
-    defaultReason: reason,
-    stateReasons: [
-      { condition: query.isPending, reason: reasonOnLoading },
-      { condition: isFetchingButNotLoading, reason: reasonOnFetching },
-      { condition: query.isError, reason: reasonOnError },
-    ],
-  });
-
-  useBlockingManager({
-    blockerId,
-    shouldBlock,
-    scope,
-    reason: currentReason,
-    priority,
-    timeout,
-    onTimeout,
+  useBlockingCoordination({
+    kind: "infinite-query",
+    key: options.queryKey,
+    state: {
+      loading: query.isPending,
+      fetching: query.isRefetching || query.isFetchingNextPage || query.isFetchingPreviousPage,
+      error: query.isError,
+    },
+    config: blockingConfig,
+    defaultReason: "Loading more data...",
+    defaultPriority: 10,
   });
 
   return query;

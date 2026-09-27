@@ -4,8 +4,7 @@ import {
   type UseMutationResult,
   useMutation,
 } from "@tanstack/react-query";
-import { useBlockingManager, useMutationBlockerId } from "../internal";
-import { resolveBlockingReason } from "../utils";
+import { useBlockingCoordination } from "../internal";
 import type { UseBlockingMutationOptions } from "./useBlockingMutation.types";
 
 /**
@@ -221,37 +220,13 @@ export function useBlockingMutation<
   const { blockingConfig, mutationKey, ...mutationOptions } = options;
   const mutation = useMutation({ mutationKey, ...mutationOptions }, queryClient);
 
-  const blockerId = useMutationBlockerId("mutation", mutationKey);
-
-  const {
-    scope,
-    reason = "Saving changes...",
-    reasonOnPending,
-    reasonOnError,
-    priority = 30,
-    timeout,
-    onTimeout,
-    onError = false,
-  } = blockingConfig;
-
-  const shouldBlock = mutation.isPending || (onError && mutation.isError);
-
-  const currentReason = resolveBlockingReason({
-    defaultReason: reason,
-    stateReasons: [
-      { condition: mutation.isPending, reason: reasonOnPending },
-      { condition: mutation.isError, reason: reasonOnError },
-    ],
-  });
-
-  useBlockingManager({
-    blockerId,
-    shouldBlock,
-    scope,
-    reason: currentReason,
-    priority,
-    timeout,
-    onTimeout,
+  useBlockingCoordination({
+    kind: "mutation",
+    key: mutationKey,
+    state: { loading: mutation.isPending, fetching: false, error: mutation.isError },
+    config: { ...blockingConfig, reasonOnLoading: blockingConfig.reasonOnPending },
+    defaultReason: "Saving changes...",
+    defaultPriority: 30,
   });
 
   return mutation;

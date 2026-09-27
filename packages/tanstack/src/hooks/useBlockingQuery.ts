@@ -7,8 +7,7 @@ import {
   type UseQueryResult,
   useQuery,
 } from "@tanstack/react-query";
-import { useBlockingManager, useQueryBlockerId } from "../internal";
-import { resolveBlockingReason } from "../utils";
+import { useBlockingCoordination } from "../internal";
 import type {
   DefinedInitialDataBlockingQueryOptions,
   UndefinedInitialDataBlockingQueryOptions,
@@ -201,44 +200,13 @@ export function useBlockingQuery<
   const { blockingConfig, ...queryOptions } = options;
   const query = useQuery(queryOptions, queryClient);
 
-  const blockerId = useQueryBlockerId("query", options.queryKey);
-
-  const {
-    scope,
-    reason = "Loading data...",
-    reasonOnLoading,
-    reasonOnFetching,
-    reasonOnError,
-    priority = 10,
-    timeout,
-    onTimeout,
-    onLoading = true,
-    onFetching = false,
-    onError = false,
-  } = blockingConfig;
-
-  const shouldBlock =
-    (onLoading && query.isPending) ||
-    (onFetching && query.isRefetching) ||
-    (onError && query.isError);
-
-  const currentReason = resolveBlockingReason({
-    defaultReason: reason,
-    stateReasons: [
-      { condition: query.isPending, reason: reasonOnLoading },
-      { condition: query.isRefetching, reason: reasonOnFetching },
-      { condition: query.isError, reason: reasonOnError },
-    ],
-  });
-
-  useBlockingManager({
-    blockerId,
-    shouldBlock,
-    scope,
-    reason: currentReason,
-    priority,
-    timeout,
-    onTimeout,
+  useBlockingCoordination({
+    kind: "query",
+    key: options.queryKey,
+    state: { loading: query.isPending, fetching: query.isRefetching, error: query.isError },
+    config: blockingConfig,
+    defaultReason: "Loading data...",
+    defaultPriority: 10,
   });
 
   return query;
