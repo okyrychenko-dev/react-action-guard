@@ -14,7 +14,7 @@
 - 💬 Dynamic reasons - different messages for different states
 - 🔒 Type-safe with full TypeScript support
 - 🧠 Preserves TanStack Query inference for `select`, `initialData`, mutation variables, and `useQueries` tuples
-- ⚡ Seamless TanStack Query integration - supports all TanStack Query hooks
+- ⚡ TanStack Query integration for queries, infinite queries, mutations, and parallel queries
 - 🧹 Automatic cleanup on component unmount
 - ⚙️ Stable blocker lifecycle across rerenders and React `StrictMode`
 - 🪝 4 specialized hooks - `useBlockingQuery`, `useBlockingMutation`, `useBlockingInfiniteQuery`, `useBlockingQueries`
@@ -33,7 +33,7 @@ pnpm add @okyrychenko-dev/react-action-guard-tanstack @okyrychenko-dev/react-act
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^1.0.1 - The core UI blocking library
+- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^1.0.4 - The core UI blocking library
 - [@tanstack/react-query](https://tanstack.com/query) ^5.90.10 - TanStack Query for data fetching
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)
@@ -83,214 +83,56 @@ function UserProfile() {
 
 ## API Reference
 
-### Hooks
+All four hooks accept the native TanStack Query options and return the corresponding native result. `blockingConfig` controls one blocker owned by each mounted hook instance. The optional `queryClient` argument is supported on every hook.
 
-#### `useBlockingQuery(options)`
+| Hook                                                        | Blocking configuration                                         | Result                                                              | Default reason         | Default priority |
+| ----------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------- | ---------------- |
+| `useBlockingQuery(options, queryClient?)`                   | `options.blockingConfig: QueryBlockingConfig`                  | `UseQueryResult` (including defined `initialData` overload)         | `Loading data...`      | `10`             |
+| `useBlockingInfiniteQuery(options, queryClient?)`           | `options.blockingConfig: InfiniteQueryBlockingConfig`          | `UseInfiniteQueryResult` (including defined `initialData` overload) | `Loading more data...` | `10`             |
+| `useBlockingMutation(options, queryClient?)`                | `options.blockingConfig: MutationBlockingConfig`               | `UseMutationResult`                                                 | `Saving changes...`    | `30`             |
+| `useBlockingQueries(queries, blockingConfig, queryClient?)` | `blockingConfig: QueriesBlockingConfig` applies to all queries | Inferred tuple of query results                                     | `Loading queries...`   | `10`             |
 
-A wrapper around TanStack Query's `useQuery` that integrates with the UI blocking system.
+### Blocking configuration
 
-**Parameters:**
+| Option                                    | Meaning                                                                          | Default                                         |
+| ----------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `scope?: string \| ReadonlyArray<string>` | Scope or scopes affected by this blocker; omitted scope uses core's global scope | Global scope                                    |
+| `reason?: string`                         | Fallback blocking message                                                        | Hook-specific value above                       |
+| `priority?: number`                       | Priority used by React Action Guard when several blockers apply                  | Hook-specific value above                       |
+| `timeout?: number`                        | Milliseconds before the Blocking lifecycle removes the blocker                   | No timeout                                      |
+| `onTimeout?: (blockerId: string) => void` | Called when the blocker times out; treat the ID as opaque                        | None                                            |
+| `onLoading?: boolean`                     | Block while loading; mutation pending always blocks                              | `true` for queries; always enabled for mutation |
+| `onFetching?: boolean`                    | Block while fetching after initial load; not available for mutation              | `false`                                         |
+| `onError?: boolean`                       | Keep blocking in an error state                                                  | `false`                                         |
+| `reasonOnLoading?: string`                | Loading message for query and multi-query hooks                                  | Not set                                         |
+| `reasonOnPending?: string`                | Pending message for mutation                                                     | Not set                                         |
+| `reasonOnFetching?: string`               | Fetching message for query and multi-query hooks                                 | Not set                                         |
+| `reasonOnError?: string`                  | Error message                                                                    | Not set                                         |
 
-- `options: UseBlockingQueryOptions<TData, TError>` - All standard `useQuery` options plus:
-  - `blockingConfig: QueryBlockingConfig` - Blocking configuration
-    - `scope?: string | string[]` - Scope(s) to block
-    - `reason?: string` - Default message (default: `'Loading data...'`)
-    - `priority?: number` - Priority level (default: `10`)
-    - `timeout?: number` - Auto-remove blocker after N milliseconds
-    - `onTimeout?: (blockerId: string) => void` - Callback when blocker is auto-removed
-    - `onLoading?: boolean` - Block during the initial pending state (default: `true`)
-    - `onFetching?: boolean` - Block during background refetching (default: `false`)
-    - `onError?: boolean` - Block when query fails (default: `false`)
-    - `reasonOnLoading?: string` - Message for the initial pending state
-    - `reasonOnFetching?: string` - Message for the background refetching state
-    - `reasonOnError?: string` - Message for error state
+`onLoading` and `onFetching` are available on query, infinite-query, and multi-query configurations. Mutations always block while pending and do not have a fetching state.
 
-**Returns:** `UseQueryResult<TData, TError>` - Standard TanStack Query result
+### State mapping and reason precedence
 
-**Example:**
+| Hook                       | Loading               | Fetching                                                          | Error                   |
+| -------------------------- | --------------------- | ----------------------------------------------------------------- | ----------------------- |
+| `useBlockingQuery`         | `isPending`           | `isRefetching`                                                    | `isError`               |
+| `useBlockingInfiniteQuery` | `isPending`           | `isRefetching`, `isFetchingNextPage`, or `isFetchingPreviousPage` | `isError`               |
+| `useBlockingMutation`      | `isPending`           | Not applicable                                                    | `isError`               |
+| `useBlockingQueries`       | Any result is pending | Any result is refetching                                          | Any result has an error |
 
-```tsx
-function MyComponent() {
-  const query = useBlockingQuery({
-    queryKey: ["users"],
-    queryFn: fetchUsers,
-    blockingConfig: {
-      scope: "global",
-      reasonOnLoading: "Loading users...",
-      reasonOnFetching: "Refreshing users...",
-      reasonOnError: "Failed to load users",
-      onLoading: true,
-      onFetching: false,
-      onError: true,
-    },
-  });
+The enabled `onLoading`, `onFetching`, and `onError` options decide whether a blocker exists. When states overlap, the reason is selected in **loading → fetching → error** order from the first defined state-specific message; otherwise it falls back to `reason`. This reason precedence is independent of which blocking option is enabled. An empty string is a defined message.
 
-  return <div>{/* your UI */}</div>;
-}
-```
-
-#### `useBlockingMutation(options)`
-
-A wrapper around TanStack Query's `useMutation` that integrates with the UI blocking system.
-
-**Parameters:**
-
-- `options: UseBlockingMutationOptions<TData, TError, TVariables>` - All standard `useMutation` options plus:
-  - `blockingConfig: MutationBlockingConfig` - Blocking configuration
-    - `scope?: string | string[]` - Scope(s) to block
-    - `reason?: string` - Default message (default: `'Saving changes...'`)
-    - `priority?: number` - Priority level (default: `30`)
-    - `timeout?: number` - Auto-remove blocker after N milliseconds
-    - `onTimeout?: (blockerId: string) => void` - Callback when blocker is auto-removed
-    - `onError?: boolean` - Block when mutation fails (default: `false`)
-    - `reasonOnPending?: string` - Message for pending state
-    - `reasonOnError?: string` - Message for error state (requires `onError: true`)
-
-**Returns:** `UseMutationResult<TData, TError, TVariables>` - Standard TanStack Query result
-
-**Example:**
-
-```tsx
-function MyComponent() {
-  const mutation = useBlockingMutation({
-    mutationFn: createUser,
-    blockingConfig: {
-      scope: "user-form",
-      reasonOnPending: "Creating user...",
-      reasonOnError: "Failed to create user",
-      onError: true,
-    },
-  });
-
-  return <button onClick={() => mutation.mutate({ name: "John" })}>Create User</button>;
-}
-```
-
-#### `useBlockingInfiniteQuery(options)`
-
-A wrapper around TanStack Query's `useInfiniteQuery` that integrates with the UI blocking system.
-
-**Parameters:**
-
-- `options: UseBlockingInfiniteQueryOptions<TData, TError, TPageParam>` - All standard `useInfiniteQuery` options plus:
-  - `blockingConfig: InfiniteQueryBlockingConfig` - Blocking configuration
-    - `scope?: string | string[]` - Scope(s) to block
-    - `reason?: string` - Default message (default: `'Loading more data...'`)
-    - `priority?: number` - Priority level (default: `10`)
-    - `timeout?: number` - Auto-remove blocker after N milliseconds
-    - `onTimeout?: (blockerId: string) => void` - Callback when blocker is auto-removed
-    - `onLoading?: boolean` - Block during the initial pending state (default: `true`)
-    - `onFetching?: boolean` - Block during refetching or fetching next/previous page (default: `false`)
-    - `onError?: boolean` - Block when query fails (default: `false`)
-    - `reasonOnLoading?: string` - Message for the initial pending state
-    - `reasonOnFetching?: string` - Message for refetching or page fetching
-    - `reasonOnError?: string` - Message for error state
-
-**Returns:** `UseInfiniteQueryResult<TData, TError>` - Standard TanStack Query result
-
-**Example:**
-
-```tsx
-function InfiniteList() {
-  const query = useBlockingInfiniteQuery({
-    queryKey: ["posts"],
-    queryFn: ({ pageParam }) => fetchPosts(pageParam),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
-    blockingConfig: {
-      scope: "post-list",
-      reasonOnLoading: "Loading posts...",
-      reasonOnFetching: "Loading more posts...",
-      onLoading: true,
-      onFetching: true,
-    },
-  });
-
-  return (
-    <div>
-      {query.data?.pages.map((page, i) => (
-        <div key={i}>
-          {page.posts.map((post) => (
-            <div key={post.id}>{post.title}</div>
-          ))}
-        </div>
-      ))}
-      {query.hasNextPage && <button onClick={() => query.fetchNextPage()}>Load More</button>}
-    </div>
-  );
-}
-```
-
-#### `useBlockingQueries(queries, blockingConfig)`
-
-A wrapper around TanStack Query's `useQueries` that integrates with the UI blocking system.
-
-**Parameters:**
-
-- `queries: Array<UseBlockingQueriesOptions>` - Array of query options (same as `useQueries`)
-- `blockingConfig: QueriesBlockingConfig` - Unified blocking configuration for all queries
-  - `scope?: string | string[]` - Scope(s) to block
-  - `reason?: string` - Default message (default: `'Loading queries...'`)
-  - `priority?: number` - Priority level (default: `10`)
-  - `timeout?: number` - Auto-remove blocker after N milliseconds
-  - `onTimeout?: (blockerId: string) => void` - Callback when blocker is auto-removed
-  - `onLoading?: boolean` - Block when any query is pending (default: `true`)
-  - `onFetching?: boolean` - Block when any query is refetching (default: `false`)
-  - `onError?: boolean` - Block when any query fails (default: `false`)
-  - `reasonOnLoading?: string` - Message for the pending state
-  - `reasonOnFetching?: string` - Message for the refetching state
-  - `reasonOnError?: string` - Message for error state
-
-**Returns:** Array of `UseQueryResult` - Standard TanStack Query results
-
-**Example:**
-
-```tsx
-function Dashboard() {
-  const results = useBlockingQueries(
-    [
-      { queryKey: ["user"], queryFn: fetchUser },
-      { queryKey: ["posts"], queryFn: fetchPosts },
-      { queryKey: ["comments"], queryFn: fetchComments },
-    ],
-    {
-      scope: "dashboard",
-      reasonOnLoading: "Loading dashboard...",
-      reasonOnFetching: "Refreshing data...",
-      onLoading: true,
-    }
-  );
-
-  const [userQuery, postsQuery, commentsQuery] = results;
-
-  return (
-    <div>
-      <div>User: {userQuery.data?.name}</div>
-      <div>Posts: {postsQuery.data?.length}</div>
-      <div>Comments: {commentsQuery.data?.length}</div>
-    </div>
-  );
-}
-```
+The hooks use the nearest `UIBlockingProvider` store, or the global store when there is no provider. Each mounted hook owns its blocker; changing a query or mutation key releases its previous blocker, and unmounting releases only that hook's blocker. Cleanup remains safe in React `StrictMode`. `useBlockingQueries` owns one blocker for the whole query array, including dynamic arrays, and does not block for an empty array.
 
 ## Tree Shaking
 
 The library is fully tree-shakeable. Import only the hooks you need to keep your bundle size small:
 
 ```tsx
-// Only imports the hook you need
 import { useBlockingQuery } from "@okyrychenko-dev/react-action-guard-tanstack";
-
-// Internal utilities are not bundled unless used
-import { useBlockingMutation } from "@okyrychenko-dev/react-action-guard-tanstack";
 ```
 
 The package is configured with `"sideEffects": false`, allowing modern bundlers (Webpack, Rollup, Vite) to eliminate unused code automatically.
-
-**Bundle sizes** (approximate):
-
-- Full library: ~6.3 KB (ESM, minified)
-- Single hook: ~2-3 KB (with shared utilities)
 
 ## TypeScript
 
@@ -338,12 +180,11 @@ const query = useBlockingQuery<User>({
     reason: "Loading user...",
   },
 });
-// query.data is User | undefined
 
 const mutation = useBlockingMutation<
-  User, // Response type
-  Error, // Error type
-  { name: string } // Variables type
+  User,
+  Error,
+  { name: string }
 >({
   mutationFn: (variables) => createUser(variables),
   blockingConfig: {
@@ -360,7 +201,6 @@ Blocker synchronization is designed to stay stable across rerenders.
 - Inline `blockingConfig` objects update the existing blocker instead of causing remove/add churn
 - Cleanup is safe under React `StrictMode`
 - Query and mutation blocker IDs stay unique per hook instance, even when keys match
-- blocker management reads store actions directly, avoiding unnecessary rerenders from store subscriptions
 
 ## React-Action-Guard Concepts
 

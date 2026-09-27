@@ -1,4 +1,4 @@
-import { isDefined } from "@okyrychenko-dev/type-utils";
+import { type Optional, isDefined } from "@okyrychenko-dev/type-utils";
 import { type QueryKey, hashKey } from "@tanstack/react-query";
 import type { BlockingKind, BlockingPolicy, BlockingState } from "./useBlockingCoordination.types";
 
@@ -24,7 +24,7 @@ export function resolveReason(
 
 export function resolveBlockerId(
   kind: BlockingKind,
-  key: QueryKey | undefined,
+  key: Optional<QueryKey>,
   instanceId: string
 ): string {
   if (isDefined(key)) {
