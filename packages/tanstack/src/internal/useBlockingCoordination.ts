@@ -1,23 +1,27 @@
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { hashKey } from "@tanstack/react-query";
 import { useEffect, useId, useRef } from "react";
-import type { BlockingCoordinationOptions, BlockingState } from "./useBlockingCoordination.types";
+import type {
+  BlockingCoordinationOptions,
+  BlockingPolicy,
+  BlockingState,
+} from "./useBlockingCoordination.types";
 
 function resolveReason(
   state: BlockingState,
-  reason: string,
-  loading?: string,
-  fetching?: string,
-  error?: string
+  config: BlockingPolicy,
+  defaultReason: string
 ): string {
-  if (state.loading && loading !== undefined) {
-    return loading;
+  const { reason = defaultReason, reasonOnLoading, reasonOnFetching, reasonOnError } = config;
+
+  if (state.loading && reasonOnLoading !== undefined) {
+    return reasonOnLoading;
   }
-  if (state.fetching && fetching !== undefined) {
-    return fetching;
+  if (state.fetching && reasonOnFetching !== undefined) {
+    return reasonOnFetching;
   }
-  if (state.error && error !== undefined) {
-    return error;
+  if (state.error && reasonOnError !== undefined) {
+    return reasonOnError;
   }
 
   return reason;
@@ -44,10 +48,6 @@ export function useBlockingCoordination({
 
   const {
     scope,
-    reason = defaultReason,
-    reasonOnLoading,
-    reasonOnFetching,
-    reasonOnError,
     priority = defaultPriority,
     timeout,
     onTimeout,
@@ -58,13 +58,7 @@ export function useBlockingCoordination({
 
   const shouldBlock =
     (onLoading && state.loading) || (onFetching && state.fetching) || (onError && state.error);
-  const currentReason = resolveReason(
-    state,
-    reason,
-    reasonOnLoading,
-    reasonOnFetching,
-    reasonOnError
-  );
+  const currentReason = resolveReason(state, config, defaultReason);
 
   useEffect(() => {
     return () => {
