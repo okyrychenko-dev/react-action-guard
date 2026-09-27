@@ -25,7 +25,7 @@ function maxEventsOf(session: ObservationSession) {
 afterEach(() => vi.restoreAllMocks());
 
 describe("Observation session participation", () => {
-  it("shares one history and observer across participants", () => {
+  it("should share one history and observer across participants", () => {
     const session = resolveDevtoolsObservationSession();
     const first = session.participate({ defaultOpen: true, maxEvents: 10 });
     const second = session.participate();
@@ -51,7 +51,7 @@ describe("Observation session participation", () => {
     expect(eventsOf(session)).toEqual([]);
   });
 
-  it("isolates blocking stores and retains session identity across epochs", () => {
+  it("should isolate blocking stores and retain session identity across epochs", () => {
     const firstStore = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider })
       .result.current;
     const secondStore = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider })
@@ -72,7 +72,7 @@ describe("Observation session participation", () => {
     expect(resolveDevtoolsObservationSession(firstStore)).toBe(firstSession);
   });
 
-  it("transfers authority to the earliest configured participant without applying candidate values", () => {
+  it("should transfer authority to the earliest configured participant without applying candidate values", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
     const session = resolveDevtoolsObservationSession(store);
@@ -101,7 +101,7 @@ describe("Observation session participation", () => {
     later.release();
   });
 
-  it("preserves the current open state when a successor updates maxEvents", () => {
+  it("should preserve the current open state when a successor updates maxEvents", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
     const session = resolveDevtoolsObservationSession(store);
@@ -126,7 +126,7 @@ describe("Observation session participation", () => {
     successor.release();
   });
 
-  it("ignores stale releases and updates after a new epoch begins", () => {
+  it("should ignore stale releases and updates after a new epoch begins", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
     const session = resolveDevtoolsObservationSession(store);
@@ -144,7 +144,7 @@ describe("Observation session participation", () => {
     current.release();
   });
 
-  it("detaches observation before resetting runtime state on final release", () => {
+  it("should detach observation before resetting runtime state on final release", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
     const session = resolveDevtoolsObservationSession(store);
@@ -189,7 +189,7 @@ describe("Observation session participation", () => {
     removeBlocker("during-reset");
   });
 
-  it("keeps custom-store automatic observation additive to manual middleware", () => {
+  it("should keep custom-store automatic observation additive to manual middleware", () => {
     const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
       .current;
     const session = resolveDevtoolsObservationSession(store);
@@ -217,7 +217,7 @@ describe("Observation session participation", () => {
     removeBlocker("custom-manual-event");
   });
 
-  it("preserves a manual registration installed during observation delivery and after release", () => {
+  it("should preserve a manual registration installed during observation delivery and after release", () => {
     const {
       addBlocker,
       observeBlockingEvents,
@@ -255,7 +255,7 @@ describe("Observation session participation", () => {
     }
   });
 
-  it("keeps a manual global registration authoritative", () => {
+  it("should keep a manual global registration authoritative", () => {
     const { addBlocker, registerMiddleware, removeBlocker, unregisterMiddleware } =
       uiBlockingStoreApi.getState();
 
