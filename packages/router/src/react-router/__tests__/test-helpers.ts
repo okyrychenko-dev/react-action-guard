@@ -1,5 +1,5 @@
-import { type Optional, isFunction } from "@okyrychenko-dev/type-utils";
-import { type MockInstance, vi } from "vitest";
+import { isFunction } from "@okyrychenko-dev/type-utils";
+import { vi } from "vitest";
 import type { Blocker, Location } from "react-router-dom";
 
 const mockLocation: Location = {
@@ -40,18 +40,6 @@ export function createBlockerMock(state: "blocked" | "unblocked" | "proceeding")
     reset: undefined,
     location: mockLocation,
   };
-}
-
-/**
- * Helper to safely access mock calls
- */
-export function getMockCall<TArgs extends Array<unknown>>(
-  mock: MockInstance<(...args: TArgs) => unknown>,
-  index: number
-): Optional<TArgs> {
-  const calls = mock.mock.calls;
-
-  return calls[index];
 }
 
 /**
