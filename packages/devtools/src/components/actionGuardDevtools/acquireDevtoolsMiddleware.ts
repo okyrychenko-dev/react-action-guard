@@ -4,6 +4,7 @@ import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../.
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
 import type { DevtoolsStoreApi } from "../../store";
 import type {
+  ObservationParticipation,
   ObservationSession,
   ObservationSessionConfiguration,
 } from "./acquireDevtoolsMiddleware.types";
@@ -119,58 +120,58 @@ function createObservationSession(
     }
   }
 
-  return {
-    devtoolsStore,
-    participate(configuration) {
+  function participate(configuration?: ObservationSessionConfiguration): ObservationParticipation {
+    if (participants.size === 0) {
+      attachObservation();
+    }
+
+    const participant = {};
+    const joinedEpoch = epoch;
+
+    participants.set(participant, {});
+
+    if (isDefined(configuration)) {
+      configureParticipant(participant, configuration);
+    }
+
+    function updateConfiguration(nextConfiguration: ObservationSessionConfiguration): void {
+      if (joinedEpoch !== epoch) {
+        return;
+      }
+
+      configureParticipant(participant, nextConfiguration);
+    }
+
+    function release(): void {
+      if (joinedEpoch !== epoch || !participants.delete(participant)) {
+        return;
+      }
+
+      if (configurationOwner === participant) {
+        configurationOwner = undefined;
+
+        for (const [candidate, record] of participants) {
+          if (isDefined(record.configuration)) {
+            configurationOwner = candidate;
+            break;
+          }
+        }
+      }
+
       if (participants.size === 0) {
-        attachObservation();
+        releaseObservation?.();
+        releaseObservation = undefined;
+        configurationOwner = undefined;
+        appliedConfiguration = undefined;
+        epoch += 1;
+        resetObservationSession(devtoolsStore);
       }
+    }
 
-      const participant = {};
-      const joinedEpoch = epoch;
+    return { updateConfiguration, release };
+  }
 
-      participants.set(participant, {});
-
-      if (isDefined(configuration)) {
-        configureParticipant(participant, configuration);
-      }
-
-      return {
-        updateConfiguration(nextConfiguration) {
-          if (joinedEpoch !== epoch) {
-            return;
-          }
-
-          configureParticipant(participant, nextConfiguration);
-        },
-        release() {
-          if (joinedEpoch !== epoch || !participants.delete(participant)) {
-            return;
-          }
-
-          if (configurationOwner === participant) {
-            configurationOwner = undefined;
-
-            for (const [candidate, record] of participants) {
-              if (isDefined(record.configuration)) {
-                configurationOwner = candidate;
-                break;
-              }
-            }
-          }
-
-          if (participants.size === 0) {
-            releaseObservation?.();
-            releaseObservation = undefined;
-            configurationOwner = undefined;
-            appliedConfiguration = undefined;
-            epoch += 1;
-            resetObservationSession(devtoolsStore);
-          }
-        },
-      };
-    },
-  };
+  return { devtoolsStore, participate };
 }
 
 export function getDevtoolsObservationSession(
@@ -198,8 +199,11 @@ export function resolveDevtoolsObservationSession(
 ): ObservationSession {
   const targetStore = customStore ?? uiBlockingStoreApi;
 
-  return getDevtoolsObservationSession(
-    targetStore,
-    targetStore === uiBlockingStoreApi ? devtoolsStoreApi : undefined
-  );
+  let initialDevtoolsStore = undefined;
+
+  if (targetStore === uiBlockingStoreApi) {
+    initialDevtoolsStore = devtoolsStoreApi;
+  }
+
+  return getDevtoolsObservationSession(targetStore, initialDevtoolsStore);
 }
