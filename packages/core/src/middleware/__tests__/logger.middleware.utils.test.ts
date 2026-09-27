@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { formatLogData, getActionEmoji } from "../loggerMiddleware.utils";
 
 describe("loggerMiddleware.utils", () => {
-  it("returns an emoji for every supported action and falls back for unknown actions", () => {
+  it("should return an emoji for every supported action and falls back for unknown actions", () => {
     expect(getActionEmoji("add")).toBe("➕");
     expect(getActionEmoji("update")).toBe("🔄");
     expect(getActionEmoji("remove")).toBe("➖");
@@ -12,7 +12,7 @@ describe("loggerMiddleware.utils", () => {
     expect(getActionEmoji("unexpected")).toBe("❓");
   });
 
-  it("returns empty log data when no config or special fields are provided", () => {
+  it("should return empty log data when no config or special fields are provided", () => {
     expect(
       formatLogData({
         action: "remove",
@@ -22,7 +22,7 @@ describe("loggerMiddleware.utils", () => {
     ).toEqual({});
   });
 
-  it("returns config details directly when only config is present", () => {
+  it("should return config details directly when only config is present", () => {
     expect(
       formatLogData({
         action: "add",
@@ -41,7 +41,7 @@ describe("loggerMiddleware.utils", () => {
     });
   });
 
-  it("keeps special fields when scope, count, or previous state are present", () => {
+  it("should keep special fields when scope, count, or previous state are present", () => {
     expect(
       formatLogData({
         action: "clear_scope",

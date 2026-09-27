@@ -1,13 +1,14 @@
 import { ReactElement } from "react";
 import { Badge } from "../shared";
 import { getBadgeClassName, shouldShowBadge } from "./ToggleButtonBadge.utils";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 interface ToggleButtonBadgeProps {
   count: number;
   isPaused: boolean;
 }
 
-function ToggleButtonBadge(props: ToggleButtonBadgeProps): ReactElement | null {
+function ToggleButtonBadge(props: ToggleButtonBadgeProps): Nullable<ReactElement> {
   const { count, isPaused } = props;
 
   if (!shouldShowBadge(count)) {

@@ -1,85 +1,44 @@
-# React Action Guard Documentation
+# React Action Guard documentation
 
-> Comprehensive documentation for the React Action Guard ecosystem
+This private VitePress package hosts guides and generated API references for React Action Guard,
+Devtools, the TanStack Query integration, and React Zustand Toolkit. The UI and router package
+READMEs currently carry their own API guides.
 
-This repository contains the complete documentation for all React Action Guard packages:
+## Work locally
 
-- **[@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)** - Core UI blocking management
-- **[@okyrychenko-dev/react-action-guard-devtools](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-devtools)** - Developer tools
-- **[@okyrychenko-dev/react-action-guard-tanstack](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-tanstack)** - TanStack Query integration
-- **[@okyrychenko-dev/react-zustand-toolkit](https://www.npmjs.com/package/@okyrychenko-dev/react-zustand-toolkit)** - Zustand utilities
-
-## 🚀 Quick Start
-
-### Running Locally
+Run these commands from the monorepo root:
 
 ```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
+pnpm install
+pnpm --filter @okyrychenko-dev/react-action-guard-docs run dev
+pnpm --filter @okyrychenko-dev/react-action-guard-docs run build
+pnpm --filter @okyrychenko-dev/react-action-guard-docs run preview
 ```
 
-The documentation will be available at `http://localhost:5173/`
+The development server prints its local URL. VitePress uses `http://localhost:5173/` by default
+when that port is available.
 
-## 📖 Documentation Structure
+## Content layout
 
-```
-.
-├── src/                 # Documentation source
-│   ├── .vitepress/      # VitePress configuration
-│   ├── packages/        # Package-specific documentation
-│   │   ├── react-action-guard/
-│   │   ├── react-action-guard-devtools/
-│   │   ├── react-action-guard-tanstack/
-│   │   └── react-zustand-toolkit/
-│   ├── guides/          # Cross-package guides
-│   ├── architecture/    # Architecture documentation
-│   ├── index.md        # Landing page
-│   ├── getting-started.md
-│   └── typedoc.json
-├── package.json
-└── README.md
-```
+- `src/getting-started.md` and `src/index.md` introduce the ecosystem.
+- `src/packages/` holds package guides and committed API pages.
+- `src/typedoc.*.json` configures API generation for each documented package.
+- `src/.vitepress/` contains the site configuration and theme.
 
-## 🤝 Contributing
+Source comments stay concise; usage examples and longer explanations belong in the package
+READMEs and these guides.
 
-We welcome contributions to improve the documentation!
+## API reference generation
 
-### Making Changes
+From the monorepo root, run `pnpm --filter @okyrychenko-dev/react-action-guard-docs run typedoc`
+to regenerate all configured references. The package also exposes `typedoc:core`,
+`typedoc:devtools`, `typedoc:tanstack`, and `typedoc:zustand` for targeted updates.
+Review generated changes before committing them.
 
-1. Fork this repository
-2. Create a branch: `git checkout -b docs/your-improvement`
-3. Make your changes
-4. Test locally: `npm run dev`
-5. Build to verify: `npm run build`
-6. Submit a pull request
+## Contributing
 
-### Documentation Guidelines
+Update the relevant guide or package README when public usage changes. Check examples against the
+current exports, then run the docs build and the root `pnpm run check` command.
 
-- **Clear and concise**: Write for developers of all skill levels
-- **Code examples**: Include working code examples
-- **Up to date**: Ensure examples match latest API
-- **Links**: Use relative links for internal navigation
-- **Formatting**: Follow existing Markdown conventions
-
-## 🔗 Links
-
-- **Main Repository**: [react-action-guard](https://github.com/okyrychenko-dev/react-action-guard)
-- **NPM Packages**: [@okyrychenko-dev](https://www.npmjs.com/~okyrychenko-dev)
-- **Issues**: [GitHub Issues](https://github.com/okyrychenko-dev/react-action-guard/issues)
-
-## 📝 License
-
-MIT © Oleksii Kyrychenko
-
----
-
-**Built with [VitePress](https://vitepress.dev/)**
+[Repository](https://github.com/okyrychenko-dev/react-action-guard) ·
+[Issues](https://github.com/okyrychenko-dev/react-action-guard/issues)

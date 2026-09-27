@@ -86,6 +86,7 @@ function ObservationSessionHarness(props: ObservationSessionHarnessProps): React
 describe("ActionGuardDevtools", () => {
   beforeEach(() => {
     resetDevtoolsStore();
+
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
     clearAllBlockers();
@@ -241,6 +242,7 @@ describe("ActionGuardDevtools", () => {
     const first = renderWithProviders(<ActionGuardDevtools />);
 
     renderWithProviders(<ActionGuardDevtools />);
+
     const { addBlocker } = uiBlockingStoreApi.getState();
 
     // Two instances share one ref-counted middleware → exactly one event per action.
@@ -294,6 +296,7 @@ describe("ActionGuardDevtools", () => {
 
     try {
       renderWithProviders(<ActionGuardDevtools />);
+
       const { addBlocker } = uiBlockingStoreApi.getState();
 
       act(() => {
@@ -387,6 +390,7 @@ describe("ActionGuardDevtools", () => {
     act(() => {
       addBlocker("automatically-observed-blocker");
     });
+
     const { events: automaticallyObservedEvents } = devtoolsStoreApi.getState();
 
     expect(
@@ -399,6 +403,7 @@ describe("ActionGuardDevtools", () => {
     act(() => {
       addBlocker("manual-during-automatic-blocker");
     });
+
     const { events: eventsDuringManualObservation } = devtoolsStoreApi.getState();
 
     expect(
@@ -448,6 +453,7 @@ describe("ActionGuardDevtools", () => {
     );
 
     fireEvent.click(screen.getByRole("button", { name: "Toggle manual custom observation" }));
+
     const { clearEvents } = devtoolsStoreApi.getState();
 
     clearEvents();
@@ -599,6 +605,7 @@ describe("ActionGuardDevtools", () => {
         useGlobalStore={true}
       />
     );
+
     const { setActiveTab, setFilter, toggleMinimized } = devtoolsStoreApi.getState();
 
     act(() => {

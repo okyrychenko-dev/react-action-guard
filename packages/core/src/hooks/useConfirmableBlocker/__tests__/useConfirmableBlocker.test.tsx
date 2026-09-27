@@ -39,6 +39,7 @@ describe("useConfirmableBlocker", () => {
     });
 
     expect(result.current.isDialogOpen).toBe(true);
+
     const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(true);

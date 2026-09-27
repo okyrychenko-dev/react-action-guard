@@ -42,41 +42,6 @@ export interface BaseNavigationBlockerOptions {
 
   /**
    * Custom confirmation handler for showing your own dialog UI.
-   *
-   * If provided, this will be called instead of window.confirm() to allow
-   * custom dialog components. Async handlers are supported, but note:
-   * - Next.js Pages Router re-attempts navigation after resolve.
-   * - Router adapters may ignore stale resolves if a newer confirm starts.
-   *
-   * @param message - The confirmation message to display
-   * @returns boolean | Promise<boolean> - true to allow navigation, false to block
-   *
-   * @example
-   * ```tsx
-   * // With custom dialog component
-   * const [dialogState, setDialogState] = useState(null);
-   *
-   * onConfirm: (message) => {
-   *   return new Promise((resolve) => {
-   *     setDialogState({ message, resolve });
-   *   });
-   * }
-   *
-   * // In JSX:
-   * {dialogState && (
-   *   <CustomDialog
-   *     message={dialogState.message}
-   *     onConfirm={() => {
-   *       dialogState.resolve(true);
-   *       setDialogState(null);
-   *     }}
-   *     onCancel={() => {
-   *       dialogState.resolve(false);
-   *       setDialogState(null);
-   *     }}
-   *   />
-   * )}
-   * ```
    */
   onConfirm?: (message: string) => boolean | PromiseLike<boolean>;
 }

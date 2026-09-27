@@ -352,6 +352,7 @@ describe("useBlocker", () => {
     renderHook(() => {
       useActionBlocker("blocker-1", config1);
     });
+
     const { unmount } = renderHook(() => {
       useActionBlocker("blocker-2", config2);
     });

@@ -296,6 +296,7 @@ describe("useIsBlocked", () => {
     });
 
     expect(result.current).toBe(false);
+
     const initialRenderCount = renderCount;
 
     act(() => {

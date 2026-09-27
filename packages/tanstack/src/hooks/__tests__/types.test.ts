@@ -12,7 +12,7 @@ const tuple = <const T extends Array<unknown>>(...values: T): T => {
   return values;
 };
 
-it("preserves query select inference", () => {
+it("should preserve query select inference", () => {
   function useTypedQuery() {
     return useBlockingQuery({
       queryKey: tuple("user"),
@@ -33,7 +33,7 @@ it("preserves query select inference", () => {
   expect(queryDataCheck).toBe(true);
 });
 
-it("preserves infinite query data shape", () => {
+it("should preserve infinite query data shape", () => {
   function useTypedInfiniteQuery() {
     return useBlockingInfiniteQuery({
       queryKey: tuple("feed"),
@@ -61,7 +61,7 @@ it("preserves infinite query data shape", () => {
   expect(infiniteDataCheck).toBe(true);
 });
 
-it("preserves mutation variable and result inference", () => {
+it("should preserve mutation variable and result inference", () => {
   function useTypedMutation() {
     return useBlockingMutation({
       mutationFn: async (variables: { id: string }): Promise<{ ok: true; id: string }> => {
@@ -92,7 +92,7 @@ it("preserves mutation variable and result inference", () => {
   expect(mutationStateCheck).toBe(true);
 });
 
-it("preserves tuple inference for parallel queries", () => {
+it("should preserve tuple inference for parallel queries", () => {
   function useTypedQueries() {
     return useBlockingQueries(
       tuple(

@@ -181,11 +181,7 @@ const query = useBlockingQuery<User>({
   },
 });
 
-const mutation = useBlockingMutation<
-  User,
-  Error,
-  { name: string }
->({
+const mutation = useBlockingMutation<User, Error, { name: string }>({
   mutationFn: (variables) => createUser(variables),
   blockingConfig: {
     scope: "user-form",
@@ -549,7 +545,7 @@ This package lives in the [react-action-guard monorepo](https://github.com/okyry
 pnpm install
 
 # Run this package's scripts with --filter
-pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run test
+pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run test:run
 pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run test:coverage
 pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run build
 pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run typecheck
@@ -560,7 +556,7 @@ pnpm --filter @okyrychenko-dev/react-action-guard-tanstack run dev
 
 # Or cd into the package and run scripts directly
 cd packages/tanstack
-pnpm run test
+pnpm run test:run
 ```
 
 ## Contributing

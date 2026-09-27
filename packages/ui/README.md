@@ -349,7 +349,7 @@ Class name for screen-reader-only text. Prefer this when your project has a no-i
 ```tsx
 import { visuallyHiddenClassName } from "@okyrychenko-dev/react-action-guard-ui";
 
-<span className={visuallyHiddenClassName}>{reasonContent}</span>
+<span className={visuallyHiddenClassName}>{reasonContent}</span>;
 ```
 
 Add the CSS once in your app stylesheet:
@@ -430,7 +430,7 @@ This package lives in the [react-action-guard monorepo](https://github.com/okyry
 pnpm install
 
 # Run this package's scripts with --filter
-pnpm --filter @okyrychenko-dev/react-action-guard-ui run test
+pnpm --filter @okyrychenko-dev/react-action-guard-ui run test:run
 pnpm --filter @okyrychenko-dev/react-action-guard-ui run test:coverage
 pnpm --filter @okyrychenko-dev/react-action-guard-ui run build
 pnpm --filter @okyrychenko-dev/react-action-guard-ui run typecheck
@@ -441,7 +441,7 @@ pnpm --filter @okyrychenko-dev/react-action-guard-ui run dev
 
 # Or cd into the package and run scripts directly
 cd packages/ui
-pnpm run test
+pnpm run test:run
 ```
 
 ## Contributing

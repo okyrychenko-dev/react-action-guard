@@ -1,8 +1,9 @@
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { DEFAULT_FILTER } from "../../store/devtoolsStore.constants";
 import type { DevtoolsFilter } from "../../types";
 
 export function isFilterActive(filter: DevtoolsFilter): boolean {
-  if (filter.search.length > 0 || filter.scopes.length > 0) {
+  if (filter.search.length > 0 || isNonEmptyArray(filter.scopes)) {
     return true;
   }
 

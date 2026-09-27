@@ -1,4 +1,4 @@
-import { isString } from "@okyrychenko-dev/type-utils";
+import { isString, isUndefined } from "@okyrychenko-dev/type-utils";
 
 export type FormattableScope = string | ReadonlyArray<string>;
 
@@ -15,7 +15,7 @@ export function formatDuration(ms: number): string {
 }
 
 export function formatScope(scope?: FormattableScope): string {
-  if (scope === undefined || scope.length === 0) {
+  if (isUndefined(scope) || scope.length === 0) {
     return "global";
   }
 

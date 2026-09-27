@@ -22,6 +22,7 @@ describe("ActionGuardDevtoolsProvider", () => {
       toggleMinimized();
     }
     window.localStorage.clear();
+
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
     clearAllBlockers();

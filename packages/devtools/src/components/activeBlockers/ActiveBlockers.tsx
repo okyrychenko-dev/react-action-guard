@@ -1,4 +1,5 @@
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
 import { DEFAULT_STUCK_THRESHOLD_MS, STUCK_TICK_INTERVAL_MS } from "./ActiveBlockers.constants";
@@ -21,12 +22,13 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
   const blockingSnapshot = useStore(targetStore, (state) => state.blockingSnapshot);
 
   const blockers = useMemo(() => getSortedBlockers(blockingSnapshot), [blockingSnapshot]);
+  const hasBlockers = isNonEmptyArray(blockers);
 
   // Tick while blockers are present so ages (and the stuck flag) stay fresh.
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (blockers.length === 0) {
+    if (!hasBlockers) {
       return;
     }
 
@@ -37,9 +39,9 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
     return () => {
       clearInterval(intervalId);
     };
-  }, [blockers.length]);
+  }, [hasBlockers, blockers.length]);
 
-  if (blockers.length === 0) {
+  if (!hasBlockers) {
     return <ActiveBlockersEmptyState />;
   }
 

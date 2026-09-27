@@ -36,6 +36,7 @@ describe("ToggleButtonBadge", () => {
 describe("ToggleButton", () => {
   beforeEach(() => {
     resetDevtoolsStore();
+
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
     clearAllBlockers();

@@ -1,7 +1,5 @@
-export type AnalyticsEventData = Record<
-  string,
-  string | number | ReadonlyArray<string> | undefined
->;
+import type { Optional } from "@okyrychenko-dev/type-utils";
+export type AnalyticsEventData = Record<string, Optional<string | number | ReadonlyArray<string>>>;
 
 export type AnalyticsProvider = "ga" | "mixpanel" | "amplitude";
 

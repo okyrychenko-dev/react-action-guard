@@ -134,10 +134,12 @@ describe("useBlockingQuery", () => {
     });
 
     expect(onTimeout).toHaveBeenCalledTimes(1);
+
     const timedOutId = onTimeout.mock.calls[0]?.[0];
 
     expect(typeof timedOutId).toBe("string");
     expect(timedOutId).toContain('query-["test"]-');
+
     const { isBlocked } = uiBlockingStoreApi.getState();
 
     expect(isBlocked("test")).toBe(false);

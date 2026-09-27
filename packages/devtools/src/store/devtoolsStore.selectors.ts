@@ -1,7 +1,13 @@
-import { isDefined, isNumber, isString } from "@okyrychenko-dev/type-utils";
+import {
+  type Optional,
+  isDefined,
+  isNonEmptyArray,
+  isNumber,
+  isString,
+} from "@okyrychenko-dev/type-utils";
 import type { DevtoolsEvent, DevtoolsEventStats, DevtoolsFilter, DevtoolsStore } from "../types";
 
-type ScopeValue = string | ReadonlyArray<string> | undefined;
+type ScopeValue = Optional<string | ReadonlyArray<string>>;
 
 /** Number of most-frequent scopes surfaced by the stats selector. */
 const TOP_SCOPES_LIMIT = 5;
@@ -64,7 +70,7 @@ function normalizeScopes(scope: ScopeValue): ReadonlyArray<string> {
 function getEventScopes(event: DevtoolsEvent): ReadonlyArray<string> {
   const configScopes = normalizeScopes(event.config?.scope);
 
-  if (configScopes.length > 0) {
+  if (isNonEmptyArray(configScopes)) {
     return configScopes;
   }
 
@@ -75,17 +81,17 @@ function matchesActionFilter(
   event: DevtoolsEvent,
   actions: DevtoolsStore["filter"]["actions"]
 ): boolean {
-  return actions.length === 0 || actions.includes(event.action);
+  return !isNonEmptyArray(actions) || actions.includes(event.action);
 }
 
 function matchesScopeFilter(event: DevtoolsEvent, scopes: Array<string>): boolean {
-  if (scopes.length === 0) {
+  if (!isNonEmptyArray(scopes)) {
     return true;
   }
 
   const eventScopes = getEventScopes(event);
 
-  if (eventScopes.length === 0) {
+  if (!isNonEmptyArray(eventScopes)) {
     return false;
   }
 

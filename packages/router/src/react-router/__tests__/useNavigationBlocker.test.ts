@@ -161,6 +161,7 @@ describe("useNavigationBlocker (React Router)", () => {
 
     it("should proceed after async confirmation resolves true", async () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const blocker = createBlockerMock("blocked");
 
       mockUseBlocker.mockReturnValue(blocker);
@@ -184,6 +185,7 @@ describe("useNavigationBlocker (React Router)", () => {
       if (!isNoArgBlocker(blockerFn)) {
         throw new Error("Expected no-arg blocker function");
       }
+
       let result = false;
 
       act(() => {
@@ -202,6 +204,7 @@ describe("useNavigationBlocker (React Router)", () => {
 
     it("should reset after async confirmation resolves false", async () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const blocker = createBlockerMock("blocked");
 
       mockUseBlocker.mockReturnValue(blocker);
@@ -245,6 +248,7 @@ describe("useNavigationBlocker (React Router)", () => {
 
     it("should reset after async confirmation rejects", async () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const blocker = createBlockerMock("blocked");
 
       mockUseBlocker.mockReturnValue(blocker);
@@ -292,6 +296,7 @@ describe("useNavigationBlocker (React Router)", () => {
 
     it("should block when sync confirmation returns false", () => {
       mockUseShouldBlock.mockReturnValue(true);
+
       const blocker = createBlockerMock("blocked");
 
       mockUseBlocker.mockReturnValue(blocker);
@@ -326,7 +331,7 @@ describe("useNavigationBlocker (React Router)", () => {
   });
 
   describe("Backward compatibility", () => {
-    it('should support deprecated "block" option', () => {
+    it("should support the deprecated block option", () => {
       const options: UseNavigationBlockerOptions = {
         block: true,
       };
@@ -336,7 +341,7 @@ describe("useNavigationBlocker (React Router)", () => {
       expect(mockUseShouldBlock).toHaveBeenCalledWith(true, undefined);
     });
 
-    it('should prefer "when" over deprecated "block"', () => {
+    it("should prefer when over the deprecated block option", () => {
       const options: UseNavigationBlockerOptions = {
         when: false,
         block: true,

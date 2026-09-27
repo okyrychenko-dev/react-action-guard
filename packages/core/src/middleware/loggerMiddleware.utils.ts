@@ -1,3 +1,4 @@
+import { isNonEmptyArray, isUndefined } from "@okyrychenko-dev/type-utils";
 import { MiddlewareBlockerConfig, MiddlewareContext } from "./middleware.types";
 
 export function getActionEmoji(action: string): string {
@@ -31,7 +32,7 @@ function extractConfigDetails(config?: MiddlewareBlockerConfig): Record<string, 
     reason,
   };
 
-  if (priority !== undefined) {
+  if (!isUndefined(priority)) {
     details.priority = priority;
   }
 
@@ -44,17 +45,17 @@ export function formatLogData(context: MiddlewareContext): Record<string, unknow
   const logData: Record<string, unknown> = {};
 
   // Add scope for clear_scope action
-  if (context.scope !== undefined) {
+  if (!isUndefined(context.scope)) {
     logData.scope = context.scope;
   }
 
   // Add count for clear actions
-  if (context.count !== undefined) {
+  if (!isUndefined(context.count)) {
     logData.count = context.count;
   }
 
   // Add config details
-  if (Object.keys(configDetails).length > 0) {
+  if (isNonEmptyArray(Object.keys(configDetails))) {
     logData.config = configDetails;
   }
 
@@ -64,7 +65,7 @@ export function formatLogData(context: MiddlewareContext): Record<string, unknow
   }
 
   // Return config details directly if no special fields
-  if (Object.keys(logData).length === 0) {
+  if (!isNonEmptyArray(Object.keys(logData))) {
     return configDetails;
   }
 

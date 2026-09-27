@@ -153,16 +153,19 @@ describe("devtoolsStore", () => {
       const store = devtoolsStoreApi.getState();
 
       store.setMaxEvents(0);
+
       const { maxEvents: minimumMaxEvents } = devtoolsStoreApi.getState();
 
       expect(minimumMaxEvents).toBe(1);
 
       store.setMaxEvents(-10);
+
       const { maxEvents: negativeMaxEvents } = devtoolsStoreApi.getState();
 
       expect(negativeMaxEvents).toBe(1);
 
       store.setMaxEvents(Number.POSITIVE_INFINITY);
+
       const { maxEvents: infiniteMaxEvents } = devtoolsStoreApi.getState();
 
       expect(infiniteMaxEvents).toBe(DEFAULT_MAX_EVENTS);
@@ -231,6 +234,7 @@ describe("devtoolsStore", () => {
       const store = devtoolsStoreApi.getState();
 
       store.setOpen(true);
+
       let state = devtoolsStoreApi.getState();
 
       expect(state.isOpen).toBe(true);
@@ -619,6 +623,7 @@ describe("devtoolsStore", () => {
       const { addEvent } = secondSessionStore.getState();
 
       setActiveTab("stats");
+
       const { activeTab: secondSessionActiveTab } = secondSessionStore.getState();
 
       expect(secondSessionActiveTab).toBe("timeline");

@@ -4,6 +4,7 @@ import { getPanelClassName } from "./DevtoolsPanel.utils";
 import DevtoolsPanelContent from "./DevtoolsPanelContent";
 import DevtoolsPanelHeader from "./DevtoolsPanelHeader";
 import DevtoolsPanelTabs from "./DevtoolsPanelTabs";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsPosition } from "../../types";
 import type { UIBlockingStoreApi } from "../actionGuardDevtools";
 
@@ -13,7 +14,7 @@ interface DevtoolsPanelProps {
   stuckThresholdMs?: number;
 }
 
-function DevtoolsPanel(props: DevtoolsPanelProps): ReactElement | null {
+function DevtoolsPanel(props: DevtoolsPanelProps): Nullable<ReactElement> {
   const { position, store, stuckThresholdMs } = props;
 
   const {

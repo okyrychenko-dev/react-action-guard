@@ -1,4 +1,11 @@
-import { assertDefined, isNullish, isPromise, isUndefined } from "@okyrychenko-dev/type-utils";
+import {
+  type Awaitable,
+  type Nullable,
+  assertDefined,
+  isNullish,
+  isPromise,
+  isUndefined,
+} from "@okyrychenko-dev/type-utils";
 import { createJSONStorage } from "zustand/middleware";
 import {
   DEFAULT_TAB,
@@ -17,7 +24,7 @@ import type { DevtoolsFilter, DevtoolsStore } from "../types";
 export type PersistedDevtoolsState = Pick<DevtoolsStore, "isMinimized" | "activeTab" | "filter">;
 
 type PersistedStorageValue = StorageValue<PersistedDevtoolsState>;
-type PersistedStorageResult = PersistedStorageValue | null | Promise<PersistedStorageValue | null>;
+type PersistedStorageResult = Awaitable<Nullable<PersistedStorageValue>>;
 
 const noopStorage: StateStorage = {
   getItem: () => null,
@@ -35,11 +42,11 @@ function createDefaultPreferences(): PersistedDevtoolsState {
 
 function isPersistedStoragePromise(
   value: PersistedStorageResult
-): value is Promise<PersistedStorageValue | null> {
+): value is Promise<Nullable<PersistedStorageValue>> {
   return isPromise(value);
 }
 
-function getPersistedPreferences(value: PersistedStorageValue | null): PersistedDevtoolsState {
+function getPersistedPreferences(value: Nullable<PersistedStorageValue>): PersistedDevtoolsState {
   if (isNullish(value) || value.version !== DEVTOOLS_STORAGE_VERSION) {
     return createDefaultPreferences();
   }
@@ -131,8 +138,8 @@ export function createDevtoolsPreferenceStorage(
   let previousPreferences = createDefaultPreferences();
 
   const rememberPreferences = (
-    value: PersistedStorageValue | null
-  ): PersistedStorageValue | null => {
+    value: Nullable<PersistedStorageValue>
+  ): Nullable<PersistedStorageValue> => {
     previousPreferences = getPersistedPreferences(value);
 
     return value;
@@ -141,7 +148,7 @@ export function createDevtoolsPreferenceStorage(
   const persistChangedPreferences = (
     name: string,
     value: PersistedStorageValue,
-    latestValue: PersistedStorageValue | null
+    latestValue: Nullable<PersistedStorageValue>
   ): unknown => {
     const latestPreferences = getPersistedPreferences(latestValue);
     const mergedPreferences = mergeChangedPreferences(

@@ -5,6 +5,7 @@ import { ShieldIcon } from "../../icons";
 import { useDevtoolsStore } from "../../store";
 import { getToggleButtonClassName } from "./ToggleButton.utils";
 import ToggleButtonBadge from "./ToggleButtonBadge";
+import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsPosition } from "../../types";
 import type { UIBlockingStoreApi } from "../actionGuardDevtools";
 
@@ -13,7 +14,7 @@ interface ToggleButtonProps {
   store?: UIBlockingStoreApi;
 }
 
-function ToggleButton(props: ToggleButtonProps): ReactElement | null {
+function ToggleButton(props: ToggleButtonProps): Nullable<ReactElement> {
   const { position, store } = props;
 
   const { isOpen, toggleOpen, isPaused } = useDevtoolsStore((state) => ({

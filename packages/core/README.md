@@ -56,7 +56,11 @@ function SaveButton() {
     });
   };
 
-  return <button onClick={handleClick} disabled={isSaving}>Save</button>;
+  return (
+    <button onClick={handleClick} disabled={isSaving}>
+      Save
+    </button>
+  );
 }
 ```
 
@@ -131,7 +135,7 @@ When `isActive` is `true`, changing `config` updates the existing blocker via `u
 
 ```jsx
 function MyComponent() {
-  useBlocker("my-blocker", {
+  useActionBlocker("my-blocker", {
     scope: "form",
     reason: "Form is saving",
     priority: 10,
@@ -144,16 +148,20 @@ function MyComponent() {
 function SaveButton() {
   const [isSaving, setIsSaving] = useState(false);
 
-  useBlocker("save-operation", {
-    scope: "form",
-    reason: "Saving...",
-    timeout: 30000,
-    onTimeout: (id) => {
-      console.warn(`Operation ${id} timed out`);
-      showNotification("Operation timed out");
-      setIsSaving(false);
+  useActionBlocker(
+    "save-operation",
+    {
+      scope: "form",
+      reason: "Saving...",
+      timeout: 30000,
+      onTimeout: (id) => {
+        console.warn(`Operation ${id} timed out`);
+        showNotification("Operation timed out");
+        setIsSaving(false);
+      },
     },
-  }, isSaving);
+    isSaving
+  );
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -164,7 +172,11 @@ function SaveButton() {
     }
   };
 
-  return <button onClick={handleSave} disabled={isSaving}>Save</button>;
+  return (
+    <button onClick={handleSave} disabled={isSaving}>
+      Save
+    </button>
+  );
 }
 ```
 
@@ -269,10 +281,11 @@ function ApiComponent() {
     },
   });
 
-  const fetchData = () => execute(async () => {
-    const response = await fetch("/api/data");
-    return response.json();
-  });
+  const fetchData = () =>
+    execute(async () => {
+      const response = await fetch("/api/data");
+      return response.json();
+    });
 
   return <button onClick={fetchData}>Fetch Data</button>;
 }
@@ -316,21 +329,15 @@ Use it for advanced confirmation flows after the core hooks are already a good f
 
 ```jsx
 function UnsavedChangesGuard({ discardChanges }) {
-  const {
-    execute,
-    isDialogOpen,
-    isExecuting,
-    confirmConfig,
-    onConfirm,
-    onCancel,
-  } = useConfirmableBlocker("unsaved-changes", {
-    scope: "navigation",
-    reason: "Unsaved changes",
-    confirmMessage: "You have unsaved changes. Are you sure you want to leave?",
-    onConfirm: async () => {
-      await discardChanges();
-    },
-  });
+  const { execute, isDialogOpen, isExecuting, confirmConfig, onConfirm, onCancel } =
+    useConfirmableBlocker("unsaved-changes", {
+      scope: "navigation",
+      reason: "Unsaved changes",
+      confirmMessage: "You have unsaved changes. Are you sure you want to leave?",
+      onConfirm: async () => {
+        await discardChanges();
+      },
+    });
 
   return (
     <>
@@ -470,9 +477,7 @@ function App() {
 
 // Testing - isolated state per test, no cleanup needed
 function renderWithProvider(ui) {
-  return render(
-    <UIBlockingProvider>{ui}</UIBlockingProvider>
-  );
+  return render(<UIBlockingProvider>{ui}</UIBlockingProvider>);
 }
 
 // Micro-frontends - each app has its own blocking state
@@ -495,6 +500,7 @@ function MicroFrontend() {
 - `useResolvedValue(selector)` - Resolve to provider/global store and select with shallow comparison
 
 Legacy aliases remain available for backward compatibility:
+
 - `useOptionalContext()` -> `useOptionalUIBlockingContext()`
 - `useResolvedStore()` -> `useResolvedStoreApi()`
 - `useResolvedStoreWithSelector()` -> `useResolvedValue()`
@@ -519,6 +525,7 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 - `unregisterMiddleware(name)` - Deprecated named unregistration for compatibility
 
 **Note about `updateBlocker` and timeouts:**
+
 - If you pass a **new** `timeout` value, the timer will be **restarted**
 - If you **don't** pass `timeout`, the existing timer continues unchanged
 - Set `timeout: 0` to **clear** an existing timeout
@@ -597,6 +604,7 @@ Middleware receives events for the following actions:
 - `"clear_scope"` - Blockers for specific scope were cleared (includes `scope` and `count` fields)
 
 **MiddlewareContext type:**
+
 ```typescript
 {
   action: "add" | "update" | "remove" | "timeout" | "clear" | "clear_scope";
@@ -760,7 +768,7 @@ The library is fully tree-shakeable. Import only the features you need to keep y
 
 ```jsx
 // Only imports the hook you need
-import { useBlocker } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
 
 // Middleware is not included unless you import it
 import {
@@ -815,8 +823,7 @@ import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
 type AppScopes = "global" | "form" | "navigation" | "checkout";
 
-const { useBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } =
-  createTypedHooks<AppScopes>();
+const { useBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } = createTypedHooks<AppScopes>();
 
 useBlocker("save", { scope: "form" }); // OK
 useBlocker("save", { scope: "typo" }); // Type error
@@ -832,7 +839,7 @@ The first four examples below are the most representative starting points.
 function DataLoader() {
   const [isLoading, setIsLoading] = useState(false);
 
-  useBlocker(
+  useActionBlocker(
     "data-loader",
     {
       scope: "content",
@@ -878,22 +885,19 @@ function FormWithUnsavedWarning() {
   const [formData, setFormData] = useState({});
   const [hasChanges, setHasChanges] = useState(false);
 
-  const {
-    execute,
-    isDialogOpen,
-    confirmConfig,
-    onConfirm,
-    onCancel,
-  } = useConfirmableBlocker("unsaved-form", {
-    scope: "navigation",
-    reason: "Unsaved form data",
-    priority: 100,
-    confirmMessage: "You have unsaved changes. Discard them?",
-    onConfirm: () => {
-      setFormData({});
-      setHasChanges(false);
-    },
-  });
+  const { execute, isDialogOpen, confirmConfig, onConfirm, onCancel } = useConfirmableBlocker(
+    "unsaved-form",
+    {
+      scope: "navigation",
+      reason: "Unsaved form data",
+      priority: 100,
+      confirmMessage: "You have unsaved changes. Discard them?",
+      onConfirm: () => {
+        setFormData({});
+        setHasChanges(false);
+      },
+    }
+  );
 
   return (
     <form>
@@ -903,7 +907,9 @@ function FormWithUnsavedWarning() {
           setHasChanges(true);
         }}
       />
-      <button type="button" onClick={execute}>Cancel</button>
+      <button type="button" onClick={execute}>
+        Cancel
+      </button>
       {isDialogOpen && (
         <ConfirmDialog
           title={confirmConfig.title}
@@ -941,7 +947,7 @@ function MultiStepWizard() {
   const [step, setStep] = useState(1);
 
   // Higher priority for payment step
-  useBlocker(
+  useActionBlocker(
     "payment-step",
     {
       scope: ["navigation", "form"],
@@ -952,7 +958,7 @@ function MultiStepWizard() {
   );
 
   // Lower priority for other steps
-  useBlocker(
+  useActionBlocker(
     "wizard-step",
     {
       scope: "navigation",
@@ -1031,12 +1037,10 @@ import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 import { useEffect } from "react";
 
 function CheckoutPage() {
-  const { clearBlockersForScope, clearAllBlockers } = useUIBlockingStore(
-    (state) => ({
-      clearBlockersForScope: state.clearBlockersForScope,
-      clearAllBlockers: state.clearAllBlockers,
-    })
-  );
+  const { clearBlockersForScope, clearAllBlockers } = useUIBlockingStore((state) => ({
+    clearBlockersForScope: state.clearBlockersForScope,
+    clearAllBlockers: state.clearAllBlockers,
+  }));
 
   // Clear checkout-specific blockers when leaving the page
   useEffect(() => {
@@ -1069,13 +1073,11 @@ Extend or update blocker timeouts dynamically:
 import { useUIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 
 function SessionManager() {
-  const { addBlocker, updateBlocker, removeBlocker } = useUIBlockingStore(
-    (state) => ({
-      addBlocker: state.addBlocker,
-      updateBlocker: state.updateBlocker,
-      removeBlocker: state.removeBlocker,
-    })
-  );
+  const { addBlocker, updateBlocker, removeBlocker } = useUIBlockingStore((state) => ({
+    addBlocker: state.addBlocker,
+    updateBlocker: state.updateBlocker,
+    removeBlocker: state.removeBlocker,
+  }));
 
   const startSession = () => {
     addBlocker("session-timeout", {
@@ -1123,7 +1125,7 @@ This package lives in the [react-action-guard monorepo](https://github.com/okyry
 pnpm install
 
 # Run this package's scripts with --filter
-pnpm --filter @okyrychenko-dev/react-action-guard run test
+pnpm --filter @okyrychenko-dev/react-action-guard run test:run
 pnpm --filter @okyrychenko-dev/react-action-guard run test:coverage
 pnpm --filter @okyrychenko-dev/react-action-guard run build
 pnpm --filter @okyrychenko-dev/react-action-guard run typecheck
@@ -1134,7 +1136,7 @@ pnpm --filter @okyrychenko-dev/react-action-guard run dev
 
 # Or cd into the package and run scripts directly
 cd packages/core
-pnpm run test
+pnpm run test:run
 ```
 
 ## Contributing

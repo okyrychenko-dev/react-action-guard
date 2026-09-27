@@ -1,3 +1,4 @@
+import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { useMemo } from "react";
 import { useResolvedGuardedScope } from "../../context";
 import { useTopBlocker } from "../useTopBlocker";
@@ -54,7 +55,7 @@ export function useGuardedControl<
   );
 
   const controlState = useMemo(() => {
-    if (getControlState === undefined) {
+    if (isUndefined(getControlState)) {
       return baseState;
     }
 

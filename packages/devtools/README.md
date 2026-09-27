@@ -345,14 +345,14 @@ import type {
 ### Debugging Complex Blocking Logic
 
 ```jsx
-import { useBlocker } from "@okyrychenko-dev/react-action-guard";
+import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
 import { ActionGuardDevtools } from "@okyrychenko-dev/react-action-guard-devtools";
 
 function ComplexForm() {
   const [step, setStep] = useState(1);
 
   // Multiple blockers with different priorities
-  useBlocker(
+  useActionBlocker(
     "validation",
     {
       scope: "form",
@@ -361,7 +361,7 @@ function ComplexForm() {
     !isValid
   );
 
-  useBlocker(
+  useActionBlocker(
     "api-call",
     {
       scope: ["form", "navigation"],
@@ -430,7 +430,7 @@ This package lives in the [react-action-guard monorepo](https://github.com/okyry
 pnpm install
 
 # Run this package's scripts with --filter
-pnpm --filter @okyrychenko-dev/react-action-guard-devtools run test
+pnpm --filter @okyrychenko-dev/react-action-guard-devtools run test:run
 pnpm --filter @okyrychenko-dev/react-action-guard-devtools run test:ui
 pnpm --filter @okyrychenko-dev/react-action-guard-devtools run test:coverage
 pnpm --filter @okyrychenko-dev/react-action-guard-devtools run build
@@ -442,7 +442,7 @@ pnpm --filter @okyrychenko-dev/react-action-guard-devtools run dev
 
 # Or cd into the package and run scripts directly
 cd packages/devtools
-pnpm run test
+pnpm run test:run
 ```
 
 ## Contributing
