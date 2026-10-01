@@ -520,9 +520,7 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 - `getBlockingInfo(scope)` - Get detailed blocking information
 - `clearAllBlockers()` - Remove all blockers (emits `"clear"` middleware event)
 - `clearBlockersForScope(scope)` - Remove blockers for specific scope (emits `"clear_scope"` middleware event)
-- `observeBlockingEvents(observer, options?)` - Observe lifecycle events; returns an idempotent release function. During migration from named middleware, `skipWhenNamedMiddlewareActive` suppresses the observer when that named registration is still scheduled for or already handled the current event.
-- `registerMiddleware(name, middleware)` - Deprecated named registration for compatibility
-- `unregisterMiddleware(name)` - Deprecated named unregistration for compatibility
+- `observeBlockingEvents(observer)` - Observe lifecycle events; returns an ownership-safe, idempotent release function.
 
 **Note about `updateBlocker` and timeouts:**
 
@@ -625,18 +623,22 @@ immutable snapshots in transition order. For a transition with an event, all sna
 called before its observers; that event reaches every observer before notifications from actions started
 by those callbacks. Reentrant notifications are queued and drained synchronously.
 
-`restore()` publishes a snapshot without an action event. The Zustand compatibility store publishes an
-external `setState({ activeBlockers })` replacement once and keeps lifecycle reads synchronized. A
-subscriber or observer throwing does not interrupt delivery to the others. Legacy named middleware
-receives events in registration order without waiting for asynchronous completion. Asynchronous
-observers may finish in a different order. Use `observeBlockingEvents()`
-for new integrations; each call owns only its own registration and returns a release function.
-Direct compatibility calls to `runMiddlewares()` start every middleware without serial waiting; the
-returned promise settles after all asynchronous middleware completes.
+The Zustand adapter publishes `blockingSnapshot`, a readonly array of frozen `BlockerInfo`
+projections. It retains `@okyrychenko-dev/react-zustand-toolkit` for both global and provider-scoped
+React state. Use lifecycle actions to change blockers; external `setState` writes cannot replace the
+lifecycle projection. Each store adapts one independent lifecycle.
 
-When changing lifecycle delivery or its Zustand adapter, cover nested actions from a snapshot
-subscriber, an event observer, and a Zustand subscriber. Verify snapshot and event order, one
-publication per external replacement, timer behavior, and delivery after a listener throws.
+Observation is anonymous and additive. A throwing subscriber or observer does not interrupt
+transitions or later listeners. Observers run in registration order without awaiting asynchronous
+completion. Each `observeBlockingEvents()` call owns only its own registration and returns an
+idempotent release function. A throwing timeout callback cannot prevent the separate, ordered
+`timeout` and `remove` events. Replacing a blocker invalidates its previous timer.
+
+Scope normalization is shared with guarded controls: omitted scopes resolve to `global` and empty lists match nothing,
+arrays are deduplicated and sorted, and global blockers affect every ordinary scope observation.
+Targeted clearing does not treat global as a wildcard and preserves global blockers.
+
+See [architecture migration](./MIGRATION.md) for removed compatibility interfaces.
 
 ### Built-in Middleware
 
@@ -703,7 +705,7 @@ configureMiddleware([
 ```
 
 Note: `configureMiddleware` registers middleware on the global store. If you use `UIBlockingProvider`, register middleware via the provider's `middlewares` prop instead.
-Each `configureMiddleware(...)` call replaces previously configured global middlewares (`middleware-*`) and keeps provider-level middlewares untouched.
+Each `configureMiddleware(...)` call releases only its previous configured observations. Independent observations and provider-level middleware remain active.
 
 Analytics middleware is SSR-safe: in non-browser environments it becomes a no-op for `ga`, `mixpanel`, and `amplitude` providers.
 

@@ -1,4 +1,4 @@
-[**React Action Guard DevTools API v0.1.2**](../README.md)
+[**React Action Guard DevTools API v0.3.0**](../README.md)
 
 ***
 
@@ -8,6 +8,6 @@
 
 > **DevtoolsPosition** = `"left"` \| `"right"`
 
-Defined in: [src/types/devtools.types.ts:48](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L48)
+Defined in: [types/devtools.types.ts:51](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L51)
 
 Position of the devtools panel

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { createBlockingLifecycle } from "../blockingLifecycle";
+import type { Middleware } from "../../../middleware";
 import type { BlockingLifecycleObservation } from "../blockingLifecycle.types";
 
 describe("Blocking lifecycle", () => {
@@ -340,4 +341,87 @@ describe("Blocking lifecycle", () => {
     expect(events).toEqual(["add", "remove"]);
     expect(lifecycle.getSnapshot()).toEqual([]);
   });
+
+  it("should normalize default values and preserve public transition contexts", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1000);
+
+    const lifecycle = createBlockingLifecycle();
+    const observer = vi.fn<Middleware>();
+
+    lifecycle.observe(observer);
+    lifecycle.add("default");
+
+    expect(lifecycle.getSnapshot()[0]).toMatchObject({
+      id: "default",
+      scope: "global",
+      reason: "Unknown",
+      priority: 0,
+      timestamp: 1000,
+    });
+
+    lifecycle.update("default", { scope: ["form"], reason: "Saving", priority: -5 });
+
+    expect(lifecycle.getBlockingInfo("form")[0]).toMatchObject({ reason: "Saving", priority: 0 });
+    expect(observer.mock.calls[1]?.[0]).toMatchObject({
+      action: "update",
+      blockerId: "default",
+      config: { reason: "Saving", priority: 0 },
+      prevState: { scope: "global", reason: "Unknown" },
+    });
+
+    lifecycle.remove("default");
+
+    expect(observer.mock.calls[2]?.[0]).toMatchObject({
+      action: "remove",
+      blockerId: "default",
+      config: { reason: "Saving" },
+    });
+    expect(observer.mock.calls.every(([event]) => !("timeoutId" in (event.config ?? {})))).toBe(
+      true
+    );
+  });
+
+  it("should restart changed timeouts and disable them explicitly", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const onTimeout = vi.fn();
+
+    lifecycle.add("save", { timeout: 100, onTimeout });
+    vi.advanceTimersByTime(50);
+    lifecycle.update("save", { timeout: 200 });
+    vi.advanceTimersByTime(100);
+    expect(lifecycle.isBlocked()).toBe(true);
+    lifecycle.update("save", { timeout: 0 });
+    vi.advanceTimersByTime(500);
+    expect(onTimeout).not.toHaveBeenCalled();
+    expect(lifecycle.isBlocked()).toBe(true);
+    lifecycle.update("save", { timeout: 10 });
+    vi.advanceTimersByTime(10);
+    expect(onTimeout).toHaveBeenCalledWith("save");
+    expect(lifecycle.isBlocked()).toBe(false);
+  });
+
+  it.each(["remove", "clear", "clearScope"])(
+    "should cancel timeout callbacks when blockers are released by %s",
+    (operation) => {
+      vi.useFakeTimers();
+
+      const lifecycle = createBlockingLifecycle();
+      const onTimeout = vi.fn();
+
+      lifecycle.add("save", { scope: "form", timeout: 10, onTimeout });
+      if (operation === "remove") {
+        lifecycle.remove("save");
+      } else if (operation === "clear") {
+        lifecycle.clear();
+      } else {
+        lifecycle.clearScope("form");
+      }
+      vi.advanceTimersByTime(20);
+      expect(onTimeout).not.toHaveBeenCalled();
+      expect(lifecycle.getSnapshot()).toEqual([]);
+    }
+  );
 });

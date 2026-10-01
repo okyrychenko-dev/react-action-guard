@@ -29,8 +29,8 @@ useIsBlocked(scope?: string | string[]): boolean
 
 ### Parameters
 
-| Parameter | Type                 | Required | Default     | Description                                       |
-| --------- | -------------------- | -------- | ----------- | ------------------------------------------------- |
+| Parameter | Type                 | Required | Default    | Description                                         |
+| --------- | -------------------- | -------- | ---------- | --------------------------------------------------- |
 | `scope`   | `string \| string[]` | ❌       | `"global"` | Scope(s) to check. If omitted, checks global scope. |
 
 ### Return Value
@@ -171,7 +171,11 @@ function AppStatusIndicator() {
 
   return (
     <StatusBar>
-      {isGloballyBlocked ? <span>⚠️ Global actions are currently blocked</span> : <span>✅ Global scope is clear</span>}
+      {isGloballyBlocked ? (
+        <span>⚠️ Global actions are currently blocked</span>
+      ) : (
+        <span>✅ Global scope is clear</span>
+      )}
     </StatusBar>
   );
 }
@@ -490,37 +494,9 @@ function UnoptimizedComponent() {
 
 ## How It Works
 
-Under the hood, `useIsBlocked`:
-
-1. Subscribes to the Zustand blocking store
-2. Uses a selector to check active blockers
-3. Returns true if any blocker matches the criteria:
-   - For specific scope: blocker.scope === scope OR blocker.scope === 'global'
-   - For array of scopes: blocker.scope in scopes OR blocker.scope === 'global'
-   - For no scope: any blocker exists
-4. Automatically re-renders component when blocking state changes
-
-```typescript
-// Simplified implementation
-export function useIsBlocked(scope?: string | string[]): boolean {
-  return useUIBlockingStore((state) => {
-    const blockers = Array.from(state.activeBlockers.values());
-
-    if (!scope) {
-      // Check if any blocker exists
-      return blockers.length > 0;
-    }
-
-    if (Array.isArray(scope)) {
-      // Check if any of the specified scopes are blocked
-      return blockers.some((blocker) => scope.includes(blocker.scope as string) || blocker.scope === "global");
-    }
-
-    // Check specific scope
-    return blockers.some((blocker) => blocker.scope === scope || blocker.scope === "global");
-  });
-}
-```
+`useIsBlocked` resolves the nearest provider store, falling back to the global store. It subscribes
+to immutable lifecycle snapshots through Zustand and asks the shared scope module whether a blocker
+affects the requested scope. No mutable blocker storage is exposed. Omitted queried scopes resolve to `global`, while empty lists match nothing; a global blocker affects every queried scope.
 
 ## Scope Resolution Rules
 
@@ -530,7 +506,7 @@ The `global` scope is special:
 
 - Blocks ALL other scopes
 - Always checked regardless of specified scope
-- Highest priority blocking
+- Scope matching is independent of priority; priority selects the top blocker for guarded controls
 
 ```tsx
 // Global blocker active
@@ -702,7 +678,9 @@ function NavigationGuard({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {isNavigationBlocked && <Banner type="warning">You have unsaved changes. Please save before leaving.</Banner>}
+      {isNavigationBlocked && (
+        <Banner type="warning">You have unsaved changes. Please save before leaving.</Banner>
+      )}
       {children}
     </>
   );

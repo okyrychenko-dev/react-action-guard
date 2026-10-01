@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
@@ -8,10 +8,4 @@
 
 > **MutationBlockingConfig** = `MutationBlockingConfigWithoutError` \| `MutationBlockingConfigWithError`
 
-Defined in: [src/hooks/useBlockingMutation.types.ts:67](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingMutation.types.ts#L67)
-
-Discriminated union for mutation blocking configuration.
-Type-safe configuration that prevents using reasonOnError when onError is false.
-
-Use `onError: false` (or omit) to only block during mutation execution.
-Use `onError: true` to also block when mutation fails.
+Defined in: [packages/tanstack/src/hooks/useBlockingMutation.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingMutation.types.ts#L18)

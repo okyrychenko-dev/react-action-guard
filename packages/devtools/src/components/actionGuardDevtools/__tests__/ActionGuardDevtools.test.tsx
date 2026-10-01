@@ -1,4 +1,3 @@
-import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "@devtools/middleware";
 import {
   DEFAULT_FILTER,
   DEFAULT_MAX_EVENTS,
@@ -18,7 +17,6 @@ import { ReactElement, StrictMode, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import ActionGuardDevtools from "../ActionGuardDevtools";
 import ActionGuardDevtoolsContent from "../ActionGuardDevtoolsContent";
-import { ManualCustomObservationContent } from "./fixtures";
 import type { DevtoolsEvent } from "@devtools/types";
 
 function resetDevtoolsStore(): void {
@@ -338,149 +336,6 @@ describe("ActionGuardDevtools", () => {
 
     expect(screen.getByText("pre-existing-blocker")).toBeInTheDocument();
     expect(events).toHaveLength(0);
-  });
-
-  it("should preserve caller-owned manual middleware during automatic observation", () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-    const manualMiddleware = createDevtoolsMiddleware();
-    const { addBlocker, registerMiddleware, unregisterMiddleware } = uiBlockingStoreApi.getState();
-
-    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manualMiddleware);
-
-    const devtools = renderWithProviders(<ActionGuardDevtools />);
-
-    act(() => {
-      addBlocker("manual-and-automatic-blocker");
-    });
-
-    const { events: eventsDuringAutomaticObservation } = devtoolsStoreApi.getState();
-
-    expect(
-      eventsDuringAutomaticObservation.filter(
-        (event) => event.blockerId === "manual-and-automatic-blocker"
-      )
-    ).toHaveLength(1);
-    expect(warn).toHaveBeenCalledWith(
-      "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
-        "middleware registration. The manual registration remains authoritative."
-    );
-
-    devtools.unmount();
-
-    act(() => {
-      addBlocker("manual-after-automatic-blocker");
-    });
-
-    const { events: eventsAfterAutomaticObservation } = devtoolsStoreApi.getState();
-
-    expect(
-      eventsAfterAutomaticObservation.some(
-        (event) => event.blockerId === "manual-after-automatic-blocker"
-      )
-    ).toBe(true);
-
-    unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-  });
-
-  it("should preserve caller middleware registered during automatic observation", () => {
-    const devtools = renderWithProviders(<ActionGuardDevtools />);
-    const replacementMiddleware = createDevtoolsMiddleware();
-    const { addBlocker, registerMiddleware } = uiBlockingStoreApi.getState();
-
-    act(() => {
-      addBlocker("automatically-observed-blocker");
-    });
-
-    const { events: automaticallyObservedEvents } = devtoolsStoreApi.getState();
-
-    expect(
-      automaticallyObservedEvents.some(
-        (event) => event.blockerId === "automatically-observed-blocker"
-      )
-    ).toBe(true);
-
-    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, replacementMiddleware);
-    act(() => {
-      addBlocker("manual-during-automatic-blocker");
-    });
-
-    const { events: eventsDuringManualObservation } = devtoolsStoreApi.getState();
-
-    expect(
-      eventsDuringManualObservation.filter(
-        (event) => event.blockerId === "manual-during-automatic-blocker"
-      )
-    ).toHaveLength(1);
-
-    devtools.unmount();
-
-    const { addBlocker: addBlockerAfterUnmount, unregisterMiddleware } =
-      uiBlockingStoreApi.getState();
-
-    act(() => {
-      addBlockerAfterUnmount("replacement-after-automatic-blocker");
-    });
-
-    const { events } = devtoolsStoreApi.getState();
-
-    expect(events.some((event) => event.blockerId === "replacement-after-automatic-blocker")).toBe(
-      true
-    );
-
-    unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-  });
-
-  it("should record custom-store events when caller-owned middleware is already registered", async () => {
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
-    const reservedMiddleware = vi.fn();
-
-    renderWithProviders(
-      <UIBlockingProvider>
-        <ManualCustomObservationContent onReservedMiddlewareCall={reservedMiddleware} />
-      </UIBlockingProvider>
-    );
-
-    await screen.findByText("Action Guard");
-    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("manual-custom-blocker")).toBeInTheDocument();
-    });
-    expect(reservedMiddleware).toHaveBeenCalledOnce();
-    expect(warn).toHaveBeenCalledWith(
-      "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
-        "Devtools middleware and added an observation lease for the custom store."
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Toggle manual custom observation" }));
-
-    const { clearEvents } = devtoolsStoreApi.getState();
-
-    clearEvents();
-    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
-
-    const { events } = devtoolsStoreApi.getState();
-
-    expect(events.some((event) => event.blockerId === "manual-custom-blocker")).toBe(true);
-  });
-
-  it("should keep observing a custom store after caller-owned middleware is registered", async () => {
-    renderWithProviders(
-      <UIBlockingProvider>
-        <ManualCustomObservationContent
-          onReservedMiddlewareCall={vi.fn()}
-          registerManualBeforeObservation={false}
-        />
-      </UIBlockingProvider>
-    );
-
-    await screen.findByText("Action Guard");
-    fireEvent.click(screen.getByRole("button", { name: "Register manual custom middleware" }));
-    fireEvent.click(screen.getByRole("button", { name: "Add manually observed custom blocker" }));
-
-    await waitFor(() => {
-      expect(screen.getByText("manual-custom-blocker")).toBeInTheDocument();
-    });
   });
 
   it("should isolate observation sessions for different custom stores", async () => {

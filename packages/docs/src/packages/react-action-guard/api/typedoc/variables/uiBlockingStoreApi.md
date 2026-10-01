@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,6 +6,6 @@
 
 # Variable: uiBlockingStoreApi
 
-> **uiBlockingStoreApi**: `StoreApi`\<[`UIBlockingStore`](../type-aliases/UIBlockingStore.md)\>
+> `const` **uiBlockingStoreApi**: `WithDevtools`\<`StoreApi`\<[`UIBlockingStore`](../type-aliases/UIBlockingStore.md)\>\> = `storeBindings.store`
 
-Defined in: [src/store/uiBlockingStore.store.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.store.ts#L20)
+Defined in: [store/uiBlockingStore.store.ts:23](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.store.ts#L23)

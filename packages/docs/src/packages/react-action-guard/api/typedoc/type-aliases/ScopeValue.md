@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > **ScopeValue**\<`TScope`\> = `TScope` \| `ReadonlyArray`\<`TScope`\>
 
-Defined in: [src/types/scopes.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/types/scopes.ts#L9)
+Defined in: [types/scopes.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/types/scopes.ts#L9)
 
 Utility type for scope values - can be a single scope or array of scopes
 

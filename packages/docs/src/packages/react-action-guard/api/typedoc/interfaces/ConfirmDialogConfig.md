@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConfirmDialogConfig
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L6)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L6)
 
 Configuration for the confirmation dialog
 
@@ -16,7 +16,7 @@ Configuration for the confirmation dialog
 
 > **title**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L7)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L7)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:7](h
 
 > **message**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L8)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L8)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:8](h
 
 > **confirmText**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L9)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L9)
 
 ***
 
@@ -40,4 +40,4 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:9](h
 
 > **cancelText**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L10)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L10)

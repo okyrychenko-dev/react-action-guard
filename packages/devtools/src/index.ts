@@ -11,10 +11,7 @@ export {
 } from "./store";
 
 // Middleware (for manual registration)
-export {
-  createDevtoolsMiddleware,
-  DEVTOOLS_MIDDLEWARE_NAME,
-} from "./middleware/devtoolsMiddleware";
+export { createDevtoolsMiddleware } from "./middleware/devtoolsMiddleware";
 
 // Types
 export type {

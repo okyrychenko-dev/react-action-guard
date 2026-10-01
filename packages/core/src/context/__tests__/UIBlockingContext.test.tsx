@@ -321,7 +321,7 @@ describe("UIBlockingProvider", () => {
 
       const { result } = renderHook(() => useUIBlockingStoreFromContext(), { wrapper });
 
-      expect(result.current.activeBlockers).toBeInstanceOf(Map);
+      expect(result.current.blockingSnapshot).toEqual([]);
       expect(result.current.addBlocker).toBeTypeOf("function");
     });
 
@@ -331,12 +331,12 @@ describe("UIBlockingProvider", () => {
       );
 
       const { result } = renderHook(
-        () => useUIBlockingStoreFromContext((state) => state.activeBlockers),
+        () => useUIBlockingStoreFromContext((state) => state.blockingSnapshot),
         { wrapper }
       );
 
-      expect(result.current).toBeInstanceOf(Map);
-      expect(result.current.size).toBe(0);
+      expect(result.current).toEqual([]);
+      expect(result.current.length).toBe(0);
     });
 
     it("should throw when used outside provider", () => {

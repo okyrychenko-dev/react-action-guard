@@ -1,5 +1,4 @@
 import { type MouseEvent, useCallback } from "react";
-import { resolveActionReason, resolveGuardedLinkState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
 import type { UseGuardedLinkParams, UseGuardedLinkReturn } from "./useGuardedLink.types";
 
@@ -17,22 +16,13 @@ export function useGuardedLink<TElement extends HTMLElement = HTMLAnchorElement>
     stopPropagationWhenBlocked,
   } = params;
 
-  const resolveState = useCallback(
-    (isBlocked: boolean) =>
-      resolveGuardedLinkState({
-        disabled,
-        isBlocked,
-        removeFromTabOrder,
-      }),
-    [disabled, removeFromTabOrder]
-  );
-
   const control = useGuardedControl({
+    kind: "link",
+    disabled,
+    removeFromTabOrder,
     reasonFallback,
     reasonId,
     reasonMode,
-    resolveReason: resolveActionReason,
-    resolveState,
     scope,
   });
 

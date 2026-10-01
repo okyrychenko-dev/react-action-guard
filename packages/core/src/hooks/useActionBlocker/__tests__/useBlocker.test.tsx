@@ -277,7 +277,8 @@ describe("useBlocker", () => {
   it("should not update blocker config when inline onTimeout callback changes", () => {
     const updateMiddleware = vi.fn();
 
-    uiBlockingStoreApi.getState().registerMiddleware("update-spy", (context) => {
+    const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+    const release = observeBlockingEvents((context) => {
       if (context.action === "update") {
         updateMiddleware();
       }
@@ -298,7 +299,7 @@ describe("useBlocker", () => {
 
     expect(updateMiddleware).not.toHaveBeenCalled();
 
-    uiBlockingStoreApi.getState().unregisterMiddleware("update-spy");
+    release();
   });
 
   it("should call the latest onTimeout callback without updating the blocker", () => {

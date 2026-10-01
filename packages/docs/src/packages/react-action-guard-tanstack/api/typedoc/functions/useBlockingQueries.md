@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
@@ -6,190 +6,32 @@
 
 # Function: useBlockingQueries()
 
-> **useBlockingQueries**\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>(`queries`, `blockingConfig`): `unknown` *extends* `TQueryFnData` \| `InitialDataFunction`\<`TQueryFnData`\> ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TQueryFnData` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TQueryFnData` *extends* () => `TInitialDataResult` ? `unknown` *extends* `TInitialDataResult` ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TInitialDataResult` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> \| `InitialDataFunction`\<`TQueryFnData`\> *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `unknown` *extends* `TQueryFnData` \| `undefined` ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `undefined` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> \| `TQueryFnData` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\>[]
+> **useBlockingQueries**\<`T`\>(`queries`, `blockingConfig`, `queryClient?`): `T` *extends* \[\] ? \[\] : `T` *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>\] : `T` *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>\] : \[`...Tails[]`\] *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>\] : \[`...Tails[]`\] *extends* \[`Head`, `...Tails[]`\] ? \[`...(...)[]`\] *extends* \[\] ? \[\] : ... *extends* ... ? ... : ... : \[`...{ [K in (...)]: (...) }[]`\] : \[...\{ \[K in string \| number \| symbol\]: GetUseQueryResult\<Tails\[K\]\> \}\[\]\] : \{ \[K in string \| number \| symbol\]: GetUseQueryResult\<T\[K\]\> \}
 
-Defined in: [src/hooks/useBlockingQueries.ts:164](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingQueries.ts#L164)
+Defined in: [packages/tanstack/src/hooks/useBlockingQueries.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingQueries.ts#L6)
 
-A wrapper around TanStack Query's `useQueries` for parallel queries with automatic UI blocking.
-
-This hook wraps TanStack Query's `useQueries` to run multiple queries in parallel while
-automatically managing UI blocking based on the combined state of all queries. It blocks when
-ANY of the queries meet the blocking conditions (loading, fetching, error).
-
-This is ideal for loading data from multiple sources simultaneously, such as loading
-user profile, posts, and comments all at once for a dashboard.
-
-By default, blocks when ANY query is loading but not when queries are fetching in the background.
+Wraps TanStack Queries with one shared UI blocker.
 
 ## Type Parameters
 
-### TQueryFnData
+### T
 
-`TQueryFnData` = `unknown`
-
-The type of data returned by the query function
-
-### TError
-
-`TError` = `Error`
-
-The type of error that can be thrown (default: Error)
-
-### TData
-
-`TData` = `TQueryFnData`
-
-The type of data returned by the hook (default: TQueryFnData)
-
-### TQueryKey
-
-`TQueryKey` *extends* readonly `unknown`[] = readonly `unknown`[]
-
-The type of the query key (default: QueryKey)
+`T` *extends* `unknown`[]
 
 ## Parameters
 
 ### queries
 
-readonly [`UseBlockingQueriesOptions`](../type-aliases/UseBlockingQueriesOptions.md)\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>[]
-
-Array of query option objects (same as TanStack Query `useQueries`)
+readonly \[`T` *extends* \[\] ? \[\] : `T` *extends* \[`Head`\] ? \[`GetUseQueryOptionsForUseQueries`\<`Head`\>\] : `T` *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryOptionsForUseQueries`\<`Head`\>, `GetUseQueryOptionsForUseQueries`\<`Head`\>\] : \[`...Tails[]`\] *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryOptionsForUseQueries`\<...\>, `GetUseQueryOptionsForUseQueries`\<...\>, `GetUseQueryOptionsForUseQueries`\<...\>\] : \[`...(...)[]`\] *extends* \[..., `...(...)[]`\] ? ... *extends* ... ? ... : ... : ... *extends* ... ? ... : ... : readonly `unknown`[] *extends* \[`...Tails[]`\] ? \[`...Tails[]`\] : \[`...Tails[]`\] *extends* `UseQueryOptionsForUseQueries`\<..., ..., ..., ...\>[] ? `UseQueryOptionsForUseQueries`\<..., ..., ..., ...\>[] : `UseQueryOptionsForUseQueries`\<..., ..., ..., ...\>[] : readonly `unknown`[] *extends* `T` ? `T` : `T` *extends* `UseQueryOptionsForUseQueries`\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>[] ? `UseQueryOptionsForUseQueries`\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>[] : `UseQueryOptionsForUseQueries`\<`unknown`, `Error`, `unknown`, readonly `unknown`[]\>[]\]
 
 ### blockingConfig
 
 [`QueriesBlockingConfig`](../interfaces/QueriesBlockingConfig.md)
 
-Shared blocking configuration for all queries
+### queryClient?
+
+`QueryClient`
 
 ## Returns
 
-`unknown` *extends* `TQueryFnData` \| `InitialDataFunction`\<`TQueryFnData`\> ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TQueryFnData` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TQueryFnData` *extends* () => `TInitialDataResult` ? `unknown` *extends* `TInitialDataResult` ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `TInitialDataResult` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> \| `InitialDataFunction`\<`TQueryFnData`\> *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `unknown` *extends* `TQueryFnData` \| `undefined` ? `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `undefined` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> \| `TQueryFnData` *extends* `unknown` *extends* `TData` ? `TQueryFnData` : `TData` ? `DefinedUseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\> : `UseQueryResult`\<`unknown` *extends* `TData` ? `TQueryFnData` : `TData`, `unknown` *extends* `TError` ? `Error` : `TError`\>[]
-
-Array of query result objects (same as TanStack Query `useQueries`)
-
-## Examples
-
-Parallel coordination - block until ALL queries ready
-```ts
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
-
-function DashboardDataLoader() {
-  // Load 3 data sources in parallel
-  const queries = useBlockingQueries(
-    [
-      { queryKey: ['user'], queryFn: fetchUser },
-      { queryKey: ['posts'], queryFn: fetchPosts },
-      { queryKey: ['stats'], queryFn: fetchStats },
-    ],
-    {
-      scope: 'dashboard',
-      reasonOnLoading: 'Loading dashboard...',
-      priority: 20,
-    }
-  );
-  return null;
-}
-
-// Dashboard UI reacts to ALL queries
-function Dashboard() {
-  const blockers = useBlockingInfo('dashboard');
-  
-  if (blockers.length > 0) {
-    // blockers[0].reason === "Loading dashboard..."
-    // Blocked until ALL 3 queries complete
-    // Show full dashboard skeleton
-    return null;
-  }
-  
-  // All data ready - render full dashboard
-  return null;
-}
-```
-
-Dynamic query arrays - coordinate changing data sources
-```ts
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
-
-function MultiCategoryView({ categoryIds }: { categoryIds: string[] }) {
-  // Number of queries changes dynamically
-  const queries = useBlockingQueries(
-    categoryIds.map(id => ({
-      queryKey: ['category', id],
-      queryFn: () => fetchCategory(id),
-    })),
-    {
-      scope: 'categories',
-      reasonOnLoading: `Loading ${categoryIds.length} categories...`,
-    }
-  );
-  
-  return null;
-}
-
-// UI reacts to ANY category loading
-function CategoryGrid() {
-  const isBlocked = useIsBlocked('categories');
-  
-  // isBlocked === true if ANY category is loading
-  // Coordinated loading state for dynamic data
-  
-  return null;
-}
-```
-
-Critical initialization - high priority app startup
-```ts
-import { useIsBlocked, useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
-
-function AppBootstrap() {
-  const queries = useBlockingQueries(
-    [
-      { queryKey: ['config'], queryFn: fetchAppConfig },
-      { queryKey: ['permissions'], queryFn: fetchPermissions },
-      { queryKey: ['tenant'], queryFn: fetchTenant },
-    ],
-    {
-      scope: ['app-init', 'global'],
-      reasonOnLoading: 'Initializing application...',
-      priority: 100, // Highest - blocks everything
-      timeout: 30000,
-    }
-  );
-  return null;
-}
-
-// Entire app is blocked during initialization
-function App() {
-  const blockers = useBlockingInfo('global');
-  
-  if (blockers.length > 0) {
-    // Show app-wide loading screen
-    // blockers[0].reason === "Initializing application..."
-    return null;
-  }
-  
-  // All critical data loaded - render app
-  return null;
-}
-
-// Individual features check app-init
-function FeaturePanel() {
-  const isReady = useIsBlocked('app-init');
-  
-  if (isReady) {
-    return null; // Wait for init
-  }
-  
-  return null; // Render feature
-}
-```
-
-## See
-
- - [TanStack Query useQueries docs](https://tanstack.com/query/latest/docs/react/reference/useQueries)
- - [useBlockingQuery](useBlockingQuery.md) for single queries
- - [useBlockingMutation](useBlockingMutation.md) for mutations
-
-## Since
-
-0.6.0
+`T` *extends* \[\] ? \[\] : `T` *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>\] : `T` *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>\] : \[`...Tails[]`\] *extends* \[`Head`, `...Tails[]`\] ? \[`...Tails[]`\] *extends* \[\] ? \[\] : \[`...Tails[]`\] *extends* \[`Head`\] ? \[`GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>, `GetUseQueryResult`\<`Head`\>\] : \[`...Tails[]`\] *extends* \[`Head`, `...Tails[]`\] ? \[`...(...)[]`\] *extends* \[\] ? \[\] : ... *extends* ... ? ... : ... : \[`...{ [K in (...)]: (...) }[]`\] : \[...\{ \[K in string \| number \| symbol\]: GetUseQueryResult\<Tails\[K\]\> \}\[\]\] : \{ \[K in string \| number \| symbol\]: GetUseQueryResult\<T\[K\]\> \}

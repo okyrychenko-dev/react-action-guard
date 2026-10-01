@@ -16,10 +16,7 @@ export type {
 export type {
   BlockerConfig,
   BlockerInfo,
-  BlockingObservationOptions,
-  StoredBlocker,
   UIBlockingStore,
   UIBlockingStoreActions,
   UIBlockingStoreState,
-  ShallowStoreBindings,
 } from "./uiBlockingStore.types";

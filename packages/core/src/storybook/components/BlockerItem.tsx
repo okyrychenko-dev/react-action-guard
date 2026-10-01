@@ -1,10 +1,10 @@
 import { ReactElement } from "react";
-import { StoredBlocker } from "../../store";
+import { BlockerInfo } from "../../store";
 import { formatScope } from "./BlockerItem.utils";
 
 export interface BlockerEntry {
   id: string;
-  blocker: StoredBlocker;
+  blocker: BlockerInfo;
 }
 
 function BlockerItem({ id, blocker }: BlockerEntry): ReactElement {

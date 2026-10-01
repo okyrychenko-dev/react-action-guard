@@ -95,10 +95,10 @@ import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
 const store = uiBlockingStoreApi.getState();
 
 // Register
-store.registerMiddleware('my-middleware', myMiddleware);
+const release = store.observeBlockingEvents(myMiddleware);
 
 // Unregister
-store.unregisterMiddleware('my-middleware');
+release();
 ```
 
 ## Built-in Middleware
@@ -381,7 +381,7 @@ const auditMiddleware: Middleware = (context) => {
 const persistenceMiddleware: Middleware = (context) => {
   // Save to localStorage on any change
   const state = uiBlockingStoreApi.getState();
-  const blockers = Array.from(state.blockers.values());
+  const blockers = state.blockingSnapshot;
   
   localStorage.setItem('blockers', JSON.stringify(blockers));
 };

@@ -1,4 +1,4 @@
-[**React Action Guard DevTools API v0.1.2**](../README.md)
+[**React Action Guard DevTools API v0.3.0**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DevtoolsEvent
 
-Defined in: [src/types/devtools.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L6)
+Defined in: [types/devtools.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L7)
 
 Extended event stored in devtools history
 
@@ -16,7 +16,7 @@ Extended event stored in devtools history
 
 > **id**: `string`
 
-Defined in: [src/types/devtools.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L8)
+Defined in: [types/devtools.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L9)
 
 Unique event identifier
 
@@ -26,7 +26,7 @@ Unique event identifier
 
 > **action**: `BlockingAction`
 
-Defined in: [src/types/devtools.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L10)
+Defined in: [types/devtools.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L11)
 
 The action that occurred
 
@@ -36,7 +36,7 @@ The action that occurred
 
 > **blockerId**: `string`
 
-Defined in: [src/types/devtools.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L12)
+Defined in: [types/devtools.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L13)
 
 ID of the blocker
 
@@ -44,23 +44,23 @@ ID of the blocker
 
 ### config?
 
-> `optional` **config**: `object`
+> `optional` **config?**: `object`
 
-Defined in: [src/types/devtools.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L14)
+Defined in: [types/devtools.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L15)
 
 Blocker configuration at time of event
 
 #### scope?
 
-> `optional` **scope**: `string` \| readonly `string`[]
+> `optional` **scope?**: `string` \| readonly `string`[]
 
 #### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
 #### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
 ***
 
@@ -68,7 +68,7 @@ Blocker configuration at time of event
 
 > **timestamp**: `number`
 
-Defined in: [src/types/devtools.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L20)
+Defined in: [types/devtools.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L21)
 
 Unix timestamp of the event
 
@@ -76,40 +76,50 @@ Unix timestamp of the event
 
 ### prevState?
 
-> `optional` **prevState**: `object`
+> `optional` **prevState?**: `object`
 
-Defined in: [src/types/devtools.types.ts:22](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L22)
+Defined in: [types/devtools.types.ts:23](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L23)
 
 Previous state (available on remove/update)
 
 #### scope?
 
-> `optional` **scope**: `string` \| readonly `string`[]
+> `optional` **scope?**: `string` \| readonly `string`[]
 
 #### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
 #### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
 ***
 
 ### duration?
 
-> `optional` **duration**: `number`
+> `optional` **duration?**: `number`
 
-Defined in: [src/types/devtools.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L28)
+Defined in: [types/devtools.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L29)
 
 Duration in ms (calculated for remove events)
 
 ***
 
-### source?
+### scope?
 
-> `optional` **source**: `string`
+> `optional` **scope?**: `string`
 
-Defined in: [src/types/devtools.types.ts:30](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L30)
+Defined in: [types/devtools.types.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L31)
 
-Source of the blocking action
+Scope attached directly to middleware event (for clear_scope, etc.)
+
+***
+
+### count?
+
+> `optional` **count?**: `number`
+
+Defined in: [types/devtools.types.ts:33](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L33)
+
+Number of affected blockers for bulk actions

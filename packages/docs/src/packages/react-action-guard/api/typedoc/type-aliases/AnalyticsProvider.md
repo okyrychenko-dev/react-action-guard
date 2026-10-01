@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -8,4 +8,4 @@
 
 > **AnalyticsProvider** = `"ga"` \| `"mixpanel"` \| `"amplitude"`
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L6)
+Defined in: [middleware/analyticsMiddleware.types.ts:4](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L4)

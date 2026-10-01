@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,15 +6,15 @@
 
 # Interface: CustomAnalyticsConfig
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L20)
+Defined in: [middleware/analyticsMiddleware.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L18)
 
 ## Properties
 
-### track()
+### track
 
 > **track**: (`event`, `data`) => `void`
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L21)
+Defined in: [middleware/analyticsMiddleware.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L19)
 
 #### Parameters
 

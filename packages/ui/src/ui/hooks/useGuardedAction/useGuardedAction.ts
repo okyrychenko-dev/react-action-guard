@@ -1,5 +1,3 @@
-import { useCallback } from "react";
-import { resolveActionReason, resolveGuardedActionState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
 import type { GuardedActionState } from "../../types";
 import type { UseGuardedActionParams, UseGuardedActionReturn } from "./useGuardedAction.types";
@@ -29,24 +27,15 @@ export function useGuardedAction<TActionState>(
     scope,
   } = params;
 
-  const resolveState = useCallback(
-    (isBlocked: boolean) =>
-      resolveGuardedActionState({
-        blockedState,
-        disabled,
-        isBlocked,
-        loading,
-      }),
-    [blockedState, disabled, loading]
-  );
-
   const control = useGuardedControl({
+    kind: "action",
+    blockedState,
+    disabled,
+    loading,
     getControlState: getActionState,
     reasonFallback,
     reasonId,
     reasonMode,
-    resolveReason: resolveActionReason,
-    resolveState,
     scope,
   });
 

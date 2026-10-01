@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
@@ -6,188 +6,82 @@
 
 # Function: useBlockingQuery()
 
-> **useBlockingQuery**\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>(`options`): `UseQueryResult`\<`TData`, `TError`\>
+## Call Signature
 
-Defined in: [src/hooks/useBlockingQuery.ts:160](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingQuery.ts#L160)
+> **useBlockingQuery**\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>(`options`, `queryClient?`): `DefinedUseQueryResult`\<`NoInfer`\<`TData`\>, `TError`\>
 
-A wrapper around TanStack Query's `useQuery` that integrates with the UI blocking system.
+Defined in: [packages/tanstack/src/hooks/useBlockingQuery.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingQuery.ts#L18)
 
-This hook provides the same API as `useQuery` with additional blocking configuration.
-It automatically manages UI blocking based on query states (loading, fetching, error).
+Wraps TanStack Query with UI blocking.
 
-## Type Parameters
+### Type Parameters
 
-### TQueryFnData
+#### TQueryFnData
 
 `TQueryFnData` = `unknown`
 
-The type of data returned by the query function
-
-### TError
+#### TError
 
 `TError` = `Error`
 
-The type of error that can be thrown
-
-### TData
+#### TData
 
 `TData` = `TQueryFnData`
 
-The type of data returned by the hook (after select transformation)
-
-### TQueryKey
+#### TQueryKey
 
 `TQueryKey` *extends* readonly `unknown`[] = readonly `unknown`[]
 
-The type of the query key
+### Parameters
 
-## Parameters
+#### options
 
-### options
+`DefinedInitialDataBlockingQueryOptions`\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>
 
-[`UseBlockingQueryOptions`](../interfaces/UseBlockingQueryOptions.md)\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>
+#### queryClient?
 
-Query options including blocking configuration
+`QueryClient`
 
-## Returns
+### Returns
 
-`UseQueryResult`\<`TData`, `TError`\>
+`DefinedUseQueryResult`\<`NoInfer`\<`TData`\>, `TError`\>
 
-Query result object from TanStack Query
+## Call Signature
 
-## Examples
+> **useBlockingQuery**\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>(`options`, `queryClient?`): `UseQueryResult`\<`NoInfer`\<`TData`\>, `TError`\>
 
-Scope isolation - independent UI sections
-```ts
-import { useIsBlocked, useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+Defined in: [packages/tanstack/src/hooks/useBlockingQuery.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingQuery.ts#L28)
 
-// Component A: Loads data for table
-function UserTableLoader() {
-  useBlockingQuery({
-    queryKey: ['users'],
-    queryFn: fetchUsers,
-    blockingConfig: {
-      scope: 'users-table',
-      reasonOnLoading: 'Loading users...',
-    }
-  });
-  return null;
-}
+Wraps TanStack Query with UI blocking.
 
-// Component B: Table checks its scope
-function UserTable() {
-  const isBlocked = useIsBlocked('users-table');
-  const blockers = useBlockingInfo('users-table');
-  
-  if (isBlocked) {
-    // Show: "Loading users..." from blockers[0].reason
-    return null;
-  }
-  return null; // render table
-}
+### Type Parameters
 
-// Component C: Sidebar is independent
-function Sidebar() {
-  const isBlocked = useIsBlocked('sidebar');
-  // isBlocked === false - sidebar fully interactive! ✅
-  return null;
-}
-```
+#### TQueryFnData
 
-Background refresh - don't block UI updates
-```ts
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+`TQueryFnData` = `unknown`
 
-function LiveDashboard()  {
-  const query = useBlockingQuery({
-    queryKey: ['metrics'],
-    queryFn: fetchMetrics,
-    refetchInterval: 5000, // Auto-refresh every 5s
-    blockingConfig: {
-      scope: 'dashboard',
-      reasonOnLoading: 'Loading dashboard...',
-      reasonOnFetching: 'Refreshing data...',
-      onLoading: true,   // Block initial load
-      onFetching: false, // Don't block refresh ✅
-    }
-  });
-  
-  const blockers = useBlockingInfo('dashboard');
-  
-  // Initial load: blockers.length > 0, show full loading
-  // Background refresh: blockers.length === 0, show subtle indicator
-  // This prevents janky UI during auto-updates
-  
-  return null;
-}
-```
+#### TError
 
-Error handling - keep blocking during retries
-```ts
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+`TError` = `Error`
 
-function CriticalDataLoader() {
-  const query = useBlockingQuery({
-    queryKey: ['critical-config'],
-    queryFn: fetchCriticalConfig,
-    retry: 3,
-    retryDelay: 1000,
-    blockingConfig: {
-      scope: 'app-init',
-      reasonOnLoading: 'Loading configuration...',
-      reasonOnError: 'Config failed, retrying...',
-      onLoading: true,
-      onError: true, // Keep blocking during retries ✅
-      priority: 100,
-    }
-  });
-  
-  const blockers = useBlockingInfo('app-init');
-  
-  // During retry:
-  // blockers[0].reason === "Config failed, retrying..."
-  // User sees what's happening, not just stuck
-  
-  return null;
-}
-```
+#### TData
 
-Multiple scopes - coordinate across app
-```ts
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+`TData` = `TQueryFnData`
 
-function CheckoutDataLoader() {
-  useBlockingQuery({
-    queryKey: ['checkout-session'],
-    queryFn: fetchCheckoutSession,
-    blockingConfig: {
-      // Block MULTIPLE scopes simultaneously
-      scope: ['checkout', 'navigation', 'forms'],
-      reasonOnLoading: 'Loading checkout...',
-      priority: 90,
-    }
-  });
-  return null;
-}
+#### TQueryKey
 
-// Different components check different scopes
-function CheckoutForm() {
-  const isBlocked = useIsBlocked('forms');
-  // Forms disabled during checkout load
-  return null;
-}
+`TQueryKey` *extends* readonly `unknown`[] = readonly `unknown`[]
 
-function NavigationBar() {
-  const isBlocked = useIsBlocked('navigation');
-  // Navigation locked during checkout load
-  return null;
-}
+### Parameters
 
-function PaymentSection() {
-  const isBlocked = useIsBlocked('checkout');
-  // Entire checkout blocked
-  return null;
-}
+#### options
 
-// All synchronized via scope array! 🎯
-```
+`UndefinedInitialDataBlockingQueryOptions`\<`TQueryFnData`, `TError`, `TData`, `TQueryKey`\>
+
+#### queryClient?
+
+`QueryClient`
+
+### Returns
+
+`UseQueryResult`\<`NoInfer`\<`TData`\>, `TError`\>

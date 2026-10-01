@@ -63,11 +63,11 @@ For most apps, the path looks like this:
 
 ### Advanced hooks
 
-| Hook                    | Purpose                      | Typical use case                      |
-| ----------------------- | ---------------------------- | ------------------------------------- |
-| `useConfirmableBlocker` | Confirmation flow helper     | Destructive actions                   |
-| `useScheduledBlocker`   | Time-based blocking          | Maintenance windows                   |
-| `useConditionalBlocker` | Polling-based blocking sync  | External state without event hooks    |
+| Hook                    | Purpose                     | Typical use case                   |
+| ----------------------- | --------------------------- | ---------------------------------- |
+| `useConfirmableBlocker` | Confirmation flow helper    | Destructive actions                |
+| `useScheduledBlocker`   | Time-based blocking         | Maintenance windows                |
+| `useConditionalBlocker` | Polling-based blocking sync | External state without event hooks |
 
 ## 🚀 Quick Start
 
@@ -266,7 +266,11 @@ const loggingMiddleware = (context) => {
   console.log(`Blocker ${context.action}: ${context.blockerId}`);
 };
 
-uiBlockingStoreApi.getState().registerMiddleware("logger", loggingMiddleware);
+const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+const releaseLogging = observeBlockingEvents(loggingMiddleware);
+
+// When the logging consumer finishes:
+releaseLogging();
 ```
 
 ### Multiple Scopes

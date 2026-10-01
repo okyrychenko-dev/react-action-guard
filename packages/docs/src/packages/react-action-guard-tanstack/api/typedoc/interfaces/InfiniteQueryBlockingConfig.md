@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
@@ -6,10 +6,9 @@
 
 # Interface: InfiniteQueryBlockingConfig
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L8)
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L11)
 
-Configuration for infinite query blocking with dynamic reasons.
-Supports different messages for loading, fetching, and error states.
+Shared blocking options.
 
 ## Extends
 
@@ -19,78 +18,57 @@ Supports different messages for loading, fetching, and error states.
 
 ### onLoading?
 
-> `optional` **onLoading**: `boolean`
+> `optional` **onLoading?**: `boolean`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L13)
-
-Whether to block during initial loading (default: true).
-Set to false to skip blocking during the first data fetch.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L12)
 
 ***
 
 ### onFetching?
 
-> `optional` **onFetching**: `boolean`
+> `optional` **onFetching?**: `boolean`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L18)
-
-Whether to block during background fetching or loading next/previous pages (default: false).
-Set to true to block when refetching data or loading more pages.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L13)
 
 ***
 
 ### onError?
 
-> `optional` **onError**: `boolean`
+> `optional` **onError?**: `boolean`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:23](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L23)
-
-Whether to block on error (default: false).
-Set to true to keep UI blocked when query fails.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L14)
 
 ***
 
 ### reasonOnLoading?
 
-> `optional` **reasonOnLoading**: `string`
+> `optional` **reasonOnLoading?**: `string`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L28)
-
-Message to show during initial loading.
-Falls back to `reason` if not specified.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L15)
 
 ***
 
 ### reasonOnFetching?
 
-> `optional` **reasonOnFetching**: `string`
+> `optional` **reasonOnFetching?**: `string`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:33](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L33)
-
-Message to show during background fetching or loading next/previous pages.
-Falls back to `reason` if not specified.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:16](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L16)
 
 ***
 
 ### reasonOnError?
 
-> `optional` **reasonOnError**: `string`
+> `optional` **reasonOnError?**: `string`
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:38](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L38)
-
-Message to show when query fails.
-Falls back to `reason` if not specified.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L17)
 
 ***
 
 ### scope?
 
-> `optional` **scope**: `string` \| readonly `string`[]
+> `optional` **scope?**: `string` \| readonly `string`[]
 
-Defined in: [src/types/common.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/types/common.types.ts#L10)
-
-Scope(s) to block. Can be a single string or array of strings.
-Use scopes to control which parts of your UI should be blocked.
+Defined in: [packages/tanstack/src/types/common.types.ts:5](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L5)
 
 #### Inherited from
 
@@ -100,12 +78,9 @@ Use scopes to control which parts of your UI should be blocked.
 
 ### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
-Defined in: [src/types/common.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/types/common.types.ts#L15)
-
-Priority level for this blocker.
-Higher priority blockers take precedence when multiple blockers are active.
+Defined in: [packages/tanstack/src/types/common.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L6)
 
 #### Inherited from
 
@@ -115,12 +90,9 @@ Higher priority blockers take precedence when multiple blockers are active.
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
-Defined in: [src/types/common.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/types/common.types.ts#L20)
-
-Default message for blocking states.
-Can be overridden by specific state reasons.
+Defined in: [packages/tanstack/src/types/common.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L7)
 
 #### Inherited from
 
@@ -130,12 +102,9 @@ Can be overridden by specific state reasons.
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `optional` **timeout?**: `number`
 
-Defined in: [src/types/common.types.ts:25](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/types/common.types.ts#L25)
-
-Automatically remove the blocker after N milliseconds.
-Useful for preventing stale blockers when requests hang.
+Defined in: [packages/tanstack/src/types/common.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L8)
 
 #### Inherited from
 
@@ -143,13 +112,11 @@ Useful for preventing stale blockers when requests hang.
 
 ***
 
-### onTimeout()?
+### onTimeout?
 
-> `optional` **onTimeout**: (`blockerId`) => `void`
+> `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [src/types/common.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/types/common.types.ts#L29)
-
-Callback invoked when the blocker is automatically removed due to timeout.
+Defined in: [packages/tanstack/src/types/common.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L9)
 
 #### Parameters
 

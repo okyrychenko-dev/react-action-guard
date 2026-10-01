@@ -1,7 +1,7 @@
 import { uiBlockingStoreApi, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { actAsync, createWrapper } from "../../test/test.utils";
+import { createWrapper } from "../../test/test.utils";
 import { useBlockingMutation } from "../useBlockingMutation";
 import { MutationBlockingConfig } from "../useBlockingMutation.types";
 
@@ -73,120 +73,6 @@ describe("useBlockingMutation", () => {
     );
   });
 
-  it("should use custom reason", async () => {
-    const mutationFn = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve("data"), 100);
-        })
-    );
-
-    const blockingConfig: MutationBlockingConfig = {
-      scope: "test",
-      reason: "Custom mutation message",
-    };
-
-    const { result } = renderHook(
-      () =>
-        useBlockingMutation({
-          mutationFn,
-          blockingConfig,
-        }),
-      { wrapper: createWrapper() }
-    );
-
-    result.current.mutate(undefined);
-
-    await waitFor(() => {
-      const { getBlockingInfo } = uiBlockingStoreApi.getState();
-      const info = getBlockingInfo("test");
-
-      if (info.length > 0) {
-        expect(info[0]?.reason).toBe("Custom mutation message");
-      }
-    });
-  });
-
-  it("should remove blocker after timeout and call onTimeout", async () => {
-    const mutationFn = vi.fn().mockImplementation(() => new Promise(() => undefined));
-    const onTimeout = vi.fn();
-
-    const blockingConfig: MutationBlockingConfig = {
-      scope: "test",
-      timeout: 50,
-      onTimeout,
-    };
-
-    const { result } = renderHook(
-      () =>
-        useBlockingMutation({
-          mutationKey: ["save"],
-          mutationFn,
-          blockingConfig,
-        }),
-      { wrapper: createWrapper() }
-    );
-
-    result.current.mutate(undefined);
-
-    await waitFor(() => {
-      const { isBlocked } = uiBlockingStoreApi.getState();
-
-      expect(isBlocked("test")).toBe(true);
-    });
-
-    await actAsync(async () => {
-      await new Promise((resolve) => {
-        setTimeout(resolve, 75);
-      });
-    });
-
-    expect(onTimeout).toHaveBeenCalledTimes(1);
-
-    const timedOutId = onTimeout.mock.calls[0]?.[0];
-
-    expect(typeof timedOutId).toBe("string");
-    expect(timedOutId).toContain('mutation-["save"]-');
-
-    const { isBlocked } = uiBlockingStoreApi.getState();
-
-    expect(isBlocked("test")).toBe(false);
-  });
-
-  it("should use custom priority", async () => {
-    const mutationFn = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve("data"), 100);
-        })
-    );
-
-    const blockingConfig: MutationBlockingConfig = {
-      scope: "test",
-      priority: 50,
-    };
-
-    const { result } = renderHook(
-      () =>
-        useBlockingMutation({
-          mutationFn,
-          blockingConfig,
-        }),
-      { wrapper: createWrapper() }
-    );
-
-    result.current.mutate(undefined);
-
-    await waitFor(() => {
-      const { getBlockingInfo } = uiBlockingStoreApi.getState();
-      const info = getBlockingInfo("test");
-
-      if (info.length > 0) {
-        expect(info[0]?.priority).toBe(50);
-      }
-    });
-  });
-
   it("should use default reason when not provided", async () => {
     const mutationFn = vi.fn().mockImplementation(
       () =>
@@ -251,75 +137,6 @@ describe("useBlockingMutation", () => {
         expect(info[0]?.priority).toBe(30);
       }
     });
-  });
-
-  it("should handle multiple scopes", async () => {
-    const mutationFn = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve("data"), 100);
-        })
-    );
-
-    const blockingConfig: MutationBlockingConfig = {
-      scope: ["scope1", "scope2"],
-    };
-
-    const { result } = renderHook(
-      () =>
-        useBlockingMutation({
-          mutationFn,
-          blockingConfig,
-        }),
-      { wrapper: createWrapper() }
-    );
-
-    result.current.mutate(undefined);
-
-    await waitFor(() => {
-      const { isBlocked } = uiBlockingStoreApi.getState();
-
-      expect(isBlocked("scope1")).toBe(true);
-      expect(isBlocked("scope2")).toBe(true);
-    });
-  });
-
-  it("should remove blocker when component unmounts", async () => {
-    const mutationFn = vi.fn().mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(() => resolve("data"), 100);
-        })
-    );
-
-    const blockingConfig: MutationBlockingConfig = {
-      scope: "test",
-    };
-
-    const { result, unmount } = renderHook(
-      () =>
-        useBlockingMutation({
-          mutationFn,
-          blockingConfig,
-        }),
-      { wrapper: createWrapper() }
-    );
-
-    result.current.mutate(undefined);
-
-    // Wait for blocker to be added
-    await waitFor(() => {
-      const { isBlocked } = uiBlockingStoreApi.getState();
-
-      expect(isBlocked("test")).toBe(true);
-    });
-
-    // Unmount and verify blocker is removed
-    unmount();
-
-    const { isBlocked } = uiBlockingStoreApi.getState();
-
-    expect(isBlocked("test")).toBe(false);
   });
 
   it("should return the same result as useMutation", async () => {

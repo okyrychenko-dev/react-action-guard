@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -8,6 +8,6 @@
 
 > **DefaultScopes** = `"global"`
 
-Defined in: [src/types/scopes.ts:4](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/types/scopes.ts#L4)
+Defined in: [types/scopes.ts:4](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/types/scopes.ts#L4)
 
 Default scope type

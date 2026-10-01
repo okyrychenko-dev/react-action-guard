@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
@@ -6,10 +6,7 @@
 
 # Interface: UseBlockingInfiniteQueryOptions\<TQueryFnData, TError, TData, TQueryKey, TPageParam\>
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:51](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L51)
-
-Options for useBlockingInfiniteQuery hook.
-Extends TanStack Query's UseInfiniteQueryOptions with blocking configuration.
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L20)
 
 ## Extends
 
@@ -21,31 +18,21 @@ Extends TanStack Query's UseInfiniteQueryOptions with blocking configuration.
 
 `TQueryFnData` = `unknown`
 
-The type of data returned by the query function
-
 ### TError
 
-`TError` = `Error`
-
-The type of error that can be thrown
+`TError` = `DefaultError`
 
 ### TData
 
-`TData` = `TQueryFnData`
-
-The type of data returned by the hook (after select transformation)
+`TData` = `InfiniteData`\<`TQueryFnData`\>
 
 ### TQueryKey
 
 `TQueryKey` *extends* `QueryKey` = `QueryKey`
 
-The type of the query key
-
 ### TPageParam
 
 `TPageParam` = `unknown`
-
-The type of the page parameter
 
 ## Properties
 
@@ -53,17 +40,15 @@ The type of the page parameter
 
 > **blockingConfig**: [`InfiniteQueryBlockingConfig`](InfiniteQueryBlockingConfig.md)
 
-Defined in: [src/hooks/useBlockingInfiniteQuery.types.ts:61](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingInfiniteQuery.types.ts#L61)
-
-Configuration for UI blocking behavior
+Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts#L27)
 
 ***
 
 ### retry?
 
-> `optional` **retry**: `RetryValue`\<`TError`\>
+> `optional` **retry?**: `RetryValue`\<`TError`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:604
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:604
 
 If `false`, failed queries will not retry by default.
 If `true`, failed queries will retry infinitely., failureCount: num
@@ -78,9 +63,9 @@ If set to a function `(failureCount, error) => boolean` failed queries will retr
 
 ### retryDelay?
 
-> `optional` **retryDelay**: `RetryDelayValue`\<`TError`\>
+> `optional` **retryDelay?**: `RetryDelayValue`\<`TError`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:605
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:605
 
 #### Inherited from
 
@@ -90,9 +75,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### networkMode?
 
-> `optional` **networkMode**: `NetworkMode`
+> `optional` **networkMode?**: `NetworkMode`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:606
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:606
 
 #### Inherited from
 
@@ -102,9 +87,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### gcTime?
 
-> `optional` **gcTime**: `number`
+> `optional` **gcTime?**: `number`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:613
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:613
 
 The time in milliseconds that unused/inactive cache data remains in memory.
 When a query's cache becomes unused or inactive, that cache data will be garbage collected after this duration.
@@ -119,9 +104,9 @@ Setting it to `Infinity` will disable garbage collection.
 
 ### queryFn?
 
-> `optional` **queryFn**: *typeof* `skipToken` \| `QueryFunction`\<`TQueryFnData`, `TQueryKey`, `TPageParam`\>
+> `optional` **queryFn?**: *typeof* `skipToken` \| `QueryFunction`\<`TQueryFnData`, `TQueryKey`, `TPageParam`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:614
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:614
 
 #### Inherited from
 
@@ -131,9 +116,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### persister?
 
-> `optional` **persister**: `QueryPersister`\<`NoInfer`\<`TQueryFnData`\>, `NoInfer`\<`TQueryKey`\>, `NoInfer`\<`TPageParam`\>\>
+> `optional` **persister?**: `QueryPersister`\<`NoInfer`\<`TQueryFnData`\>, `NoInfer`\<`TQueryKey`\>, `NoInfer`\<`TPageParam`\>\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:615
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:615
 
 #### Inherited from
 
@@ -143,9 +128,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### queryHash?
 
-> `optional` **queryHash**: `string`
+> `optional` **queryHash?**: `string`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:616
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:616
 
 #### Inherited from
 
@@ -157,7 +142,7 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 > **queryKey**: `TQueryKey` & `object`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:617
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:617
 
 #### Inherited from
 
@@ -167,9 +152,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### queryKeyHashFn?
 
-> `optional` **queryKeyHashFn**: `QueryKeyHashFunction`\<`TQueryKey`\>
+> `optional` **queryKeyHashFn?**: `QueryKeyHashFunction`\<`TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:618
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:618
 
 #### Inherited from
 
@@ -179,9 +164,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### initialData?
 
-> `optional` **initialData**: `InfiniteData`\<`TQueryFnData`, `TPageParam`\> \| `InitialDataFunction`\<`InfiniteData`\<`TQueryFnData`, `TPageParam`\>\>
+> `optional` **initialData?**: `InfiniteData`\<`TQueryFnData`, `TPageParam`\> \| `InitialDataFunction`\<`InfiniteData`\<`TQueryFnData`, `TPageParam`\>\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:619
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:619
 
 #### Inherited from
 
@@ -191,9 +176,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### initialDataUpdatedAt?
 
-> `optional` **initialDataUpdatedAt**: `number` \| () => `number` \| `undefined`
+> `optional` **initialDataUpdatedAt?**: `number` \| (() => `number` \| `undefined`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:620
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:620
 
 #### Inherited from
 
@@ -203,9 +188,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### behavior?
 
-> `optional` **behavior**: `QueryBehavior`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
+> `optional` **behavior?**: `QueryBehavior`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:621
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:621
 
 #### Inherited from
 
@@ -215,9 +200,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### structuralSharing?
 
-> `optional` **structuralSharing**: `boolean` \| (`oldData`, `newData`) => `unknown`
+> `optional` **structuralSharing?**: `boolean` \| ((`oldData`, `newData`) => `unknown`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:627
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:627
 
 Set this to `false` to disable structural sharing between query results.
 Set this to a function which accepts the old and new data and returns resolved data of the same type to implement custom structural sharing logic.
@@ -231,9 +216,9 @@ Defaults to `true`.
 
 ### \_defaulted?
 
-> `optional` **\_defaulted**: `boolean`
+> `optional` **\_defaulted?**: `boolean`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:628
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:628
 
 #### Inherited from
 
@@ -243,9 +228,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### meta?
 
-> `optional` **meta**: `Record`\<`string`, `unknown`\>
+> `optional` **meta?**: `Record`\<`string`, `unknown`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:633
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:633
 
 Additional payload to be stored on each query.
 Use this property to pass information that can be used in other places.
@@ -258,9 +243,9 @@ Use this property to pass information that can be used in other places.
 
 ### maxPages?
 
-> `optional` **maxPages**: `number`
+> `optional` **maxPages?**: `number`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:637
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:637
 
 Maximum number of pages to store in the data of an infinite query.
 
@@ -274,7 +259,7 @@ Maximum number of pages to store in the data of an infinite query.
 
 > **initialPageParam**: `TPageParam`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:640
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:640
 
 #### Inherited from
 
@@ -284,9 +269,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### getPreviousPageParam?
 
-> `optional` **getPreviousPageParam**: `GetPreviousPageParamFunction`\<`TPageParam`, `TQueryFnData`\>
+> `optional` **getPreviousPageParam?**: `GetPreviousPageParamFunction`\<`TPageParam`, `TQueryFnData`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:647
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:647
 
 This function can be set to automatically get the previous cursor for infinite queries.
 The result will also be used to determine the value of `hasPreviousPage`.
@@ -301,7 +286,7 @@ The result will also be used to determine the value of `hasPreviousPage`.
 
 > **getNextPageParam**: `GetNextPageParamFunction`\<`TPageParam`, `TQueryFnData`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:652
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:652
 
 This function can be set to automatically get the next cursor for infinite queries.
 The result will also be used to determine the value of `hasNextPage`.
@@ -314,9 +299,9 @@ The result will also be used to determine the value of `hasNextPage`.
 
 ### enabled?
 
-> `optional` **enabled**: `Enabled`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
+> `optional` **enabled?**: `Enabled`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:662
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:662
 
 Set this to `false` or a function that returns `false` to disable automatic refetching when the query mounts or changes query keys.
 To refetch the query, use the `refetch` method returned from the `useQuery` instance.
@@ -331,9 +316,9 @@ Defaults to `true`.
 
 ### staleTime?
 
-> `optional` **staleTime**: `StaleTimeFunction`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
+> `optional` **staleTime?**: `StaleTimeFunction`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:669
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:669
 
 The time in milliseconds after data is considered stale.
 If set to `Infinity`, the data will never be considered stale.
@@ -348,9 +333,9 @@ Defaults to `0`.
 
 ### refetchInterval?
 
-> `optional` **refetchInterval**: `number` \| `false` \| (`query`) => `number` \| `false` \| `undefined`
+> `optional` **refetchInterval?**: `number` \| `false` \| ((`query`) => `number` \| `false` \| `undefined`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:675
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:675
 
 If set to a number, the query will continuously refetch at this frequency in milliseconds.
 If set to a function, the function will be executed with the latest data and query to compute a frequency
@@ -364,9 +349,9 @@ Defaults to `false`.
 
 ### refetchIntervalInBackground?
 
-> `optional` **refetchIntervalInBackground**: `boolean`
+> `optional` **refetchIntervalInBackground?**: `boolean`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:680
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:680
 
 If set to `true`, the query will continue to refetch while their tab/window is in the background.
 Defaults to `false`.
@@ -379,9 +364,9 @@ Defaults to `false`.
 
 ### refetchOnWindowFocus?
 
-> `optional` **refetchOnWindowFocus**: `boolean` \| `"always"` \| (`query`) => `boolean` \| `"always"`
+> `optional` **refetchOnWindowFocus?**: `boolean` \| `"always"` \| ((`query`) => `boolean` \| `"always"`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:688
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:688
 
 If set to `true`, the query will refetch on window focus if the data is stale.
 If set to `false`, the query will not refetch on window focus.
@@ -397,9 +382,9 @@ Defaults to `true`.
 
 ### refetchOnReconnect?
 
-> `optional` **refetchOnReconnect**: `boolean` \| `"always"` \| (`query`) => `boolean` \| `"always"`
+> `optional` **refetchOnReconnect?**: `boolean` \| `"always"` \| ((`query`) => `boolean` \| `"always"`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:696
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:696
 
 If set to `true`, the query will refetch on reconnect if the data is stale.
 If set to `false`, the query will not refetch on reconnect.
@@ -415,9 +400,9 @@ Defaults to the value of `networkOnline` (`true`)
 
 ### refetchOnMount?
 
-> `optional` **refetchOnMount**: `boolean` \| `"always"` \| (`query`) => `boolean` \| `"always"`
+> `optional` **refetchOnMount?**: `boolean` \| `"always"` \| ((`query`) => `boolean` \| `"always"`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:704
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:704
 
 If set to `true`, the query will refetch on mount if the data is stale.
 If set to `false`, will disable additional instances of a query to trigger background refetch.
@@ -433,9 +418,9 @@ Defaults to `true`.
 
 ### retryOnMount?
 
-> `optional` **retryOnMount**: `boolean`
+> `optional` **retryOnMount?**: `boolean`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:709
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:709
 
 If set to `false`, the query will not be retried on mount if it contains an error.
 Defaults to `true`.
@@ -448,9 +433,9 @@ Defaults to `true`.
 
 ### notifyOnChangeProps?
 
-> `optional` **notifyOnChangeProps**: `NotifyOnChangeProps`
+> `optional` **notifyOnChangeProps?**: `NotifyOnChangeProps`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:717
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:717
 
 If set, the component will only re-render if any of the listed properties change.
 When set to `['data', 'error']`, the component will only re-render when the `data` or `error` properties change.
@@ -466,9 +451,9 @@ By default, access to properties will be tracked, and the component will only re
 
 ### throwOnError?
 
-> `optional` **throwOnError**: `ThrowOnError`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
+> `optional` **throwOnError?**: `ThrowOnError`\<`TQueryFnData`, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:725
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:725
 
 Whether errors should be thrown instead of setting the `error` property.
 If set to `true` or `suspense` is `true`, all errors will be thrown to the error boundary.
@@ -482,11 +467,11 @@ Defaults to `false`.
 
 ***
 
-### select()?
+### select?
 
-> `optional` **select**: (`data`) => `TData`
+> `optional` **select?**: (`data`) => `TData`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:729
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:729
 
 This option can be used to transform or select a part of the data returned by the query function.
 
@@ -508,9 +493,9 @@ This option can be used to transform or select a part of the data returned by th
 
 ### placeholderData?
 
-> `optional` **placeholderData**: `InfiniteData`\<`TQueryFnData`, `TPageParam`\> \| `PlaceholderDataFunction`\<`InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
+> `optional` **placeholderData?**: `InfiniteData`\<`TQueryFnData`, `TPageParam`\> \| `PlaceholderDataFunction`\<`InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TError`, `InfiniteData`\<`TQueryFnData`, `TPageParam`\>, `TQueryKey`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:739
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:739
 
 If set, this value will be used as the placeholder data for this particular query observer while the query is still in the `loading` data and no initialData has been provided.
 
@@ -522,9 +507,9 @@ If set, this value will be used as the placeholder data for this particular quer
 
 ### \_optimisticResults?
 
-> `optional` **\_optimisticResults**: `"optimistic"` \| `"isRestoring"`
+> `optional` **\_optimisticResults?**: `"optimistic"` \| `"isRestoring"`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:740
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:740
 
 #### Inherited from
 
@@ -534,9 +519,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### experimental\_prefetchInRender?
 
-> `optional` **experimental\_prefetchInRender**: `boolean`
+> `optional` **experimental\_prefetchInRender?**: `boolean`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:744
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:744
 
 Enable prefetching during rendering
 
@@ -548,9 +533,9 @@ Enable prefetching during rendering
 
 ### subscribed?
 
-> `optional` **subscribed**: `boolean`
+> `optional` **subscribed?**: `boolean`
 
-Defined in: node\_modules/@tanstack/react-query/build/legacy/types.d.ts:27
+Defined in: node\_modules/.pnpm/@tanstack+react-query@5.90.10\_react@19.2.8/node\_modules/@tanstack/react-query/build/legacy/types.d.ts:27
 
 Set this to `false` to unsubscribe this observer from updates to the query cache.
 Defaults to `true`.

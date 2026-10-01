@@ -1,5 +1,4 @@
-import { StoreApi } from "zustand";
-import { Middleware, MiddlewareContext } from "../middleware";
+import type { Middleware } from "../middleware";
 import type { BlockingLifecycleSnapshot } from "./blockingLifecycle";
 
 /**
@@ -21,60 +20,24 @@ export interface BlockerConfig {
 }
 
 /**
- * Internal representation of a blocker with all fields populated.
- *
- * This is the stored format in the Map. All optional fields from {@link BlockerConfig}
- * are converted to required fields with default values applied.
- *
- * @internal This type is primarily for internal use. Users should work with
- *           {@link BlockerConfig} for configuration and {@link BlockerInfo} for
- *           reading blocker data.
- *
- * @since 0.6.0
- */
-export interface StoredBlocker {
-  scope: string | ReadonlyArray<string>;
-  reason: string;
-  priority: number;
-  timestamp: number;
-  /** Timeout duration in milliseconds (if set) */
-  timeout?: number;
-  /** Internal timeout ID for cleanup */
-  timeoutId?: ReturnType<typeof setTimeout>;
-  /** Callback invoked when the blocker is automatically removed due to timeout */
-  onTimeout?: (blockerId: string) => void;
-}
-
-/**
  * Complete blocker information including its unique identifier.
  *
  * @public
  * @since 0.6.0
  */
-export interface BlockerInfo extends Omit<StoredBlocker, "timeoutId"> {
-  id: string;
+export interface BlockerInfo {
+  readonly id: string;
+  readonly scope: string | ReadonlyArray<string>;
+  readonly reason: string;
+  readonly priority: number;
+  readonly timestamp: number;
+  readonly timeout?: number;
+  readonly onTimeout?: (blockerId: string) => void;
 }
 
-/**
- * Internal state structure of the UI blocking store.
- *
- * Contains the core data structures for managing blockers and middleware.
- * This state is combined with {@link UIBlockingStoreActions} to create the
- * complete {@link UIBlockingStore} type.
- *
- * @internal
- * @since 0.6.0
- */
+/** Immutable projection published by the Zustand adapter. */
 export interface UIBlockingStoreState {
-  /** Immutable lifecycle projection for React selectors. */
-  blockingSnapshot: BlockingLifecycleSnapshot;
-  activeBlockers: Map<string, StoredBlocker>;
-  middlewares: Map<string, Middleware>;
-}
-
-/** Suppress observation when named middleware is still scheduled for or already handled this event. */
-export interface BlockingObservationOptions {
-  skipWhenNamedMiddlewareActive?: string;
+  readonly blockingSnapshot: BlockingLifecycleSnapshot;
 }
 
 /**
@@ -92,16 +55,7 @@ export interface UIBlockingStoreActions {
   clearAllBlockers: VoidFunction;
   clearBlockersForScope: (scope: string) => void;
   /** Observe lifecycle transitions through an anonymous, ownership-safe lease. */
-  observeBlockingEvents: (
-    observer: Middleware,
-    options?: BlockingObservationOptions
-  ) => VoidFunction;
-  /** Legacy named registration for compatibility. Prefer `observeBlockingEvents`. */
-  registerMiddleware: (name: string, middleware: Middleware) => void;
-  /** Legacy named unregistration for compatibility. */
-  unregisterMiddleware: (name: string) => void;
-  /** Legacy direct dispatch for compatibility. */
-  runMiddlewares: (context: MiddlewareContext) => Promise<void>;
+  observeBlockingEvents: (observer: Middleware) => VoidFunction;
 }
 
 /**
@@ -111,11 +65,3 @@ export interface UIBlockingStoreActions {
  * @since 0.6.0
  */
 export type UIBlockingStore = UIBlockingStoreState & UIBlockingStoreActions;
-
-export interface ShallowStoreBindings<StoreState> {
-  useStore: {
-    (): StoreState;
-    <T>(selector: (state: StoreState) => T): T;
-  };
-  useStoreApi: StoreApi<StoreState>;
-}

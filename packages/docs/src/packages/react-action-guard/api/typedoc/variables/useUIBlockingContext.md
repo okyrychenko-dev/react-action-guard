@@ -1,14 +1,14 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
 [React Action Guard API](../README.md) / useUIBlockingContext
 
-# Variable: useUIBlockingContext()
+# Variable: useUIBlockingContext
 
 > **useUIBlockingContext**: () => `StoreApi`\<[`UIBlockingStore`](../type-aliases/UIBlockingStore.md)\>
 
-Defined in: [src/context/UIBlockingContext.tsx:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L34)
+Defined in: [context/UIBlockingContext.tsx:30](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/UIBlockingContext.tsx#L30)
 
 ## Returns
 

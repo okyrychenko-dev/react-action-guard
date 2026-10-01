@@ -478,7 +478,7 @@ const persistenceMiddleware: Middleware = (() => {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => {
       const state = uiBlockingStoreApi.getState();
-      const blockers = Array.from(state.blockers.values());
+      const blockers = state.blockingSnapshot;
       
       // Only persist certain blockers
       const persistable = blockers.filter(b =>

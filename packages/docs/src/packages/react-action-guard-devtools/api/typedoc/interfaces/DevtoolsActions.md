@@ -1,4 +1,4 @@
-[**React Action Guard DevTools API v0.1.2**](../README.md)
+[**React Action Guard DevTools API v0.3.0**](../README.md)
 
 ***
 
@@ -6,17 +6,17 @@
 
 # Interface: DevtoolsActions
 
-Defined in: [src/types/devtools.types.ts:75](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L75)
+Defined in: [types/devtools.types.ts:96](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L96)
 
 Devtools store actions
 
 ## Properties
 
-### addEvent()
+### addEvent
 
 > **addEvent**: (`event`) => `void`
 
-Defined in: [src/types/devtools.types.ts:77](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L77)
+Defined in: [types/devtools.types.ts:98](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L98)
 
 Add a new event to history
 
@@ -36,7 +36,7 @@ Add a new event to history
 
 > **clearEvents**: `VoidFunction`
 
-Defined in: [src/types/devtools.types.ts:79](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L79)
+Defined in: [types/devtools.types.ts:100](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L100)
 
 Clear all events
 
@@ -46,17 +46,17 @@ Clear all events
 
 > **toggleOpen**: `VoidFunction`
 
-Defined in: [src/types/devtools.types.ts:81](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L81)
+Defined in: [types/devtools.types.ts:102](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L102)
 
 Toggle panel open/closed
 
 ***
 
-### setOpen()
+### setOpen
 
 > **setOpen**: (`open`) => `void`
 
-Defined in: [src/types/devtools.types.ts:83](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L83)
+Defined in: [types/devtools.types.ts:104](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L104)
 
 Set panel open state
 
@@ -76,17 +76,17 @@ Set panel open state
 
 > **toggleMinimized**: `VoidFunction`
 
-Defined in: [src/types/devtools.types.ts:85](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L85)
+Defined in: [types/devtools.types.ts:106](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L106)
 
 Toggle minimized state
 
 ***
 
-### setActiveTab()
+### setActiveTab
 
 > **setActiveTab**: (`tab`) => `void`
 
-Defined in: [src/types/devtools.types.ts:87](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L87)
+Defined in: [types/devtools.types.ts:108](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L108)
 
 Set active tab
 
@@ -94,7 +94,7 @@ Set active tab
 
 ##### tab
 
-`"timeline"` | `"blockers"`
+`"timeline"` \| `"blockers"` \| `"stats"`
 
 #### Returns
 
@@ -102,11 +102,11 @@ Set active tab
 
 ***
 
-### setFilter()
+### setFilter
 
 > **setFilter**: (`filter`) => `void`
 
-Defined in: [src/types/devtools.types.ts:89](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L89)
+Defined in: [types/devtools.types.ts:110](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L110)
 
 Update filter settings
 
@@ -126,17 +126,17 @@ Update filter settings
 
 > **resetFilter**: `VoidFunction`
 
-Defined in: [src/types/devtools.types.ts:91](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L91)
+Defined in: [types/devtools.types.ts:112](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L112)
 
 Reset filters to default
 
 ***
 
-### selectEvent()
+### selectEvent
 
 > **selectEvent**: (`eventId`) => `void`
 
-Defined in: [src/types/devtools.types.ts:93](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L93)
+Defined in: [types/devtools.types.ts:114](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L114)
 
 Select an event for detail view
 
@@ -144,7 +144,7 @@ Select an event for detail view
 
 ##### eventId
 
-`string` | `null`
+`Nullable`\<`string`\>
 
 #### Returns
 
@@ -156,17 +156,17 @@ Select an event for detail view
 
 > **togglePause**: `VoidFunction`
 
-Defined in: [src/types/devtools.types.ts:95](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L95)
+Defined in: [types/devtools.types.ts:116](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L116)
 
 Toggle pause state
 
 ***
 
-### setMaxEvents()
+### setMaxEvents
 
 > **setMaxEvents**: (`max`) => `void`
 
-Defined in: [src/types/devtools.types.ts:97](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L97)
+Defined in: [types/devtools.types.ts:118](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L118)
 
 Set max events limit
 

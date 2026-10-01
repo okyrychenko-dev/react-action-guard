@@ -161,31 +161,32 @@ the provider.
 
 ## Advanced Usage
 
-### Manual Middleware Registration
+### Manual Observation
 
-If you need more control, you can register the middleware manually:
+For a manual global history consumer, acquire a lifecycle observation lease:
 
 ```jsx
-import {
-  createDevtoolsMiddleware,
-  DEVTOOLS_MIDDLEWARE_NAME,
-} from "@okyrychenko-dev/react-action-guard-devtools";
+import { createDevtoolsMiddleware } from "@okyrychenko-dev/react-action-guard-devtools";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 
-// Register middleware
-const middleware = createDevtoolsMiddleware();
-uiBlockingStoreApi.getState().registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+const release = observeBlockingEvents(createDevtoolsMiddleware());
 
-// Later, unregister if needed
-uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+// Release only this observation when its consumer finishes.
+release();
 ```
 
-If automatic observation finds this manual registration on the global blocking store, it keeps the
-caller-owned middleware, records each event once, and emits a development warning. On a custom
-blocking store, automatic observation uses an anonymous lifecycle lease because
-`createDevtoolsMiddleware()` targets the global compatibility session. This keeps the custom panel
-active even when manual middleware is registered after it mounts. Unmounting the automatic panel
-releases only its own observation and never unregisters the manual middleware.
+All observations are additive. Use `ActionGuardDevtools` or `ActionGuardDevtoolsProvider` to share
+one automatic observation and history for a store. A manually attached Devtools middleware alongside
+an automatic global panel records an additional copy in the global history; choose one approach for
+that history. Independently owned observations survive panel teardown.
+
+The first active participant declaring configuration owns it. Conflicting declarations warn in
+development. When the owner releases, authority transfers to the earliest remaining configured
+participant; its next explicit update applies configuration. Final release detaches observation
+before resetting history and runtime viewing state. Stale releases cannot affect a later session.
+
+See [architecture migration](../core/MIGRATION.md) for removed named registration.
 
 ### Accessing Devtools Store
 

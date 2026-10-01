@@ -7,10 +7,12 @@ export function allocateBlockerId(store: StoreApi<UIBlockingStore>, prefix: stri
   let sequence = storeSequences.get(store) ?? 0;
   let blockerId: string;
 
+  const { blockingSnapshot } = store.getState();
+
   do {
     sequence += 1;
     blockerId = `${prefix}-${String(sequence)}`;
-  } while (store.getState().activeBlockers.has(blockerId));
+  } while (blockingSnapshot.some(({ id }) => id === blockerId));
 
   storeSequences.set(store, sequence);
 

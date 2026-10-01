@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: UseConfirmableBlockerReturn
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:37](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L37)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:37](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L37)
 
 Return type for useConfirmableBlocker hook
 
@@ -16,7 +16,7 @@ Return type for useConfirmableBlocker hook
 
 > **execute**: `VoidFunction`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:38](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L38)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:38](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L38)
 
 ***
 
@@ -24,7 +24,7 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:38](
 
 > **isDialogOpen**: `boolean`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:39](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L39)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:39](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L39)
 
 ***
 
@@ -32,7 +32,7 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:39](
 
 > **isExecuting**: `boolean`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L40)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L40)
 
 ***
 
@@ -40,15 +40,15 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:40](
 
 > **confirmConfig**: [`ConfirmDialogConfig`](ConfirmDialogConfig.md)
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L41)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L41)
 
 ***
 
-### onConfirm()
+### onConfirm
 
 > **onConfirm**: () => `Promise`\<`void`\>
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:42](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L42)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:42](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L42)
 
 #### Returns
 
@@ -60,4 +60,4 @@ Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:42](
 
 > **onCancel**: `VoidFunction`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L43)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L43)

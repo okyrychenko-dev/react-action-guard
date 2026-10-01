@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -8,4 +8,4 @@
 
 > **AnalyticsConfig** = [`GoogleAnalyticsConfig`](../interfaces/GoogleAnalyticsConfig.md) \| [`MixpanelConfig`](../interfaces/MixpanelConfig.md) \| [`AmplitudeConfig`](../interfaces/AmplitudeConfig.md) \| [`CustomAnalyticsConfig`](../interfaces/CustomAnalyticsConfig.md)
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L24)
+Defined in: [middleware/analyticsMiddleware.types.ts:22](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L22)

@@ -1,4 +1,4 @@
-[**React Action Guard DevTools API v0.1.2**](../README.md)
+[**React Action Guard DevTools API v0.3.0**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DevtoolsFilter
 
-Defined in: [src/types/devtools.types.ts:36](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L36)
+Defined in: [types/devtools.types.ts:39](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L39)
 
 Filter configuration for the timeline
 
@@ -16,7 +16,7 @@ Filter configuration for the timeline
 
 > **actions**: `BlockingAction`[]
 
-Defined in: [src/types/devtools.types.ts:38](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L38)
+Defined in: [types/devtools.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L41)
 
 Filter by action types
 
@@ -26,7 +26,7 @@ Filter by action types
 
 > **scopes**: `string`[]
 
-Defined in: [src/types/devtools.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L40)
+Defined in: [types/devtools.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L43)
 
 Filter by scope
 
@@ -36,6 +36,6 @@ Filter by scope
 
 > **search**: `string`
 
-Defined in: [src/types/devtools.types.ts:42](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L42)
+Defined in: [types/devtools.types.ts:45](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L45)
 
 Search query for blocker IDs

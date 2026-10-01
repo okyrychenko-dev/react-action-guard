@@ -1,4 +1,4 @@
-[**React Action Guard DevTools API v0.1.2**](../README.md)
+[**React Action Guard DevTools API v0.3.0**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: DevtoolsState
 
-Defined in: [src/types/devtools.types.ts:53](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L53)
+Defined in: [types/devtools.types.ts:74](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L74)
 
 Devtools store state
 
@@ -16,7 +16,7 @@ Devtools store state
 
 > **events**: [`DevtoolsEvent`](DevtoolsEvent.md)[]
 
-Defined in: [src/types/devtools.types.ts:55](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L55)
+Defined in: [types/devtools.types.ts:76](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L76)
 
 Event history
 
@@ -26,7 +26,7 @@ Event history
 
 > **maxEvents**: `number`
 
-Defined in: [src/types/devtools.types.ts:57](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L57)
+Defined in: [types/devtools.types.ts:78](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L78)
 
 Maximum number of events to keep
 
@@ -36,7 +36,7 @@ Maximum number of events to keep
 
 > **isOpen**: `boolean`
 
-Defined in: [src/types/devtools.types.ts:59](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L59)
+Defined in: [types/devtools.types.ts:80](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L80)
 
 Whether the panel is open
 
@@ -46,7 +46,7 @@ Whether the panel is open
 
 > **isMinimized**: `boolean`
 
-Defined in: [src/types/devtools.types.ts:61](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L61)
+Defined in: [types/devtools.types.ts:82](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L82)
 
 Whether the panel is minimized
 
@@ -54,9 +54,9 @@ Whether the panel is minimized
 
 ### activeTab
 
-> **activeTab**: `"timeline"` \| `"blockers"`
+> **activeTab**: `"timeline"` \| `"blockers"` \| `"stats"`
 
-Defined in: [src/types/devtools.types.ts:63](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L63)
+Defined in: [types/devtools.types.ts:84](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L84)
 
 Active tab in the panel
 
@@ -66,7 +66,7 @@ Active tab in the panel
 
 > **filter**: [`DevtoolsFilter`](DevtoolsFilter.md)
 
-Defined in: [src/types/devtools.types.ts:65](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L65)
+Defined in: [types/devtools.types.ts:86](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L86)
 
 Current filter settings
 
@@ -74,9 +74,9 @@ Current filter settings
 
 ### selectedEventId
 
-> **selectedEventId**: `string` \| `null`
+> **selectedEventId**: `Nullable`\<`string`\>
 
-Defined in: [src/types/devtools.types.ts:67](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L67)
+Defined in: [types/devtools.types.ts:88](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L88)
 
 Selected event for detail view
 
@@ -86,6 +86,6 @@ Selected event for detail view
 
 > **isPaused**: `boolean`
 
-Defined in: [src/types/devtools.types.ts:69](https://github.com/okyrychenko-dev/react-action-guard-devtools/blob/main/src/types/devtools.types.ts#L69)
+Defined in: [types/devtools.types.ts:90](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/devtools/src/types/devtools.types.ts#L90)
 
 Whether devtools is paused (stops recording)
