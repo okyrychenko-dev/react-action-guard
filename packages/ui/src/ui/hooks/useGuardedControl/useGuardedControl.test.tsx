@@ -2,9 +2,17 @@ import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { useGuardedControl } from "./useGuardedControl";
+import { interpretControlState } from "./useGuardedControl.utils";
 import type { GuardedFieldReasonMode, GuardedReasonMode } from "../../types";
 
 describe("guarded control interpretation", () => {
+  it("should reject an unknown control kind at runtime", () => {
+    expect(() => {
+      // @ts-expect-error JavaScript callers can supply an unsupported control kind.
+      interpretControlState({ kind: "unexpected" }, false);
+    }).toThrow();
+  });
+
   afterEach(() => {
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
