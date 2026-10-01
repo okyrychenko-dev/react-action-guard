@@ -2,10 +2,10 @@ import { ReactElement } from "react";
 import { Content } from "../shared";
 import ActiveBlockerItem from "./ActiveBlockerItem";
 import { isBlockerStuck } from "./ActiveBlockers.utils";
-import type { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import type { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
 
 interface ActiveBlockersListProps {
-  blockers: Array<[string, StoredBlocker]>;
+  blockers: Array<[string, BlockerInfo]>;
   now: number;
   stuckThresholdMs: number;
 }

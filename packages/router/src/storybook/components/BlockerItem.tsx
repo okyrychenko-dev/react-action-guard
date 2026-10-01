@@ -1,10 +1,10 @@
-import { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
 import { ReactElement } from "react";
 import { formatScope } from "./BlockerItem.utils";
 
 export interface BlockerEntry {
   id: string;
-  blocker: StoredBlocker;
+  blocker: BlockerInfo;
 }
 
 function BlockerItem(props: BlockerEntry): ReactElement {

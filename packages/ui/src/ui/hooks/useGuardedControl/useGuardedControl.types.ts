@@ -1,57 +1,74 @@
 import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type {
+  GuardedActionBlockedState,
+  GuardedActionState,
+  GuardedFieldBlockedState,
   GuardedFieldReasonMode,
+  GuardedFieldState,
+  GuardedGroupState,
+  GuardedLinkState,
   GuardedReasonBlocker,
   GuardedReasonMode,
-  GuardedReasonResult,
   GuardedScope,
   UseTopBlockerReturn,
 } from "../../types";
 
-export type ResolveGuardedControlState<TBaseState> = (isBlocked: boolean) => TBaseState;
-
-export type ResolveGuardedControlReason<
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
-> = (params: {
-  blocker: GuardedReasonBlocker;
-  fallback?: string;
-  mode: TReasonMode;
-  reasonId?: string;
-}) => GuardedReasonResult;
-
-export interface UseGuardedControlParams<
-  TBaseState,
-  TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
-> {
+interface GuardedControlOptions<TMode> {
   scope?: GuardedScope;
-  resolveState: ResolveGuardedControlState<TBaseState>;
-  getControlState?: (state: TBaseState) => TControlState;
   reasonFallback?: string;
   reasonId?: string;
-  reasonMode: TReasonMode;
-  resolveReason: ResolveGuardedControlReason<TReasonMode>;
+  reasonMode?: TMode;
 }
-
-export type UseUnmappedGuardedControlParams<
-  TBaseState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
-> = Omit<UseGuardedControlParams<TBaseState, TBaseState, TReasonMode>, "getControlState"> & {
-  getControlState?: undefined;
-};
-
-export type UseMappedGuardedControlParams<
-  TBaseState,
-  TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode,
-> = UseGuardedControlParams<TBaseState, TControlState, TReasonMode> & {
-  getControlState: (state: TBaseState) => TControlState;
-};
-
-export interface UseGuardedControlReturn<TControlState> {
+export interface ActionControlOptions<
+  TState = GuardedActionState,
+> extends GuardedControlOptions<GuardedReasonMode> {
+  kind: "action";
+  blockedState?: GuardedActionBlockedState;
+  disabled?: boolean;
+  loading?: boolean;
+  getControlState?: (state: GuardedActionState) => TState;
+}
+export interface FieldControlOptions<
+  TState = GuardedFieldState,
+> extends GuardedControlOptions<GuardedFieldReasonMode> {
+  kind: "field";
+  blockedState?: GuardedFieldBlockedState;
+  disabled?: boolean;
+  loading?: boolean;
+  readOnly?: boolean;
+  getControlState?: (state: GuardedFieldState) => TState;
+}
+export interface GroupControlOptions extends GuardedControlOptions<GuardedReasonMode> {
+  kind: "group";
+}
+export interface LinkControlOptions extends GuardedControlOptions<GuardedReasonMode> {
+  kind: "link";
+  disabled?: boolean;
+  removeFromTabOrder?: boolean;
+}
+export interface GuardedControlOptionsByKind<TState> {
+  action: ActionControlOptions<TState>;
+  field: FieldControlOptions<TState>;
+  group: GroupControlOptions;
+  link: LinkControlOptions;
+}
+export interface GuardedControlReasonOptions {
+  blocker: GuardedReasonBlocker;
+  fallback?: string;
+  mode: GuardedReasonMode | GuardedFieldReasonMode;
+  reasonId?: string;
+}
+export type GuardedControlState =
+  GuardedActionState | GuardedFieldState | GuardedGroupState | GuardedLinkState;
+export type UseGuardedControlParams<TState> =
+  | ActionControlOptions<TState>
+  | FieldControlOptions<TState>
+  | GroupControlOptions
+  | LinkControlOptions;
+export interface UseGuardedControlReturn<TState> {
   blocker: UseTopBlockerReturn;
   isBlocked: boolean;
-  controlState: TControlState;
+  controlState: TState;
   reasonContent: Nullable<string>;
   ariaDescribedBy?: string;
 }

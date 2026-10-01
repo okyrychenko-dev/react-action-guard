@@ -43,14 +43,11 @@ export type {
   BlockingLifecycleSnapshot,
 } from "./store/blockingLifecycle";
 export { useUIBlockingStore, uiBlockingStoreApi } from "./store/uiBlockingStore.store";
-export type { ShallowStoreBindings } from "./store/uiBlockingStore.types";
 
 // Store types
 export type {
   BlockerConfig,
   BlockerInfo,
-  BlockingObservationOptions,
-  StoredBlocker,
   UIBlockingStore,
   UIBlockingStoreActions,
   UIBlockingStoreState,

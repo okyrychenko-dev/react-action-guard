@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,34 +6,9 @@
 
 # Interface: UIBlockingStoreActions
 
-Defined in: [src/store/uiBlockingStore.types.ts:144](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L144)
+Defined in: [store/uiBlockingStore.types.ts:49](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L49)
 
 All available actions for managing UI blocking state.
-
-These methods allow adding, removing, updating blockers, checking blocking status,
-and managing middleware. Combined with UIBlockingStoreState to form
-the complete [UIBlockingStore](../type-aliases/UIBlockingStore.md) type.
-
-All actions are safe to call multiple times and handle edge cases gracefully.
-
-## Example
-
-Using store actions directly
-```ts
-import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
-
-// Add a blocker
-uiBlockingStoreApi.getState().addBlocker('my-blocker', {
-  scope: 'form',
-  reason: 'Processing...'
-});
-
-// Check if blocked
-const isBlocked = uiBlockingStoreApi.getState().isBlocked('form');
-
-// Remove blocker
-uiBlockingStoreApi.getState().removeBlocker('my-blocker');
-```
 
 ## Since
 
@@ -41,11 +16,11 @@ uiBlockingStoreApi.getState().removeBlocker('my-blocker');
 
 ## Properties
 
-### addBlocker()
+### addBlocker
 
 > **addBlocker**: (`id`, `config?`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:145](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L145)
+Defined in: [store/uiBlockingStore.types.ts:50](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L50)
 
 #### Parameters
 
@@ -63,11 +38,11 @@ Defined in: [src/store/uiBlockingStore.types.ts:145](https://github.com/okyryche
 
 ***
 
-### updateBlocker()
+### updateBlocker
 
 > **updateBlocker**: (`id`, `config?`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:146](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L146)
+Defined in: [store/uiBlockingStore.types.ts:51](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L51)
 
 #### Parameters
 
@@ -85,11 +60,11 @@ Defined in: [src/store/uiBlockingStore.types.ts:146](https://github.com/okyryche
 
 ***
 
-### removeBlocker()
+### removeBlocker
 
 > **removeBlocker**: (`id`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:147](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L147)
+Defined in: [store/uiBlockingStore.types.ts:52](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L52)
 
 #### Parameters
 
@@ -103,17 +78,17 @@ Defined in: [src/store/uiBlockingStore.types.ts:147](https://github.com/okyryche
 
 ***
 
-### isBlocked()
+### isBlocked
 
 > **isBlocked**: (`scope?`) => `boolean`
 
-Defined in: [src/store/uiBlockingStore.types.ts:148](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L148)
+Defined in: [store/uiBlockingStore.types.ts:53](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L53)
 
 #### Parameters
 
 ##### scope?
 
-`string` | readonly `string`[]
+`string` \| readonly `string`[]
 
 #### Returns
 
@@ -121,11 +96,11 @@ Defined in: [src/store/uiBlockingStore.types.ts:148](https://github.com/okyryche
 
 ***
 
-### getBlockingInfo()
+### getBlockingInfo
 
-> **getBlockingInfo**: (`scope`) => readonly [`BlockerInfo`](BlockerInfo.md)[]
+> **getBlockingInfo**: (`scope`) => readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]
 
-Defined in: [src/store/uiBlockingStore.types.ts:149](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L149)
+Defined in: [store/uiBlockingStore.types.ts:54](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L54)
 
 #### Parameters
 
@@ -135,7 +110,7 @@ Defined in: [src/store/uiBlockingStore.types.ts:149](https://github.com/okyryche
 
 #### Returns
 
-readonly [`BlockerInfo`](BlockerInfo.md)[]
+readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]
 
 ***
 
@@ -143,15 +118,15 @@ readonly [`BlockerInfo`](BlockerInfo.md)[]
 
 > **clearAllBlockers**: `VoidFunction`
 
-Defined in: [src/store/uiBlockingStore.types.ts:150](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L150)
+Defined in: [store/uiBlockingStore.types.ts:55](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L55)
 
 ***
 
-### clearBlockersForScope()
+### clearBlockersForScope
 
 > **clearBlockersForScope**: (`scope`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:151](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L151)
+Defined in: [store/uiBlockingStore.types.ts:56](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L56)
 
 #### Parameters
 
@@ -165,58 +140,20 @@ Defined in: [src/store/uiBlockingStore.types.ts:151](https://github.com/okyryche
 
 ***
 
-### registerMiddleware()
+### observeBlockingEvents
 
-> **registerMiddleware**: (`name`, `middleware`) => `void`
+> **observeBlockingEvents**: (`observer`) => `VoidFunction`
 
-Defined in: [src/store/uiBlockingStore.types.ts:152](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L152)
+Defined in: [store/uiBlockingStore.types.ts:58](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L58)
+
+Observe lifecycle transitions through an anonymous, ownership-safe lease.
 
 #### Parameters
 
-##### name
-
-`string`
-
-##### middleware
+##### observer
 
 [`Middleware`](../type-aliases/Middleware.md)
 
 #### Returns
 
-`void`
-
-***
-
-### unregisterMiddleware()
-
-> **unregisterMiddleware**: (`name`) => `void`
-
-Defined in: [src/store/uiBlockingStore.types.ts:153](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L153)
-
-#### Parameters
-
-##### name
-
-`string`
-
-#### Returns
-
-`void`
-
-***
-
-### runMiddlewares()
-
-> **runMiddlewares**: (`context`) => `Promise`\<`void`\>
-
-Defined in: [src/store/uiBlockingStore.types.ts:154](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L154)
-
-#### Parameters
-
-##### context
-
-[`MiddlewareContext`](MiddlewareContext.md)
-
-#### Returns
-
-`Promise`\<`void`\>
+`VoidFunction`

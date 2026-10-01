@@ -67,7 +67,7 @@ function AdvancedComponent() {
 function DebugComponent() {
   const store = useUIBlockingStore(state => state);
   
-  return <pre>{JSON.stringify(store.blockers, null, 2)}</pre>;
+  return <pre>{JSON.stringify(store.blockingSnapshot, null, 2)}</pre>;
 }
 ```
 
@@ -105,7 +105,7 @@ test('blocker lifecycle', () => {
 // In utility functions
 function logBlockers() {
   const state = uiBlockingStoreApi.getState();
-  const blockers = Array.from(state.blockers.values());
+  const blockers = state.blockingSnapshot;
   
   console.log('Active blockers:', blockers);
 }
@@ -125,7 +125,7 @@ document.addEventListener('online', () => {
 
 // Subscribe to changes
 const unsubscribe = uiBlockingStoreApi.subscribe((state, prevState) => {
-  console.log('Blockers changed:', state.blockers);
+  console.log('Blockers changed:', state.blockingSnapshot);
 });
 
 // Cleanup
@@ -138,7 +138,7 @@ unsubscribe();
 interface UIBlockingStore extends UIBlockingStoreState, UIBlockingStoreActions {}
 
 interface UIBlockingStoreState {
-  blockers: Map<string, StoredBlocker>;
+  readonly blockingSnapshot: ReadonlyArray<Readonly<BlockerInfo>>;
 }
 
 interface UIBlockingStoreActions {
@@ -149,15 +149,14 @@ interface UIBlockingStoreActions {
   
   // Queries
   isBlocked(scope?: string | string[]): boolean;
-  getBlockingInfo(scope?: string): ReadonlyArray<BlockerInfo>;
+  getBlockingInfo(scope: string): ReadonlyArray<BlockerInfo>;
   
   // Bulk operations
   clearAllBlockers(): void;
   clearBlockersForScope(scope: string): void;
   
   // Middleware
-  registerMiddleware(name: string, middleware: Middleware): void;
-  unregisterMiddleware(name: string): void;
+  observeBlockingEvents(observer: Middleware): VoidFunction;
 }
 ```
 
@@ -421,7 +420,7 @@ store.isBlocked('anything');   // true (global blocks everything)
 Get detailed information about blockers for a scope.
 
 ```typescript
-getBlockingInfo(scope?: string): ReadonlyArray<BlockerInfo>
+getBlockingInfo(scope: string): ReadonlyArray<BlockerInfo>
 ```
 
 **Parameters:**
@@ -575,24 +574,15 @@ middleware((context) => {
 
 ---
 
-### registerMiddleware
+### observeBlockingEvents
 
-Register a middleware function.
-
-```typescript
-registerMiddleware(name: string, middleware: Middleware): void
-```
-
-[See Middleware API →](./middleware)
-
----
-
-### unregisterMiddleware
-
-Unregister a middleware by name.
+Acquire an anonymous, additive observation lease. Cleanup releases only this registration and is
+idempotent. Events describe actual lifecycle transitions; direct event dispatch is not supported.
 
 ```typescript
-unregisterMiddleware(name: string): void
+const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+const release = observeBlockingEvents(({ action, blockerId }) => console.log(action, blockerId));
+release();
 ```
 
 [See Middleware API →](./middleware)
@@ -627,17 +617,17 @@ function useCustomBlocking() {
 ```typescript
 function getBlockerCount(): number {
   const state = uiBlockingStoreApi.getState();
-  return state.blockers.size;
+  return state.blockingSnapshot.length;
 }
 
 function getBlockerIds(): string[] {
   const state = uiBlockingStoreApi.getState();
-  return Array.from(state.blockers.keys());
+  return state.blockingSnapshot.map(({ id }) => id);
 }
 
 function hasBlocker(id: string): boolean {
   const state = uiBlockingStoreApi.getState();
-  return state.blockers.has(id);
+  return state.blockingSnapshot.some(blocker => blocker.id === id);
 }
 ```
 

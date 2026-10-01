@@ -1,4 +1,4 @@
-import { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
 import { clsx } from "clsx";
 import { ReactElement } from "react";
 import { formatRelativeTime, formatScope } from "../../utils";
@@ -7,7 +7,7 @@ import styles from "./ActiveBlockers.module.css";
 
 interface BlockerItemProps {
   id: string;
-  blocker: StoredBlocker;
+  blocker: BlockerInfo;
   isStuck: boolean;
 }
 

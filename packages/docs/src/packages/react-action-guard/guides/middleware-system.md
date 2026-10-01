@@ -210,7 +210,7 @@ const persistenceMiddleware: Middleware = () => {
   // Debounce to avoid too frequent saves
   debounce(() => {
     const state = uiBlockingStoreApi.getState();
-    const blockers = Array.from(state.blockers.values());
+    const blockers = state.blockingSnapshot;
     
     localStorage.setItem('ui-blockers', JSON.stringify(blockers));
   }, 500)();
@@ -349,10 +349,10 @@ import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
 const store = uiBlockingStoreApi.getState();
 
 // Register
-store.registerMiddleware('my-middleware', myMiddleware);
+const release = store.observeBlockingEvents(myMiddleware);
 
 // Unregister
-store.unregisterMiddleware('my-middleware');
+release();
 ```
 
 ### 4. Conditional Registration

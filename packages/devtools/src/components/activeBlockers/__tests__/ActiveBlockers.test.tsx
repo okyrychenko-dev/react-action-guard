@@ -6,7 +6,7 @@ import ActiveBlockerItem from "../ActiveBlockerItem";
 import ActiveBlockers from "../ActiveBlockers";
 import ActiveBlockersEmptyState from "../ActiveBlockersEmptyState";
 import ActiveBlockersList from "../ActiveBlockersList";
-import type { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import type { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
 
 describe("ActiveBlockers", () => {
   beforeEach(() => {
@@ -59,7 +59,8 @@ describe("ActiveBlockerItem", () => {
     const now = 10_000;
     const nowSpy = vi.spyOn(Date, "now").mockReturnValue(now);
 
-    const blocker: StoredBlocker = {
+    const blocker: BlockerInfo = {
+      id: "test-blocker",
       scope: ["scope-a", "scope-b"],
       reason: "Saving",
       priority: 42,
@@ -79,7 +80,8 @@ describe("ActiveBlockerItem", () => {
   });
 
   it("should render a Stuck badge instead of Active when stuck", () => {
-    const blocker: StoredBlocker = {
+    const blocker: BlockerInfo = {
+      id: "test-blocker",
       scope: "test",
       reason: "Saving",
       priority: 1,
@@ -96,7 +98,8 @@ describe("ActiveBlockerItem", () => {
     const now = 1_000_000;
     const nowSpy = vi.spyOn(Date, "now").mockReturnValue(now);
 
-    const blocker: StoredBlocker = {
+    const blocker: BlockerInfo = {
+      id: "test-blocker",
       scope: "test",
       reason: "Test",
       priority: 1,
@@ -114,7 +117,8 @@ describe("ActiveBlockerItem", () => {
     const now = 10_000_000;
     const nowSpy = vi.spyOn(Date, "now").mockReturnValue(now);
 
-    const blocker: StoredBlocker = {
+    const blocker: BlockerInfo = {
+      id: "test-blocker",
       scope: "test",
       reason: "Test",
       priority: 1,
@@ -131,9 +135,15 @@ describe("ActiveBlockerItem", () => {
 
 describe("ActiveBlockersList", () => {
   it("should render each blocker item", () => {
-    const blockers: Array<[string, StoredBlocker]> = [
-      ["blocker-1", { scope: "a", reason: "Reason A", priority: 1, timestamp: 1_000 }],
-      ["blocker-2", { scope: "b", reason: "Reason B", priority: 2, timestamp: 2_000 }],
+    const blockers: Array<[string, BlockerInfo]> = [
+      [
+        "blocker-1",
+        { id: "blocker-1", scope: "a", reason: "Reason A", priority: 1, timestamp: 1_000 },
+      ],
+      [
+        "blocker-2",
+        { id: "blocker-2", scope: "b", reason: "Reason B", priority: 2, timestamp: 2_000 },
+      ],
     ];
 
     renderWithProviders(
@@ -146,9 +156,9 @@ describe("ActiveBlockersList", () => {
 
   it("should mark only blockers older than the threshold as stuck", () => {
     const now = 20_000;
-    const blockers: Array<[string, StoredBlocker]> = [
-      ["fresh", { scope: "a", reason: "Fresh", priority: 2, timestamp: now - 1_000 }],
-      ["stuck", { scope: "b", reason: "Stuck", priority: 1, timestamp: now - 15_000 }],
+    const blockers: Array<[string, BlockerInfo]> = [
+      ["fresh", { id: "fresh", scope: "a", reason: "Fresh", priority: 2, timestamp: now - 1_000 }],
+      ["stuck", { id: "stuck", scope: "b", reason: "Stuck", priority: 1, timestamp: now - 15_000 }],
     ];
 
     renderWithProviders(

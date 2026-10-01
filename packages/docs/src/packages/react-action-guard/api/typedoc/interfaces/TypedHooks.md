@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: TypedHooks\<TScope\>
 
-Defined in: [src/createTypedHooks.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/createTypedHooks.ts#L10)
+Defined in: [createTypedHooks.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L10)
 
 Return type for createTypedHooks factory
 
@@ -18,13 +18,13 @@ Return type for createTypedHooks factory
 
 ## Properties
 
-### useBlocker()
+### useActionBlocker
 
-> **useBlocker**: (`blockerId`, `config`, `isActive?`) => `void`
+> **useActionBlocker**: (`blockerId`, `config`, `isActive?`) => `void`
 
-Defined in: [src/createTypedHooks.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/createTypedHooks.ts#L14)
+Defined in: [createTypedHooks.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L14)
 
-Type-safe version of useBlocker hook
+Type-safe action blocker hook
 
 #### Parameters
 
@@ -46,11 +46,43 @@ Type-safe version of useBlocker hook
 
 ***
 
-### useIsBlocked()
+### ~~useBlocker~~
+
+> **useBlocker**: (`blockerId`, `config`, `isActive?`) => `void`
+
+Defined in: [createTypedHooks.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L24)
+
+Backward-compatible name for useActionBlocker
+
+#### Parameters
+
+##### blockerId
+
+`string`
+
+##### config
+
+[`BlockerConfigTyped`](BlockerConfigTyped.md)\<`TScope`\>
+
+##### isActive?
+
+`boolean`
+
+#### Returns
+
+`void`
+
+#### Deprecated
+
+Use `useActionBlocker`.
+
+***
+
+### useIsBlocked
 
 > **useIsBlocked**: (`scope?`) => `boolean`
 
-Defined in: [src/createTypedHooks.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/createTypedHooks.ts#L19)
+Defined in: [createTypedHooks.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L29)
 
 Type-safe version of useIsBlocked hook
 
@@ -66,11 +98,11 @@ Type-safe version of useIsBlocked hook
 
 ***
 
-### useAsyncAction()
+### useAsyncAction
 
 > **useAsyncAction**: \<`T`\>(`actionId`, `scope?`, `options?`) => (`asyncFn`) => `Promise`\<`T`\>
 
-Defined in: [src/createTypedHooks.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/createTypedHooks.ts#L24)
+Defined in: [createTypedHooks.ts:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L34)
 
 Type-safe version of useAsyncAction hook
 
@@ -96,25 +128,15 @@ Type-safe version of useAsyncAction hook
 
 #### Returns
 
-> (`asyncFn`): `Promise`\<`T`\>
-
-##### Parameters
-
-###### asyncFn
-
-() => `Promise`\<`T`\>
-
-##### Returns
-
-`Promise`\<`T`\>
+(`asyncFn`) => `Promise`\<`T`\>
 
 ***
 
-### useBlockingInfo()
+### useBlockingInfo
 
-> **useBlockingInfo**: (`scope`) => readonly [`BlockerInfo`](BlockerInfo.md)[]
+> **useBlockingInfo**: (`scope`) => readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]
 
-Defined in: [src/createTypedHooks.ts:33](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/createTypedHooks.ts#L33)
+Defined in: [createTypedHooks.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L43)
 
 Type-safe version of useBlockingInfo hook
 
@@ -126,4 +148,4 @@ Type-safe version of useBlockingInfo hook
 
 #### Returns
 
-readonly [`BlockerInfo`](BlockerInfo.md)[]
+readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]

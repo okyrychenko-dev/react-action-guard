@@ -3,8 +3,6 @@ import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../store";
 
-export const DEVTOOLS_MIDDLEWARE_NAME = "action-guard-devtools";
-
 interface TrackedBlocker {
   timestamp: number;
   scope?: string | ReadonlyArray<string>;

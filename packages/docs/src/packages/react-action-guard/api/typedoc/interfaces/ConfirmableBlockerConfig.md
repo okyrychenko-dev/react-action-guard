@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConfirmableBlockerConfig
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L19)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L19)
 
 Configuration for confirmable blocker hook.
 
@@ -23,7 +23,7 @@ than the confirmMessage. If not provided, confirmMessage will be used as the rea
 
 > **confirmMessage**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L21)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L21)
 
 Message to display in the confirmation dialog
 
@@ -31,9 +31,9 @@ Message to display in the confirmation dialog
 
 ### confirmTitle?
 
-> `optional` **confirmTitle**: `string`
+> `optional` **confirmTitle?**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:23](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L23)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:23](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L23)
 
 Title for the confirmation dialog (default: "Confirm Action")
 
@@ -41,9 +41,9 @@ Title for the confirmation dialog (default: "Confirm Action")
 
 ### confirmButtonText?
 
-> `optional` **confirmButtonText**: `string`
+> `optional` **confirmButtonText?**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:25](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L25)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:25](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L25)
 
 Text for the confirm button (default: "Confirm")
 
@@ -51,19 +51,19 @@ Text for the confirm button (default: "Confirm")
 
 ### cancelButtonText?
 
-> `optional` **cancelButtonText**: `string`
+> `optional` **cancelButtonText?**: `string`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L27)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L27)
 
 Text for the cancel button (default: "Cancel")
 
 ***
 
-### onConfirm()
+### onConfirm
 
 > **onConfirm**: () => `void` \| `Promise`\<`void`\>
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L29)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L29)
 
 Callback to execute when confirmed. Can be async.
 
@@ -75,9 +75,9 @@ Callback to execute when confirmed. Can be async.
 
 ### onCancel?
 
-> `optional` **onCancel**: `VoidFunction`
+> `optional` **onCancel?**: `VoidFunction`
 
-Defined in: [src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L31)
+Defined in: [hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConfirmableBlocker/useConfirmableBlocker.types.ts#L31)
 
 Optional callback to execute when cancelled
 
@@ -85,9 +85,9 @@ Optional callback to execute when cancelled
 
 ### scope?
 
-> `optional` **scope**: `string` \| readonly `string`[]
+> `optional` **scope?**: `string` \| readonly `string`[]
 
-Defined in: [src/store/uiBlockingStore.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L40)
+Defined in: [store/uiBlockingStore.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L11)
 
 #### Inherited from
 
@@ -97,9 +97,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:40](https://github.com/okyrychen
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
-Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L41)
+Defined in: [store/uiBlockingStore.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L12)
 
 #### Inherited from
 
@@ -109,9 +109,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychen
 
 ### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L43)
+Defined in: [store/uiBlockingStore.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L14)
 
 Priority level (negative values are normalized to 0)
 
@@ -123,9 +123,9 @@ Priority level (negative values are normalized to 0)
 
 ### timestamp?
 
-> `optional` **timestamp**: `number`
+> `optional` **timestamp?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L44)
+Defined in: [store/uiBlockingStore.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L15)
 
 #### Inherited from
 
@@ -135,9 +135,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychen
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `optional` **timeout?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:46](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L46)
+Defined in: [store/uiBlockingStore.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L17)
 
 Automatically remove the blocker after N milliseconds
 
@@ -147,11 +147,11 @@ Automatically remove the blocker after N milliseconds
 
 ***
 
-### onTimeout()?
+### onTimeout?
 
-> `optional` **onTimeout**: (`blockerId`) => `void`
+> `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:48](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L48)
+Defined in: [store/uiBlockingStore.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L19)
 
 Callback invoked when the blocker is automatically removed due to timeout
 

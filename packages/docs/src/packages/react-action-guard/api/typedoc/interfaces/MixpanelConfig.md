@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: MixpanelConfig
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L12)
+Defined in: [middleware/analyticsMiddleware.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L10)
 
 ## Properties
 
@@ -14,4 +14,4 @@ Defined in: [src/middleware/analyticsMiddleware.types.ts:12](https://github.com/
 
 > **provider**: `"mixpanel"`
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L13)
+Defined in: [middleware/analyticsMiddleware.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L11)

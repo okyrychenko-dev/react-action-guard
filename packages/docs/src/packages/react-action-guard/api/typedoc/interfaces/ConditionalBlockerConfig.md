@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ConditionalBlockerConfig\<TState\>
 
-Defined in: [src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L9)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L9)
 
 Configuration for conditional blocker hook.
 
@@ -29,17 +29,17 @@ because conditional blockers must have a defined scope to check against.
 
 > **scope**: `string` \| readonly `string`[]
 
-Defined in: [src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L11)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L11)
 
 Required scope(s) to block. Unlike base BlockerConfig, this is mandatory for conditional blockers.
 
 ***
 
-### condition()
+### condition
 
 > **condition**: (`state?`) => `boolean`
 
-Defined in: [src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L13)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L13)
 
 Function that determines whether blocking should be active
 
@@ -57,9 +57,9 @@ Function that determines whether blocking should be active
 
 ### checkInterval?
 
-> `optional` **checkInterval**: `number`
+> `optional` **checkInterval?**: `number`
 
-Defined in: [src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L15)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L15)
 
 Interval in milliseconds to check the condition (default: 1000ms)
 
@@ -67,9 +67,9 @@ Interval in milliseconds to check the condition (default: 1000ms)
 
 ### state?
 
-> `optional` **state**: `TState`
+> `optional` **state?**: `TState`
 
-Defined in: [src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L17)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.types.ts#L17)
 
 Optional state to pass to the condition function
 
@@ -77,9 +77,9 @@ Optional state to pass to the condition function
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
-Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L41)
+Defined in: [store/uiBlockingStore.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L12)
 
 #### Inherited from
 
@@ -89,9 +89,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychen
 
 ### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L43)
+Defined in: [store/uiBlockingStore.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L14)
 
 Priority level (negative values are normalized to 0)
 
@@ -103,9 +103,9 @@ Priority level (negative values are normalized to 0)
 
 ### timestamp?
 
-> `optional` **timestamp**: `number`
+> `optional` **timestamp?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L44)
+Defined in: [store/uiBlockingStore.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L15)
 
 #### Inherited from
 
@@ -115,9 +115,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychen
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `optional` **timeout?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:46](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L46)
+Defined in: [store/uiBlockingStore.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L17)
 
 Automatically remove the blocker after N milliseconds
 
@@ -127,11 +127,11 @@ Automatically remove the blocker after N milliseconds
 
 ***
 
-### onTimeout()?
+### onTimeout?
 
-> `optional` **onTimeout**: (`blockerId`) => `void`
+> `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:48](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L48)
+Defined in: [store/uiBlockingStore.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L19)
 
 Callback invoked when the blocker is automatically removed due to timeout
 

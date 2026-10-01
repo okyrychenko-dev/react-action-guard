@@ -1,94 +1,101 @@
-import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { useMemo } from "react";
 import { useResolvedGuardedScope } from "../../context";
 import { useTopBlocker } from "../useTopBlocker";
-import type { GuardedFieldReasonMode, GuardedReasonMode } from "../../types";
+import { interpretControlState, resolveControlReason } from "./useGuardedControl.utils";
 import type {
+  GuardedActionState,
+  GuardedFieldState,
+  GuardedGroupState,
+  GuardedLinkState,
+} from "../../types";
+import type {
+  ActionControlOptions,
+  FieldControlOptions,
+  GroupControlOptions,
+  GuardedControlOptionsByKind,
+  GuardedControlState,
+  LinkControlOptions,
   UseGuardedControlParams,
   UseGuardedControlReturn,
-  UseMappedGuardedControlParams,
-  UseUnmappedGuardedControlParams,
 } from "./useGuardedControl.types";
 
-export function useGuardedControl<
-  TBaseState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
->(
-  params: UseUnmappedGuardedControlParams<TBaseState, TReasonMode>
-): UseGuardedControlReturn<TBaseState>;
-export function useGuardedControl<
-  TBaseState,
-  TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
->(
-  params: UseMappedGuardedControlParams<TBaseState, TControlState, TReasonMode>
-): UseGuardedControlReturn<TControlState>;
-export function useGuardedControl<
-  TBaseState,
-  TControlState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
->(
-  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>
-): UseGuardedControlReturn<TBaseState | TControlState>;
-export function useGuardedControl<
-  TBaseState,
-  TControlState = TBaseState,
-  TReasonMode extends GuardedReasonMode | GuardedFieldReasonMode = GuardedReasonMode,
->(
-  params: UseGuardedControlParams<TBaseState, TControlState, TReasonMode>
-): UseGuardedControlReturn<TBaseState | TControlState> {
-  const {
-    getControlState,
-    reasonFallback,
-    reasonId,
-    reasonMode,
-    resolveReason,
-    resolveState,
-    scope,
-  } = params;
+export function useGuardedControl<TState = GuardedActionState>(
+  params: ActionControlOptions<TState>
+): UseGuardedControlReturn<GuardedActionState | TState>;
+export function useGuardedControl<TState = GuardedFieldState>(
+  params: FieldControlOptions<TState>
+): UseGuardedControlReturn<GuardedFieldState | TState>;
+export function useGuardedControl(
+  params: GroupControlOptions
+): UseGuardedControlReturn<GuardedGroupState>;
+export function useGuardedControl(
+  params: LinkControlOptions
+): UseGuardedControlReturn<GuardedLinkState>;
+export function useGuardedControl<TState>(
+  params: UseGuardedControlParams<TState>
+): UseGuardedControlReturn<GuardedControlState | TState> {
+  const { kind, scope, reasonFallback, reasonId, reasonMode = "hidden" } = params;
   const resolvedScope = useResolvedGuardedScope(scope);
   const blocker = useTopBlocker(resolvedScope);
+  const { isBlocked, reason: blockerReason } = blocker;
+  // Depend on option values, so inline options do not invalidate public state identity.
+  const disabled = "disabled" in params ? params.disabled : undefined;
+  const loading = "loading" in params ? params.loading : undefined;
+  const readOnly = "readOnly" in params ? params.readOnly : undefined;
+  const actionBlockedState = kind === "action" ? params.blockedState : undefined;
+  const fieldBlockedState = kind === "field" ? params.blockedState : undefined;
+  const removeFromTabOrder = kind === "link" ? params.removeFromTabOrder : undefined;
+  const actionMapping = kind === "action" ? params.getControlState : undefined;
+  const fieldMapping = kind === "field" ? params.getControlState : undefined;
 
-  const baseState = useMemo(
-    () => resolveState(blocker.isBlocked),
-    [blocker.isBlocked, resolveState]
-  );
-
-  const controlState = useMemo(() => {
-    if (isUndefined(getControlState)) {
-      return baseState;
-    }
-
-    return getControlState(baseState);
-  }, [baseState, getControlState]);
-
-  const reasonBlocker = useMemo(
+  const optionsByKind = useMemo<GuardedControlOptionsByKind<TState>>(
     () => ({
-      isBlocked: blocker.isBlocked,
-      reason: blocker.reason,
+      action: {
+        kind: "action",
+        disabled,
+        loading,
+        blockedState: actionBlockedState,
+        getControlState: actionMapping,
+      },
+      field: {
+        kind: "field",
+        disabled,
+        loading,
+        readOnly,
+        blockedState: fieldBlockedState,
+        getControlState: fieldMapping,
+      },
+      group: { kind: "group" },
+      link: { kind: "link", disabled, removeFromTabOrder },
     }),
-    [blocker.isBlocked, blocker.reason]
+    [
+      disabled,
+      loading,
+      readOnly,
+      actionBlockedState,
+      fieldBlockedState,
+      removeFromTabOrder,
+      actionMapping,
+      fieldMapping,
+    ]
   );
-
+  const controlState = useMemo(
+    () => interpretControlState<TState>(optionsByKind[kind], isBlocked),
+    [optionsByKind, kind, isBlocked]
+  );
   const reason = useMemo(
     () =>
-      resolveReason({
-        blocker: reasonBlocker,
-        fallback: reasonFallback,
+      resolveControlReason({
+        blocker: { isBlocked, reason: blockerReason },
         mode: reasonMode,
+        fallback: reasonFallback,
         reasonId,
       }),
-    [reasonBlocker, reasonFallback, reasonId, reasonMode, resolveReason]
+    [isBlocked, blockerReason, reasonMode, reasonFallback, reasonId]
   );
 
   return useMemo(
-    () => ({
-      blocker,
-      isBlocked: blocker.isBlocked,
-      controlState,
-      reasonContent: reason.reasonContent,
-      ariaDescribedBy: reason.ariaDescribedBy,
-    }),
-    [blocker, controlState, reason.ariaDescribedBy, reason.reasonContent]
+    () => ({ blocker, isBlocked, controlState, ...reason }),
+    [blocker, isBlocked, controlState, reason]
   );
 }

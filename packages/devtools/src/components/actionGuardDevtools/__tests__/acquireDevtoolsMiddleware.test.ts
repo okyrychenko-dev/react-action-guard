@@ -5,9 +5,7 @@ import {
 } from "@okyrychenko-dev/react-action-guard";
 import { renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware } from "../../../middleware";
 import { resolveDevtoolsObservationSession } from "../acquireDevtoolsMiddleware";
-import type { MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 import type { ObservationSession } from "../acquireDevtoolsMiddleware.types";
 
 function eventsOf(session: ObservationSession) {
@@ -189,91 +187,20 @@ describe("Observation session participation", () => {
     removeBlocker("during-reset");
   });
 
-  it("should keep custom-store automatic observation additive to manual middleware", () => {
-    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
-      .current;
-    const session = resolveDevtoolsObservationSession(store);
-    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+  it("should release only session observation and preserve an independent observation lease", () => {
+    const { addBlocker, observeBlockingEvents, removeBlocker } = uiBlockingStoreApi.getState();
     const manual = vi.fn();
-    const { addBlocker, registerMiddleware, removeBlocker, unregisterMiddleware } =
-      store.getState();
-
-    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manual);
-
+    const releaseManual = observeBlockingEvents(manual);
+    const session = resolveDevtoolsObservationSession();
     const participant = session.participate();
 
-    addBlocker("custom-manual-event");
-
-    expect(manual).toHaveBeenCalled();
-    expect(
-      eventsOf(session).filter((event) => event.blockerId === "custom-manual-event")
-    ).toHaveLength(1);
-    expect(warn).toHaveBeenCalled();
-
+    addBlocker("leased-event");
+    expect(eventsOf(session).filter((event) => event.blockerId === "leased-event")).toHaveLength(1);
+    expect(manual).toHaveBeenCalledOnce();
     participant.release();
-
-    unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-
-    removeBlocker("custom-manual-event");
-  });
-
-  it("should preserve a manual registration installed during observation delivery and after release", () => {
-    const {
-      addBlocker,
-      observeBlockingEvents,
-      registerMiddleware,
-      removeBlocker,
-      unregisterMiddleware,
-    } = uiBlockingStoreApi.getState();
-    const manual = createDevtoolsMiddleware();
-    const releaseEarlierObserver = observeBlockingEvents((event: MiddlewareContext) => {
-      if (event.blockerId === "registration-event") {
-        registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, manual);
-      }
-    });
-    const session = resolveDevtoolsObservationSession();
-    const participant = session.participate();
-
-    try {
-      addBlocker("registration-event");
-      expect(
-        eventsOf(session).filter((event) => event.blockerId === "registration-event")
-      ).toHaveLength(1);
-
-      participant.release();
-      addBlocker("after-release-event");
-
-      expect(
-        eventsOf(session).filter((event) => event.blockerId === "after-release-event")
-      ).toHaveLength(1);
-    } finally {
-      participant.release();
-      releaseEarlierObserver();
-      unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-      removeBlocker("registration-event");
-      removeBlocker("after-release-event");
-    }
-  });
-
-  it("should keep a manual global registration authoritative", () => {
-    const { addBlocker, registerMiddleware, removeBlocker, unregisterMiddleware } =
-      uiBlockingStoreApi.getState();
-
-    registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddleware());
-
-    const session = resolveDevtoolsObservationSession();
-    const participant = session.participate();
-
-    try {
-      addBlocker("manual-event");
-
-      expect(eventsOf(session).filter((event) => event.blockerId === "manual-event")).toHaveLength(
-        1
-      );
-    } finally {
-      participant.release();
-      unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
-      removeBlocker("manual-event");
-    }
+    removeBlocker("leased-event");
+    expect(eventsOf(session)).toEqual([]);
+    expect(manual).toHaveBeenCalledTimes(2);
+    releaseManual();
   });
 });

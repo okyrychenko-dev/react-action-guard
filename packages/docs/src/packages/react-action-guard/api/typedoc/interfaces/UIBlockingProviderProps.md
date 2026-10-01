@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: UIBlockingProviderProps
 
-Defined in: [src/context/UIBlockingContext.tsx:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L18)
+Defined in: [context/UIBlockingContext.tsx:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/UIBlockingContext.tsx#L18)
 
 Props for the [UIBlockingProvider](../functions/UIBlockingProvider.md) component.
 
@@ -24,14 +24,14 @@ independent blocking state.
 
 > **children**: `ReactNode`
 
-Defined in: [src/context/UIBlockingContext.tsx:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L19)
+Defined in: [context/UIBlockingContext.tsx:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/UIBlockingContext.tsx#L19)
 
 ***
 
 ### middlewares?
 
-> `optional` **middlewares**: readonly [`Middleware`](../type-aliases/Middleware.md)[]
+> `optional` **middlewares?**: readonly [`Middleware`](../type-aliases/Middleware.md)[]
 
-Defined in: [src/context/UIBlockingContext.tsx:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/context/UIBlockingContext.tsx#L20)
+Defined in: [context/UIBlockingContext.tsx:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/UIBlockingContext.tsx#L21)
 
 Initial middlewares to register

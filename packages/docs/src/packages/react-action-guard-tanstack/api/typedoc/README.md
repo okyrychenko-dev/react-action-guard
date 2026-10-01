@@ -1,8 +1,8 @@
-**React Action Guard TanStack API v0.2.3**
+**React Action Guard TanStack API v0.3.5**
 
 ***
 
-# React Action Guard TanStack API v0.2.3
+# React Action Guard TanStack API v0.3.5
 
 ## Interfaces
 

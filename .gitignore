@@ -36,3 +36,11 @@ coverage/
 
 *storybook.log
 storybook-static
+.articles
+.claude
+.instructions
+.scratch
+docs
+reports
+AGENTS.md
+CONTEXT.md

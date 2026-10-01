@@ -1,6 +1,6 @@
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
-import { DEVTOOLS_MIDDLEWARE_NAME, createDevtoolsMiddlewareForStore } from "../../middleware";
+import { createDevtoolsMiddlewareForStore } from "../../middleware";
 import { createDevtoolsStoreBindings, devtoolsStoreApi } from "../../store";
 import type { DevtoolsStoreApi } from "../../store";
 import type {
@@ -33,37 +33,9 @@ function createObservationSession(
   let epoch = 0;
 
   function attachObservation(): void {
-    const { middlewares, observeBlockingEvents } = targetStore.getState();
-    const existingMiddleware = middlewares.get(DEVTOOLS_MIDDLEWARE_NAME);
-    const isGlobalSession = targetStore === uiBlockingStoreApi;
+    const { observeBlockingEvents } = targetStore.getState();
 
-    if (!isGlobalSession || isUndefined(existingMiddleware)) {
-      const middleware = createDevtoolsMiddlewareForStore(devtoolsStore);
-
-      let options = undefined;
-
-      if (isGlobalSession) {
-        options = {
-          skipWhenNamedMiddlewareActive: DEVTOOLS_MIDDLEWARE_NAME,
-        };
-      }
-
-      releaseObservation = observeBlockingEvents(middleware, options);
-    }
-
-    if (isDefined(existingMiddleware) && process.env.NODE_ENV !== "production") {
-      let message =
-        "[ActionGuardDevtools] Automatic observation preserved the existing manual " +
-        "Devtools middleware and added an observation lease for the custom store.";
-
-      if (isGlobalSession) {
-        message =
-          "[ActionGuardDevtools] Automatic observation found an existing manual Devtools " +
-          "middleware registration. The manual registration remains authoritative.";
-      }
-
-      console.warn(message);
-    }
+    releaseObservation = observeBlockingEvents(createDevtoolsMiddlewareForStore(devtoolsStore));
   }
 
   function applyConfiguration(

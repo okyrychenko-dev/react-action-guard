@@ -1,5 +1,3 @@
-import { useCallback } from "react";
-import { resolveFieldReason, resolveGuardedFieldState } from "../../utils";
 import { useGuardedControl } from "../useGuardedControl";
 import type { GuardedFieldState } from "../../types";
 import type { UseGuardedFieldParams, UseGuardedFieldReturn } from "./useGuardedField.types";
@@ -27,25 +25,16 @@ export function useGuardedField<TFieldState>(
     scope,
   } = params;
 
-  const resolveState = useCallback(
-    (isBlocked: boolean) =>
-      resolveGuardedFieldState({
-        blockedState,
-        disabled,
-        isBlocked,
-        loading,
-        readOnly,
-      }),
-    [blockedState, disabled, loading, readOnly]
-  );
-
   const control = useGuardedControl({
+    kind: "field",
+    blockedState,
+    disabled,
+    loading,
+    readOnly,
     getControlState: getFieldState,
     reasonFallback,
     reasonId,
     reasonMode,
-    resolveReason: resolveFieldReason,
-    resolveState,
     scope,
   });
 

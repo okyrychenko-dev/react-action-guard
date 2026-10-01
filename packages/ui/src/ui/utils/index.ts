@@ -1,8 +1,7 @@
-export { getGuardedReason, resolveActionReason, resolveFieldReason } from "./reason";
+export { normalizeScope as normalizeGuardedScope } from "@okyrychenko-dev/react-action-guard";
 export {
-  normalizeGuardedScope,
   resolveGuardedActionState,
   resolveGuardedFieldState,
   resolveGuardedGroupState,
   resolveGuardedLinkState,
-} from "./state";
+} from "../hooks/useGuardedControl";

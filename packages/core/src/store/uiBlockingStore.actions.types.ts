@@ -1,10 +1,6 @@
-import type { Optional } from "@okyrychenko-dev/type-utils";
 import type { StateCreator, StoreMutatorIdentifier } from "zustand";
-import type { BlockingLifecycle } from "./blockingLifecycle/blockingLifecycle.types";
+import type { BlockingLifecycle } from "./blockingLifecycle";
 import type { UIBlockingStore } from "./uiBlockingStore.types";
-
-export type ActiveBlockers = UIBlockingStore["activeBlockers"];
-export type OptionalActiveBlockers = Optional<ActiveBlockers>;
 
 export type StoreMutatorEntry = [StoreMutatorIdentifier, unknown];
 export type StoreMutatorStack = Array<StoreMutatorEntry>;

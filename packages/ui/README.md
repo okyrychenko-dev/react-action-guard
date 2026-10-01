@@ -17,6 +17,11 @@
 - Preserve custom component-library prop shapes with typed state mappers
 - Use resolver utilities directly when a hook is not the right abstraction
 
+All guarded hooks use one interpretation module for blocker observation, existing control flags,
+and reason accessibility. State mappers receive the resolved public state. Links retain their own
+activation prevention, propagation and tab-order options. Public state resolver utilities remain
+available for applications that do not need a hook.
+
 ## Installation
 
 ```bash

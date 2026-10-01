@@ -184,43 +184,6 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     });
   }
 
-  function restore(nextBlockers: ReadonlyMap<string, BlockerConfig>): void {
-    const restored = new Map<string, ActiveBlocker>();
-
-    for (const [id, config] of nextBlockers) {
-      const previous = blockers.get(id);
-      const nextConfig = normalizeBlocker(id, config);
-
-      if (!previous || previous.config.timeout !== nextConfig.timeout) {
-        if (previous) {
-          cancelTimeout(previous);
-        }
-
-        const blocker: ActiveBlocker = { config: nextConfig };
-
-        restored.set(id, blocker);
-        scheduleTimeout(id, blocker);
-        continue;
-      }
-
-      previous.config = nextConfig;
-      restored.set(id, previous);
-    }
-
-    for (const [id, blocker] of blockers) {
-      if (!restored.has(id)) {
-        cancelTimeout(blocker);
-      }
-    }
-
-    blockers.clear();
-    for (const [id, blocker] of restored) {
-      blockers.set(id, blocker);
-    }
-
-    publish();
-  }
-
   function update(id: string, config: Partial<BlockerConfig> = {}): void {
     const previous = blockers.get(id);
 
@@ -354,7 +317,6 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   }
 
   return {
-    restore,
     add,
     update,
     remove,

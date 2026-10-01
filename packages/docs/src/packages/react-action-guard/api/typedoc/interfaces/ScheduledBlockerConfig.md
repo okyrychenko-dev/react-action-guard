@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: ScheduledBlockerConfig
 
-Defined in: [src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L24)
+Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.types.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L24)
 
 Configuration for scheduled blocker hook
 
@@ -20,7 +20,7 @@ Configuration for scheduled blocker hook
 
 > **schedule**: [`BlockingSchedule`](BlockingSchedule.md)
 
-Defined in: [src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts:26](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L26)
+Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.types.ts:26](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L26)
 
 Schedule defining when blocking should be active
 
@@ -28,9 +28,9 @@ Schedule defining when blocking should be active
 
 ### onScheduleStart?
 
-> `optional` **onScheduleStart**: `VoidFunction`
+> `optional` **onScheduleStart?**: `VoidFunction`
 
-Defined in: [src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L28)
+Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L28)
 
 Optional callback to execute when the blocking schedule starts
 
@@ -38,9 +38,9 @@ Optional callback to execute when the blocking schedule starts
 
 ### onScheduleEnd?
 
-> `optional` **onScheduleEnd**: `VoidFunction`
+> `optional` **onScheduleEnd?**: `VoidFunction`
 
-Defined in: [src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts:30](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L30)
+Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.types.ts:30](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.types.ts#L30)
 
 Optional callback to execute when the blocking schedule ends
 
@@ -48,9 +48,9 @@ Optional callback to execute when the blocking schedule ends
 
 ### scope?
 
-> `optional` **scope**: `string` \| readonly `string`[]
+> `optional` **scope?**: `string` \| readonly `string`[]
 
-Defined in: [src/store/uiBlockingStore.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L40)
+Defined in: [store/uiBlockingStore.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L11)
 
 #### Inherited from
 
@@ -60,9 +60,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:40](https://github.com/okyrychen
 
 ### reason?
 
-> `optional` **reason**: `string`
+> `optional` **reason?**: `string`
 
-Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L41)
+Defined in: [store/uiBlockingStore.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L12)
 
 #### Inherited from
 
@@ -72,9 +72,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:41](https://github.com/okyrychen
 
 ### priority?
 
-> `optional` **priority**: `number`
+> `optional` **priority?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L43)
+Defined in: [store/uiBlockingStore.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L14)
 
 Priority level (negative values are normalized to 0)
 
@@ -86,9 +86,9 @@ Priority level (negative values are normalized to 0)
 
 ### timestamp?
 
-> `optional` **timestamp**: `number`
+> `optional` **timestamp?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L44)
+Defined in: [store/uiBlockingStore.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L15)
 
 #### Inherited from
 
@@ -98,9 +98,9 @@ Defined in: [src/store/uiBlockingStore.types.ts:44](https://github.com/okyrychen
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `optional` **timeout?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:46](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L46)
+Defined in: [store/uiBlockingStore.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L17)
 
 Automatically remove the blocker after N milliseconds
 
@@ -110,11 +110,11 @@ Automatically remove the blocker after N milliseconds
 
 ***
 
-### onTimeout()?
+### onTimeout?
 
-> `optional` **onTimeout**: (`blockerId`) => `void`
+> `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:48](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L48)
+Defined in: [store/uiBlockingStore.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L19)
 
 Callback invoked when the blocker is automatically removed due to timeout
 

@@ -1,19 +1,16 @@
-[**React Action Guard TanStack API v0.2.3**](../README.md)
+[**React Action Guard TanStack API v0.3.5**](../README.md)
 
 ***
 
 [React Action Guard TanStack API](../README.md) / UseBlockingMutationOptions
 
-# Interface: UseBlockingMutationOptions\<TData, TError, TVariables, TContext\>
+# Interface: UseBlockingMutationOptions\<TData, TError, TVariables, TOnMutateResult\>
 
-Defined in: [src/hooks/useBlockingMutation.types.ts:80](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingMutation.types.ts#L80)
-
-Options for useBlockingMutation hook.
-Extends TanStack Query's UseMutationOptions with blocking configuration.
+Defined in: [packages/tanstack/src/hooks/useBlockingMutation.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingMutation.types.ts#L21)
 
 ## Extends
 
-- `UseMutationOptions`\<`TData`, `TError`, `TVariables`, `TContext`\>
+- `UseMutationOptions`\<`TData`, `TError`, `TVariables`, `TOnMutateResult`\>
 
 ## Type Parameters
 
@@ -21,25 +18,17 @@ Extends TanStack Query's UseMutationOptions with blocking configuration.
 
 `TData` = `unknown`
 
-The type of data returned by the mutation
-
 ### TError
 
-`TError` = `Error`
-
-The type of error that can be thrown
+`TError` = `DefaultError`
 
 ### TVariables
 
 `TVariables` = `void`
 
-The type of variables passed to the mutation
+### TOnMutateResult
 
-### TContext
-
-`TContext` = `unknown`
-
-The type of context for optimistic updates
+`TOnMutateResult` = `unknown`
 
 ## Properties
 
@@ -47,17 +36,15 @@ The type of context for optimistic updates
 
 > **blockingConfig**: [`MutationBlockingConfig`](../type-aliases/MutationBlockingConfig.md)
 
-Defined in: [src/hooks/useBlockingMutation.types.ts:89](https://github.com/okyrychenko-dev/react-action-guard-tanstack/blob/main/src/hooks/useBlockingMutation.types.ts#L89)
-
-Configuration for UI blocking behavior during mutation execution.
+Defined in: [packages/tanstack/src/hooks/useBlockingMutation.types.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingMutation.types.ts#L27)
 
 ***
 
 ### mutationFn?
 
-> `optional` **mutationFn**: `MutationFunction`\<`TData`, `TVariables`\>
+> `optional` **mutationFn?**: `MutationFunction`\<`TData`, `TVariables`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1198
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1198
 
 #### Inherited from
 
@@ -67,9 +54,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### mutationKey?
 
-> `optional` **mutationKey**: readonly `unknown`[]
+> `optional` **mutationKey?**: readonly `unknown`[]
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1199
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1199
 
 #### Inherited from
 
@@ -77,11 +64,11 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ***
 
-### onMutate()?
+### onMutate?
 
-> `optional` **onMutate**: (`variables`, `context`) => `TContext` \| `Promise`\<`TContext`\>
+> `optional` **onMutate?**: (`variables`, `context`) => `TOnMutateResult` \| `Promise`\<`TOnMutateResult`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1200
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1200
 
 #### Parameters
 
@@ -95,7 +82,7 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 #### Returns
 
-`TContext` \| `Promise`\<`TContext`\>
+`TOnMutateResult` \| `Promise`\<`TOnMutateResult`\>
 
 #### Inherited from
 
@@ -103,11 +90,11 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ***
 
-### onSuccess()?
+### onSuccess?
 
-> `optional` **onSuccess**: (`data`, `variables`, `onMutateResult`, `context`) => `unknown`
+> `optional` **onSuccess?**: (`data`, `variables`, `onMutateResult`, `context`) => `unknown`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1201
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1201
 
 #### Parameters
 
@@ -121,7 +108,7 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ##### onMutateResult
 
-`TContext`
+`TOnMutateResult`
 
 ##### context
 
@@ -137,11 +124,11 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ***
 
-### onError()?
+### onError?
 
-> `optional` **onError**: (`error`, `variables`, `onMutateResult`, `context`) => `unknown`
+> `optional` **onError?**: (`error`, `variables`, `onMutateResult`, `context`) => `unknown`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1202
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1202
 
 #### Parameters
 
@@ -155,7 +142,7 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ##### onMutateResult
 
-`TContext` | `undefined`
+`TOnMutateResult` \| `undefined`
 
 ##### context
 
@@ -171,21 +158,21 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ***
 
-### onSettled()?
+### onSettled?
 
-> `optional` **onSettled**: (`data`, `error`, `variables`, `onMutateResult`, `context`) => `unknown`
+> `optional` **onSettled?**: (`data`, `error`, `variables`, `onMutateResult`, `context`) => `unknown`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1203
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1203
 
 #### Parameters
 
 ##### data
 
-`TData` | `undefined`
+`TData` \| `undefined`
 
 ##### error
 
-`TError` | `null`
+`TError` \| `null`
 
 ##### variables
 
@@ -193,7 +180,7 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ##### onMutateResult
 
-`TContext` | `undefined`
+`TOnMutateResult` \| `undefined`
 
 ##### context
 
@@ -211,9 +198,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### retry?
 
-> `optional` **retry**: `RetryValue`\<`TError`\>
+> `optional` **retry?**: `RetryValue`\<`TError`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1204
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1204
 
 #### Inherited from
 
@@ -223,9 +210,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### retryDelay?
 
-> `optional` **retryDelay**: `RetryDelayValue`\<`TError`\>
+> `optional` **retryDelay?**: `RetryDelayValue`\<`TError`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1205
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1205
 
 #### Inherited from
 
@@ -235,9 +222,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### networkMode?
 
-> `optional` **networkMode**: `NetworkMode`
+> `optional` **networkMode?**: `NetworkMode`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1206
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1206
 
 #### Inherited from
 
@@ -247,9 +234,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### gcTime?
 
-> `optional` **gcTime**: `number`
+> `optional` **gcTime?**: `number`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1207
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1207
 
 #### Inherited from
 
@@ -259,9 +246,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### meta?
 
-> `optional` **meta**: `Record`\<`string`, `unknown`\>
+> `optional` **meta?**: `Record`\<`string`, `unknown`\>
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1209
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1209
 
 #### Inherited from
 
@@ -271,9 +258,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### scope?
 
-> `optional` **scope**: `MutationScope`
+> `optional` **scope?**: `MutationScope`
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1210
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1210
 
 #### Inherited from
 
@@ -283,9 +270,9 @@ Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d
 
 ### throwOnError?
 
-> `optional` **throwOnError**: `boolean` \| (`error`) => `boolean`
+> `optional` **throwOnError?**: `boolean` \| ((`error`) => `boolean`)
 
-Defined in: node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1213
+Defined in: node\_modules/.pnpm/@tanstack+query-core@5.90.10/node\_modules/@tanstack/query-core/build/legacy/hydration-DksKBgQq.d.ts:1213
 
 #### Inherited from
 

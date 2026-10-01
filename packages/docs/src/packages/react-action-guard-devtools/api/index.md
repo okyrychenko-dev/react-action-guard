@@ -366,32 +366,21 @@ function createDevtoolsMiddleware(
 ```tsx
 import {
   createDevtoolsMiddleware,
-  DEVTOOLS_MIDDLEWARE_NAME,
 } from "@okyrychenko-dev/react-action-guard-devtools";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 
 // Create and register middleware
 const middleware = createDevtoolsMiddleware();
 
-uiBlockingStoreApi
-  .getState()
-  .registerMiddleware(DEVTOOLS_MIDDLEWARE_NAME, middleware);
+const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+const release = observeBlockingEvents(middleware);
 
 // Later: unregister
-uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+release();
 ```
 
 ---
 
-### DEVTOOLS_MIDDLEWARE_NAME
-
-Constant name for DevTools middleware.
-
-```typescript
-const DEVTOOLS_MIDDLEWARE_NAME = "__devtools__";
-```
-
-Use this constant when manually registering/unregistering middleware.
 
 ---
 

@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: GoogleAnalyticsConfig
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L8)
+Defined in: [middleware/analyticsMiddleware.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L6)
 
 ## Properties
 
@@ -14,4 +14,4 @@ Defined in: [src/middleware/analyticsMiddleware.types.ts:8](https://github.com/o
 
 > **provider**: `"ga"`
 
-Defined in: [src/middleware/analyticsMiddleware.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/middleware/analyticsMiddleware.types.ts#L9)
+Defined in: [middleware/analyticsMiddleware.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/analyticsMiddleware.types.ts#L7)

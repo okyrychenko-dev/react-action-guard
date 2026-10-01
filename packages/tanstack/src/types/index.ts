@@ -1,1 +1,1 @@
-export type { BaseBlockingConfig, ReasonConfig } from "./common.types";
+export type { BaseBlockingConfig } from "./common.types";

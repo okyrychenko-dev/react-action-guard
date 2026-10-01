@@ -162,7 +162,7 @@ React Action Guard is built on [Zustand](https://zustand-demo.pmnd.rs/) for stat
 ```typescript
 interface UIBlockingStore {
   // State
-  blockers: Map<string, StoredBlocker>;
+  readonly blockingSnapshot: ReadonlyArray<Readonly<BlockerInfo>>;
   
   // Actions
   addBlocker: (id: string, config: BlockerConfig) => void;
@@ -172,8 +172,7 @@ interface UIBlockingStore {
   getBlockingInfo: (scope?: string) => BlockerInfo[];
   clearAllBlockers: () => void;
   clearBlockersForScope: (scope: string) => void;
-  registerMiddleware: (name: string, middleware: Middleware) => void;
-  unregisterMiddleware: (name: string) => void;
+  observeBlockingEvents: (observer: Middleware) => VoidFunction;
 }
 ```
 

@@ -251,19 +251,16 @@ function EventStats() {
 ```tsx
 import { 
   createDevtoolsMiddleware,
-  DEVTOOLS_MIDDLEWARE_NAME 
 } from '@okyrychenko-dev/react-action-guard-devtools';
 import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
 
 // Register manually
 const middleware = createDevtoolsMiddleware();
-uiBlockingStoreApi.getState().registerMiddleware(
-  DEVTOOLS_MIDDLEWARE_NAME,
-  middleware
-);
+const { observeBlockingEvents } = uiBlockingStoreApi.getState();
+const release = observeBlockingEvents(middleware);
 
 // Unregister
-uiBlockingStoreApi.getState().unregisterMiddleware(DEVTOOLS_MIDDLEWARE_NAME);
+release();
 ```
 
 ## Troubleshooting

@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { getBlockerAge, getSortedBlockers, isBlockerStuck } from "../ActiveBlockers.utils";
-import type { StoredBlocker } from "@okyrychenko-dev/react-action-guard";
+import type { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
 
-function makeBlocker(timestamp: number, priority = 0): StoredBlocker {
-  return { scope: "test", reason: "Test", priority, timestamp };
+function makeBlocker(timestamp: number, priority = 0): BlockerInfo {
+  return { id: "test", scope: "test", reason: "Test", priority, timestamp };
 }
 
 describe("getBlockerAge", () => {
@@ -29,8 +29,8 @@ describe("isBlockerStuck", () => {
 describe("getSortedBlockers", () => {
   it("should sort by priority descending", () => {
     const snapshot = [
-      { id: "low", ...makeBlocker(0, 1) },
-      { id: "high", ...makeBlocker(0, 10) },
+      { ...makeBlocker(0, 1), id: "low" },
+      { ...makeBlocker(0, 10), id: "high" },
     ];
 
     expect(getSortedBlockers(snapshot).map(([id]) => id)).toEqual(["high", "low"]);

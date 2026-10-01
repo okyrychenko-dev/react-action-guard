@@ -1,4 +1,4 @@
-[**React Action Guard API v0.6.0**](../README.md)
+[**React Action Guard API v1.0.5**](../README.md)
 
 ***
 
@@ -6,23 +6,9 @@
 
 # Interface: BlockerInfo
 
-Defined in: [src/store/uiBlockingStore.types.ts:95](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L95)
+Defined in: [store/uiBlockingStore.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L28)
 
 Complete blocker information including its unique identifier.
-
-This type extends StoredBlocker with the blocker's ID, making it
-suitable for reading and displaying blocker information. Returned by
-[UIBlockingStoreActions.getBlockingInfo](UIBlockingStoreActions.md#getblockinginfo) and used by [useBlockingInfo](../functions/useBlockingInfo.md).
-
-## Example
-
-Accessing blocker info
-```ts
-const blockers: BlockerInfo[] = store.getState().getBlockingInfo('form');
-blockers.forEach(blocker => {
-  console.log(`${blocker.id}: ${blocker.reason} (priority: ${blocker.priority})`);
-});
-```
 
 ## Since
 
@@ -30,89 +16,59 @@ blockers.forEach(blocker => {
 
 ## Properties
 
+### id
+
+> `readonly` **id**: `string`
+
+Defined in: [store/uiBlockingStore.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L29)
+
+***
+
 ### scope
 
-> **scope**: `string` \| readonly `string`[]
+> `readonly` **scope**: `string` \| readonly `string`[]
 
-Defined in: [src/store/uiBlockingStore.types.ts:64](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L64)
-
-#### Inherited from
-
-`StoredBlocker.scope`
+Defined in: [store/uiBlockingStore.types.ts:30](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L30)
 
 ***
 
 ### reason
 
-> **reason**: `string`
+> `readonly` **reason**: `string`
 
-Defined in: [src/store/uiBlockingStore.types.ts:65](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L65)
-
-#### Inherited from
-
-`StoredBlocker.reason`
+Defined in: [store/uiBlockingStore.types.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L31)
 
 ***
 
 ### priority
 
-> **priority**: `number`
+> `readonly` **priority**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:66](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L66)
-
-#### Inherited from
-
-`StoredBlocker.priority`
+Defined in: [store/uiBlockingStore.types.ts:32](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L32)
 
 ***
 
 ### timestamp
 
-> **timestamp**: `number`
+> `readonly` **timestamp**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:67](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L67)
-
-#### Inherited from
-
-`StoredBlocker.timestamp`
+Defined in: [store/uiBlockingStore.types.ts:33](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L33)
 
 ***
 
 ### timeout?
 
-> `optional` **timeout**: `number`
+> `readonly` `optional` **timeout?**: `number`
 
-Defined in: [src/store/uiBlockingStore.types.ts:69](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L69)
-
-Timeout duration in milliseconds (if set)
-
-#### Inherited from
-
-`StoredBlocker.timeout`
+Defined in: [store/uiBlockingStore.types.ts:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L34)
 
 ***
 
-### timeoutId?
+### onTimeout?
 
-> `optional` **timeoutId**: `number`
+> `readonly` `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [src/store/uiBlockingStore.types.ts:71](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L71)
-
-Internal timeout ID for cleanup
-
-#### Inherited from
-
-`StoredBlocker.timeoutId`
-
-***
-
-### onTimeout()?
-
-> `optional` **onTimeout**: (`blockerId`) => `void`
-
-Defined in: [src/store/uiBlockingStore.types.ts:73](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L73)
-
-Callback invoked when the blocker is automatically removed due to timeout
+Defined in: [store/uiBlockingStore.types.ts:35](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L35)
 
 #### Parameters
 
@@ -123,15 +79,3 @@ Callback invoked when the blocker is automatically removed due to timeout
 #### Returns
 
 `void`
-
-#### Inherited from
-
-`StoredBlocker.onTimeout`
-
-***
-
-### id
-
-> **id**: `string`
-
-Defined in: [src/store/uiBlockingStore.types.ts:96](https://github.com/okyrychenko-dev/react-action-guard/blob/main/src/store/uiBlockingStore.types.ts#L96)
