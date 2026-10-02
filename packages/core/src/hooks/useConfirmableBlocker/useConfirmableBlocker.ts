@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useActionBlocker } from "../useActionBlocker";
 import {
   ConfirmableBlockerConfig,
@@ -20,6 +20,7 @@ export function useConfirmableBlocker(
 ): UseConfirmableBlockerReturn {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isExecuting, setIsExecuting] = useState(false);
+  const executionRef = useRef<Promise<void> | null>(null);
 
   useActionBlocker(
     blockerId,
@@ -31,35 +32,61 @@ export function useConfirmableBlocker(
   );
 
   const execute = useCallback(() => {
+    if (executionRef.current) {
+      return;
+    }
+
     setIsDialogOpen(true);
   }, []);
 
   const onConfirm = useCallback(async () => {
+    if (executionRef.current) {
+      return executionRef.current;
+    }
+
     setIsDialogOpen(false);
     setIsExecuting(true);
 
-    try {
-      await config.onConfirm();
-    } finally {
-      setIsExecuting(false);
+    async function runConfirmation(): Promise<void> {
+      try {
+        await config.onConfirm();
+      } finally {
+        executionRef.current = null;
+        setIsExecuting(false);
+      }
     }
+
+    // Publish ownership before invoking user code, including reentrant callbacks.
+    const execution = Promise.resolve().then(runConfirmation);
+
+    executionRef.current = execution;
+
+    return execution;
   }, [config]);
 
   const onCancel = useCallback(() => {
+    if (executionRef.current) {
+      return;
+    }
+
     setIsDialogOpen(false);
     config.onCancel?.();
   }, [config]);
+
+  const { confirmTitle, confirmMessage, confirmButtonText, cancelButtonText } = config;
+
+  const confirmConfig = {
+    title: confirmTitle ?? "Confirm Action",
+    message: confirmMessage,
+    confirmText: confirmButtonText ?? "Confirm",
+    cancelText: cancelButtonText ?? "Cancel",
+  };
 
   return {
     execute,
     isDialogOpen,
     isExecuting,
-    confirmConfig: {
-      title: config.confirmTitle ?? "Confirm Action",
-      message: config.confirmMessage,
-      confirmText: config.confirmButtonText ?? "Confirm",
-      cancelText: config.cancelButtonText ?? "Cancel",
-    },
+    confirmConfig,
     onConfirm,
     onCancel,
   };
