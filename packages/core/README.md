@@ -304,6 +304,16 @@ These hooks are useful, but they are not the main onboarding path for most apps:
 Creates a confirmable action with UI blocking while the dialog is open or the action is running.
 Use it for advanced confirmation flows after the core hooks are already a good fit.
 
+Each hook instance runs at most one confirmation action at a time. Repeated `onConfirm()`
+calls while it is running await the same outcome, including rejection; promise object identity
+is not guaranteed. `execute()` and `onCancel()` do nothing during execution, including skipping
+the cancellation callback. After success or failure, a new confirmation can run. Separate
+instances remain independent and should use unique blocker IDs.
+
+The dialog and running action keep the mounted hook's blocker active. Existing timeout and
+unmount cleanup still apply: either can release the blocker without cancelling the action.
+This hook does not provide operation cancellation or exclusion across instances.
+
 **Parameters:**
 
 - `blockerId: string` - Unique identifier for the blocker
