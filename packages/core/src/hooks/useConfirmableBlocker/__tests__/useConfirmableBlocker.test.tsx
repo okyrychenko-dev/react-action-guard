@@ -31,6 +31,7 @@ describe("useConfirmableBlocker", () => {
     act(() => {
       result.current.confirmation.execute();
     });
+
     await act(async () => {
       outcomes.push(result.current.confirmation.onConfirm());
       outcomes.push(result.current.confirmation.onConfirm());
@@ -91,6 +92,7 @@ describe("useConfirmableBlocker", () => {
       finish();
       await Promise.all(outcomes);
     });
+
     expect(result.current.blocked).toBe(false);
   });
 
@@ -121,6 +123,7 @@ describe("useConfirmableBlocker", () => {
         { status: "rejected", reason: failure },
       ]);
     });
+
     expect(onConfirm).toHaveBeenCalledTimes(1);
     expect(result.current.blocked).toBe(false);
     expect(result.current.confirmation.isExecuting).toBe(false);
@@ -212,6 +215,7 @@ describe("useConfirmableBlocker", () => {
     await act(async () => {
       await expect(result.current.onConfirm()).rejects.toBe(failure);
     });
+
     expect(onConfirm).toHaveBeenCalledTimes(2);
   });
 
@@ -367,6 +371,7 @@ describe("useConfirmableBlocker", () => {
     act(() => {
       result.current.execute();
     });
+
     expect(result.current.isDialogOpen).toBe(true);
 
     await actAsync(async () => {
@@ -390,6 +395,7 @@ describe("useConfirmableBlocker", () => {
     act(() => {
       result.current.execute();
     });
+
     expect(result.current.isDialogOpen).toBe(true);
 
     act(() => {

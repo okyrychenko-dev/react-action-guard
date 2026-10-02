@@ -1,4 +1,4 @@
-import type { BaseNavigationBlockerOptions } from "../core/types";
+import type { BaseNavigationBlockerOptions } from "../core";
 
 /**
  * Options for TanStack Router navigation blocker
@@ -7,12 +7,3 @@ import type { BaseNavigationBlockerOptions } from "../core/types";
  * future TanStack Router-specific options extension.
  */
 export type UseNavigationBlockerOptions = BaseNavigationBlockerOptions;
-
-/**
- * Minimal interface for TanStack Router to ensure type safety
- */
-export interface SafeTanStackRouter {
-  history: {
-    block: (callback: (update: Record<string, unknown>) => void) => () => void;
-  };
-}
