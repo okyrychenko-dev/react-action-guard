@@ -15,7 +15,7 @@ export function useNavigationBlocker(
 
   useEffect(() => {
     return invalidate;
-  }, [when, scope, shouldBlock, message, onBlock, onAllow, onConfirm, invalidate]);
+  }, [when, scope, shouldBlock, message, onConfirm, invalidate]);
 
   const shouldBlockFn = useCallback(async () => {
     const settle = begin();

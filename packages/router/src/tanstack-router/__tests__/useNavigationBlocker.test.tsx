@@ -329,6 +329,42 @@ describe("TanStack navigation blocking with a real router", () => {
     expect(onConfirm).toHaveBeenCalledTimes(2);
   });
 
+  it.each(["onBlock", "onAllow"])(
+    "should accept pending confirmation when inline %s changes after opening confirmation UI",
+    async (observer) => {
+      const pending = deferred();
+      const onBlock = vi.fn();
+      const onAllow = vi.fn();
+      const options: UseNavigationBlockerOptions = {
+        when: true,
+        message: "Leave?",
+        onBlock: () => onBlock(),
+        onAllow: () => onAllow(),
+        onConfirm: vi.fn(() => {
+          update({
+            ...options,
+            [observer]: () => (observer === "onBlock" ? onBlock() : onAllow()),
+          });
+
+          return pending.promise;
+        }),
+      };
+      const { router, update } = await mountBlocker(options);
+
+      await transition(router, "/next");
+      expect(router.state.location.pathname).toBe("/");
+
+      await act(async () => {
+        pending.resolve(true);
+        await Promise.resolve();
+      });
+      await waitFor(() => expect(router.state.location.pathname).toBe("/next"));
+      expect(options.onConfirm).toHaveBeenCalledTimes(1);
+      expect(onBlock).toHaveBeenCalledTimes(1);
+      expect(onAllow).toHaveBeenCalledTimes(1);
+    }
+  );
+
   it("should invalidate pending confirmation when options change", async () => {
     const pending = deferred();
     const onAllow = vi.fn();
