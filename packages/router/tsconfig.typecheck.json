@@ -7,5 +7,5 @@
     },
     "rootDir": ".."
   },
-  "include": ["src", "../core/src/middleware/window.types.ts"]
+  "include": ["src", "browser", "playwright.config.ts", "../core/src/middleware/window.types.ts"]
 }

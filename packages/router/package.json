@@ -43,16 +43,18 @@
     "clean": "rm -rf dist",
     "prepublishOnly": "pnpm run clean && pnpm run build",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
-    "format": "prettier --write \"src/**/*.{ts,tsx}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx}\"",
+    "lint": "eslint src browser --ext .ts,.tsx",
+    "lint:fix": "eslint src browser --ext .ts,.tsx --fix",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" \"browser/**/*.{ts,tsx,html,md}\" playwright.config.ts",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"browser/**/*.{ts,tsx,html,md}\" playwright.config.ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
     "storybook": "storybook dev -p 6007",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "browser:serve": "vite browser --host 127.0.0.1 --port 4173 --strictPort",
+    "test:browser": "playwright test"
   },
   "keywords": [
     "react",
@@ -100,6 +102,7 @@
   },
   "devDependencies": {
     "@okyrychenko-dev/react-action-guard": "workspace:*",
+    "@playwright/test": "^1.63.0",
     "@storybook/addon-a11y": "^10.3.6",
     "@storybook/addon-docs": "^10.3.6",
     "@storybook/react-vite": "^10.3.6",
@@ -109,6 +112,7 @@
     "@testing-library/react": "^16.3.0",
     "@types/node": "^24.10.4",
     "@types/react": "^19.2.5",
+    "@types/react-dom": "~19.2.7",
     "clsx": "^2.1.1",
     "eslint-plugin-storybook": "^10.3.6",
     "next": "^15.1.6",
@@ -117,6 +121,7 @@
     "react-router-dom": "7.14.2",
     "remark-gfm": "^4.0.1",
     "storybook": "^10.3.6",
+    "vite": "8.2.1",
     "zustand": "^5.0.8"
   },
   "allowScripts": {

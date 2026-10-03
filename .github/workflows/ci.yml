@@ -69,6 +69,23 @@ jobs:
       - name: Test
         run: pnpm run test:coverage
 
+      - name: Install Chrome for navigation tests
+        if: matrix.node == 22
+        run: pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome
+
+      - name: Verify real browser back and forward
+        if: matrix.node == 22
+        run: pnpm --filter @okyrychenko-dev/react-action-guard-router test:browser
+
+      - name: Upload browser verification results
+        if: always() && matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: navigation-browser-results
+          path: packages/router/.cache/browser-history
+          include-hidden-files: true
+          if-no-files-found: ignore
+
       - name: Upload coverage
         if: matrix.node == 22
         uses: codecov/codecov-action@v4
