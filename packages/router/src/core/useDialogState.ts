@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { Nullable } from "@okyrychenko-dev/type-utils";
 
 /**
@@ -11,7 +11,7 @@ export interface DialogState<T = string> {
   /** The data to display in the dialog (typically a message) */
   message: T;
 
-  /** Resolver function to confirm/cancel navigation */
+  /** Settle and close this dialog; repeated or stale calls have no effect */
   resolve: (confirmed: boolean) => void;
 }
 
@@ -24,7 +24,7 @@ export interface UseDialogStateReturn<T = string> {
 
   /**
    * Function to use as onConfirm callback.
-   * Returns a Promise that resolves when user confirms/cancels.
+   * Resolves true on confirmation, false on cancellation, replacement or unmount.
    */
   confirm: (message: T) => Promise<boolean>;
 
@@ -41,29 +41,52 @@ export interface UseDialogStateReturn<T = string> {
 export function useDialogState<T = string>(): UseDialogStateReturn<T> {
   const [dialogState, setDialogState] = useState<Nullable<DialogState<T>>>(null);
   const resolveRef = useRef<Nullable<DialogState<T>["resolve"]>>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      resolveRef.current?.(false);
+    };
+  }, []);
 
   const confirm = useCallback((message: T): Promise<boolean> => {
+    if (!mountedRef.current) {
+      return Promise.resolve(false);
+    }
+
     return new Promise<boolean>((resolve) => {
       if (resolveRef.current) {
         resolveRef.current(false);
       }
-      resolveRef.current = resolve;
+
+      const settle = (confirmed: boolean): void => {
+        if (resolveRef.current !== settle) {
+          return;
+        }
+
+        resolveRef.current = null;
+        resolve(confirmed);
+
+        if (mountedRef.current) {
+          setDialogState(null);
+        }
+      };
+
+      resolveRef.current = settle;
+
       setDialogState({
         isOpen: true,
         message,
-        resolve,
+        resolve: settle,
       });
     });
   }, []);
 
   const closeDialog = useCallback((confirmed: boolean) => {
-    const resolve = resolveRef.current;
-
-    if (resolve) {
-      resolve(confirmed);
-    }
-    resolveRef.current = null;
-    setDialogState(null);
+    resolveRef.current?.(confirmed);
   }, []);
 
   const onConfirm = useCallback(() => {

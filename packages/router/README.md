@@ -159,10 +159,19 @@ Helper hook for managing custom confirmation dialogs.
 - `dialogState: DialogState<TMessage> | null` - Current dialog state
   - `message: TMessage` - The message passed to confirm
   - `isOpen: boolean` - Whether dialog is open
-  - `resolve: (value: boolean) => void` - Internal resolver
+  - `resolve: (value: boolean) => void` - Settle and close this specific dialog
 - `confirm: (message: TMessage) => Promise<boolean>` - Show dialog, returns Promise
 - `onConfirm: () => void` - Resolve dialog with `true`
 - `onCancel: () => void` - Resolve dialog with `false`
+
+Each request settles once: confirmation resolves `true`; cancellation, replacement by
+another `confirm` call, and hook unmount resolve `false`. Calling `dialogState.resolve`
+also closes that dialog. Repeated calls and resolvers captured from an older dialog
+have no effect on a newer dialog.
+
+`confirm`, `onConfirm`, and `onCancel` retain stable references across renders.
+The hook-level `onConfirm` and `onCancel` always act on the current dialog; use its
+`dialogState.resolve` when a captured callback must belong to a specific dialog.
 
 **Example:**
 
