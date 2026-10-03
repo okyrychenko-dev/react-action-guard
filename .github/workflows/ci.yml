@@ -75,6 +75,7 @@ jobs:
 
       - name: Verify real browser back and forward
         if: matrix.node == 22
+        timeout-minutes: 3
         run: pnpm --filter @okyrychenko-dev/react-action-guard-router test:browser
 
       - name: Upload browser verification results
