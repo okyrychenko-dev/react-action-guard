@@ -27,3 +27,4 @@ export type {
   NavigationBlockerReturn,
 } from "./types";
 export type { DialogState, UseDialogStateReturn } from "./useDialogState";
+export { createConfirmationOwner } from "./confirmationOwner.utils";

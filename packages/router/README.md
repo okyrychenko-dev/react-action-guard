@@ -34,7 +34,7 @@ This package requires the following peer dependencies:
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - One of:
   - [react-router-dom](https://reactrouter.com/) ^6.0.0 - For React Router or Remix
-  - [@tanstack/react-router](https://tanstack.com/router) ^1.0.0 - For TanStack Router
+  - [@tanstack/react-router](https://tanstack.com/router) ^1.170.41 - For TanStack Router
   - [next](https://nextjs.org/) ^13.4.0 - For Next.js Pages Router and best-effort App Router support
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)
 
@@ -280,7 +280,7 @@ function MyComponent() {
 
 ### TanStack Router
 
-Full support with TanStack Router's history blocking.
+Uses TanStack Router's native `useBlocker` for in-app transitions. Requires TanStack Router 1.170.41 or newer; earlier versions are no longer declared supported.
 
 ```tsx
 import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/tanstack-router";
@@ -293,7 +293,13 @@ function MyComponent() {
 }
 ```
 
-Async `onConfirm` is supported and evaluated once per blocked navigation attempt.
+Sync and async `onConfirm` are evaluated once per blocked navigation attempt. Active blocking without a message denies silently and emits `onBlock`. Denial, rejection, and thrown confirmation errors retain the current location. Acceptance permits that transition once and emits `onAllow`; subsequent transitions remain protected. Superseded confirmations and results received after unmount or authorization option changes cannot authorize navigation. Replacing `when` or changing the effective `scope` contents invalidates a pending confirmation even when the computed blocking condition remains true. Equivalent scope arrays preserve the attempt: array identity, order, and duplicates do not affect scope comparison. Changes to observer callbacks `onBlock` and `onAllow` do not invalidate a pending confirmation; the attempt retains the callbacks it started with.
+
+`scope` and `when` retain their existing OR behavior. `blockBrowserUnload` controls native TanStack unload protection. Its one-shot bypass suppresses a second browser prompt after accepted document navigation; later unloads remain protected. The adapter does not register a separate shared unload handler. Unload uses a browser-controlled prompt, not asynchronous custom confirmation.
+
+**Not-found limitation:** In the verified TanStack Router 1.170.41, navigation from an unmatched URL (`__notFound__`) to a matched route bypasses native `useBlocker` before this adapter's callback runs, even with `when: true` or an active scope. `onBlock`, `onConfirm`, and `onAllow` are not called for that transition. A blocker mounted above the not-found UI therefore cannot protect this exit; do not rely on it to guard unsaved work there. Subsequent matched-to-matched navigation remains guarded. This is upstream behavior introduced by [TanStack router #4917](https://github.com/TanStack/router/pull/4917), covered by real-router tests for both condition sources. The adapter does not compensate for the bypass.
+
+Compatibility tests exercise the public hook at 1.170.41 with real memory history for in-app navigation and browser history in the DOM test environment for unload protection. The tests intercept document location assignment and dispatch beforeunload events; they do not establish real-browser back/forward or prompt UI behavior. The verified floor was raised from 1.170.28 because the older locked router-core/history combination skipped blockers for external navigation. The native API is documented in [TanStack navigation blocking](https://tanstack.com/router/latest/docs/guide/navigation-blocking).
 
 ### Next.js Pages Router
 
@@ -350,7 +356,7 @@ For full navigation blocking support, use Pages Router.
 | Adapter              | `isBlocking` meaning        | `isIntercepting` | Async `onConfirm` | Caveats                                                  |
 | -------------------- | --------------------------- | ---------------- | ----------------- | -------------------------------------------------------- |
 | React Router         | Blocking condition is armed | Yes              | Yes               | Best semantic fidelity                                   |
-| TanStack Router      | Blocking condition is armed | No               | Yes               | Depends on history.block integration                     |
+| TanStack Router      | Blocking condition is armed | No               | Yes               | Native useBlocker; memory-history transitions verified                     |
 | Next.js Pages Router | Blocking condition is armed | No               | Yes               | Re-attempts confirmed navigation with `router.push(url)` |
 | Next.js App Router   | Blocking condition is armed | No               | Best effort only  | No official blocker API from Next.js                     |
 
