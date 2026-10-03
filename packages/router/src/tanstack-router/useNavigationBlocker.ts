@@ -1,10 +1,6 @@
 import { useBlocker } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
-import {
-  createConfirmationOwner,
-  resolveConfirmResult,
-  useShouldBlock,
-} from "../core";
+import { createConfirmationOwner, resolveConfirmResult, useShouldBlock } from "../core";
 import type { NavigationBlockerReturn } from "../core";
 import type { UseNavigationBlockerOptions } from "./types";
 
