@@ -365,6 +365,70 @@ describe("TanStack navigation blocking with a real router", () => {
     }
   );
 
+  it.each([
+    ["same contents", ["first", "second"]],
+    ["reordered and duplicated contents", ["second", "first", "second"]],
+  ])("should preserve pending confirmation for scope arrays with %s", async (_, scope) => {
+    const pending = deferred();
+    const onAllow = vi.fn();
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("editor", { scope: "first" });
+
+    const options: UseNavigationBlockerOptions = {
+      scope: ["first", "second"],
+      message: "Leave?",
+      onAllow,
+      onConfirm: vi.fn(() => {
+        update({ ...options, scope });
+
+        return pending.promise;
+      }),
+    };
+    const { router, update } = await mountBlocker(options);
+
+    await transition(router, "/next");
+
+    await act(async () => {
+      pending.resolve(true);
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(router.state.location.pathname).toBe("/next"));
+    expect(options.onConfirm).toHaveBeenCalledTimes(1);
+    expect(onAllow).toHaveBeenCalledTimes(1);
+  });
+
+  it("should invalidate pending confirmation when scope array contents change", async () => {
+    const pending = deferred();
+    const onAllow = vi.fn();
+    const { addBlocker } = uiBlockingStoreApi.getState();
+
+    addBlocker("first-editor", { scope: "first" });
+    addBlocker("second-editor", { scope: "second" });
+
+    const options: UseNavigationBlockerOptions = {
+      scope: ["first"],
+      message: "Leave?",
+      onAllow,
+      onConfirm: () => pending.promise,
+    };
+    const { router, update } = await mountBlocker(options);
+
+    await transition(router, "/next");
+    update({ ...options, scope: ["second"] });
+
+    await act(async () => {
+      pending.resolve(true);
+      await Promise.resolve();
+    });
+    expect(router.state.location.pathname).toBe("/");
+    expect(onAllow).not.toHaveBeenCalled();
+
+    await transition(router, "/other");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/other"));
+    expect(onAllow).toHaveBeenCalledTimes(1);
+  });
+
   it("should invalidate pending confirmation when options change", async () => {
     const pending = deferred();
     const onAllow = vi.fn();

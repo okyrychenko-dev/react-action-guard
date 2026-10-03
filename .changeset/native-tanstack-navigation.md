@@ -7,3 +7,5 @@ Restore TanStack navigation blocking using native useBlocker. Confirmed transiti
 Invalidate pending confirmations when when or scope changes, including replacements that leave the computed blocking state active.
 
 Preserve pending confirmations when observer callbacks onBlock or onAllow change during a rerender.
+
+Compare scopes by normalized contents so equivalent arrays, including reordered or duplicated entries, preserve pending confirmations while effective scope changes invalidate them.
