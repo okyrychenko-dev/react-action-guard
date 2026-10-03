@@ -169,6 +169,10 @@ another `confirm` call, and hook unmount resolve `false`. Calling `dialogState.r
 also closes that dialog. Repeated calls and resolvers captured from an older dialog
 have no effect on a newer dialog.
 
+Effect teardown also cancels and clears the pending dialog when React preserves
+hook state, such as when an `Activity` becomes hidden. Revealing the subtree starts
+with no open dialog and allows new confirmation requests.
+
 `confirm`, `onConfirm`, and `onCancel` retain stable references across renders.
 The hook-level `onConfirm` and `onCancel` always act on the current dialog; use its
 `dialogState.resolve` when a captured callback must belong to a specific dialog.

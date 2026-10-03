@@ -1,9 +1,56 @@
 import { act, renderHook } from "@testing-library/react";
-import { StrictMode } from "react";
+import { Activity, createElement, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import { useDialogState } from "../useDialogState";
+import type { PropsWithChildren } from "react";
 
 describe("useDialogState", () => {
+  it("should clear a pending dialog when Activity hides and support a new dialog after reveal", async () => {
+    let mode: "visible" | "hidden" = "visible";
+    const { result, rerender } = renderHook(() => useDialogState(), {
+      wrapper: ({ children }: PropsWithChildren) => createElement(Activity, { mode, children }),
+    });
+    const outcomes: Array<boolean> = [];
+
+    act(() => {
+      void result.current.confirm("First").then((value) => outcomes.push(value));
+    });
+
+    const firstDialog = result.current.dialogState;
+
+    if (!firstDialog) {
+      throw new Error("Expected an open dialog");
+    }
+
+    mode = "hidden";
+
+    rerender();
+
+    await Promise.resolve();
+
+    expect(outcomes).toEqual([false]);
+
+    mode = "visible";
+
+    rerender();
+
+    expect(result.current.dialogState).toBeNull();
+
+    act(() => {
+      void result.current.confirm("Second").then((value) => outcomes.push(value));
+      firstDialog.resolve(true);
+    });
+
+    expect(result.current.dialogState?.message).toBe("Second");
+
+    act(() => result.current.onConfirm());
+
+    await Promise.resolve();
+
+    expect(outcomes).toEqual([false, true]);
+    expect(result.current.dialogState).toBeNull();
+  });
+
   it.each([true, false])("should ignore a replaced resolver settling with %s", async (value) => {
     const { result } = renderHook(() => useDialogState());
     const outcomes: Array<boolean> = [];

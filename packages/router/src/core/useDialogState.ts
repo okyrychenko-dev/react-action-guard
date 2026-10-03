@@ -24,7 +24,7 @@ export interface UseDialogStateReturn<T = string> {
 
   /**
    * Function to use as onConfirm callback.
-   * Resolves true on confirmation, false on cancellation, replacement or unmount.
+   * Resolves true on confirmation, false on cancellation, replacement or effect teardown.
    */
   confirm: (message: T) => Promise<boolean>;
 
@@ -70,9 +70,7 @@ export function useDialogState<T = string>(): UseDialogStateReturn<T> {
         resolveRef.current = null;
         resolve(confirmed);
 
-        if (mountedRef.current) {
-          setDialogState(null);
-        }
+        setDialogState(null);
       };
 
       resolveRef.current = settle;
