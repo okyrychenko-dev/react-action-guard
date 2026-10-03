@@ -10,8 +10,8 @@ import {
 } from "@tanstack/react-router";
 import { act, cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { UseNavigationBlockerOptions } from "../types";
-import { useNavigationBlocker } from "../useNavigationBlocker";
+import { useNavigationBlocker } from "../../tanstack-router";
+import type { UseNavigationBlockerOptions } from "../../tanstack-router";
 
 const OptionsContext = createContext<UseNavigationBlockerOptions>({});
 
@@ -75,6 +75,8 @@ function deferred() {
 
 afterEach(() => {
   cleanup();
+  vi.restoreAllMocks();
+  vi.unstubAllGlobals();
 
   const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
@@ -82,6 +84,30 @@ afterEach(() => {
 });
 
 describe("TanStack navigation blocking with a real router", () => {
+  it.each([true, false])(
+    "should obey browser confirmation %s without a custom handler",
+    async (confirmed) => {
+      const confirm = vi.fn(() => confirmed);
+
+      vi.stubGlobal("confirm", confirm);
+
+      const onBlock = vi.fn();
+      const onAllow = vi.fn();
+      const { router } = await mountBlocker({
+        when: true,
+        message: "Leave editor?",
+        onBlock,
+        onAllow,
+      });
+
+      await transition(router, "/next");
+      await waitFor(() => expect(router.state.location.pathname).toBe(confirmed ? "/next" : "/"));
+      expect(confirm).toHaveBeenCalledExactlyOnceWith("Leave editor?");
+      expect(onBlock).toHaveBeenCalledTimes(1);
+      expect(onAllow).toHaveBeenCalledTimes(confirmed ? 1 : 0);
+    }
+  );
+
   it("should deny silent navigation and report the attempt", async () => {
     const onBlock = vi.fn();
     const { router } = await mountBlocker({ when: true, onBlock });

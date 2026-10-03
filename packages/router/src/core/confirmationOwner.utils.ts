@@ -1,6 +1,5 @@
 import type { ConfirmationOwner } from "./confirmationOwner.types";
 
-/** Owns the right to settle only the latest navigation attempt, once. */
 export function createConfirmationOwner(): ConfirmationOwner {
   let currentAttempt = 0;
 

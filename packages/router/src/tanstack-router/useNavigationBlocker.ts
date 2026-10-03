@@ -26,10 +26,6 @@ export function useNavigationBlocker(
   const shouldBlockFn = useCallback(async () => {
     const settle = begin();
 
-    if (!shouldBlock) {
-      return false;
-    }
-
     onBlock?.();
 
     if (!message) {
@@ -58,7 +54,7 @@ export function useNavigationBlocker(
     } catch {
       return true;
     }
-  }, [shouldBlock, message, onBlock, onAllow, onConfirm, begin]);
+  }, [message, onBlock, onAllow, onConfirm, begin]);
 
   useBlocker({ shouldBlockFn, enableBeforeUnload: false, disabled: !shouldBlock });
   useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);
