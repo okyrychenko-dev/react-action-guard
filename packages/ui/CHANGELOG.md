@@ -1,5 +1,31 @@
 # Changelog
 
+## 1.0.0
+
+### Patch Changes
+
+- 32264e4: Centralize scope normalization, inheritance, observation, and targeted-clear semantics in the core package, preserve empty observed scopes, and migrate guarded UI controls to use the shared behavior. The UI package now requires the core release that exports these helpers.
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools now subscribe to those snapshots. Devtools requires core 1.1.0 or newer for the snapshot API. This compatibility drop, together with the Node.js 20 minimum in the pending type-utils migration, releases Devtools as 0.4.0 instead of a 0.3.x patch.
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [d07b65a]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

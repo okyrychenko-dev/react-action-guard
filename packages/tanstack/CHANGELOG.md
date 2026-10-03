@@ -1,5 +1,30 @@
 # Changelog
 
+## 1.0.0
+
+### Patch Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 583ec47: Route TanStack blocking hooks through the nearest `UIBlockingProvider` store while preserving the global-store fallback when no provider is present.
+- b050190: Centralize blocking state policy, reasons, instance identity, provider store resolution, and blocker cleanup across TanStack hooks. Use the shared type-utils toolset for reason selection. Consolidate public hook configuration and behavior documentation in the package README.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [d07b65a]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

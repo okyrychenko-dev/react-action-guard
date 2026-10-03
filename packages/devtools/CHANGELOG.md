@@ -1,5 +1,49 @@
 # Changelog
 
+## 1.0.0
+
+### Major Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+
+### Minor Changes
+
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools now subscribe to those snapshots. Devtools requires core 1.1.0 or newer for the snapshot API. This compatibility drop, together with the Node.js 20 minimum in the pending type-utils migration, releases Devtools as 0.4.0 instead of a 0.3.x patch.
+
+### Patch Changes
+
+- 5d403d8: Migrate the Core and Devtools store integrations to `@okyrychenko-dev/react-zustand-toolkit` 1.0.0 while preserving React Action Guard's public store and provider APIs.
+- 94547ea: Isolate Devtools event history and runtime viewing state per observed blocking store, share one observation session between Devtools instances attached to the same store, and expose custom sessions to advanced hook consumers through `ActionGuardDevtoolsProvider`.
+- 4363609: Expose anonymous, ownership-safe lifecycle event observation through global and provider-scoped stores. Provider middleware and automatic Devtools observation now use release leases without registry names, while legacy named middleware remains available for compatibility and runs without awaiting earlier observers.
+
+  Observers registered while an event is being delivered begin receiving events with the next delivery, preventing self-replacing named middleware from processing the same event twice.
+
+  Observers released before their turn in an event are skipped, and replacing named middleware keeps its original delivery position.
+
+  Named middleware replacements made during an event take effect on the next event. Direct compatibility calls to `runMiddlewares` invoke middleware concurrently and settle after all complete.
+
+  Global Devtools observation keeps the current event when manual Devtools middleware registers during delivery, while manual registrations already participating in that event remain authoritative, even if they unregister themselves after handling it.
+
+- 5d03641: Manage Devtools observation through store-specific participation leases. Panels and providers observing the same blocking store share one event history and automatic observer; configuration ownership transfers deterministically without reapplying `defaultOpen`, and the final release detaches observation and clears runtime viewing state. Manual Devtools middleware remains compatible.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [d07b65a]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
