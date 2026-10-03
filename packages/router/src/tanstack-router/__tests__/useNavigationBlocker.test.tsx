@@ -351,6 +351,50 @@ describe("TanStack navigation blocking with a real router", () => {
     expect(router.state.location.pathname).toBe("/");
   });
 
+  it.each(["scope", "when"])(
+    "should invalidate pending confirmation when %s changes while blocking remains active",
+    async (source) => {
+      const pending = deferred();
+      const onConfirm = vi.fn(() => pending.promise);
+      const onAllow = vi.fn();
+      const { addBlocker } = uiBlockingStoreApi.getState();
+
+      addBlocker("first-editor", { scope: "first" });
+      addBlocker("second-editor", { scope: "second" });
+
+      const options: UseNavigationBlockerOptions = {
+        scope: "first",
+        when: source === "when" ? () => true : false,
+        message: "Leave?",
+        onConfirm,
+        onAllow,
+      };
+      const { router, update } = await mountBlocker(options);
+
+      await transition(router, "/next");
+
+      if (source === "scope") {
+        update({ ...options, scope: "second" });
+      } else {
+        update({ ...options, when: () => true });
+      }
+
+      await act(async () => {
+        pending.resolve(true);
+        await Promise.resolve();
+      });
+
+      expect(router.state.location.pathname).toBe("/");
+      expect(onAllow).not.toHaveBeenCalled();
+
+      await transition(router, "/other");
+      await waitFor(() => expect(router.state.location.pathname).toBe("/other"));
+
+      expect(onConfirm).toHaveBeenCalledTimes(2);
+      expect(onAllow).toHaveBeenCalledTimes(1);
+    }
+  );
+
   it("should derive blocking from the selected scope", async () => {
     const { addBlocker } = uiBlockingStoreApi.getState();
 

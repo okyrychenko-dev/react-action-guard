@@ -293,7 +293,7 @@ function MyComponent() {
 }
 ```
 
-Sync and async `onConfirm` are evaluated once per blocked navigation attempt. Active blocking without a message denies silently and emits `onBlock`. Denial, rejection, and thrown confirmation errors retain the current location. Acceptance permits that transition once and emits `onAllow`; subsequent transitions remain protected. Superseded confirmations and results received after unmount or option changes cannot authorize navigation.
+Sync and async `onConfirm` are evaluated once per blocked navigation attempt. Active blocking without a message denies silently and emits `onBlock`. Denial, rejection, and thrown confirmation errors retain the current location. Acceptance permits that transition once and emits `onAllow`; subsequent transitions remain protected. Superseded confirmations and results received after unmount or option changes cannot authorize navigation. Replacing `when` or changing `scope` invalidates a pending confirmation even when the computed blocking condition remains true.
 
 `scope` and `when` retain their existing OR behavior. `blockBrowserUnload` controls native TanStack unload protection. Its one-shot bypass suppresses a second browser prompt after accepted document navigation; later unloads remain protected. The adapter does not register a separate shared unload handler. Unload uses a browser-controlled prompt, not asynchronous custom confirmation.
 
