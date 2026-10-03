@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import {
   createMemoryHistory,
+  createBrowserHistory,
   createRootRoute,
   createRoute,
   createRouter,
@@ -12,10 +13,15 @@ import { act, cleanup, render, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useNavigationBlocker } from "../../tanstack-router";
 import type { UseNavigationBlockerOptions } from "../../tanstack-router";
+import type { RouterHistory } from "@tanstack/react-router";
 
 const OptionsContext = createContext<UseNavigationBlockerOptions>({});
+const histories: Array<RouterHistory> = [];
 
-async function mountBlocker(options: UseNavigationBlockerOptions) {
+async function mountBlocker(
+  options: UseNavigationBlockerOptions,
+  history = createMemoryHistory({ initialEntries: ["/"] })
+) {
   function Root() {
     useNavigationBlocker(useContext(OptionsContext));
 
@@ -28,9 +34,10 @@ async function mountBlocker(options: UseNavigationBlockerOptions) {
   );
   const router = createRouter({
     routeTree: root.addChildren(routes),
-    history: createMemoryHistory({ initialEntries: ["/"] }),
+    history,
   });
 
+  histories.push(history);
   await router.load();
 
   const view = render(
@@ -75,6 +82,7 @@ function deferred() {
 
 afterEach(() => {
   cleanup();
+  histories.splice(0).forEach((history) => history.destroy());
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
 
@@ -84,6 +92,89 @@ afterEach(() => {
 });
 
 describe("TanStack navigation blocking with a real router", () => {
+  it("should skip one unload prompt after allowing external navigation", async () => {
+    const onConfirm = vi.fn(() => true);
+    const onAllow = vi.fn();
+    const { router } = await mountBlocker(
+      { when: true, message: "Leave editor?", onConfirm, onAllow },
+      createBrowserHistory()
+    );
+    const unload = new Event("beforeunload", { cancelable: true });
+
+    vi.spyOn(window.location, "href", "set").mockImplementation(() => {
+      window.dispatchEvent(unload);
+    });
+
+    await act(async () => {
+      await router.navigate({ href: "https://external.example/next" });
+    });
+
+    expect(onConfirm).toHaveBeenCalledTimes(1);
+    expect(onAllow).toHaveBeenCalledTimes(1);
+    expect(unload.defaultPrevented).toBe(false);
+
+    const laterUnload = new Event("beforeunload", { cancelable: true });
+
+    window.dispatchEvent(laterUnload);
+    expect(laterUnload.defaultPrevented).toBe(true);
+  });
+
+  it.each(["accept", "deny", "reject"])(
+    "should preserve unload protection after asynchronous external %s",
+    async (outcome) => {
+      const pending = deferred();
+      const onAllow = vi.fn();
+      const { router } = await mountBlocker(
+        { when: true, message: "Leave?", onConfirm: () => pending.promise, onAllow },
+        createBrowserHistory()
+      );
+      const unload = new Event("beforeunload", { cancelable: true });
+      const assignLocation = vi.spyOn(window.location, "href", "set").mockImplementation(() => {
+        window.dispatchEvent(unload);
+      });
+      let navigation = Promise.resolve();
+
+      await act(async () => {
+        navigation = router.navigate({ href: "https://external.example/next" });
+        await Promise.resolve();
+      });
+
+      expect(assignLocation).not.toHaveBeenCalled();
+      await act(async () => {
+        if (outcome === "reject") {
+          pending.reject(new Error("Confirmation failed"));
+        } else {
+          pending.resolve(outcome === "accept");
+        }
+        await navigation;
+      });
+
+      expect(assignLocation).toHaveBeenCalledTimes(outcome === "accept" ? 1 : 0);
+      expect(onAllow).toHaveBeenCalledTimes(outcome === "accept" ? 1 : 0);
+      expect(unload.defaultPrevented).toBe(false);
+
+      const laterUnload = new Event("beforeunload", { cancelable: true });
+
+      window.dispatchEvent(laterUnload);
+      expect(laterUnload.defaultPrevented).toBe(true);
+    }
+  );
+
+  it("should retain unload protection after allowing internal navigation", async () => {
+    const { router } = await mountBlocker(
+      { when: true, message: "Leave?", onConfirm: () => true },
+      createBrowserHistory()
+    );
+
+    await transition(router, "/next");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/next"));
+
+    const unload = new Event("beforeunload", { cancelable: true });
+
+    window.dispatchEvent(unload);
+    expect(unload.defaultPrevented).toBe(true);
+  });
+
   it.each([true, false])(
     "should obey browser confirmation %s without a custom handler",
     async (confirmed) => {
@@ -275,7 +366,7 @@ describe("TanStack navigation blocking with a real router", () => {
   });
 
   it.each([true, false])("should honor browser unload option %s", async (blockBrowserUnload) => {
-    await mountBlocker({ when: true, blockBrowserUnload });
+    await mountBlocker({ when: true, blockBrowserUnload }, createBrowserHistory());
 
     const event = new Event("beforeunload", { cancelable: true });
 

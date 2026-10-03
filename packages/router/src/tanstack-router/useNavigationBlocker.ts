@@ -1,10 +1,8 @@
 import { useBlocker } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
-  DEFAULT_UNLOAD_MESSAGE,
   createConfirmationOwner,
   resolveConfirmResult,
-  useBeforeUnload,
   useShouldBlock,
 } from "../core";
 import type { NavigationBlockerReturn } from "../core";
@@ -56,8 +54,11 @@ export function useNavigationBlocker(
     }
   }, [message, onBlock, onAllow, onConfirm, begin]);
 
-  useBlocker({ shouldBlockFn, enableBeforeUnload: false, disabled: !shouldBlock });
-  useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);
+  useBlocker({
+    shouldBlockFn,
+    enableBeforeUnload: blockBrowserUnload && shouldBlock,
+    disabled: !shouldBlock,
+  });
 
   return { isBlocking: shouldBlock };
 }
