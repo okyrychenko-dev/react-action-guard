@@ -1,8 +1,141 @@
 import { act, renderHook } from "@testing-library/react";
+import { Activity, createElement, StrictMode } from "react";
 import { describe, expect, it } from "vitest";
 import { useDialogState } from "../useDialogState";
+import type { PropsWithChildren } from "react";
 
 describe("useDialogState", () => {
+  it("should clear a pending dialog when Activity hides and support a new dialog after reveal", async () => {
+    let mode: "visible" | "hidden" = "visible";
+    const { result, rerender } = renderHook(() => useDialogState(), {
+      wrapper: ({ children }: PropsWithChildren) => createElement(Activity, { mode, children }),
+    });
+    const outcomes: Array<boolean> = [];
+
+    act(() => {
+      void result.current.confirm("First").then((value) => outcomes.push(value));
+    });
+
+    const firstDialog = result.current.dialogState;
+
+    if (!firstDialog) {
+      throw new Error("Expected an open dialog");
+    }
+
+    mode = "hidden";
+
+    rerender();
+
+    await Promise.resolve();
+
+    expect(outcomes).toEqual([false]);
+
+    mode = "visible";
+
+    rerender();
+
+    expect(result.current.dialogState).toBeNull();
+
+    act(() => {
+      void result.current.confirm("Second").then((value) => outcomes.push(value));
+      firstDialog.resolve(true);
+    });
+
+    expect(result.current.dialogState?.message).toBe("Second");
+
+    act(() => result.current.onConfirm());
+
+    await Promise.resolve();
+
+    expect(outcomes).toEqual([false, true]);
+    expect(result.current.dialogState).toBeNull();
+  });
+
+  it.each([true, false])("should ignore a replaced resolver settling with %s", async (value) => {
+    const { result } = renderHook(() => useDialogState());
+    const outcomes: Array<boolean> = [];
+
+    act(() => {
+      void result.current.confirm("First").then((outcome) => outcomes.push(outcome));
+    });
+
+    const firstDialog = result.current.dialogState;
+
+    if (!firstDialog) {
+      throw new Error("Expected an open dialog");
+    }
+    act(() => {
+      void result.current.confirm("Second").then((outcome) => outcomes.push(outcome));
+      firstDialog.resolve(value);
+    });
+    await Promise.resolve();
+    expect(outcomes).toEqual([false]);
+    expect(result.current.dialogState?.message).toBe("Second");
+
+    act(() => result.current.onConfirm());
+    await Promise.resolve();
+    expect(outcomes).toEqual([false, true]);
+  });
+
+  it("should support dialogs after Strict Mode effect cleanup and deny retained controls after unmount", async () => {
+    const { result, unmount } = renderHook(() => useDialogState(), { wrapper: StrictMode });
+    const { confirm, onConfirm, onCancel } = result.current;
+    const outcomes: Array<boolean> = [];
+
+    act(() => {
+      void confirm("Leave?").then((value) => outcomes.push(value));
+    });
+    expect(result.current.dialogState?.message).toBe("Leave?");
+    unmount();
+    onConfirm();
+    onCancel();
+    await Promise.resolve();
+    expect(outcomes).toEqual([false]);
+    await expect(confirm("After unmount")).resolves.toBe(false);
+  });
+
+  it("should deny the pending dialog on unmount", async () => {
+    const { result, unmount } = renderHook(() => useDialogState());
+    const settled: Array<boolean> = [];
+
+    act(() => {
+      void result.current.confirm("Leave?").then((value) => settled.push(value));
+    });
+    unmount();
+    await Promise.resolve();
+    expect(settled).toEqual([false]);
+  });
+
+  it("should close its own dialog and ignore repeated or stale resolvers", async () => {
+    const { result } = renderHook(() => useDialogState());
+    const outcomes: Array<boolean> = [];
+
+    act(() => {
+      void result.current.confirm("First").then((value) => outcomes.push(value));
+    });
+
+    const firstDialog = result.current.dialogState;
+
+    if (!firstDialog) {
+      throw new Error("Expected an open dialog");
+    }
+    act(() => firstDialog.resolve(true));
+    expect(result.current.dialogState).toBeNull();
+
+    act(() => {
+      void result.current.confirm("Second").then((value) => outcomes.push(value));
+      firstDialog.resolve(false);
+      firstDialog.resolve(true);
+    });
+    await Promise.resolve();
+    expect(outcomes).toEqual([true]);
+    expect(result.current.dialogState?.message).toBe("Second");
+
+    act(() => result.current.onCancel());
+    await Promise.resolve();
+    expect(outcomes).toEqual([true, false]);
+  });
+
   describe("Initialization", () => {
     it("should initialize with null dialog state", () => {
       const { result } = renderHook(() => useDialogState());
