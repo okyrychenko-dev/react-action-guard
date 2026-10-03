@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- b4945b0: Restore TanStack navigation blocking using native useBlocker. Confirmed transitions keep protection armed, failed confirmations deny navigation, and superseded or unmounted attempts cannot allow navigation. Require TanStack Router >=1.170.41 within v1, the verified compatibility floor, and use native unload protection with a one-shot bypass after accepted document navigation, avoiding a duplicate browser prompt.
+
+  Invalidate pending confirmations when when or scope changes, including replacements that leave the computed blocking state active.
+
+  Preserve pending confirmations when observer callbacks onBlock or onAllow change during a rerender.
+
+  Compare scopes by normalized contents so equivalent arrays, including reordered or duplicated entries, preserve pending confirmations while effective scope changes invalidate them.
+
+  Document and test the native not-found limitation at TanStack Router 1.170.41: unmatched-to-matched navigation skips adapter callbacks even with an active condition or scope; subsequent matched-route navigation remains guarded.
+
+### Patch Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [d07b65a]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
