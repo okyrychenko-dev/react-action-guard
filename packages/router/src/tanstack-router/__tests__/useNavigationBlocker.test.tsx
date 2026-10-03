@@ -28,7 +28,10 @@ async function mountBlocker(
     return <Outlet />;
   }
 
-  const root = createRootRoute({ component: Root });
+  const root = createRootRoute({
+    component: Root,
+    notFoundComponent: () => <div>Not found</div>,
+  });
   const routes = ["/", "/next", "/other"].map((path) =>
     createRoute({ getParentRoute: () => root, path, component: () => <div>Destination</div> })
   );
@@ -46,7 +49,7 @@ async function mountBlocker(
     </OptionsContext.Provider>
   );
 
-  await waitFor(() => expect(view.getByText("Destination")).toBeTruthy());
+  await waitFor(() => expect(view.getByText(/^(Destination|Not found)$/)).toBeTruthy());
   function update(next: UseNavigationBlockerOptions) {
     view.rerender(
       <OptionsContext.Provider value={next}>
@@ -92,6 +95,45 @@ afterEach(() => {
 });
 
 describe("TanStack navigation blocking with a real router", () => {
+  it.each(["when", "scope"])(
+    "should expose native not-found bypass with active %s and guard subsequent matched navigation",
+    async (condition) => {
+      const onBlock = vi.fn();
+      const onConfirm = vi.fn(() => false);
+      const onAllow = vi.fn();
+      const { addBlocker } = uiBlockingStoreApi.getState();
+
+      if (condition === "scope") {
+        addBlocker("editor", { scope: "editor" });
+      }
+
+      const { router, getByText } = await mountBlocker(
+        {
+          when: condition === "when",
+          scope: condition === "scope" ? "editor" : undefined,
+          message: "Leave?",
+          onBlock,
+          onConfirm,
+          onAllow,
+        },
+        createMemoryHistory({ initialEntries: ["/missing"] })
+      );
+
+      expect(getByText("Not found")).toBeTruthy();
+      await transition(router, "/next");
+      await waitFor(() => expect(router.state.location.pathname).toBe("/next"));
+      expect(onBlock).not.toHaveBeenCalled();
+      expect(onConfirm).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+
+      await transition(router, "/other");
+      expect(router.state.location.pathname).toBe("/next");
+      expect(onBlock).toHaveBeenCalledTimes(1);
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(onAllow).not.toHaveBeenCalled();
+    }
+  );
+
   it("should skip one unload prompt after allowing external navigation", async () => {
     const onConfirm = vi.fn(() => true);
     const onAllow = vi.fn();

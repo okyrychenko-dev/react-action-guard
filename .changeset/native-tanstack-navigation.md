@@ -9,3 +9,5 @@ Invalidate pending confirmations when when or scope changes, including replaceme
 Preserve pending confirmations when observer callbacks onBlock or onAllow change during a rerender.
 
 Compare scopes by normalized contents so equivalent arrays, including reordered or duplicated entries, preserve pending confirmations while effective scope changes invalidate them.
+
+Document and test the native not-found limitation at TanStack Router 1.170.41: unmatched-to-matched navigation skips adapter callbacks even with an active condition or scope; subsequent matched-route navigation remains guarded.
