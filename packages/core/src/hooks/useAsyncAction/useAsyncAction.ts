@@ -7,7 +7,7 @@ import { useBlockerIdAllocator } from "../useBlockerIdAllocator";
  * Options for useAsyncAction hook
  */
 export interface UseAsyncActionOptions {
-  /** Timeout in milliseconds after which the blocker will be automatically removed */
+  /** Blocker lifetime in milliseconds; does not cancel or settle the operation */
   timeout?: number;
   /** Callback invoked when the blocker is automatically removed due to timeout */
   onTimeout?: (blockerId: string) => void;
@@ -15,7 +15,8 @@ export interface UseAsyncActionOptions {
 
 /**
  * Wraps async functions with UI blocking. Concurrent calls get unique blocker IDs;
- * each blocker is removed on success or failure.
+ * each blocker is removed in finally on success or failure, even after caller unmount.
+ * Tracking does not exclude concurrent execution. Timeout releases only the blocker.
  *
  * @public
  * @since 0.6.0

@@ -6,7 +6,7 @@
 
 > Coordinate shared UI interaction locks in form-heavy and workflow-heavy React applications
 
-`react-action-guard` is for interfaces where one operation must disable or inform several unrelated components. It coordinates duplicate-submit protection, conflicting actions, navigation-sensitive workflows, and non-network blockers through shared scopes with automatic lifecycle cleanup.
+`react-action-guard` is for interfaces where one operation must disable or inform several unrelated components. It coordinates UI availability for conflicting actions, navigation-sensitive workflows, and non-network blockers through shared scopes. The application owns execution exclusion and cancellation.
 
 For a button with one local loading state, React state or your data-fetching library is usually enough. This package becomes useful when multiple independent operations and components need to agree on what is blocked, where, and why.
 
@@ -43,26 +43,47 @@ If you previously imported `createShallowStore`, `createStoreToolkit`, `createSt
 
 ## Quick Start
 
-```jsx
-import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+Choose a store boundary, register work, observe its scope, then apply that state to a control.
+`UIBlockingProvider` isolates this workflow; without it, hooks use the shared global store.
 
-function SaveButton() {
+```tsx
+import type { ReactElement } from "react";
+import {
+  UIBlockingProvider,
+  useAsyncAction,
+  useIsBlocked,
+} from "@okyrychenko-dev/react-action-guard";
+
+function SaveButton(): ReactElement {
+  const runSave = useAsyncAction<void>("save-profile", "form");
   const isSaving = useIsBlocked("form");
-  const runSave = useAsyncAction("save-profile", "form");
 
-  const handleClick = async () => {
-    await runSave(async () => {
-      await api.saveProfile();
-    });
+  const handleClick = async (): Promise<void> => {
+    try {
+      await runSave(async () => {
+        const response = await fetch("/api/profile", { method: "POST" });
+        if (!response.ok) {
+          throw new Error("Save failed");
+        }
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  return (
-    <button onClick={handleClick} disabled={isSaving}>
-      Save
-    </button>
-  );
+  return <button onClick={handleClick} disabled={isSaving}>Save</button>;
+}
+
+export function App(): ReactElement {
+  return <UIBlockingProvider><SaveButton /></UIBlockingProvider>;
 }
 ```
+
+For existing boolean state, register with `useActionBlocker` instead. Read reasons with
+`useBlockingInfo`; for richer control state and accessibility relationships, use
+[`useGuardedButton` and the other guarded controls](../ui/README.md).
+A disabled control communicates UI availability. Every call to `runSave` still executes;
+use an application-owned synchronous gate when repeat submission must be excluded.
 
 ## Core Concepts
 
@@ -79,9 +100,9 @@ The original `useBlocker` export remains available as a deprecated alias for bac
 
 ## Core Use Cases
 
-### Prevent duplicate async actions
+### Track async actions
 
-Use `useAsyncAction` when a button, mutation, or workflow should block while work is in flight.
+Use `useAsyncAction` when related controls should reflect work in flight. It tracks concurrent calls rather than excluding them.
 
 ### Coordinate multiple components
 
@@ -161,9 +182,8 @@ function SaveButton() {
       reason: "Saving...",
       timeout: 30000,
       onTimeout: (id) => {
-        console.warn(`Operation ${id} timed out`);
-        showNotification("Operation timed out");
-        setIsSaving(false);
+        console.warn(`Blocker ${id} expired; saving may still be running`);
+        showNotification("UI blocker expired; check operation status");
       },
     },
     isSaving
@@ -255,13 +275,23 @@ Wraps an async function with automatic blocking/unblocking.
 - `scope?: string | string[]` - Scope(s) to block during execution
 - `options?: UseAsyncActionOptions` - Optional configuration
   - `timeout?: number` - Auto-remove blocker after N milliseconds
-  - `onTimeout?: (blockerId: string) => void` - Callback when timed out
+  - `onTimeout?: (blockerId: string) => void` - Callback when the blocker timeout expires
 
 **Returns:** `(asyncFn: () => Promise<T>) => Promise<T>` - Function wrapper
 
 Each execution receives a unique blocker ID within the resolved store, including concurrent
 executions from different hook instances. Separate `UIBlockingProvider` stores allocate IDs
-independently.
+independently. Calls may overlap, even with the same action ID and scope. Each run removes only
+its own blocker in `finally` after success or rejection, and returns the operation's result or error.
+
+Caller unmount does not release an in-flight `useAsyncAction` blocker. It remains in the resolved
+store until settlement, explicit clearing, or blocker timeout. By contrast, `useActionBlocker`
+and the mounted confirmable, scheduled, and conditional hooks release their registrations on
+unmount; releasing a blocker does not cancel application work.
+
+`timeout` limits blocker lifetime only. It neither aborts the operation nor resolves or rejects
+its promise. After timeout, the operation may still succeed or fail and must still be handled.
+A hung operation without timeout or application cleanup can leave its blocker active indefinitely.
 
 **Example:**
 
@@ -278,12 +308,12 @@ function MyComponent() {
   return <button onClick={handleSave}>Save</button>;
 }
 
-// With timeout - prevents infinite blocking if operation hangs
+// Blocker timeout releases UI even if the operation is still pending
 function ApiComponent() {
   const execute = useAsyncAction("api-call", "global", {
-    timeout: 60000, // 1 minute timeout
+    timeout: 60000, // 1 minute blocker lifetime
     onTimeout: (id) => {
-      showError("Request timed out. Please try again.");
+      showError("UI blocker expired; the request may still be running.");
     },
   });
 
@@ -296,6 +326,66 @@ function ApiComponent() {
   return <button onClick={fetchData}>Fetch Data</button>;
 }
 ```
+
+#### Application-owned cancellation and exclusion
+
+This component owns its `AbortController` and synchronous ref gate. The transport must honor
+`signal` for abort to affect the request. The gate stays closed until settlement, even if the
+UI blocker expires. A backend may already have accepted a request when the client aborts;
+use server-side idempotency where duplicate side effects matter.
+
+```tsx
+import { useEffect, useRef, type ReactElement } from "react";
+import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+
+export function PaymentButton(): ReactElement {
+  const active = useRef<AbortController | null>(null);
+  const run = useAsyncAction<void>("payment", "payment", { timeout: 5000 });
+  const blocked = useIsBlocked("payment");
+
+  useEffect(() => () => {
+    active.current?.abort();
+  }, []);
+
+  const pay = async (): Promise<void> => {
+    if (active.current !== null) {
+      return;
+    }
+
+    const controller = new AbortController();
+
+    active.current = controller;
+
+    try {
+      await run(async () => {
+        const response = await fetch("/api/payment", {
+          method: "POST",
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error("Payment failed");
+        }
+      });
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        console.error(error);
+      }
+    } finally {
+      if (active.current === controller) {
+        active.current = null;
+      }
+    }
+  };
+
+  return <>
+    <button disabled={blocked} onClick={pay}>Pay</button>
+    <button onClick={() => active.current?.abort()}>Cancel payment</button>
+  </>;
+}
+```
+
+Scheduling and confirmation are described below. [Lifecycle observation and analytics](#middleware-system)
+are optional diagnostics rather than prerequisites for this workflow.
 
 #### Advanced hooks
 
