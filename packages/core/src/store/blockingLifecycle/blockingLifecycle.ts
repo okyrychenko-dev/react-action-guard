@@ -184,7 +184,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     });
   }
 
-  function update(id: string, config: Partial<BlockerConfig> = {}): void {
+  function applyUpdate(id: string, config: BlockerConfig, replace: boolean): void {
     const previous = blockers.get(id);
 
     if (!previous) {
@@ -194,16 +194,26 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     }
 
     const oldConfig = previous.config;
-    const nextConfig: BlockerInfo = {
-      ...oldConfig,
-      scope: copyScope(config.scope ?? oldConfig.scope),
-      reason: config.reason ?? oldConfig.reason,
-      priority: Math.max(0, config.priority ?? oldConfig.priority),
-      timestamp: config.timestamp ?? oldConfig.timestamp,
-      timeout: config.timeout ?? oldConfig.timeout,
-      onTimeout: config.onTimeout ?? oldConfig.onTimeout,
-    };
-    const timeoutChanged = !isUndefined(config.timeout) && config.timeout !== oldConfig.timeout;
+    let nextConfig: BlockerInfo;
+
+    if (replace) {
+      nextConfig = normalizeBlocker(id, {
+        ...config,
+        timestamp: config.timestamp ?? oldConfig.timestamp,
+      });
+    } else {
+      nextConfig = {
+        ...oldConfig,
+        scope: copyScope(config.scope ?? oldConfig.scope),
+        reason: config.reason ?? oldConfig.reason,
+        priority: Math.max(0, config.priority ?? oldConfig.priority),
+        timestamp: config.timestamp ?? oldConfig.timestamp,
+        timeout: config.timeout ?? oldConfig.timeout,
+        onTimeout: config.onTimeout ?? oldConfig.onTimeout,
+      };
+    }
+
+    const timeoutChanged = nextConfig.timeout !== oldConfig.timeout;
     let blocker = previous;
 
     if (timeoutChanged) {
@@ -224,6 +234,14 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       config: publicConfig(nextConfig),
       prevState: publicConfig(oldConfig),
     });
+  }
+
+  function update(id: string, config: Partial<BlockerConfig> = {}): void {
+    applyUpdate(id, config, false);
+  }
+
+  function replace(id: string, config: BlockerConfig): void {
+    applyUpdate(id, config, true);
   }
 
   function remove(id: string): void {
@@ -319,6 +337,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   return {
     add,
     update,
+    replace,
     remove,
     clear,
     clearScope,

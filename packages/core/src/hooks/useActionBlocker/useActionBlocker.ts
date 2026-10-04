@@ -15,10 +15,10 @@ import type { BlockerConfig } from "../../store";
  * @see {@link useConfirmableBlocker} for blockers that require user confirmation
  */
 export function useActionBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
-  const { addBlocker, removeBlocker, updateBlocker } = useResolvedValue((state) => ({
+  const { addBlocker, removeBlocker, replaceBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
-    updateBlocker: state.updateBlocker,
+    replaceBlocker: state.replaceBlocker,
   }));
   const lastConfigRef = useRef<Nullable<BlockerConfig>>(null);
   const onTimeoutRef = useRef(config.onTimeout);
@@ -66,9 +66,9 @@ export function useActionBlocker(blockerId: string, config: BlockerConfig, isAct
       return;
     }
 
-    updateBlocker(blockerId, storeConfig);
+    replaceBlocker(blockerId, storeConfig);
     lastConfigRef.current = storeConfig;
-  }, [blockerId, storeConfig, isActive, updateBlocker]);
+  }, [blockerId, storeConfig, isActive, replaceBlocker]);
 }
 
 /**

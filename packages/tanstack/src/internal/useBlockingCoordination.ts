@@ -15,7 +15,7 @@ export function useBlockingCoordination({
   const instanceId = useId();
   const blockerId = resolveBlockerId(kind, key, instanceId);
   const store = useResolvedStoreApi();
-  const { addBlocker, updateBlocker, removeBlocker } = store.getState();
+  const { addBlocker, replaceBlocker, removeBlocker } = store.getState();
   const registered = useRef(false);
 
   const { scope, priority = defaultPriority, timeout, onTimeout } = config;
@@ -37,7 +37,7 @@ export function useBlockingCoordination({
 
     if (blocking) {
       if (registered.current) {
-        updateBlocker(blockerId, blockerConfig);
+        replaceBlocker(blockerId, blockerConfig);
       } else {
         addBlocker(blockerId, blockerConfig);
         registered.current = true;
@@ -48,7 +48,7 @@ export function useBlockingCoordination({
     }
   }, [
     addBlocker,
-    updateBlocker,
+    replaceBlocker,
     removeBlocker,
     blockerId,
     blocking,

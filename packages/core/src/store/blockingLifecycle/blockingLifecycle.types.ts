@@ -14,6 +14,7 @@ export interface BlockingLifecycleObservation {
 export interface BlockingLifecycle extends BlockingLifecycleObservation {
   add: (id: string, config?: BlockerConfig) => void;
   update: (id: string, config?: Partial<BlockerConfig>) => void;
+  replace: (id: string, config: BlockerConfig) => void;
   remove: (id: string) => void;
   clear: () => void;
   clearScope: (scope: string) => void;

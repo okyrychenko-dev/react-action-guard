@@ -18,6 +18,7 @@ function createActions(lifecycle: BlockingLifecycle): LifecycleActionsCreator {
     observeBlockingEvents: lifecycle.observe,
     addBlocker: lifecycle.add,
     updateBlocker: lifecycle.update,
+    replaceBlocker: lifecycle.replace,
     removeBlocker: lifecycle.remove,
     clearAllBlockers: lifecycle.clear,
     clearBlockersForScope: lifecycle.clearScope,

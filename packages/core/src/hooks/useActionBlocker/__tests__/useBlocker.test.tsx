@@ -2,11 +2,63 @@ import { renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { uiBlockingStoreApi } from "../../../store";
 import { useActionBlocker } from "../useActionBlocker";
+import type { Middleware } from "../../../middleware";
 import type { BlockerConfig } from "../../../store";
 
 describe("useBlocker", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
+  });
+
+  it("should clear omitted reactive configuration without replacing the registration", () => {
+    vi.useFakeTimers();
+    try {
+      const onTimeout = vi.fn();
+      const { observeBlockingEvents, getBlockingInfo } = uiBlockingStoreApi.getState();
+      const events = vi.fn<Middleware>();
+      const release = observeBlockingEvents(events);
+      const config: BlockerConfig = {
+        scope: "checkout",
+        reason: "Saving",
+        priority: 20,
+        timeout: 100,
+        onTimeout,
+      };
+      const { rerender, unmount } = renderHook(
+        (current: BlockerConfig) => useActionBlocker("reactive", current),
+        { initialProps: config }
+      );
+      const [initial] = getBlockingInfo("checkout");
+
+      vi.advanceTimersByTime(40);
+      rerender({});
+
+      expect(getBlockingInfo("other")).toEqual([
+        expect.objectContaining({
+          id: "reactive",
+          scope: "global",
+          reason: "Unknown",
+          priority: 0,
+          timestamp: initial.timestamp,
+          timeout: undefined,
+          onTimeout: undefined,
+        }),
+      ]);
+
+      expect(events.mock.calls.map(([event]) => event.action)).toEqual(["add", "update"]);
+
+      vi.advanceTimersByTime(100);
+
+      expect(onTimeout).not.toHaveBeenCalled();
+      expect(getBlockingInfo("other")).toHaveLength(1);
+
+      unmount();
+      release();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should add blocker when component mounts", () => {

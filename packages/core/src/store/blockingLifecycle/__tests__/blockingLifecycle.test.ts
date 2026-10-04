@@ -9,6 +9,98 @@ describe("Blocking lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it("should preserve reactive deadlines and invoke only the current callback", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const obsolete = vi.fn();
+    const current = vi.fn();
+
+    lifecycle.add("saving", { timeout: 100, onTimeout: obsolete, timestamp: 10 });
+
+    vi.advanceTimersByTime(40);
+
+    lifecycle.replace("saving", { timeout: 100, onTimeout: current, reason: "Updated" });
+
+    expect(lifecycle.getSnapshot()[0]?.timestamp).toBe(10);
+
+    vi.advanceTimersByTime(59);
+
+    expect(lifecycle.isBlocked()).toBe(true);
+
+    vi.advanceTimersByTime(1);
+
+    expect(current).toHaveBeenCalledWith("saving");
+    expect(obsolete).not.toHaveBeenCalled();
+    expect(lifecycle.isBlocked()).toBe(false);
+  });
+
+  it("should clear an undefined callback without extending an unchanged deadline", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const onTimeout = vi.fn();
+
+    lifecycle.add("save", { timeout: 100, onTimeout });
+    vi.advanceTimersByTime(40);
+    lifecycle.replace("save", { timeout: 100, onTimeout: undefined });
+    vi.advanceTimersByTime(60);
+    expect(onTimeout).not.toHaveBeenCalled();
+    expect(lifecycle.getSnapshot()).toEqual([]);
+  });
+
+  it("should restart changed reactive timeouts and cancel removed timeouts", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+
+    lifecycle.add("save", { timeout: 100 });
+    vi.advanceTimersByTime(40);
+    lifecycle.replace("save", { timeout: 200 });
+    vi.advanceTimersByTime(199);
+    expect(lifecycle.isBlocked()).toBe(true);
+    vi.advanceTimersByTime(1);
+    expect(lifecycle.isBlocked()).toBe(false);
+
+    lifecycle.replace("save", { timeout: 50 });
+    vi.advanceTimersByTime(20);
+    lifecycle.replace("save", { timeout: undefined });
+    vi.advanceTimersByTime(100);
+    expect(lifecycle.getSnapshot()[0]?.timeout).toBeUndefined();
+    expect(lifecycle.isBlocked()).toBe(true);
+    lifecycle.clear();
+  });
+
+  it("should preserve omitted and undefined fields in imperative patches", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const onTimeout = vi.fn();
+
+    lifecycle.update("save", {
+      scope: "form",
+      reason: "Saving",
+      priority: 20,
+      timeout: 100,
+      onTimeout,
+    });
+
+    const initial = lifecycle.getSnapshot();
+
+    vi.advanceTimersByTime(40);
+    lifecycle.update("save", {
+      scope: undefined,
+      reason: undefined,
+      priority: undefined,
+      timeout: undefined,
+      onTimeout: undefined,
+    });
+    expect(lifecycle.getSnapshot()).toEqual(initial);
+    vi.advanceTimersByTime(60);
+    expect(onTimeout).toHaveBeenCalledWith("save");
+    expect(lifecycle.isBlocked("form")).toBe(false);
+  });
+
   it("should reuse its snapshot until a transition publishes new state", () => {
     const lifecycle = createBlockingLifecycle();
     const initial = lifecycle.getSnapshot();
