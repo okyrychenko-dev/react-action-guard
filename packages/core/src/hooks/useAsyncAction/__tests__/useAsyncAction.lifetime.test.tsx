@@ -6,6 +6,7 @@ import { useAsyncAction } from "../../useAsyncAction";
 describe("useAsyncAction lifetime", () => {
   beforeEach(() => {
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
     clearAllBlockers();
   });
 
@@ -45,7 +46,9 @@ describe("useAsyncAction lifetime", () => {
             finish = resolve;
           })
       );
+
       void operation.then(settled);
+
       const { isBlocked } = uiBlockingStoreApi.getState();
 
       expect(isBlocked("form")).toBe(true);
