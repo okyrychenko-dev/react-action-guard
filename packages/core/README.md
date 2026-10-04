@@ -384,10 +384,6 @@ export function PaymentButton(): ReactElement {
 }
 ```
 
-The local enterprise checkout follows the same ownership split: its controller ref excludes
-repeated payment calls, and its cancellation-aware wait handles abort. Its five-second library
-blocker timeout only releases UI blocking; it does not cancel payment authorization.
-
 Scheduling and confirmation are described below. [Lifecycle observation and analytics](#middleware-system)
 are optional diagnostics rather than prerequisites for this workflow.
 
