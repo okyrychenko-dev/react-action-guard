@@ -1,7 +1,7 @@
 import { type Nullable, isNull } from "@okyrychenko-dev/type-utils";
 import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useResolvedValue } from "../../context";
-import { areBlockerConfigsEqual } from "./useActionBlocker.utils";
+import { useResolvedStoreApi, useResolvedValue } from "../../context";
+import { areBlockerConfigsEqual, trackHookRegistration } from "./useActionBlocker.utils";
 import type { BlockerConfig } from "../../store";
 
 /**
@@ -15,6 +15,7 @@ import type { BlockerConfig } from "../../store";
  * @see {@link useConfirmableBlocker} for blockers that require user confirmation
  */
 export function useActionBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
+  const store = useResolvedStoreApi();
   const { addBlocker, removeBlocker, replaceBlocker } = useResolvedValue((state) => ({
     addBlocker: state.addBlocker,
     removeBlocker: state.removeBlocker,
@@ -44,15 +45,18 @@ export function useActionBlocker(blockerId: string, config: BlockerConfig, isAct
       return;
     }
 
+    const releaseRegistration = trackHookRegistration(store, blockerId);
+
     addBlocker(blockerId, storeConfig);
     lastConfigRef.current = storeConfig;
 
     return () => {
+      releaseRegistration();
       lastConfigRef.current = null;
       removeBlocker(blockerId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockerId, isActive, addBlocker, removeBlocker]);
+  }, [blockerId, isActive, addBlocker, removeBlocker, store]);
 
   useEffect(() => {
     if (!isActive || !blockerId) {
