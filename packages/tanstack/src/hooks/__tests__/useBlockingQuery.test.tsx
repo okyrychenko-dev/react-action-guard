@@ -4,15 +4,71 @@ import {
   useIsBlocked,
 } from "@okyrychenko-dev/react-action-guard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, renderHook, screen, waitFor } from "@testing-library/react";
+import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createWrapper } from "../../test/test.utils";
 import { useBlockingQuery } from "../useBlockingQuery";
 import { QueryBlockingConfig } from "../useBlockingQuery.types";
+import type { Middleware } from "@okyrychenko-dev/react-action-guard";
 
 describe("useBlockingQuery", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
+  });
+
+  it("should apply current configuration while a real query remains loading", () => {
+    vi.useFakeTimers();
+    try {
+      const onTimeout = vi.fn();
+      const config: QueryBlockingConfig = {
+        scope: "checkout",
+        reason: "Custom",
+        priority: 25,
+        timeout: 100,
+        onTimeout,
+      };
+      const { getBlockingInfo, observeBlockingEvents } = uiBlockingStoreApi.getState();
+      const events = vi.fn<Middleware>();
+      const release = observeBlockingEvents(events);
+      const { rerender, unmount } = renderHook(
+        (blockingConfig: QueryBlockingConfig) =>
+          useBlockingQuery({
+            queryKey: ["current-config"],
+            queryFn: () => new Promise<string>(() => undefined),
+            blockingConfig,
+          }),
+        { initialProps: config, wrapper: createWrapper() }
+      );
+      const [initial] = getBlockingInfo("checkout");
+
+      expect(initial).toBeDefined();
+      act(() => {
+        vi.advanceTimersByTime(40);
+      });
+      rerender({});
+      expect(getBlockingInfo("other")).toEqual([
+        expect.objectContaining({
+          scope: "global",
+          reason: "Loading data...",
+          priority: 10,
+          timestamp: initial.timestamp,
+          timeout: undefined,
+          onTimeout: undefined,
+        }),
+      ]);
+      expect(events.mock.calls.map(([event]) => event.action)).toEqual(["add", "update"]);
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+      expect(onTimeout).not.toHaveBeenCalled();
+      expect(getBlockingInfo("other")).toHaveLength(1);
+      unmount();
+      release();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should isolate blocking state between sibling UIBlockingProviders", async () => {
@@ -55,7 +111,10 @@ describe("useBlockingQuery", () => {
       expect(screen.getByTestId("first-provider")).toHaveTextContent("blocked");
     });
     expect(screen.getByTestId("second-provider")).toHaveTextContent("not-blocked");
-    expect(uiBlockingStoreApi.getState().isBlocked("provider-isolation")).toBe(false);
+
+    const { isBlocked } = uiBlockingStoreApi.getState();
+
+    expect(isBlocked("provider-isolation")).toBe(false);
   });
 
   it("should block UI during initial loading", async () => {

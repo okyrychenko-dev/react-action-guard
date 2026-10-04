@@ -8,6 +8,21 @@ Complete API reference for all React Action Guard hooks.
 
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
+`useActionBlocker` (and its `useBlocker` compatibility alias) treats each reactive
+configuration as the current configuration. Removing `scope` restores `global`,
+removing `reason` restores `Unknown`, and removing `priority` restores `0`.
+Omitted or explicitly `undefined` `timeout` and `onTimeout` values disable the
+timer and clear the callback respectively. Metadata and callback changes keep an
+unchanged timeout deadline; changing the timeout starts a new deadline from the
+update. Updates preserve the registration timestamp unless explicitly supplied.
+
+**Migration:** If a rerender previously relied on omitted values retaining their
+old settings, keep those values in the hook configuration. TanStack blocking hooks
+apply the same replacement rules, with their own default reason and priority.
+Imperative `updateBlocker(id, patch)` still retains omitted or `undefined` values.
+Reactive updates publish an `update` transition, without removing and adding the
+blocker.
+
 ```typescript
 function useBlocker(
   blockerId: string,

@@ -49,6 +49,8 @@ export interface UIBlockingStoreState {
 export interface UIBlockingStoreActions {
   addBlocker: (id: string, config?: BlockerConfig) => void;
   updateBlocker: (id: string, config?: Partial<BlockerConfig>) => void;
+  /** @internal Apply current reactive configuration, clearing omitted optional fields. */
+  replaceBlocker: (id: string, config: BlockerConfig) => void;
   removeBlocker: (id: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;
   getBlockingInfo: (scope: string) => ReadonlyArray<Readonly<BlockerInfo>>;
