@@ -34,7 +34,7 @@ function evictOldestNormalizedScopeCacheEntry(): void {
 }
 
 function getCachedNormalizedScope(scopes: ReadonlyArray<string>): ReadonlyArray<string> {
-  const normalizedScope = [...new Set(scopes)].sort();
+  const normalizedScope = Object.freeze([...new Set(scopes)].sort());
   const cacheKey = getNormalizedScopeCacheKey(normalizedScope);
   const cachedScope = normalizedScopeCache.get(cacheKey);
 
@@ -52,7 +52,7 @@ function getCachedNormalizedScope(scopes: ReadonlyArray<string>): ReadonlyArray<
 }
 
 /**
- * Returns a stable, deduplicated, sorted scope list.
+ * Returns a frozen, stable, deduplicated, sorted scope list.
  * An omitted scope means global; an empty list remains empty.
  */
 export function normalizeScope(scope?: Scope): ReadonlyArray<string> {

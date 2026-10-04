@@ -20,6 +20,17 @@ describe("scope", () => {
     it("should return the canonical scope list", () => {
       expect(normalizeScope(scope)).toEqual(expected);
     });
+
+    it("should protect cached scopes from JavaScript mutation", () => {
+      const normalized = normalizeScope(scope);
+
+      expect(Reflect.set(normalized, "0", "poisoned")).toBe(false);
+      expect(Reflect.set(normalized, "length", 0)).toBe(false);
+      expect(() => Array.prototype.push.call(normalized, "poisoned")).toThrow(TypeError);
+      expect(Object.isFrozen(normalized)).toBe(true);
+      expect(normalizeScope(scope)).toBe(normalized);
+      expect(normalizeScope(scope)).toEqual(expected);
+    });
   });
 
   it("should reuse the canonical list for equivalent scopes", () => {
