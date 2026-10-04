@@ -101,7 +101,7 @@ All four hooks accept the native TanStack Query options and return the correspon
 | `priority?: number`                       | Priority used by React Action Guard when several blockers apply                  | Hook-specific value above                       |
 | `timeout?: number`                        | Milliseconds before the Blocking lifecycle removes the blocker                   | No timeout                                      |
 | `onTimeout?: (blockerId: string) => void` | Called when the blocker times out; treat the ID as opaque                        | None                                            |
-| `onLoading?: boolean`                     | Block while loading; mutation pending always blocks                              | `true` for queries; always enabled for mutation |
+| `onLoading?: boolean`                     | Block active initial fetching; mutation pending always blocks                    | `true` for queries; always enabled for mutation |
 | `onFetching?: boolean`                    | Block while fetching after initial load; not available for mutation              | `false`                                         |
 | `onError?: boolean`                       | Keep blocking in an error state                                                  | `false`                                         |
 | `reasonOnLoading?: string`                | Loading message for query and multi-query hooks                                  | Not set                                         |
@@ -111,14 +111,22 @@ All four hooks accept the native TanStack Query options and return the correspon
 
 `onLoading` and `onFetching` are available on query, infinite-query, and multi-query configurations. Mutations always block while pending and do not have a fetching state.
 
+### Migration: active loading by default
+
+Query loading now means `isPending && isFetching` (TanStack's `isLoading`). Disabled queries without data and offline paused queries leave their scopes available, even though their status is pending. Initial requests block when they actually start and release after settlement or while paused. This applies to query, infinite-query, and query collections; an idle member does not keep a collection blocked.
+
+Cached background requests do not block by default. Set `onFetching: true` to block refetches and infinite next/previous-page requests; paused fetches do not qualify. `reasonOnLoading` describes active initial requests, and `reasonOnFetching` describes background or pagination work. Error blocking still requires `onError: true`; mutation pending behavior is unchanged.
+
+If your application previously relied on a disabled or paused pending query to lock a workflow, register that workflow condition separately with core's `useActionBlocker`. There is no query option for blocking solely because data is absent.
+
 ### State mapping and reason precedence
 
 | Hook                       | Loading               | Fetching                                                          | Error                   |
 | -------------------------- | --------------------- | ----------------------------------------------------------------- | ----------------------- |
-| `useBlockingQuery`         | `isPending`           | `isRefetching`                                                    | `isError`               |
-| `useBlockingInfiniteQuery` | `isPending`           | `isRefetching`, `isFetchingNextPage`, or `isFetchingPreviousPage` | `isError`               |
+| `useBlockingQuery`         | `isLoading`           | `isRefetching`                                                    | `isError`               |
+| `useBlockingInfiniteQuery` | `isLoading`           | `isRefetching`, `isFetchingNextPage`, or `isFetchingPreviousPage` | `isError`               |
 | `useBlockingMutation`      | `isPending`           | Not applicable                                                    | `isError`               |
-| `useBlockingQueries`       | Any result is pending | Any result is refetching                                          | Any result has an error |
+| `useBlockingQueries`       | Any result is loading | Any result is refetching                                          | Any result has an error |
 
 The enabled `onLoading`, `onFetching`, and `onError` options decide whether a blocker exists. When states overlap, the reason is selected in **loading → fetching → error** order from the first defined state-specific message; otherwise it falls back to `reason`. This reason precedence is independent of which blocking option is enabled. An empty string is a defined message.
 

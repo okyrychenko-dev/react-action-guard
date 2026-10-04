@@ -66,7 +66,7 @@ export function useBlockingInfiniteQuery<
     kind: "infinite-query",
     key: options.queryKey,
     state: {
-      loading: query.isPending,
+      loading: query.isLoading,
       fetching: query.isRefetching || query.isFetchingNextPage || query.isFetchingPreviousPage,
       error: query.isError,
     },
