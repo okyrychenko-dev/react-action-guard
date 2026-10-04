@@ -118,6 +118,12 @@ Start with these first:
 
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
+Use a unique `blockerId` for each active hook within the resolved store. In development,
+concurrent hooks with the same ID in that store emit a warning. Equal IDs in isolated provider
+stores are allowed. This diagnostic does not isolate shared-ID registrations: one hook can
+still overwrite another's configuration or remove its blocker on cleanup. Production behavior
+is unchanged.
+
 **Parameters:**
 
 - `blockerId: string` - Unique identifier for the blocker

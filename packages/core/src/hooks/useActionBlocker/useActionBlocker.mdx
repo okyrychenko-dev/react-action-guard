@@ -31,7 +31,7 @@ useBlocker(
 
 | Parameter   | Type            | Required | Description                                                                |
 | ----------- | --------------- | -------- | -------------------------------------------------------------------------- |
-| `blockerId` | `string`        | ✅       | Unique identifier for this blocker. Must be unique across the application. |
+| `blockerId` | `string`        | ✅       | Unique identifier for this blocker. Must be unique among active hooks in the same store. |
 | `config`    | `BlockerConfig` | ✅       | Configuration object defining scope, reason, and priority.                 |
 | `isActive`  | `boolean`       | ❌       | `true`  | Controls whether the blocker is currently active.                          |
 
@@ -234,7 +234,7 @@ function ChildFormComponent({ isBlocking }: { isBlocking: boolean }) {
 
 ### ✅ Do
 
-- Use unique `blockerId` values across your application
+- Use unique `blockerId` values among active hooks in the same store
 - Provide meaningful `reason` strings for better debugging
 - Use appropriate priority levels to control precedence (higher = more important)
 - Combine with `useIsBlocked` to disable UI elements
