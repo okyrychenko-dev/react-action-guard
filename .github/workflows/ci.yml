@@ -34,6 +34,47 @@ jobs:
       - name: Require a changeset for package changes
         run: pnpm exec changeset status --since=origin/main
 
+  packed-compatibility:
+    name: Packed compatibility (${{ matrix.target }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          [
+            react-18,
+            react-19,
+            react-19-floor,
+            react-router-floor,
+            react-router-7-floor,
+            react-router-current,
+            tanstack-router-floor,
+            next-13-floor,
+            next-14-floor,
+            next-15-floor,
+            next-current,
+            query-floor,
+          ]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm run test:packed ${{ matrix.target }}
+      - name: Upload isolated consumer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: packed-${{ matrix.target }}
+          path: /tmp/action-guard-compatibility-*/${{ matrix.target }}/result.json
+          if-no-files-found: ignore
+
   verify:
     name: Verify (Node ${{ matrix.node }})
     runs-on: ubuntu-latest

@@ -209,3 +209,5 @@ flowchart TB
   <p class="custom-block-title">See Examples</p>
   <p>Check out <a href="/packages/react-action-guard/examples/basic-usage">real-world examples</a> including shopping carts, multi-step forms, and dashboards.</p>
 </div>
+
+[Versioned capabilities and compatibility evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md) distinguishes verified checks, declared contracts, source observations, limitations and unverified integrations.

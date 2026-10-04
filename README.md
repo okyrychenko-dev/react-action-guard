@@ -1,5 +1,7 @@
 # react-action-guard
 
+See the [versioned capability matrix](./CAPABILITIES.md) for evaluated peers, reproducible checks, evidence kinds, and limitations.
+
 [![CI](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 

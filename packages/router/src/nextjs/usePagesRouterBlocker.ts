@@ -1,4 +1,4 @@
-import { useRouter } from "next/router";
+import { useRouter } from "next/router.js";
 import { useEffect, useRef } from "react";
 import {
   DEFAULT_UNLOAD_MESSAGE,

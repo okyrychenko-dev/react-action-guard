@@ -1,0 +1,261 @@
+{
+  "sourceBase": "490aad312d3bc87c475ea20864f14827e4a3b27d",
+  "scope": "Pending source cohort; explicit supplied peers, legacy peer install; loading/types for all targets, provider and memory-router behavior only where specified in README.md.",
+  "results": [
+    {
+      "target": "next-13-floor",
+      "date": "2026-10-04T18:53:23.813Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "next": "13.4.0",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "next-14-floor",
+      "date": "2026-10-04T18:53:36.081Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "next": "14.0.0",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "next-15-floor",
+      "date": "2026-10-04T18:53:49.926Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "next": "15.0.0",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "next-current",
+      "date": "2026-10-04T18:54:00.425Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "next": "15.5.23",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "query-floor",
+      "date": "2026-10-04T18:54:05.803Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@tanstack/react-query": "5.90.10",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4",
+        "@okyrychenko-dev/react-action-guard-tanstack": "0.3.5"
+      }
+    },
+    {
+      "target": "react-18",
+      "date": "2026-10-04T18:52:21.640Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "18.0.0",
+        "react-dom": "18.0.0",
+        "@types/react": "18.0.0",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "react-19",
+      "date": "2026-10-04T18:52:32.972Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.15",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "react-19-floor",
+      "date": "2026-10-04T18:52:27.315Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.0.0",
+        "react-dom": "19.0.0",
+        "@types/react": "19.0.0",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "react-router-7-floor",
+      "date": "2026-10-04T18:52:46.473Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "react-router-dom": "7.0.0",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "react-router-current",
+      "date": "2026-10-04T18:52:55.087Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "react-router-dom": "7.14.2",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "react-router-floor",
+      "date": "2026-10-04T18:52:39.881Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "react-router-dom": "6.19.0",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    },
+    {
+      "target": "tanstack-router-floor",
+      "date": "2026-10-04T18:53:02.823Z",
+      "node": "v22.20.0",
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@tanstack/react-router": "1.170.41",
+        "@okyrychenko-dev/react-action-guard": "1.0.5",
+        "@okyrychenko-dev/react-action-guard-ui": "0.1.5",
+        "@okyrychenko-dev/react-action-guard-devtools": "0.3.0",
+        "@okyrychenko-dev/react-action-guard-router": "0.2.4"
+      }
+    }
+  ],
+  "tools": {
+    "pnpm": "11.21.0",
+    "npm": "11.19.0",
+    "typescript": "5.6.3"
+  }
+}

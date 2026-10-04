@@ -13,8 +13,8 @@
     "typecheck": "pnpm -r run typecheck",
     "lint": "pnpm -r run lint",
     "lint:fix": "pnpm -r run lint:fix",
-    "format": "prettier --write config prettier.config.mjs package.json \"packages/*/*.{json,mjs,ts}\" && pnpm -r run format",
-    "format:check": "prettier --check config prettier.config.mjs package.json \"packages/*/*.{json,mjs,ts}\" && pnpm -r run format:check",
+    "format": "prettier --write config scripts prettier.config.mjs package.json \"packages/*/*.{json,mjs,ts}\" && pnpm -r run format",
+    "format:check": "prettier --check config scripts prettier.config.mjs package.json \"packages/*/*.{json,mjs,ts}\" && pnpm -r run format:check",
     "test": "pnpm run test:run",
     "test:run": "pnpm run test:config && pnpm -r run test:run",
     "test:coverage": "pnpm -r run test:coverage",
@@ -24,7 +24,8 @@
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "pnpm run build && changeset publish",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test:packed": "node scripts/check-packed-compatibility.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "^2.27.11",

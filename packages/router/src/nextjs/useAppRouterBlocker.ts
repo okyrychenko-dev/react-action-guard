@@ -24,8 +24,8 @@ export function useNavigationBlocker(
     }
   }, [shouldBlock]);
 
-  // Best effort: Block browser navigation via beforeunload
-  // This will prevent tab close, refresh, and some browser back/forward
+  // Request a native prompt on document unload, subject to browser policy.
+  // Same-document App Router back/forward does not trigger beforeunload.
   useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);
 
   return {
