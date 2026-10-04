@@ -50,7 +50,7 @@ export function useBlockingQuery<
   useBlockingCoordination({
     kind: "query",
     key: options.queryKey,
-    state: { loading: query.isPending, fetching: query.isRefetching, error: query.isError },
+    state: { loading: query.isLoading, fetching: query.isRefetching, error: query.isError },
     config: blockingConfig,
     defaultReason: "Loading data...",
     defaultPriority: 10,

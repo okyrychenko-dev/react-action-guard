@@ -18,7 +18,7 @@ export function useBlockingQueries<T extends Array<unknown>>(
   useBlockingCoordination({
     kind: "queries",
     state: {
-      loading: results.some((result) => result.isPending),
+      loading: results.some((result) => result.isLoading),
       fetching: results.some((result) => result.isRefetching),
       error: results.some((result) => result.isError),
     },
