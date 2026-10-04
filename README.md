@@ -3,9 +3,9 @@
 [![CI](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Coordinate shared UI interaction locks across complex React forms and workflows: duplicate-submit
-protection, conflicting actions, and navigation-sensitive state, all resolved through shared scopes
-with automatic lifecycle cleanup.
+Coordinate shared UI interaction locks across complex React forms and workflows: conflicting
+actions and navigation-sensitive state, resolved through shared scopes. Async tracking reflects
+concurrent work; applications own repeat-submit exclusion and operation cancellation.
 
 This is a pnpm workspace monorepo. Each package below still ships and versions independently on npm.
 

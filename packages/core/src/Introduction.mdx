@@ -6,7 +6,7 @@ import { Meta } from "@storybook/addon-docs/blocks";
 
 **Coordinate UI blocking across async actions and competing interactions in React**
 
-React Action Guard helps you prevent duplicate submits, conflicting actions, and stale UI interactions without scattering local `isLoading` flags across components.
+React Action Guard coordinates UI availability across concurrent work and conflicting actions. Your application owns synchronous repeat-submit exclusion and operation cancellation.
 
 ## Start Here
 
@@ -46,9 +46,14 @@ useBlocker("multi-scope", { scope: ["form", "buttons"] }, isActive);
 
 For most apps, the path looks like this:
 
-1. Wrap async work with `useAsyncAction`
-2. Use a shared `scope`
-3. Disable or annotate related UI with `useIsBlocked` or `useBlockingInfo`
+1. Choose an isolated `UIBlockingProvider` boundary (or deliberately use the global store)
+2. Register async work with `useAsyncAction`, or boolean state with `useActionBlocker`
+3. Observe the same scope with `useIsBlocked` or `useBlockingInfo`
+4. Apply the state to a native control or the UI package’s guarded controls
+
+Async calls may overlap and retain their blockers after caller unmount until settlement.
+Blocker timeout releases only UI blocking; it neither cancels work nor settles its promise.
+Use application-owned cancellation and a synchronous gate when the operation needs them.
 
 ## Hooks Overview
 

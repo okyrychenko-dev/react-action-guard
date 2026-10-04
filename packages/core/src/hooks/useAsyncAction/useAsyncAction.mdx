@@ -339,41 +339,35 @@ const result = await save(async () => {
 console.log(result.id); // TypeScript knows the shape
 ```
 
+## Execution lifetime
+
+Concurrent calls, including calls in the same scope, all execute with distinct per-run IDs.
+Tracking and a disabled button do not provide synchronous execution exclusion. Use an
+application-owned ref/controller gate across every entry point that must exclude repeats.
+
+Caller unmount does not remove in-flight operation blockers. Each run cleans up in `finally`
+on success or rejection. A blocker timeout releases UI blocking without aborting the operation
+or settling its promise; eventual results and errors still reach the caller. Hung operations
+need an application cleanup policy or a blocker timeout.
+
+See the core README's application-owned cancellation example for `AbortController` and a
+synchronous ref gate. The library does not supply an AbortSignal or cancel the request.
+
 ## Performance
 
 - **Minimal overhead**: Only adds/removes blocker around your async function
 - **No polling**: Uses event-based blocking state
-- **Efficient cleanup**: Automatically cleans up on unmount
-- **Concurrent-safe**: Multiple actions can run simultaneously with different scopes
+- **Settlement cleanup**: Removes each run’s blocker in `finally`, including after unmount
+- **Concurrent-safe**: Multiple actions can run simultaneously, including in the same scope
 
 ## How It Works
 
 Under the hood, `useAsyncAction`:
 
-1. Generates a unique blocker ID from `actionId` + timestamp
-2. Adds a blocker with high priority (`ASYNC_ACTION_PRIORITY`)
-3. Executes your async function
-4. Removes the blocker when done (success or error)
-5. Propagates the return value or error
-
-```typescript
-// Simplified implementation
-const executeWithBlocking = async (asyncFn) => {
-  const uniqueBlockerId = `${actionId}-${Date.now()}`;
-
-  try {
-    addBlocker(uniqueBlockerId, {
-      scope,
-      reason: `Running ${actionId}`,
-      priority: ASYNC_ACTION_PRIORITY,
-    });
-
-    return await asyncFn();
-  } finally {
-    removeBlocker(uniqueBlockerId);
-  }
-};
-```
+1. Allocates a unique per-run blocker ID within the resolved store
+2. Registers a blocker with `ASYNC_ACTION_PRIORITY`
+3. Executes your async function, preserving its result or error
+4. Removes that run's blocker in `finally` after settlement
 
 ## Troubleshooting
 
@@ -387,11 +381,9 @@ Check that:
 
 ### UI Stays Blocked
 
-This usually means an error occurred. Make sure to:
-
-1. Wrap in try-catch to handle errors
-2. Check the browser console for uncaught errors
-3. Verify the async operation completes
+A rejected operation releases its blocker in `finally`. Check whether the operation is still
+pending or another run is active in the same scope. Unmount does not end async tracking.
+Use blocker timeout or application-owned cancellation/cleanup for hung work.
 
 ### Type Issues
 
