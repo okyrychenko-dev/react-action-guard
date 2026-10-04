@@ -3,7 +3,7 @@
 Run `pnpm run build` then `pnpm run test:packed` (all targets), or
 `pnpm run test:packed react-18` (one target). Requires Node 22+, pnpm, npm, and registry access. CI selects pnpm 12.6.0. The recorded local evaluation used Node 22.20.0, pnpm 11.21.0 and npm 11.19.0. CI runs each target independently.
 
-The runner packs all five publishable packages with pnpm, installs tarballs into
+The runner copies built artifacts and package manifests into a disposable workspace, applies the actual pending Changesets there, then packs all five publishable packages with pnpm and installs tarballs into
 fresh temporary npm consumers, and executes Node ESM and CommonJS imports plus
 TypeScript 5.6.3 NodeNext `.mts`/`.cts` consumers. No source aliases or workspace
 links are used. Unrelated optional router peers and Query are asserted absent.
@@ -31,14 +31,18 @@ selected except the `react-19` target, which checks current Zustand 5.0.15, alon
 not a claim about the newest registry release. Exact resolved transitive versions
 are retained in each consumer's package-lock.json.
 
-Internal core peer ranges refer to the pending Changesets release cohort, whose
-source manifests still have pre-release version numbers. The runner deliberately
-uses `--legacy-peer-deps` and explicitly supplies peers, preventing automatic
-installation of optional adapters. It proves packed import/declaration/runtime
-behavior for that cohort, **not strict peer resolution or compatibility with an
-older published core**. Release the packages together through Changesets; validate
-strict installation after versioning before publication. No sibling package's
-passing tests are counted as Action Guard evidence.
+Both packed runners version the cohort using the same Changesets CLI/configuration as release. Source manifests and Changesets remain untouched. Packing-only workspace links resolve `workspace:` versions inside that disposable workspace; fresh test consumers use installed tarballs and registry dependencies, with no workspace links. `npm install --strict-peer-deps` checks the resulting internal Core peers as well as external peers. Unrelated optional peers remain absent in the compatibility matrix. The full publication consumer installs all adapters and their selected peers strictly too. These are tests of the planned cohort, not promises about older published packages or npm registry publication.
+
+## Publication checks
+
+Run `pnpm run build && pnpm run package:check` for publication checks, or `pnpm run release:check` for source checks, publication checks and the full compatibility matrix. The release workflow runs publication/compatibility checks before its release action.
+
+- `publint --strict` inspects the actual versioned tarballs, failing on errors and warnings (informational suggestions are allowed).
+- Are the Types Wrong? 0.18.5 checks declarations with bundled types. Core, UI, Devtools and Query use the strict profile. Router uses the `node16` **TypeScript resolution profile**, retaining ESM/CJS/bundler analysis while excluding unsupported legacy `node10` subpath resolution. This is not a Node 16 runtime support claim. Devtools excludes only `./styles.css` from declaration analysis; that non-JavaScript asset is separately checked for publication. No diagnostic rules are suppressed.
+- Esbuild 0.28.2 measures raw/gzip bytes for declared ESM/CJS/types artifacts and a minimal consumer of every root/router entry. React, React DOM, router and Query peers are external; Toolkit/type-utils and other included dependencies contribute to measurements. Results identify externals and selected symbol. These are measurements, not universal bundle budgets or sibling comparisons.
+- Bundled ESM import probes force the package's `sideEffects` metadata on temporarily to prevent tree shaking from hiding initialization. Each isolated Node process must exit, add no global properties, and write no stdout/stderr. Consumers' original manifests are restored. These probes do not establish absence of every possible browser or external-peer side effect; Devtools CSS remains explicitly side-effectful.
+
+The runner retains `publication.json`, raw ATTW reports, consumers and resolved locks under its printed temporary directory; CI uploads reports and locks. A success record is written only after all checks pass. Versioned [publication evidence](publication-evidence.json) and [compatibility evidence](evidence.json) record the executed checks. Refresh those records after meaningful artifact, dependency or release-plan changes.
 
 Exclusions: no complete version Cartesian product, Next application/browser/RSC
 runtime, native browser prompt UI, cross-document history, or older peer versions.

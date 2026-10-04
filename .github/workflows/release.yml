@@ -43,6 +43,9 @@ jobs:
       - name: Test
         run: pnpm run test:run
 
+      - name: Verify publication and strict packed compatibility
+        run: pnpm run package:check && pnpm run test:packed
+
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
         with:

@@ -25,14 +25,18 @@
     "version-packages": "changeset version",
     "release": "pnpm run build && changeset publish",
     "prepare": "husky",
-    "test:packed": "node scripts/check-packed-compatibility.mjs"
+    "test:packed": "node scripts/check-packed-compatibility.mjs",
+    "package:check": "node scripts/check-packed-publication.mjs",
+    "release:check": "pnpm run check && pnpm run format:check && pnpm run package:check && pnpm run test:packed"
   },
   "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
     "@changesets/cli": "^2.27.11",
     "@eslint/js": "^9.39.1",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@vitest/coverage-v8": "^4.0.9",
     "@vitest/ui": "^4.0.9",
+    "esbuild": "0.28.2",
     "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
@@ -41,6 +45,7 @@
     "happy-dom": "^20.0.10",
     "husky": "^9.1.7",
     "prettier": "^3.6.2",
+    "publint": "0.3.24",
     "tsup": "^8.5.1",
     "typescript": "^5.6.3",
     "typescript-eslint": "^8.50.1",

@@ -5,10 +5,10 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
+import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-compatibility-"));
-const packageNames = ["core", "ui", "devtools", "tanstack", "router"];
 const targets = {
   "react-18": { react: "18.0.0", "react-dom": "18.0.0", "@types/react": "18.0.0" },
   "react-19-floor": { react: "19.0.0", "react-dom": "19.0.0", "@types/react": "19.0.0" },
@@ -35,17 +35,7 @@ for (const name of cases)
 function run(command, args, cwd = repository) {
   return execFileSync(command, args, { cwd, stdio: "inherit", timeout: 240_000 });
 }
-const tarballs = {};
-for (const name of packageNames) {
-  const directory = join(temporary, "packs", name);
-  mkdirSync(directory, { recursive: true });
-  const manifest = JSON.parse(
-    readFileSync(join(repository, "packages", name, "package.json"), "utf8")
-  );
-  const tarball = join(directory, "package.tgz");
-  run("pnpm", ["pack", "--out", tarball], join(repository, "packages", name));
-  tarballs[name] = { name: manifest.name, tarball };
-}
+const { tarballs } = preparePackedCohort(repository, temporary);
 for (const name of cases) {
   console.log(`\nChecking packed consumer: ${name}`);
   const consumer = join(temporary, name);
@@ -68,14 +58,12 @@ for (const name of cases) {
     join(consumer, "package.json"),
     JSON.stringify({ private: true, type: "module", dependencies }, null, 2)
   );
-  // Pending Changesets release the cohort together; current source versions do not
-  // yet satisfy Devtools/Query core peers. Explicit peers also prevent npm from
-  // installing optional router adapters. This is not a strict-peer install check.
+  // Validate the real Changesets-versioned cohort with strict peer resolution.
   run(
     "npm",
     [
       "install",
-      "--legacy-peer-deps",
+      "--strict-peer-deps",
       "--ignore-scripts",
       "--omit=optional",
       "--no-audit",
@@ -96,10 +84,13 @@ for (const name of cases) {
         );
     }
     for (const [peer, range] of Object.entries(manifest.peerDependencies ?? {})) {
-      if (peer === tarballs.core.name) continue; // Pending release-cohort versioning.
       if (dependencies[peer])
         assert.ok(
-          satisfies(dependencies[peer], range),
+          satisfies(
+            JSON.parse(readFileSync(join(consumer, "node_modules", peer, "package.json"), "utf8"))
+              .version,
+            range
+          ),
           `${name}: ${peer}@${dependencies[peer]} is outside ${range}`
         );
       else
@@ -222,7 +213,13 @@ for (const name of cases) {
   writeFileSync(
     join(consumer, "result.json"),
     JSON.stringify(
-      { target: name, date: new Date().toISOString(), node: process.version, evaluated },
+      {
+        target: name,
+        date: new Date().toISOString(),
+        node: process.version,
+        strictPeers: true,
+        evaluated,
+      },
       null,
       2
     )
