@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { afterEach, test } from "node:test";
+import { afterEach, it } from "node:test";
 import { Window } from "happy-dom";
 
 const window = new Window({ url: "http://localhost/" });
@@ -51,7 +51,7 @@ afterEach(() => {
   document.body.replaceChildren();
 });
 
-test("should isolate adjacent, nested and independent Strict Mode provider roots", () => {
+it("should isolate adjacent, nested and independent Strict Mode provider roots", () => {
   const first = mount(
     h(StrictMode, null, provider("outer", true, provider("nested")), provider("adjacent"))
   );
@@ -70,7 +70,7 @@ test("should isolate adjacent, nested and independent Strict Mode provider roots
   assert.equal(first.container.textContent, "false");
 });
 
-test("should isolate server requests and hydrate without a mismatch", async () => {
+it("should isolate server requests and hydrate without a mismatch", async () => {
   const firstHtml = renderToString(provider("request-one"));
   const firstStore = stores.get("request-one");
   const { addBlocker } = firstStore.getState();

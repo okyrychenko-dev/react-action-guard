@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
+import { it } from "node:test";
 import { readFile } from "node:fs/promises";
 import { Window } from "happy-dom";
 
@@ -43,7 +43,7 @@ function Guard() {
   return h("div", null, "guard");
 }
 
-test("should deny, allow once, and keep protecting real router navigation", async () => {
+it("should deny, allow once, and keep protecting real router navigation", async () => {
   let element;
   let navigate;
   let location;
