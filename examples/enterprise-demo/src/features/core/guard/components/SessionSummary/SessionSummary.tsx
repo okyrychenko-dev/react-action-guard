@@ -4,9 +4,9 @@ import type { ReactElement } from "react";
 import type { SessionSummaryProps } from "./SessionSummary.types";
 
 export function SessionSummary(props: SessionSummaryProps): ReactElement {
-  const { events, rejections } = props;
+  const { events, rejections, totalTimeouts } = props;
 
-  const metrics = getSessionSummaryMetrics(events, rejections);
+  const metrics = getSessionSummaryMetrics(events, rejections, totalTimeouts);
 
   return (
     <Card aria-label="Session summary">

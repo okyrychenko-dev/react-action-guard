@@ -1,3 +1,4 @@
+import { AuditSessionProvider } from "@features/core/guard";
 import { DashboardSessionProvider } from "@features/dashboard";
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -33,9 +34,11 @@ export function DemoSession({ children, demoKey, onReset }: DemoSessionProps): R
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DashboardSessionProvider>
-        {children({ demoKey, onReset: handleReset })}
-      </DashboardSessionProvider>
+      <AuditSessionProvider>
+        <DashboardSessionProvider>
+          {children({ demoKey, onReset: handleReset })}
+        </DashboardSessionProvider>
+      </AuditSessionProvider>
     </QueryClientProvider>
   );
 }

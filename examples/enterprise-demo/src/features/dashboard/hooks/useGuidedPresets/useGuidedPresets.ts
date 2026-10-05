@@ -17,10 +17,10 @@ export function useGuidedPresets({ presets }: UseGuidedPresetsOptions): UseGuide
         if (!preset) {
           return null;
         }
-        const hasRemainingBlockers = preset.blockers.some(({ id }) =>
+        const hasAllBlockers = preset.blockers.every(({ id }) =>
           blockingSnapshot.some((blocker) => blocker.id === id)
         );
-        return hasRemainingBlockers ? currentId : null;
+        return hasAllBlockers ? currentId : null;
       });
     });
   }, [presets, store]);

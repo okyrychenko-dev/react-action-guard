@@ -4,6 +4,7 @@ import type { AuditEvent } from "../../audit.types";
 export interface SessionSummaryProps {
   events: ReadonlyArray<AuditEvent>;
   rejections: ActionRejectionCounts;
+  totalTimeouts: number;
 }
 
 export interface SessionSummaryMetrics {

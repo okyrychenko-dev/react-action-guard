@@ -1,6 +1,6 @@
 import { subscribeToOrderPlaced } from "@features/core/sessionEvents";
 import { useResolvedStoreApi, useResolvedValue } from "@okyrychenko-dev/react-action-guard";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import type { UseDashboardMetricsReturn } from "../hooks/useDashboardMetrics/useDashboardMetrics.types";
 
 export function useSessionMetrics(): UseDashboardMetricsReturn {
@@ -12,7 +12,7 @@ export function useSessionMetrics(): UseDashboardMetricsReturn {
     activeBlockerCount: s.blockingSnapshot.length,
   }));
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const { observeBlockingEvents } = store.getState();
     return observeBlockingEvents(() => {
       setTotalGuardEvents((n) => n + 1);

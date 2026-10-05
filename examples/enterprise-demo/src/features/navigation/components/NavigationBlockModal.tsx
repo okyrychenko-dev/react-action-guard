@@ -2,13 +2,23 @@ import { Button, Modal } from "@heroui/react";
 import type { ReactElement } from "react";
 
 interface NavigationBlockModalProps {
+  title?: string;
+  message?: string;
+  cancelLabel?: string;
   isOpen: boolean;
   onConfirm: VoidFunction;
   onCancel: VoidFunction;
 }
 
 export function NavigationBlockModal(props: NavigationBlockModalProps): ReactElement {
-  const { isOpen, onConfirm, onCancel } = props;
+  const {
+    isOpen,
+    onConfirm,
+    onCancel,
+    title = "Navigation is guarded",
+    message = "Navigation is currently guarded. Leave this page anyway?",
+    cancelLabel = "Stay here",
+  } = props;
 
   const handleOpenChange = (open: boolean): void => {
     if (!open) {
@@ -22,15 +32,12 @@ export function NavigationBlockModal(props: NavigationBlockModalProps): ReactEle
         <Modal.Container>
           <Modal.Dialog aria-label="Navigation blocked">
             <Modal.Header>
-              <Modal.Heading>Unsaved changes detected</Modal.Heading>
+              <Modal.Heading>{title}</Modal.Heading>
             </Modal.Header>
-            <Modal.Body>
-              The <strong>navigation</strong> scope is guarded — checkout has edits that haven't
-              been saved. Leaving now will discard them.
-            </Modal.Body>
+            <Modal.Body>{message}</Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onPress={onCancel}>
-                Stay and save
+                {cancelLabel}
               </Button>
               <Button variant="danger-soft" onPress={onConfirm}>
                 Leave anyway

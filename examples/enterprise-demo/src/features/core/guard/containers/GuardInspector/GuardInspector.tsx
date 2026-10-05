@@ -2,8 +2,8 @@ import { ButtonGroup, Chip, Separator } from "@heroui/react";
 import { SectionTitle } from "@shared/components";
 import { useState } from "react";
 import { AuditLog, BlockerList, ScopeTabBar, SessionSummary } from "../../components";
-import { useAuditLog } from "../../hooks";
 import { type EnterpriseScope, useEnterpriseBlockingInfo } from "../../scopes";
+import { useAuditSession } from "../../session";
 import { AuditFilterButton } from "./AuditFilterButton";
 import { AUDIT_ACTION_FILTERS, AUDIT_SCOPE_FILTERS } from "./GuardInspector.constants";
 import { filterAuditEvents } from "./GuardInspector.utils";
@@ -15,7 +15,7 @@ export function GuardInspector(): ReactElement {
   const [auditActionFilter, setAuditActionFilter] = useState<AuditActionFilter>("all");
   const [auditScopeFilter, setAuditScopeFilter] = useState<AuditScopeFilter>("all");
   const blockers = useEnterpriseBlockingInfo(selectedScope);
-  const { events, rejections, clearEvents } = useAuditLog();
+  const { events, rejections, totalTimeouts, clearEvents } = useAuditSession();
   const filteredEvents = filterAuditEvents(events, {
     action: auditActionFilter,
     scope: auditScopeFilter,
@@ -34,7 +34,7 @@ export function GuardInspector(): ReactElement {
 
       <ScopeTabBar selectedScope={selectedScope} onScopeChange={setSelectedScope} />
       <BlockerList blockers={blockers} />
-      <SessionSummary events={events} rejections={rejections} />
+      <SessionSummary events={events} rejections={rejections} totalTimeouts={totalTimeouts} />
       <div className="flex flex-col gap-2" aria-label="Audit filters">
         <ButtonGroup size="sm" variant="secondary" className="flex flex-wrap gap-2">
           {AUDIT_SCOPE_FILTERS.map((scope) => (

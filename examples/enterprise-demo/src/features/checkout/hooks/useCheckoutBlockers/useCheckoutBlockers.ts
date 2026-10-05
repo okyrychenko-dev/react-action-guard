@@ -36,14 +36,15 @@ export function useCheckoutBlockers({
     isOperationalLockActive
   );
 
-  useConditionalBlocker("risk-review-hold", {
-    scope: ["checkout", "payment"],
-    reason: "Risk review is required before payment capture",
-    priority: 92,
-    checkInterval: 200,
-    state: riskHold,
-    condition: (value) => value === true,
-  });
+  useEnterpriseBlocker(
+    "risk-review-hold",
+    {
+      scope: ["checkout", "payment"],
+      reason: "Risk review is required before payment capture",
+      priority: 92,
+    },
+    riskHold
+  );
 
   useConditionalBlocker("inventory-reservation-missing", {
     scope: "inventory",
