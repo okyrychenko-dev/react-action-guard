@@ -1,16 +1,14 @@
+import type { ActionRejectionCounts } from "../../../sessionEvents.types";
 import type { AuditEvent } from "../../audit.types";
 import type { SessionSummaryMetrics } from "./SessionSummary.types";
 
-function isPlaceOrderBlocker(blockerId: string): boolean {
-  return blockerId.startsWith("place-order");
-}
-
-export function getSessionSummaryMetrics(events: ReadonlyArray<AuditEvent>): SessionSummaryMetrics {
+export function getSessionSummaryMetrics(
+  events: ReadonlyArray<AuditEvent>,
+  rejections: ActionRejectionCounts = { preventedActions: 0, duplicateSubmitsSuppressed: 0 }
+): SessionSummaryMetrics {
   return {
-    preventedBlockers: events.filter((event) => event.action === "add").length,
-    duplicateSubmitsSuppressed: events.filter(
-      (event) => event.action === "add" && isPlaceOrderBlocker(event.blockerId)
-    ).length,
+    preventedBlockers: rejections.preventedActions,
+    duplicateSubmitsSuppressed: rejections.duplicateSubmitsSuppressed,
     timedOutBlockers: events.filter((event) => event.action === "timeout").length,
   };
 }

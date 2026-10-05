@@ -15,7 +15,7 @@ export function GuardInspector(): ReactElement {
   const [auditActionFilter, setAuditActionFilter] = useState<AuditActionFilter>("all");
   const [auditScopeFilter, setAuditScopeFilter] = useState<AuditScopeFilter>("all");
   const blockers = useEnterpriseBlockingInfo(selectedScope);
-  const { events, clearEvents } = useAuditLog();
+  const { events, rejections, clearEvents } = useAuditLog();
   const filteredEvents = filterAuditEvents(events, {
     action: auditActionFilter,
     scope: auditScopeFilter,
@@ -34,7 +34,7 @@ export function GuardInspector(): ReactElement {
 
       <ScopeTabBar selectedScope={selectedScope} onScopeChange={setSelectedScope} />
       <BlockerList blockers={blockers} />
-      <SessionSummary events={events} />
+      <SessionSummary events={events} rejections={rejections} />
       <div className="flex flex-col gap-2" aria-label="Audit filters">
         <ButtonGroup size="sm" variant="secondary" className="flex flex-wrap gap-2">
           {AUDIT_SCOPE_FILTERS.map((scope) => (

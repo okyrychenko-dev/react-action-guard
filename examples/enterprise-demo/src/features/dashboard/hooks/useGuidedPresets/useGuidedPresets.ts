@@ -10,6 +10,21 @@ export function useGuidedPresets({ presets }: UseGuidedPresetsOptions): UseGuide
   const store = useResolvedStoreApi();
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
 
+  useEffect(() => {
+    return store.subscribe(({ blockingSnapshot }) => {
+      setActivePresetId((currentId) => {
+        const preset = presets.find(({ id }) => id === currentId);
+        if (!preset) {
+          return null;
+        }
+        const hasRemainingBlockers = preset.blockers.some(({ id }) =>
+          blockingSnapshot.some((blocker) => blocker.id === id)
+        );
+        return hasRemainingBlockers ? currentId : null;
+      });
+    });
+  }, [presets, store]);
+
   const clearPresetBlockers = useCallback(() => {
     const { removeBlocker } = store.getState();
     presets

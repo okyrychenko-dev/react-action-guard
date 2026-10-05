@@ -1,5 +1,5 @@
 import { useGuardedAction } from "@features/core/guard/scopes";
-import { publishOrderPlaced } from "@features/core/sessionEvents";
+import { publishActionRejected, publishOrderPlaced } from "@features/core/sessionEvents";
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { useGuardedButton, useGuardedField } from "@okyrychenko-dev/react-action-guard-ui";
 import { delay } from "@shared/utils";
@@ -58,6 +58,11 @@ export function useCheckoutActions({
   });
 
   const handleSaveCart = (): void => {
+    const { isBlocked } = store.getState();
+    if (isBlocked("checkout")) {
+      publishActionRejected(store, "blocked");
+      return;
+    }
     void saveCart(async () => {
       await delay(CHECKOUT_OPERATION_DELAY_MS);
       if (isMountedRef.current) {
@@ -72,6 +77,11 @@ export function useCheckoutActions({
     if (appliedCode.length === 0) {
       return;
     }
+    const { isBlocked } = store.getState();
+    if (isBlocked(["checkout", "payment"])) {
+      publishActionRejected(store, "blocked");
+      return;
+    }
 
     void applyCoupon(async () => {
       await delay(CHECKOUT_OPERATION_DELAY_MS);
@@ -83,6 +93,12 @@ export function useCheckoutActions({
 
   const handlePlaceOrder = (): void => {
     if (abortControllerRef.current !== null) {
+      publishActionRejected(store, "duplicate");
+      return;
+    }
+    const { isBlocked } = store.getState();
+    if (isBlocked(["checkout", "payment", "inventory"])) {
+      publishActionRejected(store, "blocked");
       return;
     }
 
