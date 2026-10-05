@@ -1,0 +1,1 @@
+export { ScopeTabBar } from "./ScopeTabBar";

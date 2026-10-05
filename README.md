@@ -49,6 +49,24 @@ pnpm run check     # lint + typecheck + test + build
 
 Scope a command to one package with pnpm's `--filter`, e.g. `pnpm --filter @okyrychenko-dev/react-action-guard run test`.
 
+## Enterprise demo
+
+The [enterprise demo](examples/enterprise-demo/README.md) is a regular directory in this
+repository. It demonstrates checkout navigation confirmation, isolated sessions,
+on-demand queries and application-owned payment cancellation.
+
+It has its own npm dependencies and consumes packed current-source packages. Run it with:
+
+```bash
+cd examples/enterprise-demo
+npm ci
+npm run setup:local
+npm run dev
+```
+
+See [evaluated workflows](examples/enterprise-demo/WORKFLOWS.md) for verification,
+package provenance and browser tests.
+
 ## Releasing
 
 This repo uses [Changesets](https://github.com/changesets/changesets) for independent per-package
