@@ -1,5 +1,6 @@
 import { PageHeader } from "@shared/components";
 import { DemoGuide, GuidedPresets, MetricsCard, ScopeStatusGrid } from "../components";
+import { GUIDED_PRESETS } from "../components/GuidedPresets";
 import { useDashboardMetrics } from "../hooks";
 import { useDashboardSession } from "../session";
 import type { ReactElement } from "react";
@@ -9,6 +10,14 @@ export function DashboardPage(): ReactElement {
   const { presets } = useDashboardSession();
   const { activePresetId, applyPreset, clearPresets } = presets;
 
+  const startHighRiskDemo = (): void => {
+    const preset = GUIDED_PRESETS.find(({ id }) => id === "high-risk-checkout");
+
+    if (preset) {
+      applyPreset(preset);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-7">
       <PageHeader
@@ -17,7 +26,11 @@ export function DashboardPage(): ReactElement {
         description="Try a real workflow, see which actions are protected, and follow each blocker in the live inspector."
       />
 
-      <DemoGuide />
+      <DemoGuide
+        isHighRiskActive={activePresetId === "high-risk-checkout"}
+        onStart={startHighRiskDemo}
+        onClear={clearPresets}
+      />
 
       <div className="grid grid-cols-2 gap-3 sm:gap-4 2xl:grid-cols-4">
         <MetricsCard
