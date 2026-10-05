@@ -1,0 +1,333 @@
+{
+  "date": "2026-10-04T19:10:56.739Z",
+  "node": "v22.20.0",
+  "tools": {
+    "publint": "0.3.24",
+    "@arethetypeswrong/cli": "0.18.5",
+    "esbuild": "0.28.2"
+  },
+  "checks": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0",
+      "publint": "passed",
+      "attw": "passed",
+      "profile": "strict",
+      "excludedEntrypoints": []
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-devtools",
+      "version": "1.0.0",
+      "publint": "passed",
+      "attw": "passed",
+      "profile": "strict",
+      "excludedEntrypoints": ["./styles.css"]
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "publint": "passed",
+      "attw": "passed",
+      "profile": "node16",
+      "excludedEntrypoints": []
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-tanstack",
+      "version": "0.4.0",
+      "publint": "passed",
+      "attw": "passed",
+      "profile": "strict",
+      "excludedEntrypoints": []
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "version": "1.0.0",
+      "publint": "passed",
+      "attw": "passed",
+      "profile": "strict",
+      "excludedEntrypoints": []
+    }
+  ],
+  "measurements": [
+    {
+      "path": "@okyrychenko-dev/react-action-guard",
+      "symbol": "createBlockingLifecycle",
+      "artifacts": {
+        "./dist/index.js": {
+          "bytes": 31816,
+          "gzipBytes": 7149
+        },
+        "./dist/index.cjs": {
+          "bytes": 33087,
+          "gzipBytes": 7286
+        },
+        "./dist/index.d.ts": {
+          "bytes": 21294,
+          "gzipBytes": 5512
+        },
+        "./dist/index.d.cts": {
+          "bytes": 21294,
+          "gzipBytes": 5512
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 10942,
+        "gzipBytes": 4366
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-ui",
+      "symbol": "useGuardedButton",
+      "artifacts": {
+        "./dist/index.js": {
+          "bytes": 13941,
+          "gzipBytes": 2777
+        },
+        "./dist/index.cjs": {
+          "bytes": 14591,
+          "gzipBytes": 2889
+        },
+        "./dist/index.d.ts": {
+          "bytes": 8138,
+          "gzipBytes": 1625
+        },
+        "./dist/index.d.cts": {
+          "bytes": 8138,
+          "gzipBytes": 1625
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 16603,
+        "gzipBytes": 6052
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-devtools",
+      "symbol": "ActionGuardDevtools",
+      "artifacts": {
+        "./dist/index.js": {
+          "bytes": 59118,
+          "gzipBytes": 12610
+        },
+        "./dist/index.cjs": {
+          "bytes": 61859,
+          "gzipBytes": 12683
+        },
+        "./dist/index.d.ts": {
+          "bytes": 6711,
+          "gzipBytes": 2170
+        },
+        "./dist/index.d.cts": {
+          "bytes": 6711,
+          "gzipBytes": 2170
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 37247,
+        "gzipBytes": 13226
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-tanstack",
+      "symbol": "useBlockingMutation",
+      "artifacts": {
+        "./dist/index.js": {
+          "bytes": 4758,
+          "gzipBytes": 1244
+        },
+        "./dist/index.cjs": {
+          "bytes": 4945,
+          "gzipBytes": 1276
+        },
+        "./dist/index.d.ts": {
+          "bytes": 6540,
+          "gzipBytes": 1011
+        },
+        "./dist/index.d.cts": {
+          "bytes": 6540,
+          "gzipBytes": 1011
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 12271,
+        "gzipBytes": 4911
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-router",
+      "symbol": "useDialogState",
+      "artifacts": {
+        "./dist/index.js": {
+          "bytes": 2681,
+          "gzipBytes": 921
+        },
+        "./dist/index.cjs": {
+          "bytes": 2917,
+          "gzipBytes": 995
+        },
+        "./dist/index.d.ts": {
+          "bytes": 2338,
+          "gzipBytes": 916
+        },
+        "./dist/index.d.cts": {
+          "bytes": 2339,
+          "gzipBytes": 916
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 524,
+        "gzipBytes": 327
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-router/react-router",
+      "symbol": "useNavigationBlocker",
+      "artifacts": {
+        "./dist/react-router/index.js": {
+          "bytes": 5456,
+          "gzipBytes": 1687
+        },
+        "./dist/react-router/index.cjs": {
+          "bytes": 5635,
+          "gzipBytes": 1718
+        },
+        "./dist/react-router/index.d.ts": {
+          "bytes": 1502,
+          "gzipBytes": 617
+        },
+        "./dist/react-router/index.d.cts": {
+          "bytes": 1503,
+          "gzipBytes": 617
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 12796,
+        "gzipBytes": 5127
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-router/tanstack-router",
+      "symbol": "useNavigationBlocker",
+      "artifacts": {
+        "./dist/tanstack-router/index.js": {
+          "bytes": 4251,
+          "gzipBytes": 1388
+        },
+        "./dist/tanstack-router/index.cjs": {
+          "bytes": 4361,
+          "gzipBytes": 1403
+        },
+        "./dist/tanstack-router/index.d.ts": {
+          "bytes": 602,
+          "gzipBytes": 296
+        },
+        "./dist/tanstack-router/index.d.cts": {
+          "bytes": 603,
+          "gzipBytes": 297
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 12518,
+        "gzipBytes": 5006
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    },
+    {
+      "path": "@okyrychenko-dev/react-action-guard-router/nextjs",
+      "symbol": "usePagesRouterBlocker",
+      "artifacts": {
+        "./dist/nextjs/index.js": {
+          "bytes": 5690,
+          "gzipBytes": 1693
+        },
+        "./dist/nextjs/index.cjs": {
+          "bytes": 5840,
+          "gzipBytes": 1716
+        },
+        "./dist/nextjs/index.d.ts": {
+          "bytes": 854,
+          "gzipBytes": 308
+        },
+        "./dist/nextjs/index.d.cts": {
+          "bytes": 855,
+          "gzipBytes": 309
+        }
+      },
+      "minimalConsumer": {
+        "bytes": 12890,
+        "gzipBytes": 5118
+      },
+      "importSideEffects": "passed",
+      "external": [
+        "react",
+        "react-dom",
+        "react-router-dom",
+        "@tanstack/react-router",
+        "@tanstack/react-query",
+        "next"
+      ]
+    }
+  ]
+}

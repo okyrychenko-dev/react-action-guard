@@ -11,24 +11,44 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
     },
     "./react-router": {
-      "types": "./dist/react-router/index.d.ts",
-      "import": "./dist/react-router/index.js",
-      "require": "./dist/react-router/index.cjs"
+      "import": {
+        "types": "./dist/react-router/index.d.ts",
+        "default": "./dist/react-router/index.js"
+      },
+      "require": {
+        "types": "./dist/react-router/index.d.cts",
+        "default": "./dist/react-router/index.cjs"
+      }
     },
     "./tanstack-router": {
-      "types": "./dist/tanstack-router/index.d.ts",
-      "import": "./dist/tanstack-router/index.js",
-      "require": "./dist/tanstack-router/index.cjs"
+      "import": {
+        "types": "./dist/tanstack-router/index.d.ts",
+        "default": "./dist/tanstack-router/index.js"
+      },
+      "require": {
+        "types": "./dist/tanstack-router/index.d.cts",
+        "default": "./dist/tanstack-router/index.cjs"
+      }
     },
     "./nextjs": {
-      "types": "./dist/nextjs/index.d.ts",
-      "import": "./dist/nextjs/index.js",
-      "require": "./dist/nextjs/index.cjs"
+      "import": {
+        "types": "./dist/nextjs/index.d.ts",
+        "default": "./dist/nextjs/index.js"
+      },
+      "require": {
+        "types": "./dist/nextjs/index.d.cts",
+        "default": "./dist/nextjs/index.cjs"
+      }
     }
   },
   "sideEffects": false,
@@ -87,7 +107,7 @@
     "@tanstack/react-router": "^1.170.41",
     "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
     "react": "^18.0.0 || ^19.0.0",
-    "react-router-dom": "^6.0.0 || ^7.0.0"
+    "react-router-dom": "^6.19.0 || ^7.0.0"
   },
   "peerDependenciesMeta": {
     "react-router-dom": {

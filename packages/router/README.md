@@ -1,5 +1,7 @@
 # @okyrychenko-dev/react-action-guard-router
 
+See the [versioned capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md) for evaluated peers, reproducible checks, evidence kinds, and limitations.
+
 [![npm version](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-router.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-router)
 [![npm downloads](https://img.shields.io/npm/dm/@okyrychenko-dev/react-action-guard-router.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-router)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
@@ -8,7 +10,7 @@
 
 ## Features
 
-- 🛣️ **Multi-Router Support** - React Router v6+, Remix, TanStack Router, Next.js Pages Router, and best-effort App Router support
+- 🛣️ **Multi-Router Support** - React Router v6.19+, Remix, TanStack Router, Next.js Pages Router, and best-effort App Router support
 - 🎯 **Scope-Based Blocking** - Synchronize navigation blocking with UI blocking scopes
 - 🚦 **Condition-Based Blocking** - Block based on boolean conditions or functions
 - 💬 **Custom Dialog Support** - `useDialogState` helper for async confirmation dialogs
@@ -33,7 +35,7 @@ This package requires the following peer dependencies:
 - [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^1.0.1 - The core UI blocking library
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - One of:
-  - [react-router-dom](https://reactrouter.com/) ^6.0.0 - For React Router or Remix
+  - [react-router-dom](https://reactrouter.com/) ^6.19.0 - For React Router or Remix
   - [@tanstack/react-router](https://tanstack.com/router) ^1.170.41 - For TanStack Router
   - [next](https://nextjs.org/) ^13.4.0 - For Next.js Pages Router and best-effort App Router support
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)
@@ -114,7 +116,7 @@ Blocks navigation in router applications based on conditions or scope state.
 
 **Available in:**
 
-- `@okyrychenko-dev/react-action-guard-router/react-router` - React Router v6+ & Remix
+- `@okyrychenko-dev/react-action-guard-router/react-router` - React Router v6.19+ & Remix
 - `@okyrychenko-dev/react-action-guard-router/tanstack-router` - TanStack Router
 - `@okyrychenko-dev/react-action-guard-router/nextjs` - Next.js Pages & App Router
 
@@ -358,11 +360,12 @@ export default function EditPage() {
 
 **App Router Limitations:**
 
-- ✅ Browser back/forward/close/refresh are blocked
+- `beforeunload` can request the browser’s native prompt for document unload (close, refresh, or cross-document navigation), subject to browser policy.
+- Same-document App Router back/forward is not intercepted.
 - ❌ `<Link>` component navigation is NOT blocked
 - ❌ `router.push()` is NOT blocked
 
-For full navigation blocking support, use Pages Router.
+Pages Router provides route-event interception with the replay limitations described above.
 
 ## Adapter Capabilities
 
@@ -371,7 +374,7 @@ For full navigation blocking support, use Pages Router.
 | React Router         | Blocking condition is armed | Yes              | Yes               | Best semantic fidelity                                   |
 | TanStack Router      | Blocking condition is armed | No               | Yes               | Native useBlocker; memory-history transitions verified                     |
 | Next.js Pages Router | Blocking condition is armed | No               | Yes               | Re-attempts confirmed navigation with `router.push(url)` |
-| Next.js App Router   | Blocking condition is armed | No               | Best effort only  | No official blocker API from Next.js                     |
+| Next.js App Router   | Blocking condition is armed | No               | No               | beforeunload only; no same-document interception         |
 
 ---
 
@@ -431,10 +434,12 @@ function CheckoutPage() {
 
   useNavigationBlocker({
     scope: "checkout",
-    message: "Payment is processing. Leaving will cancel the transaction.",
+    message: "Payment is processing. Leave this page?",
   });
 }
 ```
+
+UI blocking and navigation confirmation do not cancel the payment request or roll back a transaction. Cancellation, server authorization, and idempotency belong to the application and its backend.
 
 ### File Upload with Progress
 
