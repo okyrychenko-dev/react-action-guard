@@ -1,5 +1,4 @@
 import { useEnterpriseBlocker, useEnterpriseIsBlocked } from "@features/core/guard/scopes";
-import { useConditionalBlocker } from "@okyrychenko-dev/react-action-guard";
 import type {
   UseCheckoutBlockersInput,
   UseCheckoutBlockersReturn,
@@ -46,14 +45,15 @@ export function useCheckoutBlockers({
     riskHold
   );
 
-  useConditionalBlocker("inventory-reservation-missing", {
-    scope: "inventory",
-    reason: "Inventory reservation must be restored before ordering",
-    priority: 86,
-    checkInterval: 200,
-    state: inventoryReserved,
-    condition: (value) => value !== true,
-  });
+  useEnterpriseBlocker(
+    "inventory-reservation-missing",
+    {
+      scope: "inventory",
+      reason: "Inventory reservation must be restored before ordering",
+      priority: 86,
+    },
+    !inventoryReserved
+  );
 
   return { isCheckoutBlocked, isPaymentBlocked, isInventoryBlocked, isNavigationBlocked };
 }

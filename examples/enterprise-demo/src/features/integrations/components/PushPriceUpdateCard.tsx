@@ -16,6 +16,11 @@ export function PushPriceUpdateCard(): ReactElement {
     chipLabel = "Pending";
   }
 
+  if (!mutation.isPending && mutation.isDisabled) {
+    chipColor = "warning";
+    chipLabel = "Blocked";
+  }
+
   let lastRunDisplay = "Never";
 
   if (mutation.data) {
@@ -23,7 +28,7 @@ export function PushPriceUpdateCard(): ReactElement {
   }
 
   const handlePush = (): void => {
-    mutation.mutate();
+    mutation.startMutation();
   };
 
   return (
@@ -50,7 +55,7 @@ export function PushPriceUpdateCard(): ReactElement {
           variant="secondary"
           size="sm"
           onPress={handlePush}
-          isDisabled={mutation.isPending}
+          isDisabled={mutation.isDisabled}
           aria-label="Push prices"
         >
           Push prices

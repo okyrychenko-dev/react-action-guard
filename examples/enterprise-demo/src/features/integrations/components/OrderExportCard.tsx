@@ -16,6 +16,11 @@ export function OrderExportCard(): ReactElement {
     chipLabel = "Exporting";
   }
 
+  if (!mutation.isPending && mutation.isDisabled) {
+    chipColor = "warning";
+    chipLabel = "Blocked";
+  }
+
   let lastRunDisplay = "Never";
 
   if (mutation.data) {
@@ -23,7 +28,7 @@ export function OrderExportCard(): ReactElement {
   }
 
   const handleExport = (): void => {
-    mutation.mutate();
+    mutation.startMutation();
   };
 
   return (
@@ -57,7 +62,7 @@ export function OrderExportCard(): ReactElement {
           variant="secondary"
           size="sm"
           onPress={handleExport}
-          isDisabled={mutation.isPending}
+          isDisabled={mutation.isDisabled}
           aria-label="Export to ERP"
         >
           Export to ERP
