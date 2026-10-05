@@ -12,8 +12,8 @@ export function SidebarSection(props: SidebarSectionProps): ReactElement {
   const { section, pathname } = props;
 
   return (
-    <div className="flex flex-col gap-0.5">
-      <p className="px-2.5 pb-1 pt-0.5 text-slate-500 text-[10px] font-semibold tracking-[0.08em] uppercase m-0">
+    <div className="flex shrink-0 gap-1 md:flex-col md:gap-0.5">
+      <p className="hidden md:block px-2.5 pb-1 pt-0.5 text-slate-500 text-[10px] font-semibold tracking-[0.08em] uppercase m-0">
         {section.heading}
       </p>
       {section.items.map((item) => (

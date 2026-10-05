@@ -27,9 +27,9 @@ export function NavButton(props: NavButtonProps): ReactElement {
 
   return (
     <Button
-      fullWidth
       variant="ghost"
-      className={`relative justify-start gap-2.5 px-3 py-2 text-[13px] font-medium ${navClass}`}
+      className={`relative w-auto shrink-0 justify-start md:w-full gap-2.5 px-3 py-2 text-[13px] font-medium ${navClass}`}
+      aria-current={isActive ? "page" : undefined}
       onPress={handlePress}
     >
       {isActive && (

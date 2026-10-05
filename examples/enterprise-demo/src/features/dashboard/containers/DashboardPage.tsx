@@ -1,6 +1,11 @@
-import { Alert } from "@heroui/react";
 import { PageHeader } from "@shared/components";
-import { GUIDED_PRESETS, GuidedPresets, MetricsCard, ScopeStatusGrid } from "../components";
+import {
+  DemoGuide,
+  GUIDED_PRESETS,
+  GuidedPresets,
+  MetricsCard,
+  ScopeStatusGrid,
+} from "../components";
 import { useDashboardMetrics, useGuidedPresets } from "../hooks";
 import type { ReactElement } from "react";
 
@@ -13,12 +18,14 @@ export function DashboardPage(): ReactElement {
   return (
     <div className="flex flex-col gap-7">
       <PageHeader
-        eyebrow="Command Center"
-        title="System Overview"
-        description="Live view of all active blockers, guard events, and scope health across the enterprise checkout pipeline."
+        eyebrow="Interactive playground"
+        title="See action guards at work"
+        description="Try a real workflow, see which actions are protected, and follow each blocker in the live inspector."
       />
 
-      <div className="grid grid-cols-4 gap-3.5">
+      <DemoGuide />
+
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 2xl:grid-cols-4">
         <MetricsCard
           label="Orders placed"
           value={ordersPlaced}
@@ -53,25 +60,6 @@ export function DashboardPage(): ReactElement {
         </div>
         <ScopeStatusGrid />
       </div>
-
-      <Alert status="accent">
-        <Alert.Content>
-          <Alert.Title>Try the demo</Alert.Title>
-          <Alert.Description>
-            <ol className="m-0 pl-4 leading-7 flex flex-col gap-1">
-              <li>
-                Go to <strong>Checkout</strong>, edit the address field — the navigation scope
-                locks.
-              </li>
-              <li>Click any sidebar link to see the navigation-guard modal intercept you.</li>
-              <li>
-                In <strong>Admin</strong>, arm a maintenance window or simulate a team member lock.
-              </li>
-              <li>Watch the Guard Inspector on the right update in real time.</li>
-            </ol>
-          </Alert.Description>
-        </Alert.Content>
-      </Alert>
     </div>
   );
 }

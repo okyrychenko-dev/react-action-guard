@@ -28,36 +28,7 @@ input {
   font: inherit;
 }
 
-/* Complex responsive grid — can't express CSS var column sizes in Tailwind */
-.app-root {
-  display: grid;
-  grid-template-columns: 220px 1fr 370px;
-  grid-template-rows: 56px 1fr;
-  height: 100vh;
-  overflow: hidden;
-}
-
-@media (max-width: 1023px) {
-  .app-root {
-    grid-template-columns: 220px 1fr;
-  }
-
-  .inspector-panel {
-    display: none;
-  }
-}
-
-@media (max-width: 767px) {
-  .app-root {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    display: none;
-  }
-}
-
-/* Keyframe animation — not expressible in Tailwind */
+/* Custom indicator motion; respect the operating system motion preference. */
 @keyframes pulse-indicator {
   0%,
   100% {
@@ -72,6 +43,12 @@ input {
 
 .scope-indicator--blocked {
   animation: pulse-indicator 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scope-indicator--blocked {
+    animation: none;
+  }
 }
 
 /* Table descendant selectors — unwieldy in JSX */
