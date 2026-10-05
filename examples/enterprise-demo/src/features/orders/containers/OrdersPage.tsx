@@ -24,7 +24,7 @@ export function OrdersPage(): ReactElement {
       <PageHeader
         eyebrow="Order Management"
         title="Orders"
-        description="Void and Refund actions are guarded by the payment scope — block it from the Checkout page to see cross-scope protection in action."
+        description="Void and Refund actions are guarded by the payment scope — apply a Dashboard preset to see cross-route protection in action."
       />
 
       <div className="flex items-center gap-3">
@@ -98,7 +98,7 @@ export function OrdersPage(): ReactElement {
           <Alert.Title>Cross-scope guard</Alert.Title>
           <Alert.Description>
             Void and Refund actions are automatically guarded by the checkout and payment scopes.
-            Block either scope from the Checkout page to see them disable here.
+            Apply the High-risk checkout preset on Dashboard to see them disable here.
           </Alert.Description>
         </Alert.Content>
       </Alert>

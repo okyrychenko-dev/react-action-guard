@@ -1,4 +1,4 @@
-import { Input } from "@heroui/react";
+import { Input, Label, TextField } from "@heroui/react";
 import { useGuardedField } from "@okyrychenko-dev/react-action-guard-ui";
 import type { ReactElement } from "react";
 
@@ -14,20 +14,15 @@ export function GuardedInputField(props: GuardedInputFieldProps): ReactElement {
 
   const { fieldState } = useGuardedField();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    onChange(e.target.value);
-  };
-
   return (
-    <label className="flex flex-col gap-1.5 text-slate-700 text-[13px] font-medium">
-      {label}
-      <Input
-        value={value}
-        onChange={handleChange}
-        disabled={fieldState.disabled}
-        type={type}
-        aria-label={label}
-      />
-    </label>
+    <TextField
+      value={value}
+      onChange={onChange}
+      isDisabled={fieldState.disabled}
+      className="min-w-0"
+    >
+      <Label className="text-slate-700 text-[13px] font-medium">{label}</Label>
+      <Input type={type} />
+    </TextField>
   );
 }

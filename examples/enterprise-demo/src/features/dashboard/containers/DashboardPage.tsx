@@ -1,19 +1,13 @@
 import { PageHeader } from "@shared/components";
-import {
-  DemoGuide,
-  GUIDED_PRESETS,
-  GuidedPresets,
-  MetricsCard,
-  ScopeStatusGrid,
-} from "../components";
-import { useDashboardMetrics, useGuidedPresets } from "../hooks";
+import { DemoGuide, GuidedPresets, MetricsCard, ScopeStatusGrid } from "../components";
+import { useDashboardMetrics } from "../hooks";
+import { useDashboardSession } from "../session";
 import type { ReactElement } from "react";
 
 export function DashboardPage(): ReactElement {
   const { ordersPlaced, totalGuardEvents, activeBlockerCount } = useDashboardMetrics();
-  const { activePresetId, applyPreset, clearPresets } = useGuidedPresets({
-    presets: GUIDED_PRESETS,
-  });
+  const { presets } = useDashboardSession();
+  const { activePresetId, applyPreset, clearPresets } = presets;
 
   return (
     <div className="flex flex-col gap-7">

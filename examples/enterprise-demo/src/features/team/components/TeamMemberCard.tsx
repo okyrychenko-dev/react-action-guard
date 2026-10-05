@@ -1,5 +1,5 @@
 import { useEnterpriseBlocker } from "@features/core/guard/scopes";
-import { Button, Card, Chip, Separator } from "@heroui/react";
+import { Avatar, Button, Card, Chip, Separator } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { resolvePriorityColor } from "../team.utils";
 import type { ReactElement } from "react";
@@ -70,11 +70,11 @@ export function TeamMemberCard(props: TeamMemberCardProps): ReactElement {
     <Card className={isLocked ? "border-amber-400/40 bg-amber-500/3" : ""}>
       <Card.Content className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
-          <div
-            className={`w-10 h-10 rounded-full ${member.avatarColor} grid place-items-center text-white text-[13px] font-bold shrink-0`}
-          >
-            {member.avatar}
-          </div>
+          <Avatar className="shrink-0" aria-label={member.name}>
+            <Avatar.Fallback className={`${member.avatarColor} text-white text-[13px] font-bold`}>
+              {member.avatar}
+            </Avatar.Fallback>
+          </Avatar>
           <div>
             <p className="m-0 text-slate-900 text-[14px] font-semibold">{member.name}</p>
             <p className="m-0 text-slate-500 text-[12px]">{member.role}</p>

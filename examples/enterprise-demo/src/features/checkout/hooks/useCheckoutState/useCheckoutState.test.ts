@@ -48,7 +48,7 @@ describe("useCheckoutState", () => {
     expect(result.current.lastOrderId).toBe("ent-1001");
   });
 
-  it("should apply a coupon and clear unsaved state", () => {
+  it("should apply a coupon without clearing unsaved profile edits", () => {
     const { result } = renderHook(() => useCheckoutState());
 
     act(() => {
@@ -57,6 +57,6 @@ describe("useCheckoutState", () => {
     });
 
     expect(result.current.checkout.couponCode).toBe("ENTERPRISE20");
-    expect(result.current.checkout.hasUnsavedChanges).toBe(false);
+    expect(result.current.checkout.hasUnsavedChanges).toBe(true);
   });
 });

@@ -28,7 +28,7 @@ export function useCheckoutState(): UseCheckoutStateReturn {
   };
 
   const markCouponApplied = (appliedCode: string): void => {
-    setCheckout((current) => ({ ...current, couponCode: appliedCode, hasUnsavedChanges: false }));
+    setCheckout((current) => ({ ...current, couponCode: appliedCode }));
   };
 
   const setRiskHold = (value: boolean): void => {

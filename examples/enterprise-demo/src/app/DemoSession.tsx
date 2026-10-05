@@ -1,3 +1,4 @@
+import { DashboardSessionProvider } from "@features/dashboard";
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
@@ -32,7 +33,9 @@ export function DemoSession({ children, demoKey, onReset }: DemoSessionProps): R
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children({ demoKey, onReset: handleReset })}
+      <DashboardSessionProvider>
+        {children({ demoKey, onReset: handleReset })}
+      </DashboardSessionProvider>
     </QueryClientProvider>
   );
 }
