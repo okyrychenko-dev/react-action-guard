@@ -132,6 +132,106 @@ describe("useNavigationBlocker (React Router)", () => {
     });
   });
 
+  describe("Native blocking decisions", () => {
+    it("should allow navigation without prompting when protection is inactive", () => {
+      const onBlock = vi.fn();
+      const onAllow = vi.fn();
+      const onConfirm = vi.fn(() => false);
+
+      renderHook(() =>
+        useNavigationBlocker({ when: false, message: "Confirm?", onBlock, onAllow, onConfirm })
+      );
+
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(false);
+      });
+
+      expect(onBlock).not.toHaveBeenCalled();
+      expect(onConfirm).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+    });
+
+    it("should silently block without a message and release the attempt on scope change", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onBlock = vi.fn();
+      const onAllow = vi.fn();
+      const onConfirm = vi.fn(() => true);
+      const options: UseNavigationBlockerOptions = {
+        when: true,
+        scope: "editor",
+        onBlock,
+        onAllow,
+        onConfirm,
+      };
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { rerender } = renderHook((props) => useNavigationBlocker(props), {
+        initialProps: options,
+      });
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      expect(onBlock).toHaveBeenCalledTimes(1);
+      expect(onConfirm).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(blocker.reset).not.toHaveBeenCalled();
+      expect(blocker.proceed).not.toHaveBeenCalled();
+
+      await act(async () => {
+        rerender({ ...options, scope: "other" });
+      });
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).not.toHaveBeenCalled();
+    });
+
+    it.each([true, false])(
+      "should respect browser confirmation answer %s without a custom handler",
+      (answer) => {
+        mockUseShouldBlock.mockReturnValue(true);
+
+        const originalConfirm = window.confirm;
+        const confirm = vi.fn(() => answer);
+
+        window.confirm = confirm;
+
+        const onAllow = vi.fn();
+
+        try {
+          renderHook(() => useNavigationBlocker({ when: true, message: "Leave editor?", onAllow }));
+
+          const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+          if (!isNoArgBlocker(blockerFn)) {
+            throw new Error("Expected no-arg blocker function");
+          }
+
+          act(() => {
+            expect(blockerFn()).toBe(!answer);
+          });
+          expect(confirm).toHaveBeenCalledExactlyOnceWith("Leave editor?");
+          expect(onAllow).toHaveBeenCalledTimes(answer ? 1 : 0);
+        } finally {
+          window.confirm = originalConfirm;
+        }
+      }
+    );
+  });
+
   describe("Callbacks", () => {
     it("should use stable callback references", () => {
       const onBlock = vi.fn();
