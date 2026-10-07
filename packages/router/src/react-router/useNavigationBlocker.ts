@@ -8,7 +8,7 @@ import {
   useBeforeUnload,
   useShouldBlock,
 } from "../core";
-import type { Nullable } from "@okyrychenko-dev/type-utils";
+import type { Nullable, Optional } from "@okyrychenko-dev/type-utils";
 import type { NavigationBlockerReturn } from "../core";
 import type { UseNavigationBlockerOptions } from "./types";
 
@@ -36,6 +36,8 @@ export function useNavigationBlocker(
     Nullable<{
       settle: () => boolean;
       promise: Promise<boolean>;
+      scopeKey: string;
+      message: Optional<string>;
     }>
   >(null);
 
@@ -44,11 +46,9 @@ export function useNavigationBlocker(
 
   const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
 
-  // Inline callbacks can change during this hook's own pending-state rerender.
-  // Only changes to protection invalidate an attempt; its original promise remains authoritative.
   useEffect(() => {
     return invalidate;
-  }, [scopeKey, shouldBlock, message, invalidate]);
+  }, [invalidate]);
 
   // Use React Router's blocker
   const blocker = useBlocker(
@@ -73,7 +73,12 @@ export function useNavigationBlocker(
       );
 
       if (confirmation.kind === "async") {
-        setPendingConfirm({ settle, promise: confirmation.promise.catch(() => false) });
+        setPendingConfirm({
+          settle,
+          promise: confirmation.promise.catch(() => false),
+          scopeKey,
+          message,
+        });
 
         return true;
       }
@@ -85,11 +90,28 @@ export function useNavigationBlocker(
       }
 
       return true;
-    }, [shouldBlock, message, onBlock, onConfirm, onAllow, begin])
+    }, [shouldBlock, scopeKey, message, onBlock, onConfirm, onAllow, begin])
   );
 
   useEffect(() => {
     if (!pendingConfirm) {
+      return;
+    }
+
+    // Compare protection values, not inline callback identities, before attaching completion.
+    if (
+      !shouldBlock ||
+      pendingConfirm.scopeKey !== scopeKey ||
+      pendingConfirm.message !== message
+    ) {
+      queueMicrotask(() => {
+        setPendingConfirm((current) => (current === pendingConfirm ? null : current));
+      });
+
+      if (pendingConfirm.settle()) {
+        blocker.reset?.();
+      }
+
       return;
     }
 
@@ -114,7 +136,7 @@ export function useNavigationBlocker(
     return () => {
       active = false;
     };
-  }, [pendingConfirm, blocker, onAllow]);
+  }, [pendingConfirm, blocker, onAllow, shouldBlock, scopeKey, message]);
 
   // Also block browser unload if requested
   useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);

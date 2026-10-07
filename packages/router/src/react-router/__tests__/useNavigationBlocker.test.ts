@@ -322,6 +322,8 @@ describe("useNavigationBlocker (React Router)", () => {
       mockUseShouldBlock.mockReturnValue(false);
       rerender();
 
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
+
       await act(async () => {
         resolveConfirm(true);
         await promise;
@@ -329,7 +331,7 @@ describe("useNavigationBlocker (React Router)", () => {
 
       expect(onAllow).not.toHaveBeenCalled();
       expect(blocker.proceed).not.toHaveBeenCalled();
-      expect(blocker.reset).not.toHaveBeenCalled();
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
     });
 
     it("should allow async confirmation from an inline handler across its own rerenders", async () => {
@@ -435,6 +437,8 @@ describe("useNavigationBlocker (React Router)", () => {
       });
       rerender({ ...options, ...update });
 
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
+
       await act(async () => {
         resolveConfirm(true);
         await promise;
@@ -442,7 +446,77 @@ describe("useNavigationBlocker (React Router)", () => {
 
       expect(onAllow).not.toHaveBeenCalled();
       expect(blocker.proceed).not.toHaveBeenCalled();
-      expect(blocker.reset).not.toHaveBeenCalled();
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
+    });
+
+    it("should retain a replacement attempt when invalidated state clears", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      let resolveFirst: (value: boolean) => void = () => undefined;
+      let resolveSecond: (value: boolean) => void = () => undefined;
+      const first = new Promise<boolean>((resolve) => {
+        resolveFirst = resolve;
+      });
+      const second = new Promise<boolean>((resolve) => {
+        resolveSecond = resolve;
+      });
+      const onConfirm = vi
+        .fn<NonNullable<UseNavigationBlockerOptions["onConfirm"]>>()
+        .mockReturnValueOnce(first)
+        .mockReturnValueOnce(second);
+      const options: UseNavigationBlockerOptions = {
+        when: true,
+        message: "First?",
+        onConfirm,
+        onAllow,
+      };
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { rerender } = renderHook((props) => useNavigationBlocker(props), {
+        initialProps: options,
+      });
+      const firstBlockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(firstBlockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(firstBlockerFn()).toBe(true);
+      });
+
+      rerender({ ...options, message: "Second?" });
+
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
+
+      const nextBlockerFn = mockUseBlocker.mock.calls[mockUseBlocker.mock.calls.length - 1]?.[0];
+
+      if (!isNoArgBlocker(nextBlockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(nextBlockerFn()).toBe(true);
+      });
+      await act(async () => {
+        resolveFirst(true);
+        await first;
+      });
+
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(blocker.proceed).not.toHaveBeenCalled();
+
+      await act(async () => {
+        resolveSecond(true);
+        await second;
+      });
+
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
     });
 
     it("should preserve approval across callback rerenders and equivalent scopes exactly once", async () => {

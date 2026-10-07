@@ -15,7 +15,7 @@ for (const key of ["window", "self", "document", "navigator", "HTMLElement", "No
 globalThis.scrollTo = window.scrollTo.bind(window);
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 
-const { createElement: h } = await import("react");
+const { createElement: h, useState } = await import("react");
 const { createRoot } = await import("react-dom/client");
 const { act: reactAct } = await import("react");
 const act = reactAct ?? (await import("react-dom/test-utils")).act;
@@ -29,19 +29,30 @@ const { useNavigationBlocker } = await import(
 );
 let confirm = false;
 let attempts = 0;
+let allows = 0;
+let confirmation;
+let intercepting = false;
+let setProtection = () => {};
 
 function Guard() {
-  const when = adapter === "react-router" ? () => true : true;
+  const [enabled, setEnabled] = useState(true);
+  const when = adapter === "react-router" ? () => enabled : enabled;
 
-  useNavigationBlocker({
+  setProtection = setEnabled;
+
+  const { isIntercepting } = useNavigationBlocker({
     when,
     message: "Leave?",
     blockBrowserUnload: false,
     onConfirm: async () => {
       attempts++;
-      return confirm;
+      return confirmation ?? confirm;
     },
+    onAllow: () => allows++,
   });
+
+  intercepting = isIntercepting;
+
   return h("div", null, "guard");
 }
 
@@ -119,6 +130,40 @@ it("should deny, allow once, and keep protecting real router navigation", async 
     });
     assert.equal(location(), "/b");
     assert.equal(attempts, 3);
+    assert.equal(allows, 1);
+
+    if (adapter === "react-router") {
+      let settle;
+      confirmation = new Promise((resolve) => {
+        settle = resolve;
+      });
+      await act(async () => {
+        void navigate("/a");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      assert.equal(intercepting, true);
+      assert.equal(location(), "/b");
+
+      await act(async () => setProtection(false));
+      assert.equal(intercepting, false, "disabled protection must reset the blocked attempt");
+      assert.equal(location(), "/b");
+
+      await act(async () => {
+        settle(true);
+        await confirmation;
+      });
+      assert.equal(location(), "/b", "invalidated approval must not resume navigation");
+      assert.equal(intercepting, false);
+      assert.equal(allows, 1);
+
+      await act(async () => {
+        void navigate("/a");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      assert.equal(location(), "/a", "navigation should work after protection is disabled");
+      assert.equal(attempts, 4);
+    }
+
     assert.deepEqual(errors, [], "navigation must not produce runtime errors");
   } finally {
     await act(async () => root.unmount());
