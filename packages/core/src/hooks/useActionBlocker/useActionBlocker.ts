@@ -1,7 +1,5 @@
-import { type Nullable, isNull } from "@okyrychenko-dev/type-utils";
-import { useCallback, useEffect, useMemo, useRef } from "react";
-import { useResolvedStoreApi, useResolvedValue } from "../../context";
-import { areBlockerConfigsEqual, trackHookRegistration } from "./useActionBlocker.utils";
+import { useEffect } from "react";
+import { useBlockerRegistration } from "./useBlockerRegistration";
 import type { BlockerConfig } from "../../store";
 
 /**
@@ -15,64 +13,16 @@ import type { BlockerConfig } from "../../store";
  * @see {@link useConfirmableBlocker} for blockers that require user confirmation
  */
 export function useActionBlocker(blockerId: string, config: BlockerConfig, isActive = true): void {
-  const store = useResolvedStoreApi();
-  const { addBlocker, removeBlocker, replaceBlocker } = useResolvedValue((state) => ({
-    addBlocker: state.addBlocker,
-    removeBlocker: state.removeBlocker,
-    replaceBlocker: state.replaceBlocker,
-  }));
-  const lastConfigRef = useRef<Nullable<BlockerConfig>>(null);
-  const onTimeoutRef = useRef(config.onTimeout);
+  const { activate, deactivate } = useBlockerRegistration({ blockerId, config });
 
   useEffect(() => {
-    onTimeoutRef.current = config.onTimeout;
-  }, [config.onTimeout]);
-
-  const handleTimeout = useCallback((id: string): void => {
-    onTimeoutRef.current?.(id);
-  }, []);
-
-  const storeConfig = useMemo<BlockerConfig>(
-    () => ({
-      ...config,
-      onTimeout: config.onTimeout ? handleTimeout : undefined,
-    }),
-    [config, handleTimeout]
-  );
-
-  useEffect(() => {
-    if (!isActive || !blockerId) {
+    if (!isActive) {
       return;
     }
+    activate();
 
-    const releaseRegistration = trackHookRegistration(store, blockerId);
-
-    addBlocker(blockerId, storeConfig);
-    lastConfigRef.current = storeConfig;
-
-    return () => {
-      releaseRegistration();
-      lastConfigRef.current = null;
-      removeBlocker(blockerId);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockerId, isActive, addBlocker, removeBlocker, store]);
-
-  useEffect(() => {
-    if (!isActive || !blockerId) {
-      return;
-    }
-
-    if (
-      !isNull(lastConfigRef.current) &&
-      areBlockerConfigsEqual(lastConfigRef.current, storeConfig)
-    ) {
-      return;
-    }
-
-    replaceBlocker(blockerId, storeConfig);
-    lastConfigRef.current = storeConfig;
-  }, [blockerId, storeConfig, isActive, replaceBlocker]);
+    return deactivate;
+  }, [isActive, activate, deactivate]);
 }
 
 /**

@@ -530,45 +530,20 @@ useConditionalBlocker("not-optimized", {
 
 ## How It Works
 
-Under the hood, `useConditionalBlocker`:
+The condition is checked immediately on attachment and then at `checkInterval` (1000ms by default).
+Changes to `condition` or `state` are used at the next poll. Changing the interval checks immediately
+and starts the new polling cadence, without restarting an active blocker or its timeout.
 
-1. Sets up an interval timer based on checkInterval
-2. Evaluates the condition function at each interval
-3. Compares result to previous evaluation
-4. Adds blocker if condition becomes true
-5. Removes blocker if condition becomes false
-6. Cleans up interval on unmount
+While the condition stays true, scope, reason, priority and lifetime configuration update on
+committed renders. Removed options reset to their defaults; an omitted timestamp retains the
+registration's original timestamp. An unchanged timeout keeps its deadline, and a changed timeout
+starts a new deadline using the existing registration replacement rules. Timeout callbacks use the
+latest committed configuration.
 
-```typescript
-// Simplified implementation
-useEffect(() => {
-  let previousResult = false;
-
-  const checkCondition = () => {
-    const result = condition(state);
-
-    if (result !== previousResult) {
-      if (result) {
-        addBlocker(blockerId, config);
-      } else {
-        removeBlocker(blockerId);
-      }
-      previousResult = result;
-    }
-  };
-
-  // Initial check
-  checkCondition();
-
-  // Set up interval
-  const intervalId = setInterval(checkCondition, checkInterval || 1000);
-
-  return () => {
-    clearInterval(intervalId);
-    removeBlocker(blockerId);
-  };
-}, [blockerId, condition, state, checkInterval]);
-```
+A timeout ends the current registration episode. Continued true results, interval changes and
+configuration refreshes do not re-add an expired blocker. A polled false-to-true transition starts
+another episode. A new ID or Provider attachment also starts a new episode. Cleanup releases the
+registration and cancels its polling and deadline work in the owning store.
 
 ## Troubleshooting
 

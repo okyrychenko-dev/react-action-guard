@@ -1,16 +1,303 @@
 import { act, renderHook } from "@testing-library/react";
+import { type PropsWithChildren, type ReactNode, StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useConditionalBlocker } from "..";
+import { UIBlockingProvider, useUIBlockingContext } from "../../../context";
 import { uiBlockingStoreApi } from "../../../store";
+import { useConditionalBlocker } from "../useConditionalBlocker";
+import type { ConditionalBlockerConfig } from "../useConditionalBlocker.types";
+
+interface IdentityProps {
+  id: string;
+}
+
+interface StateProps {
+  state: boolean;
+}
+
+interface IntervalProps {
+  checkInterval: number;
+}
 
 describe("useConditionalBlocker", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
     vi.useFakeTimers();
   });
 
   afterEach(() => {
     vi.useRealTimers();
+  });
+
+  it("should replace current configuration while the condition stays true", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const initialProps: ConditionalBlockerConfig = {
+      scope: "old",
+      condition: () => true,
+      reason: "Old",
+      priority: 42,
+      timestamp: 123,
+    };
+    const { result, rerender } = renderHook(
+      (config: ConditionalBlockerConfig) => {
+        useConditionalBlocker("current", config);
+
+        return useUIBlockingContext();
+      },
+      { initialProps, wrapper }
+    );
+
+    rerender({ scope: "new", condition: () => true });
+
+    const { isBlocked, getBlockingInfo } = result.current.getState();
+
+    expect(isBlocked("old")).toBe(false);
+    expect(getBlockingInfo("new")).toHaveLength(1);
+    expect(getBlockingInfo("new")[0]).toMatchObject({ reason: "Unknown", priority: 0 });
+    expect(getBlockingInfo("new")[0]?.timestamp).toBe(123);
+  });
+
+  it("should retain the deadline and finish an episode until the condition becomes false", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    let active = true;
+    const oldCallback = vi.fn();
+    const currentCallback = vi.fn();
+    const initialProps: ConditionalBlockerConfig = {
+      scope: "old",
+      condition: () => active,
+      checkInterval: 100,
+      timeout: 500,
+      onTimeout: oldCallback,
+      timestamp: 123,
+    };
+    const { result, rerender } = renderHook(
+      (config: ConditionalBlockerConfig) => {
+        useConditionalBlocker("episode", config);
+
+        return useUIBlockingContext();
+      },
+      { initialProps, wrapper }
+    );
+    const { isBlocked, getBlockingInfo } = result.current.getState();
+
+    expect(getBlockingInfo("old")[0]?.timestamp).toBe(123);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    rerender({
+      ...initialProps,
+      scope: "new",
+      reason: "Current",
+      priority: 9,
+      onTimeout: currentCallback,
+      checkInterval: 50,
+    });
+    expect(isBlocked("old")).toBe(false);
+    expect(getBlockingInfo("new")[0]).toMatchObject({ reason: "Current", priority: 9 });
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(isBlocked("new")).toBe(false);
+    expect(oldCallback).not.toHaveBeenCalled();
+    expect(currentCallback).toHaveBeenCalledExactlyOnceWith("episode");
+    rerender({ ...initialProps, scope: "after", onTimeout: currentCallback });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(isBlocked("after")).toBe(false);
+    expect(currentCallback).toHaveBeenCalledTimes(1);
+    active = false;
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    active = true;
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(isBlocked("after")).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(isBlocked("after")).toBe(false);
+    expect(currentCallback).toHaveBeenCalledTimes(2);
+  });
+
+  it("should replace changed deadlines and cancel omitted timeout options", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const onTimeout = vi.fn();
+    const initialProps: ConditionalBlockerConfig = {
+      scope: "test",
+      condition: () => true,
+      checkInterval: 100,
+      timeout: 500,
+      onTimeout,
+    };
+    const { result, rerender, unmount } = renderHook(
+      (config: ConditionalBlockerConfig) => {
+        useConditionalBlocker("deadline", config);
+
+        return useUIBlockingContext();
+      },
+      { initialProps, wrapper }
+    );
+    const { isBlocked, getBlockingInfo } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    rerender({ ...initialProps, timeout: 700 });
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(isBlocked("test")).toBe(true);
+    rerender({ scope: "test", condition: () => true, checkInterval: 100 });
+    expect(getBlockingInfo("test")[0]).toMatchObject({ timeout: undefined, onTimeout: undefined });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(isBlocked("test")).toBe(true);
+    expect(onTimeout).not.toHaveBeenCalled();
+    rerender({ ...initialProps, timeout: 200 });
+    act(() => {
+      vi.advanceTimersByTime(199);
+    });
+    expect(isBlocked("test")).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(isBlocked("test")).toBe(false);
+    expect(onTimeout).toHaveBeenCalledExactlyOnceWith("deadline");
+    unmount();
+  });
+
+  it("should release the previous identity and cancel its deadline in Strict Mode", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <StrictMode>
+        <UIBlockingProvider>{children}</UIBlockingProvider>
+      </StrictMode>
+    );
+    const onTimeout = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      ({ id }: IdentityProps) => {
+        useConditionalBlocker(id, { scope: id, condition: () => true, timeout: 500, onTimeout });
+
+        return useUIBlockingContext();
+      },
+      { initialProps: { id: "first" }, wrapper }
+    );
+    const { isBlocked, getBlockingInfo } = result.current.getState();
+
+    expect(getBlockingInfo("first")).toHaveLength(1);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    rerender({ id: "second" });
+    expect(isBlocked("first")).toBe(false);
+    expect(getBlockingInfo("second")).toHaveLength(1);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(isBlocked("second")).toBe(true);
+    expect(onTimeout).not.toHaveBeenCalled();
+    unmount();
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(isBlocked("second")).toBe(false);
+    expect(onTimeout).not.toHaveBeenCalled();
+  });
+
+  it("should move registration to the current provider and preserve other stores", () => {
+    const { addBlocker, isBlocked: globalIsBlocked } = uiBlockingStoreApi.getState();
+
+    addBlocker("moving", { scope: "other-store" });
+
+    let providerKey = "first";
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider key={providerKey}>{children}</UIBlockingProvider>
+    );
+    const onTimeout = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      () => {
+        useConditionalBlocker("moving", {
+          scope: "moving",
+          condition: () => true,
+          timeout: 500,
+          onTimeout,
+        });
+
+        return useUIBlockingContext();
+      },
+      { wrapper }
+    );
+    const { isBlocked: oldIsBlocked } = result.current.getState();
+
+    expect(oldIsBlocked("moving")).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    providerKey = "second";
+    rerender();
+
+    const { isBlocked: nextIsBlocked } = result.current.getState();
+
+    expect(nextIsBlocked("moving")).toBe(true);
+    expect(oldIsBlocked("moving")).toBe(false);
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(nextIsBlocked("moving")).toBe(true);
+    expect(onTimeout).not.toHaveBeenCalled();
+    unmount();
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onTimeout).not.toHaveBeenCalled();
+    expect(globalIsBlocked("other-store")).toBe(true);
+  });
+
+  it("should expire without a callback and keep callback removal on the same deadline", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const onTimeout = vi.fn();
+    const initialProps: ConditionalBlockerConfig = {
+      scope: "test",
+      condition: () => true,
+      timeout: 500,
+      onTimeout,
+    };
+    const { result, rerender } = renderHook(
+      (config: ConditionalBlockerConfig) => {
+        useConditionalBlocker("silent", config);
+
+        return useUIBlockingContext();
+      },
+      { initialProps, wrapper }
+    );
+    const { isBlocked } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    rerender({ ...initialProps, onTimeout: undefined });
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    expect(isBlocked("test")).toBe(false);
+    expect(onTimeout).not.toHaveBeenCalled();
+    rerender({ ...initialProps, scope: "new", onTimeout: undefined });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(isBlocked("new")).toBe(false);
   });
 
   it("should block when condition returns true", () => {
@@ -43,7 +330,7 @@ describe("useConditionalBlocker", () => {
 
   it("should check condition based on state parameter", () => {
     const { rerender } = renderHook(
-      ({ state }: { state: boolean }) =>
+      ({ state }: StateProps) =>
         useConditionalBlocker("test-blocker", {
           scope: "test",
           condition: (isOnline) => !isOnline,
@@ -122,7 +409,7 @@ describe("useConditionalBlocker", () => {
   it("should restart condition checks when check interval changes", () => {
     const conditionFn = vi.fn(() => false);
     const { rerender } = renderHook(
-      ({ checkInterval }: { checkInterval: number }) =>
+      ({ checkInterval }: IntervalProps) =>
         useConditionalBlocker("test-blocker", {
           scope: "test",
           condition: conditionFn,
@@ -245,10 +532,12 @@ describe("useConditionalBlocker", () => {
       })
     );
 
-    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+    const { isBlocked } = uiBlockingStoreApi.getState();
+
+    expect(isBlocked("test")).toBe(false);
 
     expect(() => unmount()).not.toThrow();
-    expect(uiBlockingStoreApi.getState().isBlocked("test")).toBe(false);
+    expect(isBlocked("test")).toBe(false);
   });
 
   it("should handle multiple scopes", () => {
