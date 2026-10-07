@@ -20,6 +20,14 @@ This is an advanced hook for maintenance windows, timed restrictions, or other s
 Use it when blocking is driven by time rather than by a user-triggered async action.
 If a user interaction starts the work, prefer `useAsyncAction` or `useBlocker`.
 
+During an active window, scope, reason, priority and other blocker options follow the current
+configuration without restarting the schedule. Omitting an optional field clears its previous value.
+An unchanged `timeout` retains its deadline, while `onTimeout` uses the latest callback.
+Timeout ends blocking for that window; configuration rerenders do not reactivate it.
+`onScheduleEnd` still fires at the scheduled end, even if blocking timed out earlier.
+Changing the schedule starts a new window evaluation. Detaching cancels pending schedule notifications
+and removes the registration from its owning store.
+
 ## API Reference
 
 ### Signature
