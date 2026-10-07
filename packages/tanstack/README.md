@@ -111,6 +111,10 @@ All four hooks accept the native TanStack Query options and return the correspon
 
 `onLoading` and `onFetching` are available on query, infinite-query, and multi-query configurations. Mutations always block while pending and do not have a fetching state.
 
+Registration uses core's `useActionBlocker` ownership rules. Active configuration replaces previous values, equivalent scope arrays do not emit redundant updates, and unchanged timeouts retain their deadline while callbacks use the latest configuration. Timeout removes protection without cancelling Query work. A later configuration change can register protection again while the policy remains active, as with `useActionBlocker`; equivalent rerenders do not restart it. Changing query identity or unmounting releases the owned registration and its timer.
+
+Query-specific activation and reason precedence remain in this adapter: initial active loading blocks by default, refetch and error blocking are opt-in, and loading reasons precede fetching and error reasons. Mutation execution lifetime is unchanged by registration reuse.
+
 ### Migration: active loading by default
 
 Query loading now means `isPending && isFetching` (TanStack's `isLoading`). Disabled queries without data and offline paused queries leave their scopes available, even though their status is pending. Initial requests block when they actually start and release after settlement or while paused. This applies to query, infinite-query, and query collections; an idle member does not keep a collection blocked.

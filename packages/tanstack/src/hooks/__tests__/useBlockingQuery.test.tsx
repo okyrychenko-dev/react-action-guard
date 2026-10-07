@@ -2,9 +2,11 @@ import {
   UIBlockingProvider,
   uiBlockingStoreApi,
   useIsBlocked,
+  useUIBlockingContext,
 } from "@okyrychenko-dev/react-action-guard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
+import { type ReactNode, StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createWrapper } from "../../test/test.utils";
 import { useBlockingQuery } from "../useBlockingQuery";
@@ -16,6 +18,90 @@ describe("useBlockingQuery", () => {
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
     clearAllBlockers();
+  });
+
+  it("should avoid lifecycle updates for equivalent active configuration", () => {
+    const { result, rerender, unmount } = renderHook(
+      () => {
+        useBlockingQuery({
+          queryKey: ["equivalent-config"],
+          queryFn: () => new Promise<string>(() => undefined),
+          blockingConfig: { scope: ["checkout", "navigation"] },
+        });
+
+        return useUIBlockingContext();
+      },
+      { wrapper: createWrapper({ blockingProvider: true }) }
+    );
+    const { getBlockingInfo, observeBlockingEvents } = result.current.getState();
+    const events = vi.fn<Middleware>();
+    const release = observeBlockingEvents(events);
+
+    expect(getBlockingInfo("checkout")).toHaveLength(1);
+    rerender();
+    expect(getBlockingInfo("navigation")).toHaveLength(1);
+    expect(events).not.toHaveBeenCalled();
+    release();
+    unmount();
+  });
+
+  it("should release obsolete identities and provider timers under Strict Mode", () => {
+    vi.useFakeTimers();
+    try {
+      const client = new QueryClient();
+      const onTimeout = vi.fn();
+      let providerKey = "first";
+
+      function Wrapper({ children }: { children: ReactNode }) {
+        return (
+          <StrictMode>
+            <QueryClientProvider client={client}>
+              <UIBlockingProvider key={providerKey}>{children}</UIBlockingProvider>
+            </QueryClientProvider>
+          </StrictMode>
+        );
+      }
+
+      const { result, rerender, unmount } = renderHook(
+        (key: string) => {
+          useBlockingQuery({
+            queryKey: [key],
+            queryFn: () => new Promise<string>(() => undefined),
+            blockingConfig: { scope: key, timeout: 100, onTimeout },
+          });
+
+          return useUIBlockingContext();
+        },
+        { initialProps: "first-query", wrapper: Wrapper }
+      );
+      const firstStore = result.current;
+      const { getBlockingInfo: firstInfo } = firstStore.getState();
+
+      expect(firstInfo("first-query")).toHaveLength(1);
+      act(() => {
+        vi.advanceTimersByTime(40);
+      });
+      rerender("second-query");
+      expect(firstInfo("first-query")).toEqual([]);
+      expect(firstInfo("second-query")).toHaveLength(1);
+      providerKey = "second";
+      rerender("second-query");
+      expect(result.current).not.toBe(firstStore);
+      expect(firstInfo("second-query")).toEqual([]);
+
+      const { getBlockingInfo: secondInfo } = result.current.getState();
+
+      expect(secondInfo("second-query")).toHaveLength(1);
+      unmount();
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(secondInfo("second-query")).toEqual([]);
+      expect(onTimeout).not.toHaveBeenCalled();
+      client.clear();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should apply current configuration while a real query remains loading", () => {
