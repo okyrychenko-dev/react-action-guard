@@ -1,0 +1,92 @@
+{
+  "timestamp": "2026-10-06T13:43:49.693Z",
+  "sourceCommit": "711f0d7c672cf64db619be16337aa551325f1e0f",
+  "sourceDirty": "M .gitignore\n M package.json\n?? scripts/efficiency/\n?? scripts/measure-efficiency.mjs",
+  "node": "v22.20.0",
+  "esbuild": "0.28.2",
+  "packages": {
+    "core": {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0"
+    },
+    "ui": {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "version": "1.0.0"
+    }
+  },
+  "resolvedVersions": {
+    "node_modules/@okyrychenko-dev/react-action-guard": "2.0.0",
+    "node_modules/@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+    "node_modules/@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+    "node_modules/@okyrychenko-dev/type-utils": "0.1.2",
+    "node_modules/@types/node": "26.6.4",
+    "node_modules/@types/react": "19.2.18",
+    "node_modules/@types/whatwg-mimetype": "3.0.2",
+    "node_modules/@types/ws": "8.18.2",
+    "node_modules/buffer-image-size": "0.6.4",
+    "node_modules/csstype": "3.2.3",
+    "node_modules/entities": "7.0.1",
+    "node_modules/happy-dom": "20.11.2",
+    "node_modules/react": "19.2.8",
+    "node_modules/react-dom": "19.2.8",
+    "node_modules/scheduler": "0.27.0",
+    "node_modules/undici-types": "8.9.0",
+    "node_modules/whatwg-mimetype": "3.0.0",
+    "node_modules/ws": "8.22.0",
+    "node_modules/zustand": "5.0.15"
+  },
+  "method": "Minified ESM browser/es2022 actual-hook consumers from versioned tarballs; React/DOM external, Zustand included. gzipSync defaults. External variants estimate included cost only: they do not implement dependency replacement or prove equivalent behavior; gzip deltas are not additive. Sibling modal benchmarks informed warmup/setup separation, no sibling sizes reused.",
+  "measurements": [
+    {
+      "id": "core",
+      "variant": "retained",
+      "bytes": 12508,
+      "gzipBytes": 4906,
+      "external": ["react", "react-dom", "react-dom/*"]
+    },
+    {
+      "id": "core",
+      "variant": "type-utils-external",
+      "bytes": 12488,
+      "gzipBytes": 4944,
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/type-utils"]
+    },
+    {
+      "id": "core",
+      "variant": "toolkit-external",
+      "bytes": 10972,
+      "gzipBytes": 4347,
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/react-zustand-toolkit"]
+    },
+    {
+      "id": "ui",
+      "variant": "retained",
+      "bytes": 17737,
+      "gzipBytes": 6463,
+      "external": ["react", "react-dom", "react-dom/*"]
+    },
+    {
+      "id": "ui",
+      "variant": "type-utils-external",
+      "bytes": 17241,
+      "gzipBytes": 6288,
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/type-utils"]
+    },
+    {
+      "id": "ui",
+      "variant": "toolkit-external",
+      "bytes": 16196,
+      "gzipBytes": 5923,
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/react-zustand-toolkit"]
+    }
+  ],
+  "guardSet": {
+    "bytes": 294,
+    "gzipBytes": 179,
+    "runtime": "passed",
+    "strictNarrowing": "passed"
+  },
+  "retainedConsumerSSR": "passed",
+  "providerIsolationAndHydration": "passed (existing packed provider suite)",
+  "toolkitMiddlewareHandle": "passed"
+}
