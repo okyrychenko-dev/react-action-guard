@@ -1,4 +1,5 @@
 import { act, renderHook } from "@testing-library/react";
+import { StrictMode } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { UIBlockingProvider, useUIBlockingContext } from "../../../context";
 import { uiBlockingStoreApi } from "../../../store";
@@ -209,6 +210,122 @@ describe("useScheduledBlocker", () => {
       vi.advanceTimersByTime(2000);
     });
     expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it("should release the previous identity and its timers in Strict Mode", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <StrictMode>
+        <UIBlockingProvider>{children}</UIBlockingProvider>
+      </StrictMode>
+    );
+    const schedule = { start: Date.now() + 100, duration: 1000 };
+    const onTimeout = vi.fn();
+    const onScheduleEnd = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      ({ id }: { id: string }) => {
+        useScheduledBlocker(id, { scope: id, schedule, timeout: 500, onTimeout, onScheduleEnd });
+
+        return useUIBlockingContext();
+      },
+      { initialProps: { id: "first" }, wrapper }
+    );
+    const { isBlocked, getBlockingInfo } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    expect(getBlockingInfo("first")).toHaveLength(1);
+    rerender({ id: "second" });
+    expect(isBlocked("first")).toBe(false);
+    expect(getBlockingInfo("second")).toHaveLength(1);
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+    expect(isBlocked("second")).toBe(true);
+    expect(onTimeout).not.toHaveBeenCalled();
+    unmount();
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(isBlocked("second")).toBe(false);
+    expect(onTimeout).not.toHaveBeenCalled();
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it("should cancel pending work in the old Provider and start only in the current Provider", () => {
+    let providerKey = "first";
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider key={providerKey}>{children}</UIBlockingProvider>
+    );
+    const schedule = { start: Date.now() + 100, duration: 1000 };
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+    const { result, rerender, unmount } = renderHook(
+      () => {
+        useScheduledBlocker("moving", {
+          scope: "moving",
+          schedule,
+          onScheduleStart,
+          onScheduleEnd,
+        });
+
+        return useUIBlockingContext();
+      },
+      { wrapper }
+    );
+    const { isBlocked: oldIsBlocked } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    providerKey = "second";
+    rerender();
+
+    const { isBlocked: currentIsBlocked } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    expect(oldIsBlocked("moving")).toBe(false);
+    expect(currentIsBlocked("moving")).toBe(true);
+    expect(onScheduleStart).toHaveBeenCalledTimes(1);
+    unmount();
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(currentIsBlocked("moving")).toBe(false);
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it("should expire at the replacement timeout deadline", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const schedule = { start: Date.now(), duration: 2000 };
+    const onTimeout = vi.fn();
+    const { result, rerender } = renderHook(
+      ({ timeout }: { timeout: number }) => {
+        useScheduledBlocker("changed", { scope: "test", schedule, timeout, onTimeout });
+
+        return useUIBlockingContext();
+      },
+      { initialProps: { timeout: 500 }, wrapper }
+    );
+    const { isBlocked } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(200);
+    });
+    rerender({ timeout: 800 });
+    act(() => {
+      vi.advanceTimersByTime(799);
+    });
+    expect(isBlocked("test")).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(isBlocked("test")).toBe(false);
+    expect(onTimeout).toHaveBeenCalledExactlyOnceWith("changed");
   });
 
   it("should block when schedule starts", () => {
