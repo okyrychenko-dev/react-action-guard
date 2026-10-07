@@ -1,6 +1,6 @@
 import { QueryClient, onlineManager } from "@tanstack/react-query";
 import { act, renderHook, waitFor } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { createPolicyWrapper, usePolicyFixture } from "./queryPolicy.test.utils";
 
 const available = [[], [], []];
@@ -11,6 +11,75 @@ const config = { reasonOnLoading: "Loading", reasonOnFetching: "Fetching" };
 describe("active query policy across public hooks", () => {
   afterEach(() => {
     onlineManager.setOnline(true);
+  });
+
+  it("should retain deadlines and use current callbacks across active configuration changes", () => {
+    vi.useFakeTimers();
+
+    try {
+      const client = new QueryClient();
+      const firstCallback = vi.fn();
+      const currentCallback = vi.fn();
+      const queryFn = () => new Promise<string>(() => undefined);
+      const { result, rerender, unmount } = renderHook(usePolicyFixture, {
+        wrapper: createPolicyWrapper(client),
+        initialProps: {
+          client,
+          queryFn,
+          config: { timeout: 100, onTimeout: firstCallback, reason: "First", priority: 20 },
+        },
+      });
+
+      expect(result.current.reasons).toEqual([["First"], ["First"], ["First"]]);
+
+      act(() => {
+        vi.advanceTimersByTime(40);
+      });
+
+      rerender({
+        client,
+        queryFn,
+        config: { timeout: 100, onTimeout: currentCallback, reason: "Current", priority: 30 },
+      });
+
+      expect(result.current.reasons).toEqual([["Current"], ["Current"], ["Current"]]);
+
+      act(() => {
+        vi.advanceTimersByTime(59);
+      });
+
+      expect(currentCallback).not.toHaveBeenCalled();
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+
+      expect(firstCallback).not.toHaveBeenCalled();
+      expect(currentCallback).toHaveBeenCalledTimes(3);
+      expect(result.current.reasons).toEqual(available);
+
+      rerender({
+        client,
+        queryFn,
+        config: { timeout: 100, onTimeout: currentCallback, reason: "Current", priority: 30 },
+      });
+
+      expect(result.current.reasons).toEqual(available);
+
+      rerender({
+        client,
+        queryFn,
+        config: { timeout: 100, onTimeout: currentCallback, reason: "Renewed", priority: 30 },
+      });
+
+      expect(result.current.reasons).toEqual([["Renewed"], ["Renewed"], ["Renewed"]]);
+
+      unmount();
+
+      client.clear();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should leave disabled pending queries available and block when enabled", async () => {
@@ -43,9 +112,11 @@ describe("active query policy across public hooks", () => {
     expect(result.current.infinite.fetchStatus).toBe("paused");
     expect(result.current.collection[0].fetchStatus).toBe("paused");
     expect(result.current.reasons).toEqual(available);
+
     act(() => {
       onlineManager.setOnline(true);
     });
+
     await waitFor(() => expect(result.current.reasons).toEqual(loading));
   });
 
@@ -69,20 +140,25 @@ describe("active query policy across public hooks", () => {
       });
 
       expect(result.current.reasons).toEqual(available);
+
       act(() => {
         void result.current.query.refetch();
         void result.current.infinite.refetch();
         void result.current.collection[0].refetch();
       });
+
       await waitFor(() => {
         expect(result.current.query.isRefetching).toBe(true);
         expect(result.current.infinite.isRefetching).toBe(true);
         expect(result.current.collection[0].isRefetching).toBe(true);
       });
+
       expect(result.current.reasons).toEqual(onFetching ? fetching : available);
+
       await act(async () => {
         resolvers.forEach((resolve) => resolve("fresh"));
       });
+
       await waitFor(() => {
         expect(result.current.query.data).toBe("fresh");
         expect(result.current.infinite.data?.pages).toEqual(["fresh"]);
@@ -105,18 +181,24 @@ describe("active query policy across public hooks", () => {
     });
 
     expect(result.current.reasons).toEqual(loading);
+
     await act(async () => {
       resolvers.splice(0).forEach((resolve) => resolve("first"));
     });
     await waitFor(() => expect(result.current.reasons).toEqual(available));
+
     act(() => {
       void result.current.infinite.fetchNextPage();
     });
+
     await waitFor(() => expect(result.current.infinite.isFetchingNextPage).toBe(true));
+
     expect(result.current.reasons).toEqual(onFetching ? [[], ["Fetching"], []] : available);
+
     await act(async () => {
       resolvers.forEach((resolve) => resolve("second"));
     });
+
     await waitFor(() => {
       expect(result.current.infinite.data?.pages).toEqual(["first", "second"]);
       expect(result.current.reasons).toEqual(available);
@@ -139,6 +221,7 @@ describe("active query policy across public hooks", () => {
       expect(result.current.infinite.isError).toBe(true);
       expect(result.current.collection[0].isError).toBe(true);
     });
+
     expect(result.current.reasons).toEqual(onError ? [["Error"], ["Error"], ["Error"]] : available);
   });
 });
