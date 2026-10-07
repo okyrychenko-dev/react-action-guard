@@ -31,8 +31,10 @@ let confirm = false;
 let attempts = 0;
 
 function Guard() {
+  const when = adapter === "react-router" ? () => true : true;
+
   useNavigationBlocker({
-    when: true,
+    when,
     message: "Leave?",
     blockBrowserUnload: false,
     onConfirm: async () => {

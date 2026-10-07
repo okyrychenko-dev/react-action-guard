@@ -363,10 +363,45 @@ describe("useNavigationBlocker (React Router)", () => {
       expect(blocker.reset).not.toHaveBeenCalled();
     });
 
+    it.each([true, false])(
+      "should settle async answer %s with an inline condition across its own rerenders",
+      async (answer) => {
+        mockUseShouldBlock.mockReturnValue(true);
+
+        const blocker = createBlockerMock("blocked");
+        const onAllow = vi.fn();
+        const onConfirm = async () => answer;
+
+        mockUseBlocker.mockReturnValue(blocker);
+
+        renderHook(() =>
+          useNavigationBlocker({
+            when: () => true,
+            message: "Confirm?",
+            onConfirm,
+            onAllow,
+          })
+        );
+
+        const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+        if (!isNoArgBlocker(blockerFn)) {
+          throw new Error("Expected no-arg blocker function");
+        }
+
+        await act(async () => {
+          expect(blockerFn()).toBe(true);
+        });
+
+        expect(onAllow).toHaveBeenCalledTimes(answer ? 1 : 0);
+        expect(blocker.proceed).toHaveBeenCalledTimes(answer ? 1 : 0);
+        expect(blocker.reset).toHaveBeenCalledTimes(answer ? 0 : 1);
+      }
+    );
+
     it.each([
       { name: "message", update: { message: "Changed?" } },
       { name: "scope", update: { scope: "other" } },
-      { name: "condition", update: { when: () => true } },
     ])("should invalidate pending approval when $name changes", async ({ update }) => {
       mockUseShouldBlock.mockReturnValue(true);
 
