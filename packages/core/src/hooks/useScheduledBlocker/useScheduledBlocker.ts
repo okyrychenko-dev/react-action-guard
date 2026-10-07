@@ -1,7 +1,6 @@
 import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { useCallback, useEffect, useRef } from "react";
-import { useResolvedValue } from "../../context";
-import { createBlockerConfig } from "../useActionBlocker";
+import { useBlockerRegistration } from "../useActionBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
 import {
@@ -24,10 +23,11 @@ import {
  * @see {@link BlockingSchedule} for schedule specification details
  */
 export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerConfig): void {
-  const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
-    addBlocker: state.addBlocker,
-    removeBlocker: state.removeBlocker,
-  }));
+  const { activate, deactivate } = useBlockerRegistration({
+    blockerId,
+    config,
+    endEpisodeOnTimeout: true,
+  });
   const timeoutsRef = useRef<{
     start?: ReturnType<typeof setTimeout>;
     end?: ReturnType<typeof setTimeout>;
@@ -71,7 +71,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       if (remainingTime > 0) {
         timeoutsRef.current.end = setTimeout(() => {
           configRef.current.onScheduleEnd?.();
-          removeBlocker(blockerId);
+          deactivate();
         }, remainingTime);
       }
     };
@@ -79,7 +79,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
     const startBlocking = (): void => {
       const cfg = configRef.current;
 
-      addBlocker(blockerId, createBlockerConfig(cfg));
+      activate();
       cfg.onScheduleStart?.();
       scheduleEnd();
     };
@@ -107,16 +107,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
     return (): void => {
       cleanup();
-      removeBlocker(blockerId);
+      deactivate();
     };
-  }, [
-    blockerId,
-    addBlocker,
-    removeBlocker,
-    cleanup,
-    scheduleStart,
-    scheduleEnd,
-    scheduleDuration,
-    configRef,
-  ]);
+  }, [activate, deactivate, cleanup, scheduleStart, scheduleEnd, scheduleDuration, configRef]);
 }
