@@ -45,9 +45,11 @@ export function useNavigationBlocker(
   const condition = when ?? block;
   const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
 
+  // Inline confirmation callbacks can change during this hook's own pending-state rerender.
+  // Only changes to protection invalidate an attempt; its original promise remains authoritative.
   useEffect(() => {
     return invalidate;
-  }, [condition, scopeKey, shouldBlock, message, onConfirm, invalidate]);
+  }, [condition, scopeKey, shouldBlock, message, invalidate]);
 
   // Use React Router's blocker
   const blocker = useBlocker(

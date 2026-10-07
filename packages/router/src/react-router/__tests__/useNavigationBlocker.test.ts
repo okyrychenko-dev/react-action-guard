@@ -332,11 +332,41 @@ describe("useNavigationBlocker (React Router)", () => {
       expect(blocker.reset).not.toHaveBeenCalled();
     });
 
+    it("should allow async confirmation from an inline handler across its own rerenders", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+
+      mockUseBlocker.mockReturnValue(blocker);
+      renderHook(() =>
+        useNavigationBlocker({
+          when: true,
+          message: "Confirm?",
+          onConfirm: async () => true,
+          onAllow,
+        })
+      );
+
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      await act(async () => {
+        expect(blockerFn()).toBe(true);
+      });
+
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
+      expect(blocker.reset).not.toHaveBeenCalled();
+    });
+
     it.each([
       { name: "message", update: { message: "Changed?" } },
       { name: "scope", update: { scope: "other" } },
       { name: "condition", update: { when: () => true } },
-      { name: "confirmation handler", update: { onConfirm: () => true } },
     ])("should invalidate pending approval when $name changes", async ({ update }) => {
       mockUseShouldBlock.mockReturnValue(true);
 
@@ -380,7 +410,7 @@ describe("useNavigationBlocker (React Router)", () => {
       expect(blocker.reset).not.toHaveBeenCalled();
     });
 
-    it("should preserve approval across observer rerenders and equivalent scopes exactly once", async () => {
+    it("should preserve approval across callback rerenders and equivalent scopes exactly once", async () => {
       mockUseShouldBlock.mockReturnValue(true);
 
       const blocker = createBlockerMock("blocked");
@@ -416,6 +446,7 @@ describe("useNavigationBlocker (React Router)", () => {
         ...options,
         scope: ["navigation", "editor", "editor"],
         onAllow: nextOnAllow,
+        onConfirm: () => false,
         onBlock: vi.fn(),
       });
 
