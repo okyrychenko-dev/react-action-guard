@@ -1,14 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useBlocker } from "react-router-dom";
 import {
   DEFAULT_UNLOAD_MESSAGE,
+  createConfirmationOwner,
+  normalizeScope,
   resolveConfirmResult,
   useBeforeUnload,
   useShouldBlock,
 } from "../core";
 import type { Nullable } from "@okyrychenko-dev/type-utils";
-import type { NavigationBlockerReturn } from "../core/types";
-import type { UseNavigationBlockerOptions } from "./types";
+import type { NavigationBlockerReturn } from "../core";
+import type { BlockedNavigationAttempt, UseNavigationBlockerOptions } from "./types";
 
 /**
  * Blocks navigation in React Router v6+ applications based on conditions or scope state.
@@ -28,22 +30,28 @@ export function useNavigationBlocker(
     onConfirm,
   } = options;
 
-  const confirmSeqRef = useRef(0);
-  const [pendingConfirm, setPendingConfirm] = useState<
-    Nullable<{
-      id: number;
-      promise: Promise<boolean>;
-    }>
-  >(null);
+  const [confirmationOwner] = useState(createConfirmationOwner);
+  const { begin, invalidate } = confirmationOwner;
+  const [blockedAttempt, setBlockedAttempt] = useState<Nullable<BlockedNavigationAttempt>>(null);
 
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when ?? block, scope);
 
+  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
+
+  useEffect(() => {
+    return invalidate;
+  }, [invalidate]);
+
   // Use React Router's blocker
   const blocker = useBlocker(
     useCallback(() => {
+      const settle = begin();
+
       // Early return if not blocking
       if (!shouldBlock) {
+        setBlockedAttempt(null);
+
         return false;
       }
 
@@ -52,6 +60,8 @@ export function useNavigationBlocker(
 
       // If no message, just block
       if (!message) {
+        setBlockedAttempt({ kind: "denied", settle, scopeKey, message });
+
         return true;
       }
 
@@ -60,58 +70,78 @@ export function useNavigationBlocker(
       );
 
       if (confirmation.kind === "async") {
-        const id = ++confirmSeqRef.current;
-
-        setPendingConfirm({ id, promise: confirmation.promise });
+        setBlockedAttempt({
+          kind: "confirming",
+          settle,
+          promise: confirmation.promise.catch(() => false),
+          scopeKey,
+          message,
+        });
 
         return true;
       }
 
-      if (confirmation.confirmed) {
+      if (confirmation.confirmed && settle()) {
+        setBlockedAttempt(null);
         onAllow?.();
 
         return false;
       }
 
+      setBlockedAttempt({ kind: "denied", settle, scopeKey, message });
+
       return true;
-    }, [shouldBlock, message, onBlock, onConfirm, onAllow])
+    }, [shouldBlock, scopeKey, message, onBlock, onConfirm, onAllow, begin])
   );
 
   useEffect(() => {
-    if (!pendingConfirm) {
+    if (!blockedAttempt) {
+      return;
+    }
+
+    // Compare protection values, not inline callback identities, before attaching completion.
+    if (
+      !shouldBlock ||
+      blockedAttempt.scopeKey !== scopeKey ||
+      blockedAttempt.message !== message
+    ) {
+      queueMicrotask(() => {
+        setBlockedAttempt((current) => (current === blockedAttempt ? null : current));
+      });
+
+      if (blockedAttempt.settle()) {
+        blocker.reset?.();
+      }
+
+      return;
+    }
+
+    if (blockedAttempt.kind === "denied") {
       return;
     }
 
     let active = true;
-    const { id, promise } = pendingConfirm;
+    const { settle, promise } = blockedAttempt;
 
-    promise
-      .then((confirmed) => {
-        if (!active || id !== confirmSeqRef.current) {
-          return;
-        }
-        if (confirmed) {
-          onAllow?.();
-          blocker.proceed?.();
-        } else {
-          blocker.reset?.();
-        }
-      })
-      .catch(() => {
-        if (active && id === confirmSeqRef.current) {
-          blocker.reset?.();
-        }
-      })
-      .finally(() => {
-        if (active && id === confirmSeqRef.current) {
-          setPendingConfirm(null);
-        }
-      });
+    void promise.then((confirmed) => {
+      if (!active || !settle()) {
+        return;
+      }
+
+      setBlockedAttempt(null);
+
+      if (confirmed) {
+        onAllow?.();
+        blocker.proceed?.();
+      } else {
+        blocker.reset?.();
+      }
+    });
 
     return () => {
       active = false;
     };
-  }, [pendingConfirm, blocker, onAllow]);
+  }, [blockedAttempt, blocker, onAllow, shouldBlock, scopeKey, message]);
 
   // Also block browser unload if requested
   useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);
