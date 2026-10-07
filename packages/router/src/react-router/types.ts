@@ -1,4 +1,5 @@
-import type { BaseNavigationBlockerOptions } from "../core/types";
+import type { Optional } from "@okyrychenko-dev/type-utils";
+import type { BaseNavigationBlockerOptions } from "../core";
 
 /**
  * Options for React Router navigation blocker
@@ -25,3 +26,20 @@ export type UsePromptOptions = Omit<BaseNavigationBlockerOptions, "message" | "w
    */
   when: boolean | (() => boolean);
 };
+
+interface NavigationAttemptOwnership {
+  settle: () => boolean;
+  scopeKey: string;
+  message: Optional<string>;
+}
+
+export interface ConfirmingNavigationAttempt extends NavigationAttemptOwnership {
+  kind: "confirming";
+  promise: Promise<boolean>;
+}
+
+export interface DeniedNavigationAttempt extends NavigationAttemptOwnership {
+  kind: "denied";
+}
+
+export type BlockedNavigationAttempt = ConfirmingNavigationAttempt | DeniedNavigationAttempt;

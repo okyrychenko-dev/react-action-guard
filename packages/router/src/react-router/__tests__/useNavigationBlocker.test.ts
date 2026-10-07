@@ -574,6 +574,71 @@ describe("useNavigationBlocker (React Router)", () => {
       expect(blocker.reset).not.toHaveBeenCalled();
     });
 
+    it.each([
+      { name: "disablement", update: { when: false } },
+      { name: "message", update: { message: "Changed?" } },
+      { name: "scope", update: { scope: "other" } },
+    ])(
+      "should reset a synchronous denial after an async prompt when $name changes",
+      async ({ update }) => {
+        mockUseShouldBlock.mockReturnValue(true);
+
+        const firstBlocker = createBlockerMock("blocked");
+        const deniedBlocker = createBlockerMock("blocked");
+        const onAllow = vi.fn();
+        let resolveFirst: (value: boolean) => void = () => undefined;
+        const first = new Promise<boolean>((resolve) => {
+          resolveFirst = resolve;
+        });
+        const onConfirm = vi
+          .fn<NonNullable<UseNavigationBlockerOptions["onConfirm"]>>()
+          .mockReturnValueOnce(first)
+          .mockReturnValue(false);
+        const options: UseNavigationBlockerOptions = {
+          when: true,
+          scope: "editor",
+          message: "Confirm?",
+          onConfirm,
+          onAllow,
+        };
+
+        mockUseBlocker.mockReturnValue(firstBlocker);
+
+        const { rerender } = renderHook((props) => useNavigationBlocker(props), {
+          initialProps: options,
+        });
+        const firstBlockerFn = mockUseBlocker.mock.calls[0][0];
+
+        if (!isNoArgBlocker(firstBlockerFn)) {
+          throw new Error("Expected no-arg blocker function");
+        }
+
+        act(() => {
+          expect(firstBlockerFn()).toBe(true);
+        });
+        mockUseBlocker.mockReturnValue(deniedBlocker);
+        act(() => {
+          expect(firstBlockerFn()).toBe(true);
+        });
+
+        if (update.when === false) {
+          mockUseShouldBlock.mockReturnValue(false);
+        }
+        rerender({ ...options, ...update });
+
+        expect(deniedBlocker.reset).toHaveBeenCalledTimes(1);
+        expect(firstBlocker.reset).not.toHaveBeenCalled();
+        await act(async () => {
+          resolveFirst(true);
+          await first;
+        });
+        expect(onAllow).not.toHaveBeenCalled();
+        expect(firstBlocker.proceed).not.toHaveBeenCalled();
+        expect(deniedBlocker.proceed).not.toHaveBeenCalled();
+        expect(deniedBlocker.reset).toHaveBeenCalledTimes(1);
+      }
+    );
+
     it.each([true, false])(
       "should let a newer synchronous answer (%s) supersede pending approval",
       async (answer) => {

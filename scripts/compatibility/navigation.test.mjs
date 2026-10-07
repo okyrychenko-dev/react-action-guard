@@ -31,6 +31,7 @@ let confirm = false;
 let attempts = 0;
 let allows = 0;
 let confirmation;
+let synchronous = false;
 let intercepting = false;
 let setProtection = () => {};
 
@@ -44,9 +45,13 @@ function Guard() {
     when,
     message: "Leave?",
     blockBrowserUnload: false,
-    onConfirm: async () => {
+    onConfirm: () => {
       attempts++;
-      return confirmation ?? confirm;
+      if (synchronous) {
+        return confirm;
+      }
+
+      return Promise.resolve(confirmation ?? confirm);
     },
     onAllow: () => allows++,
   });
@@ -162,6 +167,45 @@ it("should deny, allow once, and keep protecting real router navigation", async 
       });
       assert.equal(location(), "/a", "navigation should work after protection is disabled");
       assert.equal(attempts, 4);
+
+      await act(async () => setProtection(true));
+      let settleSuperseded;
+      confirmation = new Promise((resolve) => {
+        settleSuperseded = resolve;
+      });
+      await act(async () => {
+        void navigate("/b");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      assert.equal(intercepting, true);
+
+      synchronous = true;
+      await act(async () => {
+        void navigate("/b");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      assert.equal(intercepting, true);
+      assert.equal(attempts, 6);
+
+      await act(async () => setProtection(false));
+      assert.equal(
+        intercepting,
+        false,
+        "disabled protection must reset the synchronous replacement"
+      );
+      await act(async () => {
+        settleSuperseded(true);
+        await confirmation;
+      });
+      assert.equal(location(), "/a");
+      assert.equal(allows, 1);
+
+      await act(async () => {
+        void navigate("/b");
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      });
+      assert.equal(location(), "/b");
+      assert.equal(attempts, 6);
     }
 
     assert.deepEqual(errors, [], "navigation must not produce runtime errors");
