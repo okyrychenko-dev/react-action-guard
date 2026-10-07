@@ -73,11 +73,11 @@ execFileSync(
 );
 
 for (const mode of ["production", "development"]) {
+  // Slow benchmark samples are evidence; let both runs finish without a deadline.
   execFileSync(process.execPath, ["fixtures/subscriptions.mjs", join(output, `${mode}.json`)], {
     cwd: consumer,
     env: { ...process.env, NODE_ENV: mode },
     stdio: "inherit",
-    timeout: 120_000,
   });
 }
 execFileSync(process.execPath, ["fixtures/toolkit.mjs"], {
