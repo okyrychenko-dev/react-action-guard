@@ -199,7 +199,7 @@ describe("useNavigationBlocker (React Router)", () => {
       });
 
       expect(onConfirm).toHaveBeenCalledTimes(1);
-      expect(blocker.proceed).toHaveBeenCalled();
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
     });
 
     it("should reset after async confirmation resolves false", async () => {
@@ -242,7 +242,7 @@ describe("useNavigationBlocker (React Router)", () => {
       });
 
       expect(onConfirm).toHaveBeenCalledTimes(1);
-      expect(blocker.reset).toHaveBeenCalled();
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
       expect(blocker.proceed).not.toHaveBeenCalled();
     });
 
@@ -290,8 +290,289 @@ describe("useNavigationBlocker (React Router)", () => {
       });
 
       expect(onConfirm).toHaveBeenCalledTimes(1);
-      expect(blocker.reset).toHaveBeenCalled();
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
       expect(blocker.proceed).not.toHaveBeenCalled();
+    });
+
+    it("should ignore pending approval after blocking is disabled", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      let resolveConfirm: (value: boolean) => void = () => undefined;
+      const promise = new Promise<boolean>((resolve) => {
+        resolveConfirm = resolve;
+      });
+      const onConfirm = vi.fn(() => promise);
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { rerender } = renderHook(() =>
+        useNavigationBlocker({ when: true, message: "Confirm?", onConfirm, onAllow })
+      );
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      mockUseShouldBlock.mockReturnValue(false);
+      rerender();
+
+      await act(async () => {
+        resolveConfirm(true);
+        await promise;
+      });
+
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(blocker.proceed).not.toHaveBeenCalled();
+      expect(blocker.reset).not.toHaveBeenCalled();
+    });
+
+    it.each([
+      { name: "message", update: { message: "Changed?" } },
+      { name: "scope", update: { scope: "other" } },
+      { name: "condition", update: { when: () => true } },
+      { name: "confirmation handler", update: { onConfirm: () => true } },
+    ])("should invalidate pending approval when $name changes", async ({ update }) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      let resolveConfirm: (value: boolean) => void = () => undefined;
+      const promise = new Promise<boolean>((resolve) => {
+        resolveConfirm = resolve;
+      });
+      const options: UseNavigationBlockerOptions = {
+        when: true,
+        scope: "editor",
+        message: "Confirm?",
+        onConfirm: () => promise,
+        onAllow,
+      };
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { rerender } = renderHook((props) => useNavigationBlocker(props), {
+        initialProps: options,
+      });
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      rerender({ ...options, ...update });
+
+      await act(async () => {
+        resolveConfirm(true);
+        await promise;
+      });
+
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(blocker.proceed).not.toHaveBeenCalled();
+      expect(blocker.reset).not.toHaveBeenCalled();
+    });
+
+    it("should preserve approval across observer rerenders and equivalent scopes exactly once", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      const nextOnAllow = vi.fn();
+      let resolveConfirm: (value: boolean) => void = () => undefined;
+      const promise = new Promise<boolean>((resolve) => {
+        resolveConfirm = resolve;
+      });
+      const options: UseNavigationBlockerOptions = {
+        when: true,
+        scope: ["editor", "navigation"],
+        message: "Confirm?",
+        onConfirm: () => promise,
+        onAllow,
+      };
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { rerender } = renderHook((props) => useNavigationBlocker(props), {
+        initialProps: options,
+      });
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      rerender({
+        ...options,
+        scope: ["navigation", "editor", "editor"],
+        onAllow: nextOnAllow,
+        onBlock: vi.fn(),
+      });
+
+      await act(async () => {
+        resolveConfirm(true);
+        await promise;
+      });
+      rerender(options);
+      await act(async () => {
+        await promise;
+      });
+
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(nextOnAllow).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
+      expect(blocker.reset).not.toHaveBeenCalled();
+    });
+
+    it.each([true, false])(
+      "should let a newer synchronous answer (%s) supersede pending approval",
+      async (answer) => {
+        mockUseShouldBlock.mockReturnValue(true);
+
+        const blocker = createBlockerMock("blocked");
+        const onAllow = vi.fn();
+        let resolveConfirm: (value: boolean) => void = () => undefined;
+        const promise = new Promise<boolean>((resolve) => {
+          resolveConfirm = resolve;
+        });
+        const onConfirm = vi
+          .fn<NonNullable<UseNavigationBlockerOptions["onConfirm"]>>()
+          .mockReturnValueOnce(promise)
+          .mockReturnValue(answer);
+
+        mockUseBlocker.mockReturnValue(blocker);
+        renderHook(() =>
+          useNavigationBlocker({ when: true, message: "Confirm?", onConfirm, onAllow })
+        );
+
+        const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+        if (!isNoArgBlocker(blockerFn)) {
+          throw new Error("Expected no-arg blocker function");
+        }
+
+        act(() => {
+          expect(blockerFn()).toBe(true);
+        });
+        act(() => {
+          expect(blockerFn()).toBe(!answer);
+        });
+        await act(async () => {
+          resolveConfirm(true);
+          await promise;
+        });
+
+        expect(onAllow).toHaveBeenCalledTimes(answer ? 1 : 0);
+        expect(blocker.proceed).not.toHaveBeenCalled();
+        expect(blocker.reset).not.toHaveBeenCalled();
+      }
+    );
+
+    it("should ignore approval after detach", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      let resolveConfirm: (value: boolean) => void = () => undefined;
+      const promise = new Promise<boolean>((resolve) => {
+        resolveConfirm = resolve;
+      });
+      const onConfirm = () => promise;
+
+      mockUseBlocker.mockReturnValue(blocker);
+
+      const { unmount } = renderHook(() =>
+        useNavigationBlocker({ when: true, message: "Confirm?", onConfirm, onAllow })
+      );
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      unmount();
+      await act(async () => {
+        resolveConfirm(true);
+        await promise;
+      });
+
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(blocker.proceed).not.toHaveBeenCalled();
+      expect(blocker.reset).not.toHaveBeenCalled();
+    });
+
+    it("should settle only the latest async attempt and protect repeated navigation", async () => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const blocker = createBlockerMock("blocked");
+      const onAllow = vi.fn();
+      const onBlock = vi.fn();
+      let resolveFirst: (value: boolean) => void = () => undefined;
+      let resolveSecond: (value: boolean) => void = () => undefined;
+      const first = new Promise<boolean>((resolve) => {
+        resolveFirst = resolve;
+      });
+      const second = new Promise<boolean>((resolve) => {
+        resolveSecond = resolve;
+      });
+      const onConfirm = vi
+        .fn<NonNullable<UseNavigationBlockerOptions["onConfirm"]>>()
+        .mockReturnValueOnce(first)
+        .mockReturnValueOnce(second)
+        .mockResolvedValueOnce(false);
+
+      mockUseBlocker.mockReturnValue(blocker);
+      renderHook(() =>
+        useNavigationBlocker({ when: true, message: "Confirm?", onConfirm, onAllow, onBlock })
+      );
+
+      const blockerFn = mockUseBlocker.mock.calls[0][0];
+
+      if (!isNoArgBlocker(blockerFn)) {
+        throw new Error("Expected no-arg blocker function");
+      }
+
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      act(() => {
+        expect(blockerFn()).toBe(true);
+      });
+      await act(async () => {
+        resolveSecond(true);
+        await second;
+      });
+      await act(async () => {
+        resolveFirst(true);
+        await first;
+      });
+
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
+      expect(blocker.reset).not.toHaveBeenCalled();
+
+      await act(async () => {
+        expect(blockerFn()).toBe(true);
+      });
+
+      expect(onBlock).toHaveBeenCalledTimes(3);
+      expect(onConfirm).toHaveBeenCalledTimes(3);
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(blocker.proceed).toHaveBeenCalledTimes(1);
+      expect(blocker.reset).toHaveBeenCalledTimes(1);
     });
 
     it("should block when sync confirmation returns false", () => {

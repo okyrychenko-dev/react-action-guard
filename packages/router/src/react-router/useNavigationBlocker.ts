@@ -1,13 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useBlocker } from "react-router-dom";
 import {
   DEFAULT_UNLOAD_MESSAGE,
+  createConfirmationOwner,
+  normalizeScope,
   resolveConfirmResult,
   useBeforeUnload,
   useShouldBlock,
 } from "../core";
 import type { Nullable } from "@okyrychenko-dev/type-utils";
-import type { NavigationBlockerReturn } from "../core/types";
+import type { NavigationBlockerReturn } from "../core";
 import type { UseNavigationBlockerOptions } from "./types";
 
 /**
@@ -28,10 +30,11 @@ export function useNavigationBlocker(
     onConfirm,
   } = options;
 
-  const confirmSeqRef = useRef(0);
+  const [confirmationOwner] = useState(createConfirmationOwner);
+  const { begin, invalidate } = confirmationOwner;
   const [pendingConfirm, setPendingConfirm] = useState<
     Nullable<{
-      id: number;
+      settle: () => boolean;
       promise: Promise<boolean>;
     }>
   >(null);
@@ -39,9 +42,18 @@ export function useNavigationBlocker(
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when ?? block, scope);
 
+  const condition = when ?? block;
+  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
+
+  useEffect(() => {
+    return invalidate;
+  }, [condition, scopeKey, shouldBlock, message, onConfirm, invalidate]);
+
   // Use React Router's blocker
   const blocker = useBlocker(
     useCallback(() => {
+      const settle = begin();
+
       // Early return if not blocking
       if (!shouldBlock) {
         return false;
@@ -60,21 +72,19 @@ export function useNavigationBlocker(
       );
 
       if (confirmation.kind === "async") {
-        const id = ++confirmSeqRef.current;
-
-        setPendingConfirm({ id, promise: confirmation.promise });
+        setPendingConfirm({ settle, promise: confirmation.promise.catch(() => false) });
 
         return true;
       }
 
-      if (confirmation.confirmed) {
+      if (settle() && confirmation.confirmed) {
         onAllow?.();
 
         return false;
       }
 
       return true;
-    }, [shouldBlock, message, onBlock, onConfirm, onAllow])
+    }, [shouldBlock, message, onBlock, onConfirm, onAllow, begin])
   );
 
   useEffect(() => {
@@ -83,30 +93,22 @@ export function useNavigationBlocker(
     }
 
     let active = true;
-    const { id, promise } = pendingConfirm;
+    const { settle, promise } = pendingConfirm;
 
-    promise
-      .then((confirmed) => {
-        if (!active || id !== confirmSeqRef.current) {
-          return;
-        }
-        if (confirmed) {
-          onAllow?.();
-          blocker.proceed?.();
-        } else {
-          blocker.reset?.();
-        }
-      })
-      .catch(() => {
-        if (active && id === confirmSeqRef.current) {
-          blocker.reset?.();
-        }
-      })
-      .finally(() => {
-        if (active && id === confirmSeqRef.current) {
-          setPendingConfirm(null);
-        }
-      });
+    void promise.then((confirmed) => {
+      if (!active || !settle()) {
+        return;
+      }
+
+      setPendingConfirm(null);
+
+      if (confirmed) {
+        onAllow?.();
+        blocker.proceed?.();
+      } else {
+        blocker.reset?.();
+      }
+    });
 
     return () => {
       active = false;
