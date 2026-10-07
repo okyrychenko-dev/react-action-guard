@@ -1,7 +1,6 @@
-import { type Nullable, isUndefined } from "@okyrychenko-dev/type-utils";
+import { isUndefined } from "@okyrychenko-dev/type-utils";
 import { useCallback, useEffect, useRef } from "react";
-import { useResolvedValue } from "../../context";
-import { createBlockerConfig } from "../useActionBlocker";
+import { useBlockerRegistration } from "../useActionBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ConditionalBlockerConfig } from "./useConditionalBlocker.types";
 
@@ -20,11 +19,11 @@ export function useConditionalBlocker<TState = unknown>(
   blockerId: string,
   config: ConditionalBlockerConfig<TState>
 ): void {
-  const { addBlocker, removeBlocker } = useResolvedValue((state) => ({
-    addBlocker: state.addBlocker,
-    removeBlocker: state.removeBlocker,
-  }));
-  const intervalRef = useRef<Nullable<ReturnType<typeof setInterval>>>(null);
+  const { activate, deactivate } = useBlockerRegistration({
+    blockerId,
+    config,
+    endEpisodeOnTimeout: true,
+  });
   const isBlockedRef = useRef(false);
   const configRef = useConfigRef(config);
 
@@ -43,27 +42,28 @@ export function useConditionalBlocker<TState = unknown>(
     }
 
     if (shouldBlock) {
-      addBlocker(blockerId, createBlockerConfig(currentConfig));
+      activate();
     } else {
-      removeBlocker(blockerId);
+      deactivate();
     }
     isBlockedRef.current = shouldBlock;
-  }, [blockerId, addBlocker, removeBlocker, configRef]);
+  }, [activate, deactivate, configRef]);
+
+  useEffect(
+    () => () => {
+      deactivate();
+      isBlockedRef.current = false;
+    },
+    [deactivate]
+  );
 
   useEffect(() => {
     checkCondition();
 
-    intervalRef.current = setInterval(checkCondition, checkInterval);
+    const interval = setInterval(checkCondition, checkInterval);
 
-    return (): void => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      if (isBlockedRef.current) {
-        removeBlocker(blockerId);
-        isBlockedRef.current = false;
-      }
+    return () => {
+      clearInterval(interval);
     };
-  }, [checkCondition, blockerId, removeBlocker, checkInterval]);
+  }, [checkCondition, checkInterval]);
 }
