@@ -1,16 +1,16 @@
 # Protect all mutation calls owned by a hook
 
-Status: accepted contract; implementation pending.
+Status: accepted contract; implemented by the mutation execution owner.
 
 Decision date: 2026-10-08. Evidence baseline: repository `055e7ba`;
 installed `@tanstack/react-query` and `@tanstack/query-core` 5.90.10.
 
-`useBlockingMutation` will protect all unsettled calls initiated through its
-`mutate` and `mutateAsync` functions. Its returned result will continue to describe
+`useBlockingMutation` protects all unsettled calls initiated through its
+`mutate` and `mutateAsync` functions. Its returned result continues to describe
 the latest native mutation observer. These are separate responsibilities: result
 observation, protection lifetime, and operation cancellation must not be confused.
-This decision defines future behavior; the current adapter only follows
-`mutation.isPending` and does not yet meet this contract.
+The original adapter followed only `mutation.isPending`; the execution owner now
+accounts for each native execution promise independently.
 
 ## Alternatives and selected boundary
 
@@ -88,8 +88,8 @@ provides backend exclusion. [5]
 The feasible public boundary is native `mutateAsync`: allocate an ownership token,
 delegate once, attach a nonthrowing fulfillment/rejection cleanup branch, and
 return the original promise. `mutate` can use the same execution path with native
-void/rejection handling. This is an implementation recommendation derived from
-source, not a completed runtime change. A token also needs cleanup if delegation
+void/rejection handling. This implementation boundary was selected from
+exact-version native source. A token also needs cleanup if delegation
 throws synchronously. Do not alter mutationFn, options, meta, MutationCache,
 callbacks, or observer subscription to recover execution identity. [2][3]
 
@@ -100,12 +100,12 @@ arguments, latest-call callback suppression, and option-update behavior. Query
 updates the currently observed pending mutation's options; older detached calls
 retain their native execution options. [1][2][3]
 
-Retaining protection after unmount is a deliberate change from the current
+Retaining protection after unmount is a deliberate change from the original
 mutation adapter's component-owned registration. An indefinitely paused or
 unfinished call can retain protection indefinitely without a configured timeout,
 just as core async-action tracking can. An expired episode can admit new work
 without renewed protection until all covered pending/error state clears. These
-trade-offs need explicit user documentation when the contract is implemented.
+trade-offs need explicit user documentation in the package README.
 
 The contract is feasible against the installed 5.90.10 public API, but this does
 not establish compatibility throughout the declared `^5.90.10` peer range. The
@@ -135,8 +135,9 @@ Existing mutation/coordination suites passed 28 tests; the core async-action
 lifetime suite passed 2 tests, independently establishing retention after caller
 unmount and timeout without operation settlement. [5] Final workspace typechecking passed; the full suite passed 790 tests. The ADR
 passed Prettier and staged whitespace checks. Build, packed consumers, and browser
-checks were not run for this documentation-only change. No new production
-behavior or permanent runtime tests are delivered by this decision record.
+checks were not run for this documentation-only change. Those decision probes
+delivered no production behavior or permanent runtime tests.
+The implementation is verified separately through the public-hook lifetime suite.
 
 Implementation verification must use the public-hook seam with real QueryClient, deferred
 promises, supported blocking observations, and controlled time only for timers.
@@ -147,6 +148,23 @@ work; reactive configuration/key/store changes; timeout expiry and rearming;
 independent hook/client ownership; and generic result/callback types. Verify
 blocker existence before metadata assertions. Include documented client-remount
 behavior instead of assuming client-prop migration.
+
+## Implementation evidence (2026-10-08)
+
+The [public-hook lifetime suite](../../src/hooks/__tests__/useBlockingMutation.lifetime.test.tsx)
+uses real QueryClient instances and covers 25 execution-lifetime scenarios,
+including reversed completion, awaited callbacks, native callback suppression,
+reset, detach, retained invocation, key/configuration changes, retry/pause/queue,
+isolation, callback reentrancy, committed layout configuration and timeout episodes.
+Query and Mutation registration checks require blocker existence before metadata.
+
+Workspace build, lint, typechecking and all 815 tests passed. Fresh strict-peer
+packed consumers passed with Query 5.90.10 and 5.104.1: ESM/CJS imports, NodeNext
+.mts/.cts generic result/variable/callback declarations, and three runtime scenarios
+per version. The [packed fixtures](../../../../scripts/compatibility/mutation.test.mjs)
+clear their clients and disable unrelated cache GC timers so successful assertions
+also produce a successful process exit. Standards and Spec reviews had no findings.
+Other packed targets and browser suites were not rerun for this change.
 
 ## Sources
 

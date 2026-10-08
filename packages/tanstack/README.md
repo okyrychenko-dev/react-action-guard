@@ -111,30 +111,77 @@ All four hooks accept the native TanStack Query options and return the correspon
 
 `onLoading` and `onFetching` are available on query, infinite-query, and multi-query configurations. Mutations always block while pending and do not have a fetching state.
 
-Registration uses core's `useActionBlocker` ownership rules. Active configuration replaces previous values, equivalent scope arrays do not emit redundant updates, and unchanged timeouts retain their deadline while callbacks use the latest configuration. Timeout removes protection without cancelling Query work. A later configuration change can register protection again while the policy remains active, as with `useActionBlocker`; equivalent rerenders do not restart it. Changing query identity or unmounting releases the owned registration and its timer.
+Query registration uses core's `useActionBlocker` ownership rules. Active configuration replaces previous values, equivalent scope arrays do not emit redundant updates, and unchanged timeouts retain their deadline while callbacks use the latest configuration. Timeout removes protection without cancelling Query work. A later configuration change can register protection again while the policy remains active, as with `useActionBlocker`; equivalent rerenders do not restart it. Changing query identity or unmounting releases the owned registration and its timer.
 
-Query-specific activation and reason precedence remain in this adapter: initial active loading blocks by default, refetch and error blocking are opt-in, and loading reasons precede fetching and error reasons. Mutation execution lifetime is unchanged by registration reuse.
+Query-specific activation and reason precedence remain in this adapter: initial active loading blocks by default, refetch and error blocking are opt-in, and loading reasons precede fetching and error reasons. Mutation execution ownership is described below.
 
 ### Migration: active loading by default
 
 Query loading now means `isPending && isFetching` (TanStack's `isLoading`). Disabled queries without data and offline paused queries leave their scopes available, even though their status is pending. Initial requests block when they actually start and release after settlement or while paused. This applies to query, infinite-query, and query collections; an idle member does not keep a collection blocked.
 
-Cached background requests do not block by default. Set `onFetching: true` to block refetches and infinite next/previous-page requests; paused fetches do not qualify. `reasonOnLoading` describes active initial requests, and `reasonOnFetching` describes background or pagination work. Error blocking still requires `onError: true`; mutation pending behavior is unchanged.
+Cached background requests do not block by default. Set `onFetching: true` to block refetches and infinite next/previous-page requests; paused fetches do not qualify. `reasonOnLoading` describes active initial requests, and `reasonOnFetching` describes background or pagination work. Error blocking still requires `onError: true`; mutations protect owned execution promises, including paused calls.
 
 If your application previously relied on a disabled or paused pending query to lock a workflow, register that workflow condition separately with core's `useActionBlocker`. There is no query option for blocking solely because data is absent.
 
 ### State mapping and reason precedence
 
-| Hook                       | Loading               | Fetching                                                          | Error                   |
-| -------------------------- | --------------------- | ----------------------------------------------------------------- | ----------------------- |
-| `useBlockingQuery`         | `isLoading`           | `isRefetching`                                                    | `isError`               |
-| `useBlockingInfiniteQuery` | `isLoading`           | `isRefetching`, `isFetchingNextPage`, or `isFetchingPreviousPage` | `isError`               |
-| `useBlockingMutation`      | `isPending`           | Not applicable                                                    | `isError`               |
-| `useBlockingQueries`       | Any result is loading | Any result is refetching                                          | Any result has an error |
+| Hook                       | Loading                  | Fetching                                                          | Error                   |
+| -------------------------- | ------------------------ | ----------------------------------------------------------------- | ----------------------- |
+| `useBlockingQuery`         | `isLoading`              | `isRefetching`                                                    | `isError`               |
+| `useBlockingInfiniteQuery` | `isLoading`              | `isRefetching`, `isFetchingNextPage`, or `isFetchingPreviousPage` | `isError`               |
+| `useBlockingMutation`      | Any unsettled owned call | Not applicable                                                    | `isError`               |
+| `useBlockingQueries`       | Any result is loading    | Any result is refetching                                          | Any result has an error |
 
 The enabled `onLoading`, `onFetching`, and `onError` options decide whether a blocker exists. When states overlap, the reason is selected in **loading → fetching → error** order from the first defined state-specific message; otherwise it falls back to `reason`. This reason precedence is independent of which blocking option is enabled. An empty string is a defined message.
 
-The hooks use the nearest `UIBlockingProvider` store, or the global store when there is no provider. Each mounted hook owns its blocker; changing a query or mutation key releases its previous blocker, and unmounting releases only that hook's blocker. Cleanup remains safe in React `StrictMode`. `useBlockingQueries` owns one blocker for the whole query array, including dynamic arrays, and does not block for an empty array.
+The hooks use the nearest `UIBlockingProvider` store, or the global store when there is no provider. Each mounted hook owns its blocker; changing a query key or unmounting a query hook releases only its owned blocker. Mutation detach and key changes follow the execution rules below. Cleanup remains safe in React `StrictMode`. `useBlockingQueries` owns one blocker for the whole query array, including dynamic arrays, and does not block for an empty array.
+
+### Mutation execution lifetime
+
+`useBlockingMutation` protects **all unsettled calls initiated through that hook's
+`mutate` or `mutateAsync`**, while its result still describes the latest native
+TanStack mutation observer. If A starts, then B starts and finishes first, the
+result can show B's success while the scope remains blocked until A finishes.
+Calls from another hook, direct cache executions, and restored persisted mutations
+are outside this owner's accounting. Equal mutation keys do not share ownership.
+
+An execution includes native retries, offline pauses, scope queues, and every
+MutationCache or hook-option callback that TanStack awaits. Per-call callbacks keep
+native latest-call suppression and unmount behavior; their returned promises are
+not awaited. Callback exceptions retain native rejection behavior. `mutate` returns
+void and consumes rejection; `mutateAsync` returns the original native promise.
+Blocking does not serialize invocations or cancel backend work.
+
+- `reset()` resets result observation and clears error-only protection, while every
+  pending owned call remains protected. Changing a mutation key also preserves
+  pending ownership and keeps native result-reset behavior.
+- Unmount retains pending protection in the originating blocking store until actual
+  settlement or timeout. Error-only protection ends on detach; a detached rejection
+  cannot create error protection. A retained mutation function can still invoke work
+  with that owner's last committed blocking configuration.
+- While attached, scope, priority, reasons, timeout, and `onTimeout` follow committed
+  configuration, including removal of optional values. Pending work uses
+  `reasonOnPending` before the fallback `reason`; eligible latest-observer errors
+  use `reasonOnError`. `onError: true` retains only the latest native observer's
+  error, and pending work takes precedence.
+- Each hook/store owner has one aggregate blocker. Old pending work remains in its
+  originating store after detach or Provider replacement; new owners remain
+  independent. Changing the QueryClient argument/provider preserves native observer
+  binding; remount the hook to bind another client.
+
+A timeout bounds a **registration episode**, not an operation. Additional calls,
+retries, and pauses do not restart the deadline. Before expiry, changing timeout
+restarts its timer, removing timeout cancels it, and metadata changes keep the
+existing deadline. After expiry, rerenders, configuration changes, more calls,
+reset during pending work, or pending-to-error transitions cannot revive that
+episode. Only clearing all pending and eligible error state permits a later call
+to start a new episode. Timeout invokes the current callback once and does not
+settle, cancel, or roll back execution.
+
+Pending work can retain protection indefinitely after unmount without a timeout.
+An expired episode can admit more work without protection until its coverage
+clears. See the [execution lifetime decision](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/docs/adr/0001-mutation-execution-lifetime.md)
+for the full contract and compatibility boundaries.
 
 ## Tree Shaking
 

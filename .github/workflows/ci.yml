@@ -80,6 +80,7 @@ jobs:
             next-15-floor,
             next-current,
             query-floor,
+            query-current,
           ]
     steps:
       - uses: actions/checkout@v4

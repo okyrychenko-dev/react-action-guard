@@ -1,6 +1,6 @@
 {
   "sourceBase": "8938a97796e2c4bf8146c7846a0beb34d09e9eb2",
-  "scope": "Actual pending Changesets-versioned cohort; strict peer installation; loading/types for all targets, provider and memory-router behavior only where specified in README.md.",
+  "scope": "Historical Changesets-versioned cohort records at sourceBase; targeted refreshes identify their own sourceBase and scope. Strict peer installation, imports and declarations for all recorded targets; behavior only as specified per result or in README.md.",
   "results": [
     {
       "target": "next-13-floor",
@@ -92,7 +92,7 @@
     },
     {
       "target": "query-floor",
-      "date": "2026-10-04T19:14:01.488Z",
+      "date": "2026-10-08T18:26:28.208Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -111,7 +111,9 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0",
         "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
-      }
+      },
+      "sourceBase": "1f76ba8b61c851191653584910fab8e79c5eb2e0",
+      "scope": "Ticket 08/09 working tree: fresh strict-peer cohort; ESM/CJS imports; NodeNext .mts/.cts mutation variable, result and callback inference; 3 public-hook mutation concurrency/reset/detach/awaited-callback tests."
     },
     {
       "target": "react-18",
@@ -263,6 +265,31 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0"
       }
+    },
+    {
+      "target": "query-current",
+      "date": "2026-10-08T18:26:35.630Z",
+      "node": "v22.20.0",
+      "strictPeers": true,
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@tanstack/react-query": "5.104.1",
+        "@okyrychenko-dev/react-action-guard": "2.0.0",
+        "@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-router": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
+      },
+      "sourceBase": "1f76ba8b61c851191653584910fab8e79c5eb2e0",
+      "scope": "Ticket 08/09 working tree: fresh strict-peer cohort; ESM/CJS imports; NodeNext .mts/.cts mutation variable, result and callback inference; 3 public-hook mutation concurrency/reset/detach/awaited-callback tests."
     }
   ],
   "tools": {
