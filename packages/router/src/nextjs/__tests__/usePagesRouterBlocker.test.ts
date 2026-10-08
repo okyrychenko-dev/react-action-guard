@@ -700,6 +700,32 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
     expect(onConfirm).toHaveBeenCalledTimes(2);
   });
 
+  it("should abort synchronous approval replaced from onAllow", () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let replaced = false;
+    const onConfirm = vi.fn(() => true);
+    const onAllow = vi.fn(() => {
+      if (!replaced) {
+        replaced = true;
+
+        const handler = onMock.mock.calls[0][1];
+
+        expect(() => handler("/replacement")).not.toThrow();
+      }
+    });
+
+    renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/old")).toThrow("Route change aborted by user");
+    expect(onConfirm).toHaveBeenCalledTimes(2);
+    expect(onAllow).toHaveBeenCalledTimes(2);
+    expect(mockRouter.events.emit).toHaveBeenCalledExactlyOnceWith("routeChangeError");
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
   describe("Performance", () => {
     it("should update listener when message changes", () => {
       mockUseShouldBlock.mockReturnValue(true);

@@ -43,6 +43,7 @@ export function useNavigationBlocker(
 
     const confirmationOwner = createConfirmationOwner();
     let allowedNavigation: Nullable<{ url: string }> = null;
+    let currentAttempt: Nullable<() => boolean> = null;
 
     function handleRouteChangeStart(url: string): void {
       // Early return for allowed URL
@@ -55,6 +56,8 @@ export function useNavigationBlocker(
       allowedNavigation = null;
 
       const settle = confirmationOwner.begin();
+
+      currentAttempt = settle;
 
       const { onBlock, onAllow, onConfirm } = callbacksRef.current;
 
@@ -83,6 +86,11 @@ export function useNavigationBlocker(
         }
 
         onAllow?.();
+
+        if (currentAttempt !== settle) {
+          router.events.emit("routeChangeError");
+          throw new Error(ROUTE_ERRORS.ABORTED);
+        }
 
         return;
       }
@@ -124,6 +132,7 @@ export function useNavigationBlocker(
 
     return () => {
       confirmationOwner.invalidate();
+      currentAttempt = null;
       allowedNavigation = null;
       router.events.off("routeChangeStart", handleRouteChangeStart);
     };
