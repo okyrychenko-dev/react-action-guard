@@ -658,6 +658,30 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
     }
   );
 
+  it("should cancel replay and clear permission when async onAllow throws", async () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onConfirm = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockReturnValue(new Promise<boolean>(() => undefined));
+    const onAllow = vi.fn(() => {
+      throw new Error("Consumer callback failed");
+    });
+
+    renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow("Route change aborted by user");
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    expect(onAllow).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+    expect(() => handler("/next")).toThrow("Route change aborted by user");
+    expect(onConfirm).toHaveBeenCalledTimes(2);
+  });
+
   describe("Performance", () => {
     it("should update listener when message changes", () => {
       mockUseShouldBlock.mockReturnValue(true);

@@ -88,7 +88,7 @@ export function useNavigationBlocker(
       }
 
       router.events.emit("routeChangeError");
-      function complete(confirmed: boolean): void {
+      async function complete(confirmed: boolean): Promise<void> {
         if (!settle() || !confirmed) {
           return;
         }
@@ -99,25 +99,24 @@ export function useNavigationBlocker(
 
         const { onAllow: notifyAllow } = callbacksRef.current;
 
-        notifyAllow?.();
+        try {
+          notifyAllow?.();
 
-        // User callbacks can replace the attempt or detach this listener synchronously.
-        if (allowedNavigation !== permission) {
-          return;
-        }
+          // User callbacks can replace the attempt or detach this listener synchronously.
+          if (allowedNavigation !== permission) {
+            return;
+          }
 
-        function clearPermission(): void {
+          await router.push(url);
+        } finally {
           if (allowedNavigation === permission) {
             allowedNavigation = null;
           }
         }
-
-        void router.push(url).then(clearPermission, clearPermission);
       }
 
-      void confirmation.promise.then(complete, () => {
-        complete(false);
-      });
+      // Treat confirmation, callback and retry failures as cancellation.
+      void confirmation.promise.then(complete).catch(() => complete(false));
       throw new Error(ROUTE_ERRORS.ABORTED);
     }
 
