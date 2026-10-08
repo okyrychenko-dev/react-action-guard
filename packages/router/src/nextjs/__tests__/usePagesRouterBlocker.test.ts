@@ -514,6 +514,40 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
     expect(currentAllow).toHaveBeenCalledTimes(1);
   });
 
+  it.each(["replacement", "detach"])("should not replay if onAllow causes %s", async (action) => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onConfirm = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockReturnValue(new Promise<boolean>(() => undefined));
+    const onAllow = vi.fn(() => {
+      if (action === "detach") {
+        unmount();
+      } else {
+        const handler = onMock.mock.calls[0][1];
+
+        expect(() => handler("/replacement")).toThrow();
+      }
+    });
+    const { unmount } = renderHook(() =>
+      useNavigationBlocker({
+        message: "Leave?",
+        onConfirm,
+        onAllow,
+      })
+    );
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/old")).toThrow();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(onAllow).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
   describe("Performance", () => {
     it("should update listener when message changes", () => {
       mockUseShouldBlock.mockReturnValue(true);

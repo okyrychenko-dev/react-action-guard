@@ -97,6 +97,11 @@ export function useNavigationBlocker(
 
         notifyAllow?.();
 
+        // User callbacks can replace the attempt or detach this listener synchronously.
+        if (allowedNavigation !== permission) {
+          return;
+        }
+
         function clearPermission(): void {
           if (allowedNavigation === permission) {
             allowedNavigation = null;
