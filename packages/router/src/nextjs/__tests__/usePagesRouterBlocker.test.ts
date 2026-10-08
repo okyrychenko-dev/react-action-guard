@@ -594,9 +594,14 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
     }
   );
 
-  it.each(["ancestor", "earlier sibling"])(
-    "should use current callbacks for %s layout navigation without replacing the listener",
-    (position) => {
+  it.each([
+    { position: "ancestor", changeMessage: false },
+    { position: "earlier sibling", changeMessage: false },
+    { position: "ancestor", changeMessage: true },
+    { position: "earlier sibling", changeMessage: true },
+  ])(
+    "should use matching protection and callbacks for $position layout navigation (message change: $changeMessage)",
+    ({ position, changeMessage }) => {
       mockUseShouldBlock.mockReturnValue(true);
 
       const previousBlock = vi.fn();
@@ -604,6 +609,7 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
       const previousConfirm = vi.fn(() => true);
       const currentConfirm = vi.fn(() => false);
       const onAllow = vi.fn();
+      let message = "Leave?";
       let onBlock = previousBlock;
       let onConfirm = previousConfirm;
       let navigateDuringLayout = false;
@@ -629,32 +635,44 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
       const { rerender } = renderHook(
         () =>
           useNavigationBlocker({
-            message: "Leave?",
+            message,
             onBlock,
             onConfirm,
             onAllow,
           }),
         { wrapper: LayoutWrapper }
       );
-      const handler = onMock.mock.calls[0][1];
 
       vi.mocked(mockRouter.push).mockImplementation(() => {
+        const handler = onMock.mock.calls[onMock.mock.calls.length - 1][1];
+
         handler("/next");
 
         return Promise.resolve(true);
       });
       onBlock = currentBlock;
       onConfirm = currentConfirm;
+      if (changeMessage) {
+        message = "Protect current work?";
+      }
       navigateDuringLayout = true;
       rerender();
 
       expect(currentBlock).toHaveBeenCalledTimes(1);
-      expect(currentConfirm).toHaveBeenCalledExactlyOnceWith("Leave?");
+
+      const expectedMessage = changeMessage ? "Protect current work?" : "Leave?";
+
+      expect(currentConfirm).toHaveBeenCalledExactlyOnceWith(expectedMessage);
       expect(previousBlock).not.toHaveBeenCalled();
       expect(previousConfirm).not.toHaveBeenCalled();
       expect(onAllow).not.toHaveBeenCalled();
-      expect(onMock).toHaveBeenCalledTimes(1);
-      expect(offMock).not.toHaveBeenCalled();
+      if (changeMessage) {
+        expect(onMock).toHaveBeenCalledTimes(2);
+        expect(offMock).toHaveBeenCalledTimes(1);
+      } else {
+        expect(onMock).toHaveBeenCalledTimes(1);
+        expect(offMock).not.toHaveBeenCalled();
+      }
     }
   );
 

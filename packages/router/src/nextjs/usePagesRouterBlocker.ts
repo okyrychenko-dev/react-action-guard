@@ -1,5 +1,5 @@
 import { useRouter } from "next/router.js";
-import { useEffect, useInsertionEffect, useRef } from "react";
+import { useInsertionEffect, useRef } from "react";
 import {
   DEFAULT_UNLOAD_MESSAGE,
   ROUTE_ERRORS,
@@ -35,8 +35,8 @@ export function useNavigationBlocker(
 
   const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
 
-  // Block navigation using Next.js router events
-  useEffect(() => {
+  // Replace protection and its listener before layout-triggered navigation can run.
+  useInsertionEffect(() => {
     if (!shouldBlock) {
       return;
     }
