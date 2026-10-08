@@ -38,14 +38,13 @@ export function hasMutationObserverKeyChanged(
 export function createMutationExecutionOwner(
   options: MutationExecutionOptions
 ): MutationExecutionOwner {
-  const { store, id } = options;
+  const { store, id, observation } = options;
 
   let config: MutationBlockingConfig = {};
   const pending = new Set<symbol>();
   const { addBlocker, replaceBlocker, removeBlocker } = store.getState();
   let attached = false;
-  let observedError = false;
-  let latest: Optional<symbol>;
+  let release: Optional<VoidFunction>;
   let episode: MutationRegistrationEpisode = { kind: "idle" };
 
   function handleTimeout(blockerId: string): void {
@@ -62,7 +61,7 @@ export function createMutationExecutionOwner(
 
     if (pending.size > 0) {
       reason = config.reasonOnPending ?? reason;
-    } else if (observedError && config.onError) {
+    } else if (observation.isError() && config.onError) {
       reason = config.reasonOnError ?? reason;
     }
 
@@ -70,7 +69,7 @@ export function createMutationExecutionOwner(
   }
 
   function hasEligibleErrorProtection(): boolean {
-    return attached && observedError && config.onError === true;
+    return attached && observation.isError() && config.onError === true;
   }
 
   function synchronize(): void {
@@ -111,20 +110,12 @@ export function createMutationExecutionOwner(
     return token;
   }
 
-  function markLatest(token: symbol): void {
-    // Registration observers can invoke another mutation before native delegation.
-    latest = token;
-    observedError = false;
-  }
-
-  function finish(token: symbol, failed: boolean): void {
+  function finish(token: symbol): void {
     if (!pending.delete(token)) {
       return;
     }
 
-    if (latest === token && attached) {
-      observedError = failed;
-    }
+    observation.refresh();
     synchronize();
   }
 
@@ -132,25 +123,28 @@ export function createMutationExecutionOwner(
     config = { ...nextConfig, scope: normalizeScope(nextConfig.scope) };
   }
 
-  function reset(): void {
-    latest = undefined;
-    observedError = false;
-
-    synchronize();
-  }
-
   function attach(): void {
     attached = true;
+
+    release ??= observation.subscribe(synchronize);
 
     synchronize();
   }
 
   function detach(): void {
     attached = false;
-    observedError = false;
-
+    release?.();
+    release = undefined;
     synchronize();
   }
 
-  return { begin, markLatest, finish, configure, refresh: synchronize, reset, attach, detach };
+  return {
+    begin,
+    finish,
+    configure,
+    refresh: synchronize,
+    reset: observation.refresh,
+    attach,
+    detach,
+  };
 }

@@ -4,8 +4,7 @@ import type { MutationBlockingConfig } from "../../hooks/useBlockingMutation.typ
 
 export interface MutationExecutionOwner {
   begin: () => symbol;
-  markLatest: (token: symbol) => void;
-  finish: (token: symbol, failed: boolean) => void;
+  finish: (token: symbol) => void;
   refresh: VoidFunction;
   configure: (config: MutationBlockingConfig) => void;
   reset: VoidFunction;
@@ -16,6 +15,13 @@ export interface MutationExecutionOwner {
 export interface MutationExecutionOptions {
   store: StoreApi<UIBlockingStore>;
   id: string;
+  observation: MutationObservation;
+}
+
+export interface MutationObservation {
+  refresh: VoidFunction;
+  isError: () => boolean;
+  subscribe: (listener: VoidFunction) => VoidFunction;
 }
 
 export interface IdleMutationEpisode {

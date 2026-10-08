@@ -14,7 +14,11 @@ import { type ReactNode, useLayoutEffect, useState } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createDeferred, createWrapper } from "../../test/test.utils";
 import { useBlockingMutation } from "../useBlockingMutation";
-import type { MutationBlockingConfig } from "../useBlockingMutation.types";
+import { createMutationErrorBoundary } from "./mutationErrorBoundary.test.utils";
+import type {
+  MutationBlockingConfig,
+  UseBlockingMutationOptions,
+} from "../useBlockingMutation.types";
 
 function blockers(scope = "lifetime") {
   const { getBlockingInfo } = uiBlockingStoreApi.getState();
@@ -941,5 +945,306 @@ describe("mutation execution lifetime", () => {
     expect(blockers()).toHaveLength(1);
     release();
     hook.unmount();
+  });
+  it.each(methods)(
+    "should clean up and preserve a synchronous delegation failure through %s",
+    async (method) => {
+      const client = new QueryClient();
+      const failure = new Error("cache subscriber failed");
+      const mutationFn = vi.fn(() => Promise.resolve("recovered"));
+      const hook = renderHook(() =>
+        useBlockingMutation({ mutationFn, blockingConfig: { scope: "lifetime" } }, client)
+      );
+      const release = client.getMutationCache().subscribe((event) => {
+        if (event.type === "added") {
+          throw failure;
+        }
+      });
+
+      act(() => {
+        expect(() => hook.result.current[method](undefined)).toThrow(failure);
+      });
+
+      expect(blockers()).toHaveLength(0);
+      expect(mutationFn).not.toHaveBeenCalled();
+
+      release();
+
+      await act(async () => {
+        hook.result.current.mutate(undefined);
+      });
+      await waitFor(() => expect(hook.result.current.isSuccess).toBe(true));
+
+      expect(blockers()).toHaveLength(0);
+
+      hook.unmount();
+      client.clear();
+    }
+  );
+  it("should keep independent native observers isolated when they share a client and store", async () => {
+    const client = new QueryClient();
+    const oldWork = createDeferred<string>();
+    const currentWork = createDeferred<string>();
+    const first = renderHook(() =>
+      useBlockingMutation(
+        {
+          mutationKey: ["same"],
+          mutationFn: () => oldWork.promise,
+          blockingConfig: { scope: "lifetime", onError: true },
+        },
+        client
+      )
+    );
+    const second = renderHook(() =>
+      useBlockingMutation(
+        {
+          mutationKey: ["same"],
+          mutationFn: () => currentWork.promise,
+          blockingConfig: { scope: "lifetime", onError: true, reasonOnError: "Current error" },
+        },
+        client
+      )
+    );
+    const retained = first.result.current.mutateAsync;
+
+    first.unmount();
+
+    let current: Promise<unknown> = Promise.resolve();
+    let old: Promise<string> = Promise.resolve("");
+
+    act(() => {
+      current = second.result.current.mutateAsync(undefined).catch(() => undefined);
+      old = retained(undefined);
+    });
+
+    await act(async () => {
+      currentWork.reject(new Error("current failed"));
+      await current;
+    });
+
+    await waitFor(() => expect(second.result.current.isError).toBe(true));
+
+    expect(blockers()).toHaveLength(2);
+
+    await act(async () => {
+      oldWork.resolve("old succeeded");
+      await old;
+    });
+
+    expect(second.result.current.isError).toBe(true);
+    expect(blockers()).toHaveLength(1);
+    expect(blockers()[0]?.reason).toBe("Current error");
+
+    act(() => second.result.current.reset());
+
+    await waitFor(() => expect(second.result.current.isIdle).toBe(true));
+
+    expect(blockers()).toHaveLength(0);
+
+    second.unmount();
+    client.clear();
+  });
+  it.each(methods)(
+    "should retain the native observed error when a later %s delegation throws",
+    async (method) => {
+      const client = new QueryClient();
+      const observedError = new Error("observed failure");
+      const delegationError = new Error("cache build failed");
+      const hook = renderHook(() =>
+        useBlockingMutation(
+          {
+            mutationFn: () => Promise.reject(observedError),
+            blockingConfig: { scope: "lifetime", onError: true, reasonOnError: "Observed error" },
+          },
+          client
+        )
+      );
+
+      await act(async () => {
+        await hook.result.current.mutateAsync(undefined).catch(() => undefined);
+      });
+      await waitFor(() => expect(hook.result.current.error).toBe(observedError));
+      expect(blockers()).toHaveLength(1);
+
+      const release = client.getMutationCache().subscribe((event) => {
+        if (event.type === "added") {
+          throw delegationError;
+        }
+      });
+
+      act(() => {
+        expect(() => hook.result.current[method](undefined)).toThrow(delegationError);
+      });
+      expect(hook.result.current.error).toBe(observedError);
+      expect(blockers()).toHaveLength(1);
+      expect(blockers()[0]?.reason).toBe("Observed error");
+      release();
+      act(() => hook.result.current.reset());
+      await waitFor(() => expect(hook.result.current.isIdle).toBe(true));
+      expect(blockers()).toHaveLength(0);
+      hook.unmount();
+      client.clear();
+    }
+  );
+
+  it("should not reinterpret a detached pending result after synchronous delegation failure", async () => {
+    const client = new QueryClient();
+    const work = createDeferred<string>();
+    const hook = renderHook(() =>
+      useBlockingMutation(
+        { mutationFn: () => work.promise, blockingConfig: { scope: "lifetime", onError: true } },
+        client
+      )
+    );
+    let pending: Promise<unknown> = Promise.resolve();
+
+    act(() => {
+      pending = hook.result.current.mutateAsync(undefined).catch(() => undefined);
+    });
+    await waitFor(() => expect(hook.result.current.isPending).toBe(true));
+
+    const failure = new Error("build failed");
+    const release = client.getMutationCache().subscribe((event) => {
+      if (event.type === "added") {
+        throw failure;
+      }
+    });
+
+    act(() => {
+      expect(() => hook.result.current.mutateAsync(undefined)).toThrow(failure);
+    });
+    expect(blockers()).toHaveLength(1);
+    release();
+    await act(async () => {
+      work.reject(new Error("detached pending failed"));
+      await pending;
+    });
+    expect(hook.result.current.isPending).toBe(true);
+    expect(hook.result.current.error).toBeNull();
+    expect(blockers()).toHaveLength(0);
+    hook.unmount();
+    client.clear();
+  });
+  it.each(methods)(
+    "should follow the native observer when a cache added notification starts a nested call through %s",
+    async (method) => {
+      const client = new QueryClient();
+      const a = createDeferred<string>();
+      const b = createDeferred<string>();
+      const hook = renderHook(() =>
+        useBlockingMutation(
+          {
+            mutationFn: (name: string) => (name === "A" ? a.promise : b.promise),
+            blockingConfig: { scope: "lifetime", onError: true },
+          },
+          client
+        )
+      );
+      let nested: Promise<unknown> = Promise.resolve();
+      let started = false;
+      const release = client.getMutationCache().subscribe((event) => {
+        if (event.type === "added" && !started) {
+          started = true;
+          nested = hook.result.current.mutateAsync("B").catch(() => undefined);
+        }
+      });
+      let outer: Promise<string> | void;
+
+      act(() => {
+        outer = hook.result.current[method]("A");
+      });
+      expect(blockers()).toHaveLength(1);
+      await act(async () => {
+        b.reject(new Error("B failed"));
+        await nested;
+      });
+      await waitFor(() => expect(hook.result.current.variables).toBe("A"));
+      expect(hook.result.current.isPending).toBe(true);
+      expect(blockers()).toHaveLength(1);
+      await act(async () => {
+        a.resolve("A succeeded");
+        await outer;
+      });
+      await waitFor(() => expect(hook.result.current.data).toBe("A succeeded"));
+      expect(hook.result.current.isSuccess).toBe(true);
+      expect(blockers()).toHaveLength(0);
+      release();
+      hook.unmount();
+      client.clear();
+    }
+  );
+
+  it.each(["predicate", "client-default"])(
+    "should preserve native throwOnError behavior from %s",
+    async (source) => {
+      const failure = new Error("throw to boundary");
+      const client = new QueryClient();
+      let throwOnError: ((error: Error) => boolean) | undefined;
+
+      if (source === "client-default") {
+        client.setDefaultOptions({ mutations: { throwOnError: true } });
+      } else {
+        throwOnError = (error) => error === failure;
+      }
+
+      const onBoundaryError = vi.fn();
+      const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+      try {
+        const options: UseBlockingMutationOptions = {
+          mutationFn: () => Promise.reject(failure),
+          blockingConfig: { scope: "lifetime", onError: true },
+        };
+
+        if (throwOnError) {
+          options.throwOnError = throwOnError;
+        }
+
+        const hook = renderHook(() => useBlockingMutation(options, client), {
+          wrapper: createMutationErrorBoundary(onBoundaryError),
+        });
+
+        await act(async () => {
+          await hook.result.current.mutateAsync(undefined).catch(() => undefined);
+        });
+        await waitFor(() => expect(onBoundaryError).toHaveBeenCalledWith(failure));
+        expect(blockers()).toHaveLength(0);
+        hook.unmount();
+      } finally {
+        consoleError.mockRestore();
+        client.clear();
+      }
+    }
+  );
+  it("should preserve non-Error mutation values thrown to an error boundary", async () => {
+    const failure: unknown = "native string failure";
+    const client = new QueryClient();
+    const onBoundaryError = vi.fn();
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => undefined);
+
+    async function mutationFn(): Promise<string> {
+      throw failure;
+    }
+
+    try {
+      const hook = renderHook(
+        () =>
+          useBlockingMutation<string, string>(
+            { mutationFn, throwOnError: true, blockingConfig: { scope: "lifetime" } },
+            client
+          ),
+        { wrapper: createMutationErrorBoundary(onBoundaryError) }
+      );
+
+      await act(async () => {
+        await hook.result.current.mutateAsync(undefined).catch(() => undefined);
+      });
+      await waitFor(() => expect(onBoundaryError).toHaveBeenCalledWith(failure));
+      expect(blockers()).toHaveLength(0);
+      hook.unmount();
+    } finally {
+      consoleError.mockRestore();
+      client.clear();
+    }
   });
 });

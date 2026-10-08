@@ -27,8 +27,10 @@ function deferred() {
   });
   return { promise, resolve, reject };
 }
-function mount(options) {
-  const client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } });
+function mount(
+  options,
+  client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } })
+) {
   clients.add(client);
   const container = document.createElement("div");
   document.body.append(container);
@@ -55,6 +57,16 @@ function blockers() {
   const { getBlockingInfo } = uiBlockingStoreApi.getState();
   return getBlockingInfo("packed-mutation");
 }
+async function waitForMutationResult(predicate) {
+  const deadline = Date.now() + 2000;
+  while (!predicate()) {
+    assert.ok(Date.now() < deadline, "native mutation result did not reach the expected state");
+    await act(async () => {
+      await new Promise((done) => setTimeout(done, 0));
+    });
+  }
+}
+
 afterEach(() => {
   act(() => {
     for (const root of roots) root.unmount();
@@ -128,3 +140,89 @@ it("should retain reset and detached work through native callback completion", a
   });
   assert.equal(blockers().length, 0);
 });
+
+for (const method of ["mutate", "mutateAsync"]) {
+  it(`should preserve native cache-added reentrancy through packed ${method}`, async () => {
+    const client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } });
+    const a = deferred();
+    const b = deferred();
+    const hook = mount(
+      {
+        mutationFn: (name) => (name === "A" ? a.promise : b.promise),
+        blockingConfig: { scope: "packed-mutation", onError: true },
+      },
+      client
+    );
+    let started = false;
+    let nested;
+    const release = client.getMutationCache().subscribe((event) => {
+      if (event.type === "added" && !started) {
+        started = true;
+        nested = hook
+          .current()
+          .mutateAsync("B")
+          .catch(() => undefined);
+      }
+    });
+    let outer;
+    act(() => {
+      outer = hook.current()[method]("A");
+    });
+    assert.equal(blockers().length, 1);
+    await act(async () => {
+      b.reject(new Error("B failed"));
+      await nested;
+      await new Promise((done) => setTimeout(done, 0));
+    });
+    assert.equal(hook.current().variables, "A");
+    assert.equal(hook.current().isPending, true);
+    await act(async () => {
+      a.resolve("A succeeded");
+      await outer;
+      await new Promise((done) => setTimeout(done, 0));
+    });
+    await waitForMutationResult(() => hook.current().isSuccess);
+    assert.equal(hook.current().data, "A succeeded");
+    assert.equal(blockers().length, 0);
+    release();
+  });
+
+  it(`should preserve prior native error after packed ${method} throws synchronously`, async () => {
+    const client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } });
+    const observedError = new Error("observed failure");
+    const delegationError = new Error("native build failed");
+    const hook = mount(
+      {
+        mutationFn: () => Promise.reject(observedError),
+        blockingConfig: { scope: "packed-mutation", onError: true },
+      },
+      client
+    );
+    await act(async () => {
+      await hook
+        .current()
+        .mutateAsync(undefined)
+        .catch(() => undefined);
+      await new Promise((done) => setTimeout(done, 0));
+    });
+    assert.equal(hook.current().error, observedError);
+    assert.equal(blockers().length, 1);
+    const release = client.getMutationCache().subscribe((event) => {
+      if (event.type === "added") throw delegationError;
+    });
+    act(() => {
+      assert.throws(
+        () => hook.current()[method](undefined),
+        (error) => error === delegationError
+      );
+    });
+    assert.equal(hook.current().error, observedError);
+    assert.equal(blockers().length, 1);
+    release();
+    await act(async () => {
+      hook.current().reset();
+      await new Promise((done) => setTimeout(done, 0));
+    });
+    assert.equal(blockers().length, 0);
+  });
+}

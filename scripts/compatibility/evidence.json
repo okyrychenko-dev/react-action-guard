@@ -92,7 +92,7 @@
     },
     {
       "target": "query-floor",
-      "date": "2026-10-08T18:26:28.208Z",
+      "date": "2026-10-08T20:30:38.128Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -112,8 +112,8 @@
         "@okyrychenko-dev/react-action-guard-router": "1.0.0",
         "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
       },
-      "sourceBase": "1f76ba8b61c851191653584910fab8e79c5eb2e0",
-      "scope": "Ticket 08/09 working tree: fresh strict-peer cohort; ESM/CJS imports; NodeNext .mts/.cts mutation variable, result and callback inference; 3 public-hook mutation concurrency/reset/detach/awaited-callback tests."
+      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
+      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
     },
     {
       "target": "react-18",
@@ -268,7 +268,7 @@
     },
     {
       "target": "query-current",
-      "date": "2026-10-08T18:26:35.630Z",
+      "date": "2026-10-08T20:30:44.781Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -288,8 +288,8 @@
         "@okyrychenko-dev/react-action-guard-router": "1.0.0",
         "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
       },
-      "sourceBase": "1f76ba8b61c851191653584910fab8e79c5eb2e0",
-      "scope": "Ticket 08/09 working tree: fresh strict-peer cohort; ESM/CJS imports; NodeNext .mts/.cts mutation variable, result and callback inference; 3 public-hook mutation concurrency/reset/detach/awaited-callback tests."
+      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
+      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
     }
   ],
   "tools": {

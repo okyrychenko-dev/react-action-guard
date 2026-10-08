@@ -4,7 +4,6 @@ import {
   type QueryClient,
   type UseMutationResult,
   hashKey,
-  useMutation,
 } from "@tanstack/react-query";
 import {
   useCallback,
@@ -14,11 +13,14 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import {
   createMutationExecutionOwner,
+  createMutationObservation,
   hasMutationObserverKeyChanged,
 } from "../internal/mutationExecution";
+import { useNativeMutationObserver } from "../internal/mutationObserver";
 import type { UseBlockingMutationOptions } from "./useBlockingMutation.types";
 
 /** Wraps TanStack Mutation with UI blocking. */
@@ -32,12 +34,25 @@ export function useBlockingMutation<
   queryClient?: QueryClient
 ): UseMutationResult<TData, TError, TVariables, TOnMutateResult> {
   const { blockingConfig, mutationKey, ...mutationOptions } = options;
-  const mutation = useMutation({ mutationKey, ...mutationOptions }, queryClient);
+  const { observer, result: mutation } = useNativeMutationObserver(
+    { mutationKey, ...mutationOptions },
+    queryClient
+  );
 
-  const { mutateAsync: nativeMutateAsync, reset: nativeReset } = mutation;
+  const { mutate: nativeMutateAsync, reset: nativeReset } = mutation;
   const store = useResolvedStoreApi();
   const id = useId();
-  const owner = useMemo(() => createMutationExecutionOwner({ store, id }), [store, id]);
+  const [observation] = useState(() => {
+    function readNativeError(): boolean {
+      return observer.getCurrentResult().isError;
+    }
+
+    return createMutationObservation(readNativeError);
+  });
+  const owner = useMemo(
+    () => createMutationExecutionOwner({ store, id, observation }),
+    [store, id, observation]
+  );
 
   useLayoutEffect(() => {
     owner.attach();
@@ -64,34 +79,36 @@ export function useBlockingMutation<
     previousKey.current = keyHash;
   }, [owner, keyHash]);
 
-  const mutateAsync = useCallback<typeof mutation.mutateAsync>(
+  const mutateAsync = useCallback<typeof nativeMutateAsync>(
     (variables, mutateOptions) => {
       const token = owner.begin();
 
       try {
-        owner.markLatest(token);
-
         const promise = nativeMutateAsync(variables, mutateOptions);
+
+        observation.refresh();
 
         void promise.then(
           () => {
-            owner.finish(token, false);
+            owner.finish(token);
           },
           () => {
-            owner.finish(token, true);
+            owner.finish(token);
           }
         );
 
         return promise;
       } catch (error) {
-        owner.finish(token, false);
+        owner.finish(token);
         throw error;
       }
     },
-    [owner, nativeMutateAsync]
+    [owner, nativeMutateAsync, observation]
   );
 
-  const mutate = useCallback<typeof mutation.mutate>(
+  const mutate = useCallback<
+    UseMutationResult<TData, TError, TVariables, TOnMutateResult>["mutate"]
+  >(
     (variables, mutateOptions) => {
       void mutateAsync(variables, mutateOptions).catch(() => undefined);
     },
