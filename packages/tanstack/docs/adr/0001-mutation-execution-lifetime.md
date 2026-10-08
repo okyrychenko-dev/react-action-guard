@@ -14,10 +14,10 @@ accounts for each native execution promise independently.
 
 ## Alternatives and selected boundary
 
-| Contract | A starts, B starts, B completes first | Trade-off |
-| --- | --- | --- |
-| Latest observer, current behavior | Result shows B; protection ends while A runs | Simple, but misses unfinished work initiated by the same hook. |
-| All owned calls, selected | Result shows B; protection remains until A completes | Requires execution ownership independent of observation and component lifetime. |
+| Contract                          | A starts, B starts, B completes first                | Trade-off                                                                       |
+| --------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Latest observer, current behavior | Result shows B; protection ends while A runs         | Simple, but misses unfinished work initiated by the same hook.                  |
+| All owned calls, selected         | Result shows B; protection remains until A completes | Requires execution ownership independent of observation and component lifetime. |
 
 An owned call is an invocation of this hook's returned mutation functions. It
 begins before delegation to native execution and ends when the native execution
@@ -37,21 +37,21 @@ await them or create callbacks that native Query would have suppressed. [1][2][3
 
 ## Lifetime rules
 
-| Event | Required behavior |
-| --- | --- |
-| `mutate(variables, options)` | Register ownership before delegating; preserve a void return and native rejection consumption. Pass per-call options through unchanged. |
-| `mutateAsync(variables, options)` | Same ownership; return the original native promise with its original data or rejection. Preserve generic types and inference. |
-| Another call starts or finishes | Each invocation completes only its own ownership token. B cannot release A. Callback reentrancy can start C without transiently releasing outstanding protection. |
-| Awaited callbacks | Keep protection through every callback phase that native execution actually awaits, including rejection paths. Do not duplicate or reorder callbacks, or normalize native exception behavior. |
-| `reset()` | Preserve native idle result/reset identity. Clear observer-derived error protection; retain every unsettled owned call. Reset does not cancel work. |
-| Unmount | Detach result observation normally. Retain pending-call protection in its originating blocking store until settlement or blocker timeout, matching core `useAsyncAction`. Remove error-only protection on detach; do not create a new error blocker after detach. |
-| Retained mutation function invoked after detach | Preserve native invocation behavior; use the originating owner and its last committed blocking configuration without restoring a result observer. |
-| Terminal rejection | Release that call's token even when an error or settlement callback throws. With `onError` omitted/false, release protection when the final call settles. |
-| `onError: true` | While attached, retain error protection from the latest native observer's `isError`, never from an aggregate history of failures. Pending ownership takes precedence for reason selection. Reset or a subsequent native non-error result clears error protection; an older call's settlement cannot rewrite the observed result. |
-| Blocking configuration changes | While attached, apply the latest committed scope, priority, reason, timeout, and onTimeout to this owner's outstanding protection, including removal of optional values. Freeze that blocking configuration at detach. Native mutation-option updates retain Query's own rules; do not freeze user mutation callbacks. |
-| `mutationKey` changes | Preserve native result-reset/options behavior, but keep ownership of previously initiated calls. A key names native mutation configuration, not execution ownership. |
-| Blocking store changes | Keep old pending work in its originating store with its detached configuration. Future invocations use a new owner in the newly resolved store. Never transfer or remove another owner's protection. |
-| QueryClient argument/provider changes | Preserve native observer binding. In 5.90.10, rerendering with a different client does not rebuild the existing observer. To actually use another client, remount a new hook; do not claim client migration. [3] |
+| Event                                           | Required behavior                                                                                                                                                                                                                                                                                                                |
+| ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `mutate(variables, options)`                    | Register ownership before delegating; preserve a void return and native rejection consumption. Pass per-call options through unchanged.                                                                                                                                                                                          |
+| `mutateAsync(variables, options)`               | Same ownership; return the original native promise with its original data or rejection. Preserve generic types and inference.                                                                                                                                                                                                    |
+| Another call starts or finishes                 | Each invocation completes only its own ownership token. B cannot release A. Callback reentrancy can start C without transiently releasing outstanding protection.                                                                                                                                                                |
+| Awaited callbacks                               | Keep protection through every callback phase that native execution actually awaits, including rejection paths. Do not duplicate or reorder callbacks, or normalize native exception behavior.                                                                                                                                    |
+| `reset()`                                       | Preserve native idle result/reset identity. Clear observer-derived error protection; retain every unsettled owned call. Reset does not cancel work.                                                                                                                                                                              |
+| Unmount                                         | Detach result observation normally. Retain pending-call protection in its originating blocking store until settlement or blocker timeout, matching core `useAsyncAction`. Remove error-only protection on detach; do not create a new error blocker after detach.                                                                |
+| Retained mutation function invoked after detach | Preserve native invocation behavior; use the originating owner and its last committed blocking configuration without restoring a result observer.                                                                                                                                                                                |
+| Terminal rejection                              | Release that call's token even when an error or settlement callback throws. With `onError` omitted/false, release protection when the final call settles.                                                                                                                                                                        |
+| `onError: true`                                 | While attached, retain error protection from the latest native observer's `isError`, never from an aggregate history of failures. Pending ownership takes precedence for reason selection. Reset or a subsequent native non-error result clears error protection; an older call's settlement cannot rewrite the observed result. |
+| Blocking configuration changes                  | While attached, apply the latest committed scope, priority, reason, timeout, and onTimeout to this owner's outstanding protection, including removal of optional values. Freeze that blocking configuration at detach. Native mutation-option updates retain Query's own rules; do not freeze user mutation callbacks.           |
+| `mutationKey` changes                           | Preserve native result-reset/options behavior, but keep ownership of previously initiated calls. A key names native mutation configuration, not execution ownership.                                                                                                                                                             |
+| Blocking store changes                          | Keep old pending work in its originating store with its detached configuration. Future invocations use a new owner in the newly resolved store. Never transfer or remove another owner's protection.                                                                                                                             |
+| QueryClient argument/provider changes           | Preserve native observer binding. In 5.90.10, rerendering with a different client does not rebuild the existing observer. To actually use another client, remount a new hook; do not claim client migration. [3]                                                                                                                 |
 
 Each hook/store owner exposes one aggregate blocker while it has pending calls or,
 while attached, an eligible latest-observer error. Independent hook instances
@@ -139,32 +139,30 @@ checks were not run for this documentation-only change. Those decision probes
 delivered no production behavior or permanent runtime tests.
 The implementation is verified separately through the public-hook lifetime suite.
 
-Implementation verification must use the public-hook seam with real QueryClient, deferred
+Implementation verification uses the public-hook seam with real QueryClient, deferred
 promises, supported blocking observations, and controlled time only for timers.
-Cover reversed settlement with both invocation methods; reset and unmount with
+Coverage includes reversed settlement with both invocation methods; reset and unmount with
 unfinished work; awaited option/cache callbacks and ignored per-call promises;
 callback throws/rejections and native suppression; retries and queued/paused
 work; reactive configuration/key/store changes; timeout expiry and rearming;
-independent hook/client ownership; and generic result/callback types. Verify
-blocker existence before metadata assertions. Include documented client-remount
-behavior instead of assuming client-prop migration.
+independent hook/client ownership; and generic result/callback types. Registration
+checks verify blocker existence before metadata assertions; client changes verify
+remount behavior rather than assuming client-prop migration.
 
-## Implementation evidence (2026-10-08)
+Implementation verification completed on 2026-10-08 through the
+[public-hook lifetime suite](../../src/hooks/__tests__/useBlockingMutation.lifetime.test.tsx):
 
-The [public-hook lifetime suite](../../src/hooks/__tests__/useBlockingMutation.lifetime.test.tsx)
-uses real QueryClient instances and covers 25 execution-lifetime scenarios,
-including reversed completion, awaited callbacks, native callback suppression,
-reset, detach, retained invocation, key/configuration changes, retry/pause/queue,
-isolation, callback reentrancy, committed layout configuration and timeout episodes.
-Query and Mutation registration checks require blocker existence before metadata.
-
-Workspace build, lint, typechecking and all 815 tests passed. Fresh strict-peer
-packed consumers passed with Query 5.90.10 and 5.104.1: ESM/CJS imports, NodeNext
-.mts/.cts generic result/variable/callback declarations, and three runtime scenarios
-per version. The [packed fixtures](../../../../scripts/compatibility/mutation.test.mjs)
-clear their clients and disable unrelated cache GC timers so successful assertions
-also produce a successful process exit. Standards and Spec reviews had no findings.
-Other packed targets and browser suites were not rerun for this change.
+- 25 lifetime scenarios passed, including reversed completion, native callbacks,
+  reset/detach, key/configuration changes, retry/pause/queue, isolation,
+  callback reentrancy, committed layout configuration and timeout episodes.
+- Query and Mutation registration checks require blocker existence before metadata.
+- Workspace build, lint, typechecking and all 815 tests passed.
+- Fresh strict-peer packed Query 5.90.10 and 5.104.1 consumers passed ESM/CJS imports,
+  NodeNext .mts/.cts mutation variable/result/callback types and three runtime
+  scenarios each. Versioned results are in the
+  [compatibility evidence](../../../../scripts/compatibility/evidence.json).
+- Standards and Spec reviews had no findings. Other packed targets and browser
+  suites were not rerun.
 
 ## Sources
 

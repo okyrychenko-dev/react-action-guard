@@ -15,7 +15,7 @@
 - 🔒 Type-safe with full TypeScript support
 - 🧠 Preserves TanStack Query inference for `select`, `initialData`, mutation variables, and `useQueries` tuples
 - ⚡ TanStack Query integration for queries, infinite queries, mutations, and parallel queries
-- 🧹 Automatic cleanup on component unmount
+- 🧹 Query cleanup on unmount; mutation protection follows execution lifetime
 - ⚙️ Stable blocker lifecycle across rerenders and React `StrictMode`
 - 🪝 4 specialized hooks - `useBlockingQuery`, `useBlockingMutation`, `useBlockingInfiniteQuery`, `useBlockingQueries`
 - 🌳 Tree-shakeable - import only what you need
@@ -83,7 +83,7 @@ function UserProfile() {
 
 ## API Reference
 
-All four hooks accept the native TanStack Query options and return the corresponding native result. `blockingConfig` controls one blocker owned by each mounted hook instance. The optional `queryClient` argument is supported on every hook.
+All four hooks accept the native TanStack Query options and return the corresponding native result. `blockingConfig` controls one blocker owned by each hook instance; pending mutation work can retain it after detach. The optional `queryClient` argument is supported on every hook.
 
 | Hook                                                        | Blocking configuration                                         | Result                                                              | Default reason         | Default priority |
 | ----------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------------------------- | ---------------------- | ---------------- |
@@ -138,50 +138,18 @@ The hooks use the nearest `UIBlockingProvider` store, or the global store when t
 
 ### Mutation execution lifetime
 
-`useBlockingMutation` protects **all unsettled calls initiated through that hook's
-`mutate` or `mutateAsync`**, while its result still describes the latest native
-TanStack mutation observer. If A starts, then B starts and finishes first, the
-result can show B's success while the scope remains blocked until A finishes.
-Calls from another hook, direct cache executions, and restored persisted mutations
-are outside this owner's accounting. Equal mutation keys do not share ownership.
+`useBlockingMutation` protects **all unsettled calls initiated through that hook's `mutate` or `mutateAsync`**, while its result still describes the latest native TanStack mutation observer. If A starts, then B starts and finishes first, the result can show B's success while the scope remains blocked until A finishes. Calls from another hook, direct cache executions, and restored persisted mutations are outside this owner's accounting. Equal mutation keys do not share ownership.
 
-An execution includes native retries, offline pauses, scope queues, and every
-MutationCache or hook-option callback that TanStack awaits. Per-call callbacks keep
-native latest-call suppression and unmount behavior; their returned promises are
-not awaited. Callback exceptions retain native rejection behavior. `mutate` returns
-void and consumes rejection; `mutateAsync` returns the original native promise.
-Blocking does not serialize invocations or cancel backend work.
+An execution includes native retries, offline pauses, scope queues, and every MutationCache or hook-option callback that TanStack awaits. Per-call callbacks keep native latest-call suppression and unmount behavior; their returned promises are not awaited. Callback exceptions retain native rejection behavior. `mutate` returns void and consumes rejection; `mutateAsync` returns the original native promise. Blocking does not serialize invocations or cancel backend work.
 
-- `reset()` resets result observation and clears error-only protection, while every
-  pending owned call remains protected. Changing a mutation key also preserves
-  pending ownership and keeps native result-reset behavior.
-- Unmount retains pending protection in the originating blocking store until actual
-  settlement or timeout. Error-only protection ends on detach; a detached rejection
-  cannot create error protection. A retained mutation function can still invoke work
-  with that owner's last committed blocking configuration.
-- While attached, scope, priority, reasons, timeout, and `onTimeout` follow committed
-  configuration, including removal of optional values. Pending work uses
-  `reasonOnPending` before the fallback `reason`; eligible latest-observer errors
-  use `reasonOnError`. `onError: true` retains only the latest native observer's
-  error, and pending work takes precedence.
-- Each hook/store owner has one aggregate blocker. Old pending work remains in its
-  originating store after detach or Provider replacement; new owners remain
-  independent. Changing the QueryClient argument/provider preserves native observer
-  binding; remount the hook to bind another client.
+- `reset()` resets result observation and clears error-only protection, while every pending owned call remains protected. Changing a mutation key also preserves pending ownership and keeps native result-reset behavior.
+- Unmount retains pending protection in the originating blocking store until actual settlement or timeout. Error-only protection ends on detach; a detached rejection cannot create error protection. A retained mutation function can still invoke work with that owner's last committed blocking configuration.
+- While attached, scope, priority, reasons, timeout, and `onTimeout` follow committed configuration, including removal of optional values. Pending work uses `reasonOnPending` before the fallback `reason`; eligible latest-observer errors use `reasonOnError`. `onError: true` retains only the latest native observer's error, and pending work takes precedence.
+- Each hook/store owner has one aggregate blocker. Old pending work remains in its originating store after detach or Provider replacement; new owners remain independent. Changing the QueryClient argument/provider preserves native observer binding; remount the hook to bind another client.
 
-A timeout bounds a **registration episode**, not an operation. Additional calls,
-retries, and pauses do not restart the deadline. Before expiry, changing timeout
-restarts its timer, removing timeout cancels it, and metadata changes keep the
-existing deadline. After expiry, rerenders, configuration changes, more calls,
-reset during pending work, or pending-to-error transitions cannot revive that
-episode. Only clearing all pending and eligible error state permits a later call
-to start a new episode. Timeout invokes the current callback once and does not
-settle, cancel, or roll back execution.
+A timeout bounds a **registration episode**, not an operation. Additional calls, retries, and pauses do not restart the deadline. Before expiry, changing timeout restarts its timer, removing timeout cancels it, and metadata changes keep the existing deadline. After expiry, rerenders, configuration changes, more calls, reset during pending work, or pending-to-error transitions cannot revive that episode. Only clearing all pending and eligible error state permits a later call to start a new episode. Timeout invokes the current callback once and does not settle, cancel, or roll back execution.
 
-Pending work can retain protection indefinitely after unmount without a timeout.
-An expired episode can admit more work without protection until its coverage
-clears. See the [execution lifetime decision](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/docs/adr/0001-mutation-execution-lifetime.md)
-for the full contract and compatibility boundaries.
+Pending work can retain protection indefinitely after unmount without a timeout. An expired episode can admit more work without protection until its coverage clears. See the [execution lifetime decision](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/docs/adr/0001-mutation-execution-lifetime.md) for the full contract and compatibility boundaries.
 
 ## Tree Shaking
 
