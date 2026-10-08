@@ -52,3 +52,14 @@ This evidence covers matched routes within the same document in the tested Chrom
 version. It does not establish cross-document navigation, other browsers, browser
 prompt UI, or the documented TanStack not-found bypass. Unload protection is disabled
 in this fixture to keep the check focused on in-app history transitions.
+
+### Ticket 06 compatibility verification (2026-10-08)
+
+Re-ran both back/forward checks after the shared confirmation-owner changes in
+React Router and Pages Router: **2 passed**, with no retries or skips. The public
+TanStack adapter already uses the common owner, so no runtime migration was needed.
+The real-router hook and custom-dialog suites also passed **35 tests**, including
+new cases rejecting pending answers after `when` disablement or scoped blocker
+removal and allowing fresh navigation without confirmation callbacks.
+
+The same browser coverage boundaries described above apply.

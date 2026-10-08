@@ -359,6 +359,57 @@ describe("TanStack navigation blocking with a real router", () => {
     expect(onAllow).not.toHaveBeenCalled();
   });
 
+  it.each(["when", "scope"])(
+    "should reject a pending answer after %s protection is disabled and allow fresh navigation",
+    async (source) => {
+      const pending = deferred();
+      const onConfirm = vi.fn(() => pending.promise);
+      const onBlock = vi.fn();
+      const onAllow = vi.fn();
+      const { addBlocker, removeBlocker } = uiBlockingStoreApi.getState();
+
+      if (source === "scope") {
+        addBlocker("editor", { scope: "editor" });
+      }
+
+      const options: UseNavigationBlockerOptions = {
+        when: source === "when",
+        scope: "editor",
+        message: "Leave?",
+        onConfirm,
+        onBlock,
+        onAllow,
+      };
+      const { router, update } = await mountBlocker(options);
+
+      await transition(router, "/next");
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(router.state.location.pathname).toBe("/");
+
+      if (source === "when") {
+        update({ ...options, when: false });
+      } else {
+        await act(async () => {
+          removeBlocker("editor");
+        });
+      }
+
+      await act(async () => {
+        pending.resolve(true);
+      });
+
+      expect(router.history.location.pathname).toBe("/");
+      expect(router.state.location.pathname).toBe("/");
+      expect(onAllow).not.toHaveBeenCalled();
+
+      await transition(router, "/other");
+      await waitFor(() => expect(router.state.location.pathname).toBe("/other"));
+      expect(onConfirm).toHaveBeenCalledTimes(1);
+      expect(onBlock).toHaveBeenCalledTimes(1);
+      expect(onAllow).not.toHaveBeenCalled();
+    }
+  );
+
   it("should deny a thrown confirmation and retain protection", async () => {
     const onConfirm = vi.fn(() => {
       throw new Error("Dialog failed");
