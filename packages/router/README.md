@@ -335,6 +335,8 @@ function EditPage() {
 **Async `onConfirm` behavior:**  
 Pages Router does not allow pausing transitions. When you return a Promise from `onConfirm`, the hook cancels the current navigation and re-attempts it via `router.push(url)` if confirmed. This may not preserve original transition options (e.g., `shallow`, `scroll`, `locale`).
 
+Only the current confirmation attempt can resume navigation. Cleanup, disabling protection, or changing the protected scope or message invalidates pending answers. Callback rerenders and equivalent scopes preserve the current attempt. `onAllow` fires once for an accepted attempt; the replay permission is consumed once and cleared when the retry finishes or another URL is attempted.
+
 ### Next.js App Router
 
 Best-effort support only. Browser unload protection works, but App Router does not expose an official navigation-blocking API.
@@ -372,9 +374,9 @@ Pages Router provides route-event interception with the replay limitations descr
 | Adapter              | `isBlocking` meaning        | `isIntercepting` | Async `onConfirm` | Caveats                                                  |
 | -------------------- | --------------------------- | ---------------- | ----------------- | -------------------------------------------------------- |
 | React Router         | Blocking condition is armed | Yes              | Yes               | Best semantic fidelity                                   |
-| TanStack Router      | Blocking condition is armed | No               | Yes               | Native useBlocker; memory-history transitions verified                     |
+| TanStack Router      | Blocking condition is armed | No               | Yes               | Native useBlocker; memory-history transitions verified   |
 | Next.js Pages Router | Blocking condition is armed | No               | Yes               | Re-attempts confirmed navigation with `router.push(url)` |
-| Next.js App Router   | Blocking condition is armed | No               | No               | beforeunload only; no same-document interception         |
+| Next.js App Router   | Blocking condition is armed | No               | No                | beforeunload only; no same-document interception         |
 
 ---
 

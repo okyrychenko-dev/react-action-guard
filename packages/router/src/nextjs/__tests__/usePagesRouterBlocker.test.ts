@@ -1,5 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { useRouter } from "next/router";
+import { Fragment, createElement, useLayoutEffect } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_UNLOAD_MESSAGE, useBeforeUnload, useShouldBlock } from "../../core";
 import { useNavigationBlocker } from "../usePagesRouterBlocker";
@@ -215,6 +217,12 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
       expect(() => handler("/next")).toThrow("Route change aborted by user");
       expect(mockRouter.events.emit).toHaveBeenCalledWith("routeChangeError");
 
+      vi.mocked(mockRouter.push).mockImplementation(async () => {
+        expect(() => handler("/next")).not.toThrow();
+
+        return true;
+      });
+
       resolveConfirm(true);
       await confirmPromise;
       await Promise.resolve();
@@ -222,9 +230,500 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
       expect(onConfirm).toHaveBeenCalledTimes(1);
       expect(mockRouter.push).toHaveBeenCalledWith("/next");
 
-      expect(() => handler("/next")).not.toThrow();
-      expect(onAllow).toHaveBeenCalled();
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(() => handler("/next")).toThrow("Route change aborted by user");
+      expect(onConfirm).toHaveBeenCalledTimes(2);
     });
+  });
+
+  it("should retain a pending attempt across inline callback and equivalent scope rerenders", async () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let resolveConfirm: (value: boolean) => void = () => undefined;
+    const promise = new Promise<boolean>((resolve) => {
+      resolveConfirm = resolve;
+    });
+    const onAllow = vi.fn();
+    const { rerender } = renderHook(() =>
+      useNavigationBlocker({
+        when: () => true,
+        scope: ["editor", "navigation"],
+        message: "Leave?",
+        onConfirm: () => promise,
+        onAllow: () => onAllow(),
+      })
+    );
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow();
+    rerender();
+    resolveConfirm(true);
+    await promise;
+    await Promise.resolve();
+
+    expect(mockRouter.push).toHaveBeenCalledExactlyOnceWith("/next");
+    expect(onAllow).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["detach", "disable", "message", "scope", "router"])(
+    "should invalidate pending confirmation on %s",
+    async (change) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      let resolveConfirm: (value: boolean) => void = () => undefined;
+      const promise = new Promise<boolean>((resolve) => {
+        resolveConfirm = resolve;
+      });
+      const onAllow = vi.fn();
+      let message = "Leave?";
+      let scope = "editor";
+      const { rerender, unmount } = renderHook(() =>
+        useNavigationBlocker({ message, scope, onConfirm: () => promise, onAllow })
+      );
+      const handler = onMock.mock.calls[0][1];
+      const originalRouter = mockRouter;
+
+      expect(() => handler("/old")).toThrow();
+
+      if (change === "detach") {
+        unmount();
+      } else {
+        if (change === "disable") {
+          mockUseShouldBlock.mockReturnValue(false);
+        } else if (change === "message") {
+          message = "Different protection";
+        } else if (change === "scope") {
+          scope = "checkout";
+        } else {
+          mockRouter = createMockRouter();
+          mockUseRouter.mockReturnValue(mockRouter);
+        }
+        rerender();
+      }
+
+      resolveConfirm(true);
+      await promise;
+      await Promise.resolve();
+
+      expect(originalRouter.push).not.toHaveBeenCalled();
+      expect(mockRouter.push).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+    }
+  );
+
+  it("should resume only the latest attempt when promises finish out of order", async () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let resolveFirst: (value: boolean) => void = () => undefined;
+    let resolveSecond: (value: boolean) => void = () => undefined;
+    const first = new Promise<boolean>((resolve) => {
+      resolveFirst = resolve;
+    });
+    const second = new Promise<boolean>((resolve) => {
+      resolveSecond = resolve;
+    });
+    const onConfirm = vi.fn().mockReturnValueOnce(first).mockReturnValueOnce(second);
+    const onAllow = vi.fn();
+
+    renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/old")).toThrow();
+    expect(() => handler("/current")).toThrow();
+    resolveSecond(true);
+    await second;
+    resolveFirst(true);
+    await first;
+    await Promise.resolve();
+
+    expect(mockRouter.push).toHaveBeenCalledExactlyOnceWith("/current");
+    expect(onAllow).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["cancel", "reject"])("should not resume after confirmation %s", async (outcome) => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let finish: VoidFunction = () => undefined;
+    const promise = new Promise<boolean>((resolve, reject) => {
+      finish = () => {
+        if (outcome === "reject") {
+          reject(new Error("Dismissed"));
+        } else {
+          resolve(false);
+        }
+      };
+    });
+    const onAllow = vi.fn();
+
+    renderHook(() =>
+      useNavigationBlocker({ message: "Leave?", onConfirm: () => promise, onAllow })
+    );
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow();
+    finish();
+    await promise.catch(() => false);
+    await Promise.resolve();
+
+    expect(mockRouter.push).not.toHaveBeenCalled();
+    expect(onAllow).not.toHaveBeenCalled();
+  });
+
+  it.each([true, false])("should preserve synchronous confirmation %s", (confirmed) => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onAllow = vi.fn();
+    const onBlock = vi.fn();
+
+    renderHook(() =>
+      useNavigationBlocker({ message: "Leave?", onConfirm: () => confirmed, onAllow, onBlock })
+    );
+
+    const handler = onMock.mock.calls[0][1];
+
+    if (confirmed) {
+      expect(() => handler("/next")).not.toThrow();
+      expect(onAllow).toHaveBeenCalledTimes(1);
+    } else {
+      expect(() => handler("/next")).toThrow("Route change aborted by user");
+      expect(onAllow).not.toHaveBeenCalled();
+    }
+    expect(onBlock).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  it("should block silently without asking for confirmation", () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onConfirm = vi.fn();
+    const onAllow = vi.fn();
+
+    renderHook(() => useNavigationBlocker({ onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow("Route change blocked");
+    expect(onConfirm).not.toHaveBeenCalled();
+    expect(onAllow).not.toHaveBeenCalled();
+    expect(mockRouter.events.emit).toHaveBeenCalledWith("routeChangeError");
+  });
+
+  it.each(["complete", "reject", "different URL"])(
+    "should clear unused replay permission after %s",
+    async (outcome) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      let finishPush: VoidFunction = () => undefined;
+      const pushPromise = new Promise<boolean>((resolve, reject) => {
+        finishPush = () => {
+          if (outcome === "reject") {
+            reject(new Error("Push failed"));
+          } else {
+            resolve(true);
+          }
+        };
+      });
+
+      vi.mocked(mockRouter.push).mockReturnValue(pushPromise);
+
+      const onConfirm = vi.fn().mockResolvedValue(true);
+      const onAllow = vi.fn();
+
+      renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+      const handler = onMock.mock.calls[0][1];
+
+      expect(() => handler("/next")).toThrow();
+      await Promise.resolve();
+      if (outcome === "different URL") {
+        onConfirm.mockReturnValue(new Promise<boolean>(() => undefined));
+        expect(() => handler("/other")).toThrow();
+      } else {
+        finishPush();
+        await pushPromise.catch(() => false);
+      }
+
+      expect(() => handler("/next")).toThrow();
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(onConfirm).toHaveBeenCalledTimes(outcome === "different URL" ? 3 : 2);
+    }
+  );
+
+  it.each([true, false])(
+    "should let a synchronous answer %s supersede an async prompt",
+    async (confirmed) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      let resolveFirst: (value: boolean) => void = () => undefined;
+      const first = new Promise<boolean>((resolve) => {
+        resolveFirst = resolve;
+      });
+      const onConfirm = vi.fn().mockReturnValueOnce(first).mockReturnValueOnce(confirmed);
+      const onAllow = vi.fn();
+
+      renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+      const handler = onMock.mock.calls[0][1];
+
+      expect(() => handler("/old")).toThrow();
+      if (confirmed) {
+        expect(() => handler("/current")).not.toThrow();
+      } else {
+        expect(() => handler("/current")).toThrow();
+      }
+      resolveFirst(true);
+      await first;
+      await Promise.resolve();
+
+      expect(mockRouter.push).not.toHaveBeenCalled();
+      expect(onAllow).toHaveBeenCalledTimes(confirmed ? 1 : 0);
+    }
+  );
+
+  it("should notify the current callback without discarding a pending attempt", async () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let resolveConfirm: (value: boolean) => void = () => undefined;
+    const promise = new Promise<boolean>((resolve) => {
+      resolveConfirm = resolve;
+    });
+    const previousAllow = vi.fn();
+    const currentAllow = vi.fn();
+    let onAllow = previousAllow;
+    let scope = ["editor", "navigation"];
+    const { rerender } = renderHook(() =>
+      useNavigationBlocker({
+        scope,
+        message: "Leave?",
+        onConfirm: () => promise,
+        onAllow,
+      })
+    );
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow();
+    onAllow = currentAllow;
+    scope = ["navigation", "editor", "editor"];
+    rerender();
+    resolveConfirm(true);
+    await promise;
+    await Promise.resolve();
+
+    expect(mockRouter.push).toHaveBeenCalledExactlyOnceWith("/next");
+    expect(previousAllow).not.toHaveBeenCalled();
+    expect(currentAllow).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(["replacement", "detach"])("should not replay if onAllow causes %s", async (action) => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onConfirm = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockReturnValue(new Promise<boolean>(() => undefined));
+    const onAllow = vi.fn(() => {
+      if (action === "detach") {
+        unmount();
+      } else {
+        const handler = onMock.mock.calls[0][1];
+
+        expect(() => handler("/replacement")).toThrow();
+      }
+    });
+    const { unmount } = renderHook(() =>
+      useNavigationBlocker({
+        message: "Leave?",
+        onConfirm,
+        onAllow,
+      })
+    );
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/old")).toThrow();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(onAllow).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  it.each(["onBlock", "onConfirm"])(
+    "should abort synchronous approval superseded by %s",
+    (callback) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      let replaced = false;
+      const onAllow = vi.fn();
+
+      function replaceNavigation(): void {
+        replaced = true;
+
+        const handler = onMock.mock.calls[0][1];
+
+        expect(() => handler("/replacement")).not.toThrow();
+      }
+
+      renderHook(() =>
+        useNavigationBlocker({
+          message: "Leave?",
+          onBlock: () => {
+            if (callback === "onBlock" && !replaced) {
+              replaceNavigation();
+            }
+          },
+          onConfirm: () => {
+            if (callback === "onConfirm" && !replaced) {
+              replaceNavigation();
+            }
+
+            return true;
+          },
+          onAllow,
+        })
+      );
+
+      const handler = onMock.mock.calls[0][1];
+
+      expect(() => handler("/old")).toThrow("Route change aborted by user");
+      expect(onAllow).toHaveBeenCalledTimes(1);
+      expect(mockRouter.events.emit).toHaveBeenCalledExactlyOnceWith("routeChangeError");
+      expect(mockRouter.push).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each([
+    { position: "ancestor", changeMessage: false },
+    { position: "earlier sibling", changeMessage: false },
+    { position: "ancestor", changeMessage: true },
+    { position: "earlier sibling", changeMessage: true },
+  ])(
+    "should use matching protection and callbacks for $position layout navigation (message change: $changeMessage)",
+    ({ position, changeMessage }) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const previousBlock = vi.fn();
+      const currentBlock = vi.fn();
+      const previousConfirm = vi.fn(() => true);
+      const currentConfirm = vi.fn(() => false);
+      const onAllow = vi.fn();
+      let message = "Leave?";
+      let onBlock = previousBlock;
+      let onConfirm = previousConfirm;
+      let navigateDuringLayout = false;
+
+      function LayoutNavigation({ children }: PropsWithChildren): ReactNode {
+        useLayoutEffect(() => {
+          if (navigateDuringLayout) {
+            expect(() => mockRouter.push("/next")).toThrow("Route change aborted by user");
+          }
+        });
+
+        return children;
+      }
+
+      function LayoutWrapper({ children }: PropsWithChildren): ReactNode {
+        if (position === "ancestor") {
+          return createElement(LayoutNavigation, null, children);
+        }
+
+        return createElement(Fragment, null, createElement(LayoutNavigation), children);
+      }
+
+      const { rerender } = renderHook(
+        () =>
+          useNavigationBlocker({
+            message,
+            onBlock,
+            onConfirm,
+            onAllow,
+          }),
+        { wrapper: LayoutWrapper }
+      );
+
+      vi.mocked(mockRouter.push).mockImplementation(() => {
+        const handler = onMock.mock.calls[onMock.mock.calls.length - 1][1];
+
+        handler("/next");
+
+        return Promise.resolve(true);
+      });
+      onBlock = currentBlock;
+      onConfirm = currentConfirm;
+      if (changeMessage) {
+        message = "Protect current work?";
+      }
+      navigateDuringLayout = true;
+      rerender();
+
+      expect(currentBlock).toHaveBeenCalledTimes(1);
+
+      const expectedMessage = changeMessage ? "Protect current work?" : "Leave?";
+
+      expect(currentConfirm).toHaveBeenCalledExactlyOnceWith(expectedMessage);
+      expect(previousBlock).not.toHaveBeenCalled();
+      expect(previousConfirm).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+      if (changeMessage) {
+        expect(onMock).toHaveBeenCalledTimes(2);
+        expect(offMock).toHaveBeenCalledTimes(1);
+      } else {
+        expect(onMock).toHaveBeenCalledTimes(1);
+        expect(offMock).not.toHaveBeenCalled();
+      }
+    }
+  );
+
+  it("should cancel replay and clear permission when async onAllow throws", async () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    const onConfirm = vi
+      .fn()
+      .mockResolvedValueOnce(true)
+      .mockReturnValue(new Promise<boolean>(() => undefined));
+    const onAllow = vi.fn(() => {
+      throw new Error("Consumer callback failed");
+    });
+
+    renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/next")).toThrow("Route change aborted by user");
+    await new Promise<void>((resolve) => setTimeout(resolve, 0));
+
+    expect(onAllow).toHaveBeenCalledTimes(1);
+    expect(mockRouter.push).not.toHaveBeenCalled();
+    expect(() => handler("/next")).toThrow("Route change aborted by user");
+    expect(onConfirm).toHaveBeenCalledTimes(2);
+  });
+
+  it("should abort synchronous approval replaced from onAllow", () => {
+    mockUseShouldBlock.mockReturnValue(true);
+
+    let replaced = false;
+    const onConfirm = vi.fn(() => true);
+    const onAllow = vi.fn(() => {
+      if (!replaced) {
+        replaced = true;
+
+        const handler = onMock.mock.calls[0][1];
+
+        expect(() => handler("/replacement")).not.toThrow();
+      }
+    });
+
+    renderHook(() => useNavigationBlocker({ message: "Leave?", onConfirm, onAllow }));
+
+    const handler = onMock.mock.calls[0][1];
+
+    expect(() => handler("/old")).toThrow("Route change aborted by user");
+    expect(onConfirm).toHaveBeenCalledTimes(2);
+    expect(onAllow).toHaveBeenCalledTimes(2);
+    expect(mockRouter.events.emit).toHaveBeenCalledExactlyOnceWith("routeChangeError");
+    expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
   describe("Performance", () => {
