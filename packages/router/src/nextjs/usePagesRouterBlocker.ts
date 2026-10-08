@@ -76,9 +76,12 @@ export function useNavigationBlocker(
       }
 
       if (confirmation.kind === "sync") {
-        if (settle()) {
-          onAllow?.();
+        if (!settle()) {
+          router.events.emit("routeChangeError");
+          throw new Error(ROUTE_ERRORS.ABORTED);
         }
+
+        onAllow?.();
 
         return;
       }
