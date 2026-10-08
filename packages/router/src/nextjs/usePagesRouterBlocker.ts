@@ -3,12 +3,14 @@ import { useEffect, useRef } from "react";
 import {
   DEFAULT_UNLOAD_MESSAGE,
   ROUTE_ERRORS,
+  createConfirmationOwner,
+  normalizeScope,
   resolveConfirmResult,
   useBeforeUnload,
   useShouldBlock,
 } from "../core";
 import type { Nullable } from "@okyrychenko-dev/type-utils";
-import type { NavigationBlockerReturn } from "../core/types";
+import type { NavigationBlockerReturn } from "../core";
 import type { UseNavigationBlockerOptions } from "./types";
 
 /**
@@ -20,10 +22,17 @@ export function useNavigationBlocker(
   const { when, scope, message, onBlock, onAllow, blockBrowserUnload = true, onConfirm } = options;
 
   const router = useRouter();
-  const allowNextUrlRef = useRef<Nullable<string>>(null);
+  const callbacksRef = useRef({ onBlock, onAllow, onConfirm });
+
+  // Callback identity changes do not replace the protected navigation attempt.
+  useEffect(() => {
+    callbacksRef.current = { onBlock, onAllow, onConfirm };
+  }, [onBlock, onAllow, onConfirm]);
 
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when, scope);
+
+  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
 
   // Block navigation using Next.js router events
   useEffect(() => {
@@ -31,14 +40,22 @@ export function useNavigationBlocker(
       return;
     }
 
-    const handleRouteChangeStart = (url: string): void => {
+    const confirmationOwner = createConfirmationOwner();
+    let allowedNavigation: Nullable<{ url: string }> = null;
+
+    function handleRouteChangeStart(url: string): void {
       // Early return for allowed URL
-      if (allowNextUrlRef.current === url) {
-        allowNextUrlRef.current = null;
-        onAllow?.();
+      if (allowedNavigation?.url === url) {
+        allowedNavigation = null;
 
         return;
       }
+
+      allowedNavigation = null;
+
+      const settle = confirmationOwner.begin();
+
+      const { onBlock, onAllow, onConfirm } = callbacksRef.current;
 
       // Trigger onBlock callback
       onBlock?.();
@@ -59,32 +76,50 @@ export function useNavigationBlocker(
       }
 
       if (confirmation.kind === "sync") {
-        onAllow?.();
+        if (settle()) {
+          onAllow?.();
+        }
 
         return;
       }
 
       router.events.emit("routeChangeError");
-      confirmation.promise
-        .then((confirmed) => {
-          if (confirmed) {
-            allowNextUrlRef.current = url;
-            onAllow?.();
-            void router.push(url);
+      function complete(confirmed: boolean): void {
+        if (!settle() || !confirmed) {
+          return;
+        }
+
+        const permission = { url };
+
+        allowedNavigation = permission;
+
+        const { onAllow: notifyAllow } = callbacksRef.current;
+
+        notifyAllow?.();
+
+        function clearPermission(): void {
+          if (allowedNavigation === permission) {
+            allowedNavigation = null;
           }
-        })
-        .catch(() => {
-          // On error, treat as cancelled
-        });
+        }
+
+        void router.push(url).then(clearPermission, clearPermission);
+      }
+
+      void confirmation.promise.then(complete, () => {
+        complete(false);
+      });
       throw new Error(ROUTE_ERRORS.ABORTED);
-    };
+    }
 
     router.events.on("routeChangeStart", handleRouteChangeStart);
 
     return () => {
+      confirmationOwner.invalidate();
+      allowedNavigation = null;
       router.events.off("routeChangeStart", handleRouteChangeStart);
     };
-  }, [shouldBlock, message, onBlock, onAllow, router, onConfirm]);
+  }, [shouldBlock, scopeKey, message, router]);
 
   // Also block browser unload if requested
   useBeforeUnload(blockBrowserUnload && shouldBlock, message ?? DEFAULT_UNLOAD_MESSAGE);
