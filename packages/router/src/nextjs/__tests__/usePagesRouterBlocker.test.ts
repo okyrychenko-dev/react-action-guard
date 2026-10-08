@@ -1,5 +1,7 @@
 import { renderHook } from "@testing-library/react";
 import { useRouter } from "next/router";
+import { Fragment, createElement, useLayoutEffect } from "react";
+import type { PropsWithChildren, ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_UNLOAD_MESSAGE, useBeforeUnload, useShouldBlock } from "../../core";
 import { useNavigationBlocker } from "../usePagesRouterBlocker";
@@ -589,6 +591,70 @@ describe("useNavigationBlocker (Next.js Pages Router)", () => {
       expect(onAllow).toHaveBeenCalledTimes(1);
       expect(mockRouter.events.emit).toHaveBeenCalledExactlyOnceWith("routeChangeError");
       expect(mockRouter.push).not.toHaveBeenCalled();
+    }
+  );
+
+  it.each(["ancestor", "earlier sibling"])(
+    "should use current callbacks for %s layout navigation without replacing the listener",
+    (position) => {
+      mockUseShouldBlock.mockReturnValue(true);
+
+      const previousBlock = vi.fn();
+      const currentBlock = vi.fn();
+      const previousConfirm = vi.fn(() => true);
+      const currentConfirm = vi.fn(() => false);
+      const onAllow = vi.fn();
+      let onBlock = previousBlock;
+      let onConfirm = previousConfirm;
+      let navigateDuringLayout = false;
+
+      function LayoutNavigation({ children }: PropsWithChildren): ReactNode {
+        useLayoutEffect(() => {
+          if (navigateDuringLayout) {
+            expect(() => mockRouter.push("/next")).toThrow("Route change aborted by user");
+          }
+        });
+
+        return children;
+      }
+
+      function LayoutWrapper({ children }: PropsWithChildren): ReactNode {
+        if (position === "ancestor") {
+          return createElement(LayoutNavigation, null, children);
+        }
+
+        return createElement(Fragment, null, createElement(LayoutNavigation), children);
+      }
+
+      const { rerender } = renderHook(
+        () =>
+          useNavigationBlocker({
+            message: "Leave?",
+            onBlock,
+            onConfirm,
+            onAllow,
+          }),
+        { wrapper: LayoutWrapper }
+      );
+      const handler = onMock.mock.calls[0][1];
+
+      vi.mocked(mockRouter.push).mockImplementation(() => {
+        handler("/next");
+
+        return Promise.resolve(true);
+      });
+      onBlock = currentBlock;
+      onConfirm = currentConfirm;
+      navigateDuringLayout = true;
+      rerender();
+
+      expect(currentBlock).toHaveBeenCalledTimes(1);
+      expect(currentConfirm).toHaveBeenCalledExactlyOnceWith("Leave?");
+      expect(previousBlock).not.toHaveBeenCalled();
+      expect(previousConfirm).not.toHaveBeenCalled();
+      expect(onAllow).not.toHaveBeenCalled();
+      expect(onMock).toHaveBeenCalledTimes(1);
+      expect(offMock).not.toHaveBeenCalled();
     }
   );
 

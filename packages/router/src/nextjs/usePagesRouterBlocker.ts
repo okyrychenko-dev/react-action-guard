@@ -1,5 +1,5 @@
 import { useRouter } from "next/router.js";
-import { useEffect, useRef } from "react";
+import { useEffect, useInsertionEffect, useRef } from "react";
 import {
   DEFAULT_UNLOAD_MESSAGE,
   ROUTE_ERRORS,
@@ -24,8 +24,9 @@ export function useNavigationBlocker(
   const router = useRouter();
   const callbacksRef = useRef({ onBlock, onAllow, onConfirm });
 
+  // Publish committed callbacks before any component can navigate from a layout effect.
   // Callback identity changes do not replace the protected navigation attempt.
-  useEffect(() => {
+  useInsertionEffect(() => {
     callbacksRef.current = { onBlock, onAllow, onConfirm };
   }, [onBlock, onAllow, onConfirm]);
 
