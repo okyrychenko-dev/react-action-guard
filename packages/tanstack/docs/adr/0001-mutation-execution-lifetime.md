@@ -1,6 +1,6 @@
 # Protect all mutation calls owned by a hook
 
-Status: accepted contract; implementation pending ticket 08.
+Status: accepted contract; implementation pending.
 
 Decision date: 2026-10-08. Evidence baseline: repository `055e7ba`;
 installed `@tanstack/react-query` and `@tanstack/query-core` 5.90.10.
@@ -35,7 +35,7 @@ function alone or an `onSettled` wrapper. Promises returned by per-call callback
 are ignored by native Query and remain outside the protection lifetime. We do not
 await them or create callbacks that native Query would have suppressed. [1][2][3]
 
-## Lifetime rules for ticket 08
+## Lifetime rules
 
 | Event | Required behavior |
 | --- | --- |
@@ -105,12 +105,12 @@ mutation adapter's component-owned registration. An indefinitely paused or
 unfinished call can retain protection indefinitely without a configured timeout,
 just as core async-action tracking can. An expired episode can admit new work
 without renewed protection until all covered pending/error state clears. These
-trade-offs need explicit user documentation in ticket 08.
+trade-offs need explicit user documentation when the contract is implemented.
 
 The contract is feasible against the installed 5.90.10 public API, but this does
-not establish compatibility throughout the declared `^5.90.10` peer range. Ticket
-08 must prove the behavior with real QueryClient tests and applicable fresh
-packed consumers. If promise ownership, detached lifetime, callback semantics,
+not establish compatibility throughout the declared `^5.90.10` peer range. The
+implementation must prove the behavior with real QueryClient tests and applicable
+fresh packed consumers. If promise ownership, detached lifetime, callback semantics,
 types, or timeout suppression cannot be preserved safely, stop and record a
 follow-up decision; do not silently fall back to latest-observer protection.
 
@@ -128,22 +128,17 @@ the unchanged adapter and real QueryClient:
   call. After reset and unmount, the original promise still fulfilled.
 
 These are baseline observations, not passing tests of the future contract. The
-temporary probe was removed from the runtime suite; its local source is retained
-under `.scratch/feedback-02-03/evidence/07-mutation-contract.test.tsx`. To reproduce
-locally, copy it to
-`packages/tanstack/src/hooks/__tests__/mutationContract.evidence.test.tsx`, run
-`pnpm --filter @okyrychenko-dev/react-action-guard-tanstack exec vitest run src/hooks/__tests__/mutationContract.evidence.test.tsx`,
-and remove the temporary suite afterward. The ignored evidence file is not part
-of the committed artifact; source-backed conclusions above remain reviewable.
+temporary probes were removed from the runtime suite and are not part of the
+committed artifact; source-backed conclusions above remain reviewable.
 
 Existing mutation/coordination suites passed 28 tests; the core async-action
 lifetime suite passed 2 tests, independently establishing retention after caller
 unmount and timeout without operation settlement. [5] Final workspace typechecking passed; the full suite passed 790 tests. The ADR
 passed Prettier and staged whitespace checks. Build, packed consumers, and browser
 checks were not run for this documentation-only change. No new production
-behavior or permanent runtime tests are delivered by this decision ticket.
+behavior or permanent runtime tests are delivered by this decision record.
 
-Ticket 08 must use the approved public-hook seam with real QueryClient, deferred
+Implementation verification must use the public-hook seam with real QueryClient, deferred
 promises, supported blocking observations, and controlled time only for timers.
 Cover reversed settlement with both invocation methods; reset and unmount with
 unfinished work; awaited option/cache callbacks and ignored per-call promises;
