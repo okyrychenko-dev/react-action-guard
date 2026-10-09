@@ -1,3 +1,4 @@
+import { isDefined } from "@okyrychenko-dev/type-utils";
 import { Component, type ComponentType, type ReactNode } from "react";
 import type {
   MutationErrorBoundaryProps,
@@ -25,7 +26,7 @@ export function createMutationErrorBoundary(
       const { error } = this.state;
       const { children } = this.props;
 
-      if (error !== undefined) {
+      if (isDefined(error)) {
         return null;
       }
 

@@ -1,4 +1,5 @@
 import { useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
+import { isDefined } from "@okyrychenko-dev/type-utils";
 import {
   type DefaultError,
   type QueryClient,
@@ -49,6 +50,7 @@ export function useBlockingMutation<
   }
 
   const ownerId = `${id}:${String(ownerIdentity.generation)}`;
+
   const [observation] = useState(() => {
     function readNativeError(): boolean {
       return observer.getCurrentResult().isError;
@@ -56,6 +58,7 @@ export function useBlockingMutation<
 
     return createMutationObservation(readNativeError);
   });
+
   const owner = useMemo(() => {
     // Detached owners can still have pending work when this store returns.
     return createMutationExecutionOwner({ store, id: ownerId, observation });
@@ -77,7 +80,7 @@ export function useBlockingMutation<
     owner.refresh();
   }, [owner, blockingConfig]);
 
-  const keyHash = mutationKey ? hashKey(mutationKey) : undefined;
+  const keyHash = isDefined(mutationKey) ? hashKey(mutationKey) : undefined;
   const previousKey = useRef(keyHash);
 
   useEffect(() => {

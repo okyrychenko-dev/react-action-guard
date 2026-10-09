@@ -3,6 +3,7 @@ import {
   uiBlockingStoreApi,
   useUIBlockingContext,
 } from "@okyrychenko-dev/react-action-guard";
+import { type Optional, isDefined } from "@okyrychenko-dev/type-utils";
 import {
   MutationCache,
   QueryClient,
@@ -864,7 +865,7 @@ describe("mutation execution lifetime", () => {
     const client = new QueryClient();
     let invoke: VoidFunction = () => undefined;
     let shouldInvoke = false;
-    let reasonAtInvocation: string | undefined;
+    let reasonAtInvocation: Optional<string>;
     let completion: Promise<string> = Promise.resolve("");
 
     function EarlierSibling() {
@@ -1179,7 +1180,7 @@ describe("mutation execution lifetime", () => {
     async (source) => {
       const failure = new Error("throw to boundary");
       const client = new QueryClient();
-      let throwOnError: ((error: Error) => boolean) | undefined;
+      let throwOnError: Optional<(error: Error) => boolean>;
 
       if (source === "client-default") {
         client.setDefaultOptions({ mutations: { throwOnError: true } });
@@ -1196,7 +1197,7 @@ describe("mutation execution lifetime", () => {
           blockingConfig: { scope: "lifetime", onError: true },
         };
 
-        if (throwOnError) {
+        if (isDefined(throwOnError)) {
           options.throwOnError = throwOnError;
         }
 
