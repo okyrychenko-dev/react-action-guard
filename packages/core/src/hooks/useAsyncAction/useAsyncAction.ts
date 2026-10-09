@@ -20,7 +20,7 @@ export interface UseAsyncActionOptions {
  *
  * @public
  * @since 0.6.0
- * @see {@link useBlocker} for manual blocker management
+ * @see {@link useActionBlocker} for manual blocker management
  * @see {@link useIsBlocked} to check blocking state
  * @see {@link UseAsyncActionOptions} for available options
  */

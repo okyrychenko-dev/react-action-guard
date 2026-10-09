@@ -21,7 +21,11 @@ This is a pnpm workspace monorepo. Each package below still ships and versions i
 | [`@okyrychenko-dev/react-action-guard-router`](packages/router)       | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-router.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-router)   | Navigation blocking for React Router, TanStack Router, and Next.js           |
 | [`@okyrychenko-dev/react-action-guard-devtools`](packages/devtools)   | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-devtools.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-devtools) | Visualization and debugging of blocking state                               |
 
-See each package's own README for installation and usage. Full docs: [react-action-guard-docs](https://github.com/okyrychenko-dev/react-action-guard-docs).
+See each package's own README for installation and usage. Full docs: [documentation site source and local build instructions](packages/docs/README.md).
+
+Use `UIBlockingProvider` for production ownership and SSR. Hooks without a provider use a shared global fallback; it does not isolate server requests.
+
+Next.js Pages Router offers limited route-event interception with replay limitations. App Router provides unload-only protection, with no same-document navigation interception. See the [router capability details](packages/router/README.md#nextjs-pages-router). The TanStack package above integrates **TanStack Query**; **TanStack Router** belongs to the Router package.
 
 ## Package Dependency Flow
 
@@ -77,4 +81,4 @@ npm.
 
 ## License
 
-MIT © [Oleksii Kyrychenko](https://github.com/okyrychenko-dev)
+[MIT](LICENSE) © [Oleksii Kyrychenko](https://github.com/okyrychenko-dev)

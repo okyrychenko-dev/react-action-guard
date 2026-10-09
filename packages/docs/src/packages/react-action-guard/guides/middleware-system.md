@@ -540,7 +540,7 @@ describe('middleware integration', () => {
     const mockMiddleware = vi.fn();
     
     const { result } = renderHook(
-      () => useBlocker('test', { scope: 'form' }),
+      () => useActionBlocker('test', { scope: 'form' }),
       {
         wrapper: ({ children }) => (
           <UIBlockingProvider middlewares={[mockMiddleware]}>

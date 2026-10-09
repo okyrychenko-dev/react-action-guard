@@ -8,4 +8,4 @@
 
 > **BlockingEvent** = [`MiddlewareContext`](../interfaces/MiddlewareContext.md)
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L24)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:25](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L25)

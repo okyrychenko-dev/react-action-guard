@@ -2,13 +2,17 @@
 
 Complete API reference for all React Action Guard hooks.
 
+Priority orders matching blockers and their reasons. Every matching active blocker retains protection; lower-priority blockers remain effective after a higher-priority blocker ends.
+
 ## Core Hooks
 
-### useBlocker
+<a id="useblocker"></a>
+
+### useActionBlocker
 
 Automatically adds a blocker when the component mounts and removes it on unmount.
 
-`useActionBlocker` (and its `useBlocker` compatibility alias) treats each reactive
+`useActionBlocker` (and its deprecated `useBlocker` compatibility alias) treats each reactive
 configuration as the current configuration. Removing `scope` restores `global`,
 removing `reason` restores `Unknown`, and removing `priority` restores `0`.
 Omitted or explicitly `undefined` `timeout` and `onTimeout` values disable the
@@ -24,7 +28,7 @@ Reactive updates publish an `update` transition, without removing and adding the
 blocker.
 
 ```typescript
-function useBlocker(
+function useActionBlocker(
   blockerId: string,
   config: BlockerConfig,
   isActive?: boolean
@@ -45,7 +49,7 @@ function useBlocker(
 interface BlockerConfig {
   scope?: string | string[];      // Scope(s) to block (default: 'global')
   reason?: string;                 // Human-readable reason
-  priority?: number;               // Priority level (default: 10)
+  priority?: number;               // Priority level (default: 0)
   timeout?: number;                // Auto-remove after N milliseconds
   onTimeout?: (blockerId: string) => void; // Callback when timed out
 }
@@ -58,7 +62,7 @@ interface BlockerConfig {
 function SaveButton() {
   const [isSaving, setIsSaving] = useState(false);
   
-  useBlocker('save-button', {
+  useActionBlocker('save-button', {
     scope: 'form',
     reason: 'Saving data...',
   }, isSaving);
@@ -68,7 +72,7 @@ function SaveButton() {
 
 // With timeout
 function ApiCall() {
-  useBlocker('api-call', {
+  useActionBlocker('api-call', {
     scope: 'global',
     timeout: 30000,
     onTimeout: (id) => {
@@ -80,7 +84,7 @@ function ApiCall() {
 
 // Multiple scopes
 function CriticalOperation() {
-  useBlocker('critical', {
+  useActionBlocker('critical', {
     scope: ['form', 'navigation', 'checkout'],
     priority: 100,
     reason: 'Critical operation in progress',
@@ -91,7 +95,7 @@ function CriticalOperation() {
 function ConditionalBlocker() {
   const shouldBlock = isLoading || hasUnsavedChanges;
   
-  useBlocker('conditional', {
+  useActionBlocker('conditional', {
     scope: 'form',
   }, shouldBlock);
 }
@@ -201,7 +205,7 @@ function Form() {
 
 **Related:**
 - [useBlockingInfo](#useblockinginfo) - Get detailed information
-- [useBlocker](#useblocker) - Add blocker
+- [useActionBlocker](#useactionblocker) - Add blocker
 
 ---
 
@@ -326,20 +330,20 @@ This ensures the most important blocker is always first.
 
 **Related:**
 - [useIsBlocked](#useisblocked) - Simple boolean check
-- [useBlocker](#useblocker) - Add blocker
+- [useActionBlocker](#useactionblocker) - Add blocker
 
 ---
 
 ### useAsyncAction
 
-Wraps an async function with automatic blocking/unblocking.
+Tracks async work with automatic blocking/unblocking. Concurrent calls receive separate IDs; tracking does not exclude repeat submissions or cancel operations. Timeouts release only UI protection. Explicit IDs in manual registration must remain unique within a store; warnings do not prevent collisions.
 
 ```typescript
-function useAsyncAction(
+function useAsyncAction<T = unknown>(
   actionId: string,
   scope?: string | string[],
   options?: UseAsyncActionOptions
-): <T>(asyncFn: () => Promise<T>) => Promise<T>
+): (asyncFn: () => Promise<T>) => Promise<T>
 ```
 
 **Parameters:**
@@ -356,12 +360,10 @@ function useAsyncAction(
 interface UseAsyncActionOptions {
   timeout?: number;                // Auto-remove after N milliseconds
   onTimeout?: (actionId: string) => void; // Callback when timed out
-  priority?: number;               // Priority level (default: 10)
-  reason?: string;                 // Blocker reason
 }
 ```
 
-**Returns:** Wrapper function that accepts an async function and returns a Promise
+**Returns:** Wrapper function that accepts an async function and returns a Promise. Its blocker uses priority `20` and reason `Executing ${actionId}`.
 
 **Examples:**
 
@@ -383,9 +385,8 @@ function DataFetcher() {
 function ApiCall() {
   const execute = useAsyncAction('api-call', 'global', {
     timeout: 30000,
-    reason: 'Calling API...',
     onTimeout: (id) => {
-      showError('Request timed out');
+      showError('UI protection expired; the request may still be running');
     }
   });
   
@@ -398,10 +399,7 @@ function ApiCall() {
 
 // Multiple scopes
 function CriticalAction() {
-  const execute = useAsyncAction('critical', ['form', 'navigation'], {
-    priority: 100,
-    reason: 'Critical operation',
-  });
+  const execute = useAsyncAction('critical', ['form', 'navigation']);
   
   const handleAction = () => execute(async () => {
     await performCriticalOperation();
@@ -478,7 +476,7 @@ async function wrappedFunction() {
 - Safe to use in `useCallback` dependencies
 
 **Related:**
-- [useBlocker](#useblocker) - Manual blocking
+- [useActionBlocker](#useactionblocker) - Manual blocking
 - [useConfirmableBlocker](#useconfirmableblocker) - With confirmation
 
 ---
@@ -955,7 +953,7 @@ function BusinessRuleBlocker() {
 
 **Related:**
 - [useScheduledBlocker](#usescheduledblocker) - Time-based blocking
-- [useBlocker](#useblocker) - Manual control
+- [useActionBlocker](#useactionblocker) - Manual control
 
 ---
 
@@ -965,7 +963,7 @@ function BusinessRuleBlocker() {
 
 | Use Case | Hook |
 |----------|------|
-| Manual blocking control | `useBlocker` |
+| Manual blocking control | `useActionBlocker` |
 | Check if blocked | `useIsBlocked` |
 | Get blocker details | `useBlockingInfo` |
 | Wrap async function | `useAsyncAction` |

@@ -110,7 +110,7 @@ Use shared scopes when one component starts work and another component should re
 
 ### Isolate blocking domains
 
-Use `UIBlockingProvider` when each request, test, or micro-frontend should get its own store instance.
+Recommend `UIBlockingProvider` for production ownership and SSR, with a fresh store for each request, test, or micro-frontend. The global fallback is shared convenience state, not request isolation.
 
 ## Documentation
 
@@ -234,7 +234,7 @@ Gets detailed information about all active blockers for a specific scope.
 
 - `scope?: string` - Scope to get blocking information for (default: "global")
 
-**Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information objects, sorted by priority (highest first)
+**Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information objects, sorted by priority (highest first). Priority orders reasons; every matching active blocker retains protection, including lower-priority ones
 
 **BlockerInfo:**
 
@@ -931,10 +931,10 @@ import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
 type AppScopes = "global" | "form" | "navigation" | "checkout";
 
-const { useBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } = createTypedHooks<AppScopes>();
+const { useActionBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } = createTypedHooks<AppScopes>();
 
-useBlocker("save", { scope: "form" }); // OK
-useBlocker("save", { scope: "typo" }); // Type error
+useActionBlocker("save", { scope: "form" }); // OK
+useActionBlocker("save", { scope: "typo" }); // Type error
 ```
 
 ## Use Cases

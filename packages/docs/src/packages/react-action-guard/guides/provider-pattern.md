@@ -4,7 +4,7 @@ Learn how to use isolated store instances for SSR, testing, and micro-frontends.
 
 ## What is the Provider Pattern?
 
-By default, React Action Guard uses a **global singleton store** shared across your entire application. The provider pattern allows you to create **isolated store instances** with independent state.
+By default, React Action Guard uses a **global singleton store** shared across your entire application. Use `UIBlockingProvider` for production ownership and SSR to create **isolated store instances** with independent state. The global fallback does not provide request isolation. Create a fresh store per request and avoid passing a shared module-level store to request providers.
 
 ## Why Use Providers?
 
@@ -127,7 +127,7 @@ All hooks automatically use the provider store when available:
 function MyComponent() {
   // These hooks will use the provider store (not global)
   const isBlocked = useIsBlocked('form');
-  useBlocker('save', { scope: 'form' }, isSaving);
+  useActionBlocker('save', { scope: 'form' }, isSaving);
   
   return <div>Content</div>;
 }
@@ -407,7 +407,7 @@ function App() {
 
 // Hooks use global store
 function Component() {
-  useBlocker('id', { scope: 'form' });
+  useActionBlocker('id', { scope: 'form' });
 }
 ```
 
@@ -424,7 +424,7 @@ function App() {
 
 // Hooks automatically use provider store
 function Component() {
-  useBlocker('id', { scope: 'form' }); // Same code!
+  useActionBlocker('id', { scope: 'form' }); // Same code!
 }
 ```
 
@@ -432,15 +432,15 @@ function Component() {
 
 ## Troubleshooting
 
-### "Cannot find store in context"
+### Hook Uses the Wrong Store
 
-**Problem:** Hook called outside provider.
+**Problem:** A core hook called in the component rendering a provider uses the outer provider or global fallback, rather than the provider it returns. Core hooks do not throw merely because a provider is absent.
 
 **Solution:**
 ```tsx
-// ❌ Bad: Hook outside provider
+// Uses the outer provider or global fallback
 function App() {
-  useBlocker('id', config); // Error!
+  useActionBlocker('id', config); // Not the provider returned below
   
   return (
     <UIBlockingProvider>
@@ -459,7 +459,7 @@ function App() {
 }
 
 function Content() {
-  useBlocker('id', config); // Works!
+  useActionBlocker('id', config); // Works!
 }
 ```
 

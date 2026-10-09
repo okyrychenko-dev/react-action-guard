@@ -8,7 +8,7 @@
 
 > **useConditionalBlocker**\<`TState`\>(`blockerId`, `config`): `void`
 
-Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.ts#L19)
+Defined in: [hooks/useConditionalBlocker/useConditionalBlocker.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useConditionalBlocker/useConditionalBlocker.ts#L18)
 
 Blocks UI based on a dynamic condition that is periodically evaluated.
 
@@ -38,6 +38,6 @@ Blocks UI based on a dynamic condition that is periodically evaluated.
 
 ## See
 
- - [useBlocker](../variables/useBlocker.md) for simple conditional blocking with boolean
+ - [useActionBlocker](useActionBlocker.md) for simple conditional blocking with boolean
  - [useScheduledBlocker](useScheduledBlocker.md) for time-based blocking
  - [ConditionalBlockerConfig](../interfaces/ConditionalBlockerConfig.md) for configuration options

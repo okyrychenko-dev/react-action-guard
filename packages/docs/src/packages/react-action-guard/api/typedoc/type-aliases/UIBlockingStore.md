@@ -8,7 +8,7 @@
 
 > **UIBlockingStore** = [`UIBlockingStoreState`](../interfaces/UIBlockingStoreState.md) & [`UIBlockingStoreActions`](../interfaces/UIBlockingStoreActions.md)
 
-Defined in: [store/uiBlockingStore.types.ts:67](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L67)
+Defined in: [store/uiBlockingStore.types.ts:69](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L69)
 
 Complete UI blocking store type combining state and actions.
 

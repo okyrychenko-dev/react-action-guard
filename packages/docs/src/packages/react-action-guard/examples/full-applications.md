@@ -65,14 +65,14 @@ export const useCartStore = create<CartStore>((set, get) => ({
 
 ```tsx
 // components/ShoppingCart.tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
 function ShoppingCart() {
   const { items, updateQuantity, removeItem, total } = useCartStore();
   const [isUpdating, setIsUpdating] = useState<string | null>(null);
   
   // Block cart while updating
-  useBlocker('cart-update', {
+  useActionBlocker('cart-update', {
     scope: 'cart',
     reason: 'Updating cart...',
     priority: 10,
@@ -193,7 +193,7 @@ function CartItem({ item, isUpdating, onQuantityChange, onRemove, disabled }) {
 
 ```tsx
 // components/Checkout.tsx
-import { useBlocker, useIsBlocked, useAsyncAction } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked, useAsyncAction } from '@okyrychenko-dev/react-action-guard';
 
 type CheckoutStep = 'shipping' | 'payment' | 'review' | 'complete';
 
@@ -292,7 +292,7 @@ Complete wizard with validation and state management.
 
 ```tsx
 // components/UserOnboarding.tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
 interface WizardData {
   personal: PersonalInfo | null;
@@ -313,7 +313,7 @@ function UserOnboardingWizard() {
   const totalSteps = 3;
   
   // Block while saving
-  useBlocker('wizard-save', {
+  useActionBlocker('wizard-save', {
     scope: 'wizard',
     reason: `Saving step ${currentStep}...`,
     priority: 50,
@@ -321,7 +321,7 @@ function UserOnboardingWizard() {
   }, isSaving);
   
   // Block navigation if unsaved changes
-  useBlocker('unsaved-changes', {
+  useActionBlocker('unsaved-changes', {
     scope: 'navigation',
     reason: 'You have unsaved changes',
     priority: 80,
@@ -657,7 +657,7 @@ Concurrent file uploads with progress tracking.
 
 ```tsx
 // components/FileUploadManager.tsx
-import { useBlocker, useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
 
 interface UploadTask {
   id: string;
@@ -674,7 +674,7 @@ function FileUploadManager() {
   // Block uploads section while any upload is active
   const activeUploads = tasks.filter(t => t.status === 'uploading');
   
-  useBlocker('file-uploads', {
+  useActionBlocker('file-uploads', {
     scope: 'uploads',
     reason: `Uploading ${activeUploads.length} file(s)...`,
     priority: 40,

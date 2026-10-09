@@ -82,10 +82,10 @@ const useStore = createShallowStore<State>((set) => ({
 
 **Example:**
 ```typescript
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
 // Block form while saving
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 
 // Check if blocked
 const isBlocked = useIsBlocked('form');
@@ -153,13 +153,13 @@ const query = useBlockingQuery({
 ```mermaid
 sequenceDiagram
     participant App as Your App
-    participant Hook as useBlocker Hook
+    participant Hook as useActionBlocker Hook
     participant Store as Zustand Store
     participant Toolkit as zustand-toolkit
     participant Middleware as Middleware System
     participant DevTools as DevTools
     
-    App->>Hook: useBlocker('save', config)
+    App->>Hook: useActionBlocker('save', config)
     Hook->>Store: addBlocker('save', config)
     Store->>Toolkit: Update state (shallow compare)
     Store->>Middleware: Emit 'add' event
@@ -190,12 +190,12 @@ sequenceDiagram
     TanStack-->>BlockingHook: { isLoading, data, ... }
     
     alt isLoading = true
-        BlockingHook->>ActionGuard: useBlocker(id, config, true)
+        BlockingHook->>ActionGuard: useActionBlocker(id, config, true)
         ActionGuard->>Store: addBlocker()
     end
     
     alt isLoading = false
-        BlockingHook->>ActionGuard: useBlocker(id, config, false)
+        BlockingHook->>ActionGuard: useActionBlocker(id, config, false)
         ActionGuard->>Store: removeBlocker()
     end
     
@@ -279,7 +279,7 @@ function UserList() {
 ### Pattern 2: Core + DevTools (No TanStack)
 
 ```typescript
-import { useBlocker } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker } from '@okyrychenko-dev/react-action-guard';
 import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
 
 function App() {
@@ -292,20 +292,20 @@ function App() {
 }
 
 function MyComponent() {
-  useBlocker('operation', { scope: 'form' }, isLoading);
+  useActionBlocker('operation', { scope: 'form' }, isLoading);
 }
 ```
 
 ### Pattern 3: Core Only (Minimal)
 
 ```typescript
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
 // No provider, no devtools, no tanstack
 // Just blocking management
 
 function MyComponent() {
-  useBlocker('save', { scope: 'form' }, isSaving);
+  useActionBlocker('save', { scope: 'form' }, isSaving);
   const isBlocked = useIsBlocked('form');
 }
 ```
@@ -321,7 +321,7 @@ const useMyStore = createShallowStore<MyState>((set) => ({
 }));
 
 // Still use action-guard for blocking
-import { useBlocker } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker } from '@okyrychenko-dev/react-action-guard';
 ```
 
 ## Design Principles
@@ -423,7 +423,7 @@ With devtools (dev): ~25 KB
 All packages are tree-shakeable:
 ```typescript
 // Only imports what you use
-import { useBlocker } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker } from '@okyrychenko-dev/react-action-guard';
 
 // Other exports are tree-shaken away
 ```
@@ -455,7 +455,7 @@ const useStore = createShallowStore((set) => ({
 const [isBlocked, setIsBlocked] = useState(false);
 
 // After - automatic with hooks
-useBlocker('operation', { scope: 'form' }, isLoading);
+useActionBlocker('operation', { scope: 'form' }, isLoading);
 const isBlocked = useIsBlocked('form');
 ```
 
@@ -464,7 +464,7 @@ const isBlocked = useIsBlocked('form');
 ```typescript
 // Before
 const query = useQuery({ queryKey, queryFn });
-useBlocker('fetch', { scope: 'content' }, query.isLoading);
+useActionBlocker('fetch', { scope: 'content' }, query.isLoading);
 
 // After - integrated
 const query = useBlockingQuery({

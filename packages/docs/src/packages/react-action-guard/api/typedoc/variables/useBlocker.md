@@ -8,7 +8,7 @@
 
 > `const` **useBlocker**: *typeof* [`useActionBlocker`](../functions/useActionBlocker.md) = `useActionBlocker`
 
-Defined in: [hooks/useActionBlocker/useActionBlocker.ts:77](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useActionBlocker/useActionBlocker.ts#L77)
+Defined in: [hooks/useActionBlocker/useActionBlocker.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useActionBlocker/useActionBlocker.ts#L31)
 
 ## Deprecated
 

@@ -64,7 +64,7 @@ Defined in: [store/uiBlockingStore.types.ts:51](https://github.com/okyrychenko-d
 
 > **removeBlocker**: (`id`) => `void`
 
-Defined in: [store/uiBlockingStore.types.ts:52](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L52)
+Defined in: [store/uiBlockingStore.types.ts:54](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L54)
 
 #### Parameters
 
@@ -82,7 +82,7 @@ Defined in: [store/uiBlockingStore.types.ts:52](https://github.com/okyrychenko-d
 
 > **isBlocked**: (`scope?`) => `boolean`
 
-Defined in: [store/uiBlockingStore.types.ts:53](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L53)
+Defined in: [store/uiBlockingStore.types.ts:55](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L55)
 
 #### Parameters
 
@@ -100,7 +100,7 @@ Defined in: [store/uiBlockingStore.types.ts:53](https://github.com/okyrychenko-d
 
 > **getBlockingInfo**: (`scope`) => readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]
 
-Defined in: [store/uiBlockingStore.types.ts:54](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L54)
+Defined in: [store/uiBlockingStore.types.ts:56](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L56)
 
 #### Parameters
 
@@ -118,7 +118,7 @@ readonly `Readonly`\<[`BlockerInfo`](BlockerInfo.md)\>[]
 
 > **clearAllBlockers**: `VoidFunction`
 
-Defined in: [store/uiBlockingStore.types.ts:55](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L55)
+Defined in: [store/uiBlockingStore.types.ts:57](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L57)
 
 ***
 
@@ -126,7 +126,7 @@ Defined in: [store/uiBlockingStore.types.ts:55](https://github.com/okyrychenko-d
 
 > **clearBlockersForScope**: (`scope`) => `void`
 
-Defined in: [store/uiBlockingStore.types.ts:56](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L56)
+Defined in: [store/uiBlockingStore.types.ts:58](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L58)
 
 #### Parameters
 
@@ -144,7 +144,7 @@ Defined in: [store/uiBlockingStore.types.ts:56](https://github.com/okyrychenko-d
 
 > **observeBlockingEvents**: (`observer`) => `VoidFunction`
 
-Defined in: [store/uiBlockingStore.types.ts:58](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L58)
+Defined in: [store/uiBlockingStore.types.ts:60](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L60)
 
 Observe lifecycle transitions through an anonymous, ownership-safe lease.
 

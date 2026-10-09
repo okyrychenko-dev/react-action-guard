@@ -10,7 +10,7 @@ import type { BlockerInfo } from "../../store";
  * @public
  * @since 0.6.0
  * @see {@link useIsBlocked} for a simple boolean check
- * @see {@link useBlocker} to create blockers
+ * @see {@link useActionBlocker} to create blockers
  * @see {@link BlockerInfo} for the structure of blocker information objects
  */
 export function useBlockingInfo(

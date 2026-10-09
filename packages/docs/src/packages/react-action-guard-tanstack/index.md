@@ -10,7 +10,7 @@ This package provides hooks that combine TanStack Query with React Action Guard'
 
 - **🔄 Automatic Blocking** - UI blocks based on query/mutation states
 - **🎯 Scope-Based** - Block specific areas, not everything
-- **📊 Priority System** - Control which operations take precedence
+- **📊 Priority System** - Order reasons from matching active blockers
 - **⚡ Tree-Shakeable** - Only include hooks you use
 - **🔌 Drop-in Replacement** - Same API as TanStack Query hooks
 - **💬 Dynamic Reasons** - Different messages for loading vs fetching
@@ -440,7 +440,7 @@ function Component() {
   });
   
   // Manual blocking
-  useBlocker('fetch-data', {
+  useActionBlocker('fetch-data', {
     scope: 'content',
     reason: 'Loading...',
   }, query.isLoading);

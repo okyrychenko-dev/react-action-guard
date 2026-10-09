@@ -11,7 +11,7 @@ const DEFAULT_CHECK_INTERVAL = 1000;
  *
  * @public
  * @since 0.6.0
- * @see {@link useBlocker} for simple conditional blocking with boolean
+ * @see {@link useActionBlocker} for simple conditional blocking with boolean
  * @see {@link useScheduledBlocker} for time-based blocking
  * @see {@link ConditionalBlockerConfig} for configuration options
  */
