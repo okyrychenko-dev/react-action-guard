@@ -42,3 +42,20 @@ export function createWrapper(options: CreateWrapperOptions = {}) {
     return content;
   };
 }
+
+/** Deferred native work controlled by a behavior test. */
+export function createDeferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T) => void;
+  reject: (error: Error) => void;
+} {
+  let resolve: (value: T) => void = () => undefined;
+  let reject: (error: Error) => void = () => undefined;
+
+  const promise = new Promise<T>((fulfill, fail) => {
+    resolve = fulfill;
+    reject = fail;
+  });
+
+  return { promise, resolve, reject };
+}

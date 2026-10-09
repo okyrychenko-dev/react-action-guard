@@ -27,6 +27,7 @@ const targets = {
   "next-15-floor": { next: "15.0.0", react: "18.2.0", "react-dom": "18.2.0" },
   "next-current": { next: "15.5.23" },
   "query-floor": { "@tanstack/react-query": "5.90.10" },
+  "query-current": { "@tanstack/react-query": "5.104.1" },
 };
 const selected = process.argv.slice(2);
 const cases = selected.length ? selected : Object.keys(targets);
@@ -51,7 +52,7 @@ for (const name of cases) {
     ...targets[name],
   };
   const modules = ["core", "ui", "devtools", "router"];
-  if (name === "query-floor") modules.push("tanstack");
+  if (targets[name]["@tanstack/react-query"]) modules.push("tanstack");
   for (const module of modules)
     dependencies[tarballs[module].name] = `file:${tarballs[module].tarball}`;
   writeFileSync(
@@ -158,8 +159,16 @@ for (const name of cases) {
     join(repository, "scripts/compatibility/consumer.typecheck.ts"),
     "utf8"
   );
+  let mutationTypes = "";
+  if (dependencies["@tanstack/react-query"]) {
+    mutationTypes = readFileSync(
+      join(repository, "scripts/compatibility/mutation.typecheck.ts"),
+      "utf8"
+    );
+  }
   const typeSource =
     commonTypes +
+    mutationTypes +
     "\n" +
     entries
       .map(
@@ -192,6 +201,13 @@ for (const name of cases) {
       join(consumer, "provider.test.mjs")
     );
     run("node", ["--test", "provider.test.mjs"], consumer);
+  }
+  if (dependencies["@tanstack/react-query"]) {
+    cpSync(
+      join(repository, "scripts/compatibility/mutation.test.mjs"),
+      join(consumer, "mutation.test.mjs")
+    );
+    run("node", ["--test", "mutation.test.mjs"], consumer);
   }
   for (const adapter of ["react-router", "tanstack-router"]) {
     const peer = adapter === "react-router" ? "react-router-dom" : "@tanstack/react-router";

@@ -1,6 +1,6 @@
 {
   "sourceBase": "8938a97796e2c4bf8146c7846a0beb34d09e9eb2",
-  "scope": "Actual pending Changesets-versioned cohort; strict peer installation; loading/types for all targets, provider and memory-router behavior only where specified in README.md.",
+  "scope": "Historical Changesets-versioned cohort records at sourceBase; targeted refreshes identify their own sourceBase and scope. Strict peer installation, imports and declarations for all recorded targets; behavior only as specified per result or in README.md.",
   "results": [
     {
       "target": "next-13-floor",
@@ -92,7 +92,7 @@
     },
     {
       "target": "query-floor",
-      "date": "2026-10-04T19:14:01.488Z",
+      "date": "2026-10-08T20:30:38.128Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -111,7 +111,9 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0",
         "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
-      }
+      },
+      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
+      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
     },
     {
       "target": "react-18",
@@ -263,6 +265,31 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0"
       }
+    },
+    {
+      "target": "query-current",
+      "date": "2026-10-08T20:30:44.781Z",
+      "node": "v22.20.0",
+      "strictPeers": true,
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@tanstack/react-query": "5.104.1",
+        "@okyrychenko-dev/react-action-guard": "2.0.0",
+        "@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-router": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
+      },
+      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
+      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
     }
   ],
   "tools": {

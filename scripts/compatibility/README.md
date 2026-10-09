@@ -24,7 +24,8 @@ success record. Re-run after changes; a previous record is not proof for a new d
 | next-14-floor         | Next 14.0.0, React/DOM 18.2.0         | Imports and declarations only                                                                |
 | next-15-floor         | Next 15.0.0, React/DOM 18.2.0         | Imports and declarations only                                                                |
 | next-current          | Next 15.5.23                          | Imports and declarations only                                                                |
-| query-floor           | TanStack Query 5.90.10                | Imports and declarations only; also the currently locked version                             |
+| query-floor           | TanStack Query 5.90.10                | Mutation concurrency, reset, detach, awaited callbacks and generic types; locked version     |
+| query-current         | TanStack Query 5.104.1                | Same packed mutation suite                                                                   |
 
 Other targets select React/DOM 19.2.8 and React types 19.2.18. Zustand 5.0.0 is
 selected except the `react-19` target, which checks current Zustand 5.0.15, along with toolkit 1.0.0 and type-utils 0.1.2. Supplied external peers and runtime dependency floors are checked against packed manifests. “Current” means the repository's selected dependency,

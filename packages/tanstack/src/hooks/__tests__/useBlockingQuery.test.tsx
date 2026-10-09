@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, renderHook, screen, waitFor } from "@testing-library/react";
 import { type ReactNode, StrictMode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { createWrapper } from "../../test/test.utils";
+import { createDeferred, createWrapper } from "../../test/test.utils";
 import { useBlockingQuery } from "../useBlockingQuery";
 import { QueryBlockingConfig } from "../useBlockingQuery.types";
 import type { Middleware } from "@okyrychenko-dev/react-action-guard";
@@ -246,7 +246,11 @@ describe("useBlockingQuery", () => {
   });
 
   it("should block during fetching when onFetching is true", async () => {
-    const queryFn = vi.fn().mockResolvedValue("data");
+    const refresh = createDeferred<string>();
+    const queryFn = vi
+      .fn()
+      .mockResolvedValueOnce("data")
+      .mockImplementation(() => refresh.promise);
 
     const blockingConfig: QueryBlockingConfig = {
       scope: "test",
@@ -270,16 +274,17 @@ describe("useBlockingQuery", () => {
     });
 
     // Refetch to trigger fetching state
-    void result.current.refetch();
+    const refreshPromise = result.current.refetch();
 
     // Should block during fetching
     await waitFor(() => {
       const { isBlocked } = uiBlockingStoreApi.getState();
 
-      if (result.current.isRefetching) {
-        expect(isBlocked("test")).toBe(true);
-      }
+      expect(result.current.isRefetching).toBe(true);
+      expect(isBlocked("test")).toBe(true);
     });
+    refresh.resolve("refreshed");
+    await refreshPromise;
   });
 
   it("should use unique blocker ID based on query key", async () => {
@@ -431,9 +436,8 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (info.length > 0) {
-        expect(info[0]?.reason).toBe("Loading data...");
-      }
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Loading data...");
     });
   });
 
@@ -464,9 +468,8 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (info.length > 0) {
-        expect(info[0]?.priority).toBe(10);
-      }
+      expect(info).toHaveLength(1);
+      expect(info[0]?.priority).toBe(10);
     });
   });
 
@@ -502,9 +505,11 @@ describe("useBlockingQuery", () => {
     });
 
     // Resolve the query
-    if (resolveQuery) {
-      resolveQuery("data");
+    await waitFor(() => expect(resolveQuery).toBeTypeOf("function"));
+    if (!resolveQuery) {
+      throw new Error("Deferred operation did not start");
     }
+    resolveQuery("data");
 
     // Should unblock after loading
     await waitFor(() => {
@@ -542,14 +547,17 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (info.length > 0) {
-        expect(info[0]?.reason).toBe("Loading initial data...");
-      }
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Loading initial data...");
     });
   });
 
   it("should use reasonOnFetching during background fetching state", async () => {
-    const queryFn = vi.fn().mockResolvedValue("data");
+    const refresh = createDeferred<string>();
+    const queryFn = vi
+      .fn()
+      .mockResolvedValueOnce("data")
+      .mockImplementation(() => refresh.promise);
 
     const blockingConfig: QueryBlockingConfig = {
       scope: "test",
@@ -575,17 +583,19 @@ describe("useBlockingQuery", () => {
     });
 
     // Refetch to trigger fetching state
-    void result.current.refetch();
+    const refreshPromise = result.current.refetch();
 
     // Should block during fetching with custom reason
     await waitFor(() => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (result.current.isRefetching && info.length > 0) {
-        expect(info[0]?.reason).toBe("Refreshing data...");
-      }
+      expect(result.current.isRefetching).toBe(true);
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Refreshing data...");
     });
+    refresh.resolve("refreshed");
+    await refreshPromise;
   });
 
   it("should use reasonOnError during error state", async () => {
@@ -603,6 +613,7 @@ describe("useBlockingQuery", () => {
         useBlockingQuery({
           queryKey: ["test"],
           queryFn,
+          retry: false,
           blockingConfig,
         }),
       { wrapper: createWrapper() }
@@ -613,9 +624,8 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (info.length > 0) {
-        expect(info[0]?.reason).toBe("Failed to load data");
-      }
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Failed to load data");
     });
   });
 
@@ -642,6 +652,7 @@ describe("useBlockingQuery", () => {
         useBlockingQuery({
           queryKey: ["test"],
           queryFn,
+          retry: false,
           blockingConfig,
         }),
       { wrapper: createWrapper() }
@@ -652,15 +663,17 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (result.current.isPending && info.length > 0) {
-        expect(info[0]?.reason).toBe("Loading...");
-      }
+      expect(result.current.isPending).toBe(true);
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Loading...");
     });
 
     // Trigger error
-    if (rejectQuery) {
-      rejectQuery(new Error("Test error"));
+    await waitFor(() => expect(rejectQuery).toBeTypeOf("function"));
+    if (!rejectQuery) {
+      throw new Error("Deferred operation did not start");
     }
+    rejectQuery(new Error("Test error"));
 
     // Force rerender to trigger error state
     rerender();
@@ -670,9 +683,9 @@ describe("useBlockingQuery", () => {
       const { getBlockingInfo } = uiBlockingStoreApi.getState();
       const info = getBlockingInfo("test");
 
-      if (result.current.isError && info.length > 0) {
-        expect(info[0]?.reason).toBe("Error occurred");
-      }
+      expect(result.current.isError).toBe(true);
+      expect(info).toHaveLength(1);
+      expect(info[0]?.reason).toBe("Error occurred");
     });
   });
 });
