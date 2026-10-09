@@ -8,6 +8,11 @@
 
 `react-action-guard-ui` provides UI-agnostic hooks and state helpers for wiring blocking state into native controls, design systems, and component libraries without framework-specific adapters.
 
+Start with the [core-only coordination example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
+to see one operation affect two independent controls. Add this package when you need its
+integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
+provide the next learning step.
+
 ## Why Use It
 
 - Convert `react-action-guard` blockers into accessible control state
@@ -66,6 +71,9 @@ function SaveButton() {
   );
 }
 ```
+
+<details>
+<summary>Detailed reference and integration patterns</summary>
 
 ## Core Concepts
 
@@ -424,6 +432,8 @@ const { buttonState } = useGuardedButton({
 This package intentionally stops at UI primitives. It does not ship MUI, HeroUI, Radix, router, or design-system adapters because those APIs change independently and cannot cover every control a real app needs.
 
 Instead, build small local wrappers around your own components. The library owns blocking semantics, priority, reasons, and ARIA state; your app owns component-library props and visuals.
+
+</details>
 
 ## Development
 

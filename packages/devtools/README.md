@@ -6,6 +6,11 @@
 
 > Developer tools for [@okyrychenko-dev/react-action-guard](https://github.com/okyrychenko-dev/react-action-guard) - visualize, debug, and monitor UI blocking events in real-time
 
+Start with the [core-only coordination example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
+to see one operation affect two independent controls. Add this package when you need its
+integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
+provide the next learning step.
+
 ## Features
 
 - 📊 **Real-time Timeline** - Visual timeline of all blocking events with duration tracking
@@ -63,6 +68,9 @@ That's it! The devtools will automatically register middleware and start trackin
 > **Note:** Styles ship as a separate stylesheet
 > (`@okyrychenko-dev/react-action-guard-devtools/styles.css`) rather than being injected at
 > runtime, to stay SSR-safe. Without this import the panel works but is unstyled.
+
+<details>
+<summary>Detailed reference and integration patterns</summary>
 
 ## Component API
 
@@ -420,6 +428,8 @@ function PerformanceMonitor() {
   return null;
 }
 ```
+
+</details>
 
 ## Development
 

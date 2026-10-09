@@ -1,25 +1,75 @@
 # react-action-guard
 
-See the [versioned capability matrix](./CAPABILITIES.md) for evaluated peers, reproducible checks, evidence kinds, and limitations.
-
 [![CI](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/okyrychenko-dev/react-action-guard/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Coordinate shared UI interaction locks across complex React forms and workflows: conflicting
-actions and navigation-sensitive state, resolved through shared scopes. Async tracking reflects
-concurrent work; applications own repeat-submit exclusion and operation cancellation.
+Saving a profile should temporarily disable its editor and a separate navigation control,
+while help remains usable. React Action Guard lets the save operation publish scopes and reasons;
+independent components observe them without receiving its loading state as props.
 
-This is a pnpm workspace monorepo. Each package below still ships and versions independently on npm.
+```text
+UIBlockingProvider
+  SavePanel → save-profile → [profile, navigation]
+    ProfileEditor reads profile      → disabled + reason
+    NavigationControl reads navigation → disabled + reason
+    HelpControl reads help          → available
+```
 
-## Packages
+## Try core first
 
-| Package                                                                | Version                                                                                                                                          | Description                                                                    |
-| ----------------------------------------------------------------------| ------------------------------------------------------------------------------------------------------------------------------------------------| ---------------------------------------------------------------------------- |
-| [`@okyrychenko-dev/react-action-guard`](packages/core)                | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)               | Core: UI blocking with priorities, scopes, and automatic cleanup             |
-| [`@okyrychenko-dev/react-action-guard-ui`](packages/ui)               | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-ui.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-ui)         | UI-agnostic guarded control primitives (buttons, links, fields, groups)      |
-| [`@okyrychenko-dev/react-action-guard-tanstack`](packages/tanstack)   | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-tanstack.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-tanstack) | TanStack Query integration: automatic blocking during queries/mutations      |
-| [`@okyrychenko-dev/react-action-guard-router`](packages/router)       | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-router.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-router)   | Navigation blocking for React Router, TanStack Router, and Next.js           |
-| [`@okyrychenko-dev/react-action-guard-devtools`](packages/devtools)   | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-devtools.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-devtools) | Visualization and debugging of blocking state                               |
+In an existing React 18/19 application, install core and its Zustand peer:
+
+```bash
+npm install @okyrychenko-dev/react-action-guard zustand
+```
+
+No UI, Query, Router or Devtools adapter is needed. Follow the
+[Provider-first quickstart](packages/core/README.md#quick-start) or run the
+[small executable example](examples/core-coordination/README.md) from this checkout:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm --filter @okyrychenko-dev/react-action-guard run build
+pnpm --filter react-action-guard-core-example run dev
+```
+
+Try success, simulated failure and hiding the save controls during work. The two consumers
+show `Executing save-profile` while blocked and recover after settlement. Help remains usable.
+The navigation button demonstrates control availability; browser navigation interception requires
+a Router adapter.
+
+## When shared coordination helps
+
+| Approach             | Good fit                                                  | What the application still connects                            |
+| -------------------- | --------------------------------------------------------- | -------------------------------------------------------------- |
+| Local pending state  | One operation and its own button                          | Pass state to other controls if they need it.                  |
+| React Context        | A shared workflow with a small, explicit state model      | Design the shared state, reasons and lifecycle yourself.       |
+| Mutation observation | Availability follows request state                        | Combine relevant executions and non-network rules when needed. |
+| Shared scopes        | Independent features need common availability and reasons | Producers declare policy; consumers apply it to controls.      |
+
+Local state or mutation state is enough for a single loading button. Shared scopes are useful
+when several independent producers and consumers must agree on availability. Tracking does not
+exclude repeated execution, cancel work or enforce backend permissions; applications own those rules.
+
+## Continue learning
+
+- [Core quickstart and hook reference](packages/core/README.md)
+- [Canonical documentation: guides and local site instructions](packages/docs/README.md)
+- [Enterprise showcase: checkout conflicts and isolated sessions](examples/enterprise-demo/README.md)
+- [Versioned capability matrix](CAPABILITIES.md): evaluated peers, evidence and limitations
+
+## Optional packages
+
+This pnpm workspace contains independently versioned npm packages. Add adapters when you need
+their integration; start with core for shared coordination.
+
+| Package                                                             | Version                                                                                                                                                             | Description                                                             |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [`@okyrychenko-dev/react-action-guard`](packages/core)              | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)                   | Core: UI blocking with priorities, scopes, and automatic cleanup        |
+| [`@okyrychenko-dev/react-action-guard-ui`](packages/ui)             | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-ui.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-ui)             | UI-agnostic guarded control primitives (buttons, links, fields, groups) |
+| [`@okyrychenko-dev/react-action-guard-tanstack`](packages/tanstack) | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-tanstack.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-tanstack) | TanStack Query integration: automatic blocking during queries/mutations |
+| [`@okyrychenko-dev/react-action-guard-router`](packages/router)     | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-router.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-router)     | Navigation blocking for React Router, TanStack Router, and Next.js      |
+| [`@okyrychenko-dev/react-action-guard-devtools`](packages/devtools) | [![npm](https://img.shields.io/npm/v/@okyrychenko-dev/react-action-guard-devtools.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard-devtools) | Visualization and debugging of blocking state                           |
 
 See each package's own README for installation and usage. Full docs: [documentation site source and local build instructions](packages/docs/README.md).
 
@@ -76,7 +126,7 @@ package provenance and browser tests.
 This repo uses [Changesets](https://github.com/changesets/changesets) for independent per-package
 versioning. Run `pnpm changeset` in a PR that changes a package's public behavior, describe the
 change, and pick a bump type. Merging the PR opens (or updates) a "Version Packages" PR with the
-version bumps and changelog entries applied; merging *that* PR publishes the affected packages to
+version bumps and changelog entries applied; merging _that_ PR publishes the affected packages to
 npm.
 
 ## License

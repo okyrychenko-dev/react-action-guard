@@ -6,6 +6,11 @@
 
 > TanStack Query integration for React Action Guard - seamless UI blocking for queries and mutations
 
+Start with the [core-only coordination example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
+to see one operation affect two independent controls. Add this package when you need its
+integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
+provide the next learning step.
+
 ## Features
 
 - 🔄 Automatic UI blocking based on query and mutation states
@@ -80,6 +85,9 @@ function UserProfile() {
   );
 }
 ```
+
+<details>
+<summary>Detailed reference and integration patterns</summary>
 
 ## API Reference
 
@@ -561,6 +569,8 @@ function CriticalDataLoader() {
   return <div>Content</div>;
 }
 ```
+
+</details>
 
 ## Development
 
