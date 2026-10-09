@@ -96,17 +96,24 @@ function SubmitButton() {
 
 ### Step 3: Add DevTools (Development)
 
-Add the DevTools component to your app:
+Bind DevTools to the same store as your application. Nesting the panel under `UIBlockingProvider` does not select that store automatically: without an explicit `store` prop, DevTools observes the global store. Read the context in a provider descendant and pass its store to the panel:
 
 ```tsx
+import { UIBlockingProvider, useUIBlockingContext } from '@okyrychenko-dev/react-action-guard';
 import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
+
+function ProviderDevtools() {
+  const store = useUIBlockingContext();
+
+  return <ActionGuardDevtools store={store} />;
+}
 
 function App() {
   return (
     <UIBlockingProvider>
       <YourApp />
       {/* DevTools auto-disabled in production - no check needed! */}
-      <ActionGuardDevtools />
+      <ProviderDevtools />
     </UIBlockingProvider>
   );
 }
