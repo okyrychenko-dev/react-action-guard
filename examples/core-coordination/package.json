@@ -6,7 +6,7 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "pnpm --filter @okyrychenko-dev/react-action-guard run build && tsc --noEmit",
     "lint": "eslint src",
     "test:run": "vitest run",
     "format:check": "prettier --check src"
