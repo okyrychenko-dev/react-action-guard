@@ -29,5 +29,5 @@ readonly `Readonly`\<[`BlockerInfo`](../interfaces/BlockerInfo.md)\>[]
 ## See
 
  - [useIsBlocked](useIsBlocked.md) for a simple boolean check
- - [useBlocker](../variables/useBlocker.md) to create blockers
+ - [useActionBlocker](useActionBlocker.md) to create blockers
  - [BlockerInfo](../interfaces/BlockerInfo.md) for the structure of blocker information objects

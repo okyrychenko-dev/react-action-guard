@@ -16,7 +16,7 @@ hero:
 features:
   - icon: 🎯
     title: Priority-Based Blocking
-    details: Manage multiple blockers with configurable priorities. Higher priority blockers take precedence, ensuring critical operations always block the UI.
+    details: Manage multiple blockers with configurable priorities. Priority orders reasons; every matching active blocker retains protection.
     
   - icon: 🔒
     title: Scoped Blocking
@@ -101,26 +101,31 @@ A powerful toolkit for creating type-safe Zustand stores with automatic shallow 
 ## Quick Example
 
 ```tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useState } from 'react';
+import { UIBlockingProvider, useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
-function MyComponent() {
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Automatically block UI while loading
-  useBlocker('my-operation', {
+function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
+  const [isSaving, setIsSaving] = useState(false);
+  useActionBlocker('save-operation', {
     scope: 'form',
     reason: 'Saving data...',
-    priority: 10,
-    timeout: 30000, // Auto-remove after 30 seconds
-  }, isLoading);
+  }, isSaving);
+  const isBlocked = useIsBlocked('form');
   
-  const isFormBlocked = useIsBlocked('form');
+  async function handleSave() {
+    setIsSaving(true);
+    try {
+      await saveData();
+    } finally {
+      setIsSaving(false);
+    }
+  }
   
-  return (
-    <button disabled={isFormBlocked} onClick={handleSave}>
-      Save
-    </button>
-  );
+  return <button disabled={isBlocked} onClick={handleSave}>Save</button>;
+}
+
+export function App({ saveData }: { saveData: () => Promise<void> }) {
+  return <UIBlockingProvider><SaveButton saveData={saveData} /></UIBlockingProvider>;
 }
 ```
 
@@ -153,7 +158,7 @@ Managing UI blocking states in React apps is complex:
 ### Solution
 React Action Guard provides a centralized, declarative approach:
 - **Automatic Management**: Hooks handle lifecycle automatically
-- **Priority System**: Control which operations take precedence
+- **Priority System**: Order reasons from matching active blockers
 - **Scoped Blocking**: Block specific UI areas, not everything
 - **Safety Mechanisms**: Timeouts prevent infinite blocking
 - **Developer Tools**: Visual debugging of blocking states

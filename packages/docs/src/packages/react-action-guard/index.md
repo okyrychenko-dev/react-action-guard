@@ -9,7 +9,7 @@ React Action Guard is a comprehensive solution for managing UI blocking states i
 ## Key Features
 
 ### 🎯 Priority-Based Blocking
-Manage multiple concurrent blockers with configurable priorities. Higher priority operations automatically take precedence, ensuring critical tasks always block the UI when needed.
+Manage multiple concurrent blockers with configurable priorities. Priority orders reasons; every matching active blocker retains protection, including lower-priority ones.
 
 ### 🔒 Scoped Blocking
 Block specific areas of your UI rather than everything. Use named scopes like `'form'`, `'navigation'`, or `'checkout'`, or block multiple scopes simultaneously.
@@ -39,25 +39,31 @@ npm install @okyrychenko-dev/react-action-guard zustand
 ## Quick Start
 
 ```tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useState } from 'react';
+import { UIBlockingProvider, useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
-function MyComponent() {
-  const [isLoading, setIsLoading] = useState(false);
-  
-  // Automatically block UI while loading
-  useBlocker('my-operation', {
+function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
+  const [isSaving, setIsSaving] = useState(false);
+  useActionBlocker('save-operation', {
     scope: 'form',
     reason: 'Saving data...',
-    priority: 10,
-  }, isLoading);
+  }, isSaving);
+  const isBlocked = useIsBlocked('form');
   
-  const isFormBlocked = useIsBlocked('form');
+  async function handleSave() {
+    setIsSaving(true);
+    try {
+      await saveData();
+    } finally {
+      setIsSaving(false);
+    }
+  }
   
-  return (
-    <button disabled={isFormBlocked}>
-      Submit
-    </button>
-  );
+  return <button disabled={isBlocked} onClick={handleSave}>Save</button>;
+}
+
+export function App({ saveData }: { saveData: () => Promise<void> }) {
+  return <UIBlockingProvider><SaveButton saveData={saveData} /></UIBlockingProvider>;
 }
 ```
 
@@ -69,12 +75,12 @@ A blocker is a temporary state that indicates the UI should be blocked. Each blo
 
 - **ID**: Unique identifier
 - **Scope**: What areas to block (`string | string[]`)
-- **Priority**: Importance level (`number`, default: 10)
+- **Priority**: Reason ordering (`number`, default: 0)
 - **Reason**: Human-readable explanation
 - **Timeout**: Optional auto-removal duration
 
 ```tsx
-useBlocker('blocker-id', {
+useActionBlocker('blocker-id', {
   scope: ['form', 'navigation'],
   priority: 50,
   reason: 'Critical operation',
@@ -89,13 +95,13 @@ Scopes define **what** gets blocked:
 
 ```tsx
 // Block form only
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 
 // Block multiple scopes
-useBlocker('checkout', { scope: ['form', 'navigation'] }, isCheckingOut);
+useActionBlocker('checkout', { scope: ['form', 'navigation'] }, isCheckingOut);
 
 // Block everything
-useBlocker('critical', { scope: 'global' }, isCritical);
+useActionBlocker('critical', { scope: 'global' }, isCritical);
 ```
 
 Check if a scope is blocked:
@@ -111,10 +117,10 @@ When multiple blockers target the same scope, priority determines which one's re
 
 ```tsx
 // Lower priority
-useBlocker('bg-task', { scope: 'global', priority: 5 }, isBgRunning);
+useActionBlocker('bg-task', { scope: 'global', priority: 5 }, isBgRunning);
 
-// Higher priority - takes precedence
-useBlocker('important', { scope: 'global', priority: 100 }, isImportantRunning);
+// Higher priority - reason listed first
+useActionBlocker('important', { scope: 'global', priority: 100 }, isImportantRunning);
 ```
 
 Get blocker information sorted by priority:
@@ -129,7 +135,7 @@ console.log(topBlocker.reason);
 
 ### Hooks
 
-- **[useBlocker](/packages/react-action-guard/api/hooks#useblocker)** - Automatically add/remove blocker
+- **[useActionBlocker](/packages/react-action-guard/api/hooks#useactionblocker)** - Automatically add/remove blocker
 - **[useIsBlocked](/packages/react-action-guard/api/hooks#useisblocked)** - Check if scope is blocked
 - **[useBlockingInfo](/packages/react-action-guard/api/hooks#useblockinginfo)** - Get detailed blocker information
 - **[useAsyncAction](/packages/react-action-guard/api/hooks#useasyncaction)** - Wrap async function with blocking
@@ -186,7 +192,7 @@ interface UIBlockingStore {
 function UserForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  useBlocker('form-submit', {
+  useActionBlocker('form-submit', {
     scope: 'form',
     reason: 'Submitting...',
   }, isSubmitting);

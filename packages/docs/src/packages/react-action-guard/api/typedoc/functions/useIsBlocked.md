@@ -28,5 +28,5 @@ Checks if one or more scopes are currently blocked.
 
 ## See
 
- - [useBlocker](../variables/useBlocker.md) to create a blocker
+ - [useActionBlocker](useActionBlocker.md) to create a blocker
  - [useBlockingInfo](useBlockingInfo.md) to get detailed information about active blockers

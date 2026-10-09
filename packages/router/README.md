@@ -10,7 +10,7 @@ See the [versioned capability matrix](https://github.com/okyrychenko-dev/react-a
 
 ## Features
 
-- 🛣️ **Multi-Router Support** - React Router v6.19+, Remix, TanStack Router, Next.js Pages Router, and best-effort App Router support
+- 🛣️ **Multi-Router Support** - React Router v6.19+, Remix, TanStack Router, limited Next.js Pages Router interception, and App Router unload-only protection
 - 🎯 **Scope-Based Blocking** - Synchronize navigation blocking with UI blocking scopes
 - 🚦 **Condition-Based Blocking** - Block based on boolean conditions or functions
 - 💬 **Custom Dialog Support** - `useDialogState` helper for async confirmation dialogs
@@ -37,7 +37,7 @@ This package requires the following peer dependencies:
 - One of:
   - [react-router-dom](https://reactrouter.com/) ^6.19.0 - For React Router or Remix
   - [@tanstack/react-router](https://tanstack.com/router) ^1.170.41 - For TanStack Router
-  - [next](https://nextjs.org/) ^13.4.0 - For Next.js Pages Router and best-effort App Router support
+  - [next](https://nextjs.org/) ^13.4.0 - For limited Pages Router interception and App Router unload-only protection
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)
 
 ## Quick Start
@@ -339,7 +339,7 @@ Only the current confirmation attempt can resume navigation. Cleanup, disabling 
 
 ### Next.js App Router
 
-Best-effort support only. Browser unload protection works, but App Router does not expose an official navigation-blocking API.
+Unload-only protection: the hook requests a browser `beforeunload` prompt, subject to browser policy. It does not intercept same-document `Link`, `push`, or back/forward navigation, and does not evaluate `onConfirm`. App Router does not expose an official navigation-blocking API.
 
 ```tsx
 // app/edit/page.tsx
@@ -484,10 +484,10 @@ import type { UseNavigationBlockerOptions } from "@okyrychenko-dev/react-action-
 import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
 type AppScopes = "form" | "checkout" | "navigation";
-const { useBlocker } = createTypedHooks<AppScopes>();
+const { useActionBlocker } = createTypedHooks<AppScopes>();
 
 function MyComponent() {
-  useBlocker("id", { scope: "form" }); // ✅ Typed in the core package
+  useActionBlocker("id", { scope: "form" }); // ✅ Typed in the core package
 
   useNavigationBlocker({
     scope: "form", // ✅ Reuses the same scope values cleanly

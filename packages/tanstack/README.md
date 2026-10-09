@@ -315,7 +315,7 @@ function NavigationLinks() {
 
 ### Priority System
 
-Higher priority blockers override lower ones:
+Priority orders reasons; every matching active blocker retains protection, including lower-priority ones:
 
 ```tsx
 // Mutation default priority: 30 (higher than queries: 10)
@@ -332,11 +332,11 @@ const query = useBlockingQuery({
   queryFn: fetchCart,
   blockingConfig: {
     scope: "checkout",
-    priority: 50, // Lower - won't block if payment is processing
+    priority: 50, // Lower - still protects its matching scopes
   },
 });
 
-// Only highest priority blocker's reason is shown
+// The first reason belongs to the highest-priority matching blocker
 const blockers = useBlockingInfo("checkout");
 const topReason = blockers[0]?.reason; // From priority 100
 ```

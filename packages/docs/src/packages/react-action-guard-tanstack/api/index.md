@@ -531,7 +531,7 @@ const query = useQuery({
   queryFn: fetchData,
 });
 
-useBlocker('fetch-data', {
+useActionBlocker('fetch-data', {
   scope: 'content',
   reason: 'Loading...',
 }, query.isLoading);

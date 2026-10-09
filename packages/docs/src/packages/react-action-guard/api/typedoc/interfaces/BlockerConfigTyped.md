@@ -44,7 +44,7 @@ Human-readable reason for blocking
 
 Defined in: [types/scopes.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/types/scopes.ts#L20)
 
-Priority level (higher priority blockers take precedence, minimum value is 0)
+Reason ordering priority (minimum 0). Every matching active blocker retains protection, including lower-priority ones.
 
 ***
 

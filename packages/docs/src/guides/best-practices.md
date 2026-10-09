@@ -8,10 +8,10 @@ Recommended patterns and guidelines for using React Action Guard effectively.
 
 ```typescript
 // ❌ Bad: Always blocking global
-useBlocker('save', { scope: 'global' }, isSaving);
+useActionBlocker('save', { scope: 'global' }, isSaving);
 
 // ✅ Good: Block specific scope
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 ```
 
 **Why:** Blocking `'global'` prevents all interactions. Use specific scopes to block only what's necessary.
@@ -20,10 +20,10 @@ useBlocker('save', { scope: 'form' }, isSaving);
 
 ```typescript
 // ❌ Bad: No timeout (risk of infinite blocking)
-useBlocker('api-call', { scope: 'form' }, isLoading);
+useActionBlocker('api-call', { scope: 'form' }, isLoading);
 
 // ✅ Good: Timeout prevents infinite blocking
-useBlocker('api-call', {
+useActionBlocker('api-call', {
   scope: 'form',
   timeout: 30000, // 30 seconds
   onTimeout: (id) => {
@@ -39,10 +39,10 @@ useBlocker('api-call', {
 
 ```typescript
 // ❌ Bad: UI locked with no indication
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 
 // ✅ Good: Clear reason shown
-useBlocker('save', {
+useActionBlocker('save', {
   scope: 'form',
   reason: 'Saving your changes...',
 }, isSaving);
@@ -62,12 +62,12 @@ return blockers[0] && <div className="status">{blockers[0].reason}</div>;
 // 50-90:  Important operations (checkout, payment)
 // 90-100: Critical operations (emergency actions)
 
-useBlocker('bg-sync', { priority: 5 }, isSyncing);
-useBlocker('form-save', { priority: 10 }, isSaving);
-useBlocker('checkout', { priority: 80 }, isCheckout);
+useActionBlocker('bg-sync', { priority: 5 }, isSyncing);
+useActionBlocker('form-save', { priority: 10 }, isSaving);
+useActionBlocker('checkout', { priority: 80 }, isCheckout);
 ```
 
-**Why:** Ensures the most important operations always take precedence.
+**Why:** Orders the displayed reasons. Every matching active blocker keeps protecting the scope, regardless of priority.
 
 ### 5. Always Cleanup
 
@@ -89,19 +89,19 @@ const handleSave = async () => {
   }
 };
 
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 ```
 
 **Why:** Hooks automatically cleanup on unmount. Manual management is error-prone.
 
 ## Hook Usage
 
-### useBlocker
+### useActionBlocker
 
 **Best:**
 ```typescript
 // Clear, specific, safe
-useBlocker('user-save', {
+useActionBlocker('user-save', {
   scope: 'form',
   reason: 'Saving user...',
   priority: 10,
@@ -112,7 +112,7 @@ useBlocker('user-save', {
 **Avoid:**
 ```typescript
 // Too vague, no timeout, no reason
-useBlocker('x', { scope: 'global' }, true);
+useActionBlocker('x', { scope: 'global' }, true);
 ```
 
 ### useAsyncAction
@@ -199,7 +199,7 @@ const SCOPES = {
 } as const;
 
 // Use
-useBlocker('save-user', {
+useActionBlocker('save-user', {
   scope: SCOPES.FORMS.USER,
 }, isSaving);
 ```
@@ -208,7 +208,7 @@ useBlocker('save-user', {
 
 ```typescript
 // Block multiple related areas
-useBlocker('critical-op', {
+useActionBlocker('critical-op', {
   scope: ['form', 'navigation', 'sidebar'],
   priority: 100,
 }, isCritical);
@@ -345,7 +345,7 @@ const handleSubmit = async () => {
 ### Timeout Handling
 
 ```typescript
-useBlocker('long-operation', {
+useActionBlocker('long-operation', {
   scope: 'global',
   timeout: 60000,
   onTimeout: (id) => {
@@ -367,14 +367,14 @@ useBlocker('long-operation', {
 
 ```typescript
 // ❌ Bad: Everything blocks global
-useBlocker('a', { scope: 'global' }, isA);
-useBlocker('b', { scope: 'global' }, isB);
-useBlocker('c', { scope: 'global' }, isC);
+useActionBlocker('a', { scope: 'global' }, isA);
+useActionBlocker('b', { scope: 'global' }, isB);
+useActionBlocker('c', { scope: 'global' }, isC);
 
 // ✅ Good: Specific scopes
-useBlocker('a', { scope: 'section-a' }, isA);
-useBlocker('b', { scope: 'section-b' }, isB);
-useBlocker('c', { scope: 'section-c' }, isC);
+useActionBlocker('a', { scope: 'section-a' }, isA);
+useActionBlocker('b', { scope: 'section-b' }, isB);
+useActionBlocker('c', { scope: 'section-c' }, isC);
 ```
 
 ### Selector Optimization
@@ -464,7 +464,7 @@ function safeBlocker(id: string, config: BlockerConfig, isActive: boolean) {
     return;
   }
   
-  useBlocker(id, config, isActive);
+  useActionBlocker(id, config, isActive);
 }
 ```
 
@@ -472,7 +472,7 @@ function safeBlocker(id: string, config: BlockerConfig, isActive: boolean) {
 
 ```typescript
 // High priority for sensitive operations
-useBlocker('delete-account', {
+useActionBlocker('delete-account', {
   scope: 'global',
   priority: 1000, // Highest priority
   reason: 'Deleting account...',
@@ -523,10 +523,10 @@ return (
 
 ```typescript
 // ❌ Risk: Infinite blocking if API hangs
-useBlocker('api', { scope: 'global' }, isLoading);
+useActionBlocker('api', { scope: 'global' }, isLoading);
 
 // ✅ Safe: Always times out
-useBlocker('api', {
+useActionBlocker('api', {
   scope: 'global',
   timeout: 30000,
   onTimeout: handleTimeout,
@@ -537,20 +537,20 @@ useBlocker('api', {
 
 ```typescript
 // ❌ Blocks everything unnecessarily
-useBlocker('minor-task', { scope: 'global' }, isMinorTask);
+useActionBlocker('minor-task', { scope: 'global' }, isMinorTask);
 
 // ✅ Blocks only affected area
-useBlocker('minor-task', { scope: 'widget' }, isMinorTask);
+useActionBlocker('minor-task', { scope: 'widget' }, isMinorTask);
 ```
 
 ### Pitfall 3: Not Showing Feedback
 
 ```typescript
 // ❌ User has no idea why UI is blocked
-useBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker('save', { scope: 'form' }, isSaving);
 
 // ✅ Clear feedback
-useBlocker('save', {
+useActionBlocker('save', {
   scope: 'form',
   reason: 'Saving changes...',
 }, isSaving);
@@ -568,7 +568,7 @@ store.addBlocker('test', { scope: 'form' });
 // Forgot to remove!
 
 // ✅ Use hooks (automatic cleanup)
-useBlocker('test', { scope: 'form' }, isActive);
+useActionBlocker('test', { scope: 'form' }, isActive);
 ```
 
 ## Checklist

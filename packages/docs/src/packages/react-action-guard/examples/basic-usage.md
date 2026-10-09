@@ -7,14 +7,14 @@ Real-world examples demonstrating common use cases for React Action Guard.
 ### Simple Form Submission
 
 ```tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
 function UserForm() {
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Block form while submitting
-  useBlocker('form-submit', {
+  useActionBlocker('form-submit', {
     scope: 'form',
     reason: 'Submitting form...',
     priority: 10,
@@ -72,7 +72,7 @@ function UserForm() {
 function FormWithTimeout() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  useBlocker('form-submit', {
+  useActionBlocker('form-submit', {
     scope: 'form',
     reason: 'Submitting form...',
     timeout: 30000, // 30 second timeout
@@ -259,7 +259,7 @@ function CheckoutForm() {
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Block both form and navigation during checkout
-  useBlocker('checkout-process', {
+  useActionBlocker('checkout-process', {
     scope: ['form', 'navigation'],
     priority: 100,
     reason: 'Processing payment...',
@@ -306,21 +306,21 @@ function Dashboard() {
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Low priority background sync
-  useBlocker('background-sync', {
+  useActionBlocker('background-sync', {
     scope: 'global',
     priority: 5,
     reason: 'Syncing data...',
   }, isSyncing);
   
   // Medium priority save
-  useBlocker('save-data', {
+  useActionBlocker('save-data', {
     scope: 'global',
     priority: 10,
     reason: 'Saving...',
   }, isSaving);
   
   // High priority payment
-  useBlocker('process-payment', {
+  useActionBlocker('process-payment', {
     scope: 'global',
     priority: 100,
     reason: 'Processing payment...',
@@ -447,7 +447,7 @@ function Wizard() {
   const [isSaving, setIsSaving] = useState(false);
   
   // Block navigation between steps while saving
-  useBlocker(`wizard-step-${step}`, {
+  useActionBlocker(`wizard-step-${step}`, {
     scope: 'navigation',
     reason: `Saving step ${step}...`,
   }, isSaving);

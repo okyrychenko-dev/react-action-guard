@@ -10,7 +10,7 @@
 
 Defined in: [store/scope/scope.utils.ts:58](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/scope/scope.utils.ts#L58)
 
-Returns a stable, deduplicated, sorted scope list.
+Returns a frozen, stable, deduplicated, sorted scope list.
 An omitted scope means global; an empty list remains empty.
 
 ## Parameters

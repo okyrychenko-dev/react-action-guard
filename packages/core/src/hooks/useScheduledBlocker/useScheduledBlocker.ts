@@ -17,7 +17,7 @@ import {
  *
  * @public
  * @since 0.6.0
- * @see {@link useBlocker} for immediate blocking without scheduling
+ * @see {@link useActionBlocker} for immediate blocking without scheduling
  * @see {@link useConditionalBlocker} for condition-based blocking
  * @see {@link ScheduledBlockerConfig} for configuration options
  * @see {@link BlockingSchedule} for schedule specification details

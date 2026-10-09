@@ -23,7 +23,7 @@ when that port is available.
 - `src/getting-started.md` and `src/index.md` introduce the ecosystem.
 - `src/packages/` holds package guides and committed API pages.
 - `src/typedoc.*.json` configures API generation for each documented package.
-- `src/.vitepress/` contains the site configuration and theme.
+- `.vitepress/` contains the site configuration and theme.
 
 Source comments stay concise; usage examples and longer explanations belong in the package
 READMEs and these guides.

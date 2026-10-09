@@ -8,7 +8,7 @@
 
 > **useActionBlocker**(`blockerId`, `config`, `isActive?`): `void`
 
-Defined in: [hooks/useActionBlocker/useActionBlocker.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useActionBlocker/useActionBlocker.ts#L17)
+Defined in: [hooks/useActionBlocker/useActionBlocker.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useActionBlocker/useActionBlocker.ts#L15)
 
 Automatically manages a UI blocker based on component lifecycle.
 

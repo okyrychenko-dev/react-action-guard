@@ -47,30 +47,34 @@ npm install @okyrychenko-dev/react-zustand-toolkit zustand
 
 ### Step 1: Create Your First Blocker
 
-The simplest way to use React Action Guard is with the `useBlocker` hook:
+Start with `UIBlockingProvider` and `useActionBlocker`. The provider owns this workflow’s store; pass your application’s save function to `App`:
 
 ```tsx
-import { useBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useState } from 'react';
+import { UIBlockingProvider, useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
 
-function SaveButton() {
+function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
   const [isSaving, setIsSaving] = useState(false);
-
-  // Automatically block UI while saving
-  useBlocker('save-operation', {
+  useActionBlocker('save-operation', {
     scope: 'form',
     reason: 'Saving data...',
   }, isSaving);
+  const isBlocked = useIsBlocked('form');
 
-  const handleSave = async () => {
+  async function handleSave() {
     setIsSaving(true);
     try {
       await saveData();
     } finally {
       setIsSaving(false);
     }
-  };
+  }
 
-  return <button onClick={handleSave}>Save</button>;
+  return <button disabled={isBlocked} onClick={handleSave}>Save</button>;
+}
+
+export function App({ saveData }: { saveData: () => Promise<void> }) {
+  return <UIBlockingProvider><SaveButton saveData={saveData} /></UIBlockingProvider>;
 }
 ```
 
@@ -92,18 +96,25 @@ function SubmitButton() {
 
 ### Step 3: Add DevTools (Development)
 
-Add the DevTools component to your app:
+Bind DevTools to the same store as your application. Nesting the panel under `UIBlockingProvider` does not select that store automatically: without an explicit `store` prop, DevTools observes the global store. Read the context in a provider descendant and pass its store to the panel:
 
 ```tsx
+import { UIBlockingProvider, useUIBlockingContext } from '@okyrychenko-dev/react-action-guard';
 import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
+
+function ProviderDevtools() {
+  const store = useUIBlockingContext();
+
+  return <ActionGuardDevtools store={store} />;
+}
 
 function App() {
   return (
-    <>
+    <UIBlockingProvider>
       <YourApp />
       {/* DevTools auto-disabled in production - no check needed! */}
-      <ActionGuardDevtools />
-    </>
+      <ProviderDevtools />
+    </UIBlockingProvider>
   );
 }
 ```
@@ -120,28 +131,28 @@ Scopes define **what** gets blocked. You can use:
 
 ```tsx
 // Block only the form
-useBlocker('form-save', { scope: 'form' }, isLoading);
+useActionBlocker('form-save', { scope: 'form' }, isLoading);
 
 // Block form and navigation
-useBlocker('critical-op', { scope: ['form', 'navigation'] }, isCritical);
+useActionBlocker('critical-op', { scope: ['form', 'navigation'] }, isCritical);
 
 // Block everything
-useBlocker('global-op', { scope: 'global' }, isGlobalLoading);
+useActionBlocker('global-op', { scope: 'global' }, isGlobalLoading);
 ```
 
 ### Priorities
 
-Priorities determine **which blocker wins** when multiple blockers target the same scope:
+Priorities order reasons when multiple blockers target the same scope. Every matching active blocker retains protection; removing the highest-priority blocker leaves the scope blocked while another matching blocker remains:
 
 ```tsx
-// Low priority (default is 10)
-useBlocker('background-task', { 
+// Low priority (core default is 0)
+useActionBlocker('background-task', {
   scope: 'global', 
   priority: 5 
 }, isBackgroundRunning);
 
-// High priority - this one takes precedence
-useBlocker('critical-task', { 
+// High priority - this reason is listed first
+useActionBlocker('critical-task', {
   scope: 'global', 
   priority: 100 
 }, isCriticalRunning);
@@ -162,7 +173,7 @@ if (blockers.length > 0) {
 Prevent infinite blocking with automatic timeouts:
 
 ```tsx
-useBlocker('api-call', {
+useActionBlocker('api-call', {
   scope: 'global',
   timeout: 30000, // Remove after 30 seconds
   onTimeout: (id) => {
@@ -172,9 +183,9 @@ useBlocker('api-call', {
 }, isLoading);
 ```
 
-### Provider Pattern (Advanced)
+### Production Ownership and SSR
 
-For SSR, testing, or micro-frontends, use isolated stores:
+Recommend `UIBlockingProvider` for production ownership, SSR, tests, and micro-frontends. Without it, hooks use a shared global fallback, which does not isolate server requests. Create a fresh provider/store for each request; do not pass a module-level shared store to request providers.
 
 ```tsx
 import { UIBlockingProvider } from '@okyrychenko-dev/react-action-guard';
@@ -193,6 +204,19 @@ Each provider creates an isolated blocking state, perfect for:
 - Testing (no cleanup between tests needed)
 - Micro-frontends (each app has independent state)
 
+### Execution and Identity Limits
+
+`useAsyncAction` tracks concurrent work; it does not prevent repeat submission or cancel operations. A blocker timeout releases UI protection without cancelling the underlying work. Applications own exclusion, abort signals, and server idempotency. Explicit blocker IDs must be unique within one store; duplicate-ID warnings are diagnostics, not collision prevention. The deprecated `useBlocker` alias remains supported for migration; current examples use `useActionBlocker`.
+
+### Router and Query Capabilities
+
+The TanStack integration here means **TanStack Query**, not TanStack Router. Router hooks live in `@okyrychenko-dev/react-action-guard-router`.
+
+- **Next Pages Router:** limited route-event interception. Async acceptance cancels and replays via `router.push(url)`; original shallow, scroll, locale, and history semantics may be lost. Real packed Next runtime verification remains pending.
+- **Next App Router:** unload-only `beforeunload` protection, subject to browser policy. Same-document `Link`, `push`, and back/forward navigation are not intercepted; `onConfirm` is not evaluated.
+
+See the [versioned capability evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md) and [Router reference](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/router#readme).
+
 ## Common Patterns
 
 ### Form Submission
@@ -201,7 +225,7 @@ Each provider creates an isolated blocking state, perfect for:
 function UserForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  useBlocker('form-submit', {
+  useActionBlocker('form-submit', {
     scope: 'form',
     reason: 'Submitting form...',
     timeout: 60000, // 1 minute max
@@ -326,13 +350,13 @@ import { createTypedHooks } from '@okyrychenko-dev/react-action-guard';
 
 type AppScopes = 'global' | 'form' | 'navigation' | 'checkout';
 
-const { useBlocker, useIsBlocked } = createTypedHooks<AppScopes>();
+const { useActionBlocker, useIsBlocked } = createTypedHooks<AppScopes>();
 
 // ✅ OK
-useBlocker('save', { scope: 'form' });
+useActionBlocker('save', { scope: 'form' });
 
 // ❌ Type error
-useBlocker('save', { scope: 'typo' });
+useActionBlocker('save', { scope: 'typo' });
 ```
 
 ## Getting Help

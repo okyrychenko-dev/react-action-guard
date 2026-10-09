@@ -18,7 +18,7 @@ Options for useAsyncAction hook
 
 Defined in: [hooks/useAsyncAction/useAsyncAction.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useAsyncAction/useAsyncAction.ts#L11)
 
-Timeout in milliseconds after which the blocker will be automatically removed
+Blocker lifetime in milliseconds; does not cancel or settle the operation
 
 ***
 

@@ -120,11 +120,33 @@ Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:16](https://gith
 
 ***
 
+### replace
+
+> **replace**: (`id`, `config`) => `void`
+
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L17)
+
+#### Parameters
+
+##### id
+
+`string`
+
+##### config
+
+[`BlockerConfig`](BlockerConfig.md)
+
+#### Returns
+
+`void`
+
+***
+
 ### remove
 
 > **remove**: (`id`) => `void`
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L17)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L18)
 
 #### Parameters
 
@@ -142,7 +164,7 @@ Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:17](https://gith
 
 > **clear**: () => `void`
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L18)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L19)
 
 #### Returns
 
@@ -154,7 +176,7 @@ Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:18](https://gith
 
 > **clearScope**: (`scope`) => `void`
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:19](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L19)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L20)
 
 #### Parameters
 
@@ -172,7 +194,7 @@ Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:19](https://gith
 
 > **isBlocked**: (`scope?`) => `boolean`
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:20](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L20)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L21)
 
 #### Parameters
 
@@ -190,7 +212,7 @@ Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:20](https://gith
 
 > **getBlockingInfo**: (`scope`) => [`BlockingLifecycleSnapshot`](../type-aliases/BlockingLifecycleSnapshot.md)
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L21)
+Defined in: [store/blockingLifecycle/blockingLifecycle.types.ts:22](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.types.ts#L22)
 
 #### Parameters
 

@@ -77,7 +77,7 @@ function DangerousAction() {
   const [step, setStep] = useState<'idle' | 'confirm' | 'verify' | 'executing'>('idle');
   const [verificationCode, setVerificationCode] = useState('');
   
-  useBlocker('dangerous-action', {
+  useActionBlocker('dangerous-action', {
     scope: 'global',
     priority: 1000,
     reason: 'Executing dangerous action...',
@@ -361,7 +361,7 @@ function SmartBlocker() {
     return Math.min(basePriority, 100); // Cap at 100
   }, [user, isCriticalTime]);
   
-  useBlocker('smart-operation', {
+  useActionBlocker('smart-operation', {
     scope: 'operations',
     priority,
     reason: `Processing (priority: ${priority})...`,
@@ -400,7 +400,7 @@ function EscalatingBlocker() {
     return () => clearInterval(interval);
   }, [isBlocking]);
   
-  useBlocker('escalating-operation', {
+  useActionBlocker('escalating-operation', {
     scope: 'global',
     priority,
     reason: `Important operation (priority escalating: ${priority})`,
@@ -600,7 +600,7 @@ function BatchedOperations() {
   const [isProcessing, setIsProcessing] = useState(false);
   
   // Single blocker for all batched operations
-  useBlocker('batch-operations', {
+  useActionBlocker('batch-operations', {
     scope: 'data-processing',
     reason: `Processing ${operations.length} operations...`,
     priority: 50,
@@ -655,7 +655,7 @@ function OptimizedDataTable() {
   const [isSaving, setIsSaving] = useState(false);
   
   // Only block the specific row being edited
-  useBlocker(`row-edit-${editingRowId}`, {
+  useActionBlocker(`row-edit-${editingRowId}`, {
     scope: `row-${editingRowId}`,
     reason: 'Saving changes...',
   }, isSaving && editingRowId !== null);
@@ -710,7 +710,7 @@ function RetryableOperation() {
   const [isRetrying, setIsRetrying] = useState(false);
   const maxAttempts = 3;
   
-  useBlocker('retryable-operation', {
+  useActionBlocker('retryable-operation', {
     scope: 'api',
     reason: attempt > 0
       ? `Retrying... (attempt ${attempt + 1}/${maxAttempts})`
