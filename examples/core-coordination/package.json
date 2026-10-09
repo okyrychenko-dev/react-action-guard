@@ -9,6 +9,7 @@
     "typecheck": "pnpm --filter @okyrychenko-dev/react-action-guard run build && tsc --noEmit",
     "lint": "eslint src",
     "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "format:check": "prettier --check src"
   },
   "dependencies": {
