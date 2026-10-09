@@ -42,6 +42,13 @@ export function useBlockingMutation<
   const { mutate: nativeMutateAsync, reset: nativeReset } = mutation;
   const store = useResolvedStoreApi();
   const id = useId();
+  const [ownerIdentity, setOwnerIdentity] = useState({ store, generation: 0 });
+
+  if (ownerIdentity.store !== store) {
+    setOwnerIdentity({ store, generation: ownerIdentity.generation + 1 });
+  }
+
+  const ownerId = `${id}:${String(ownerIdentity.generation)}`;
   const [observation] = useState(() => {
     function readNativeError(): boolean {
       return observer.getCurrentResult().isError;
@@ -49,10 +56,10 @@ export function useBlockingMutation<
 
     return createMutationObservation(readNativeError);
   });
-  const owner = useMemo(
-    () => createMutationExecutionOwner({ store, id, observation }),
-    [store, id, observation]
-  );
+  const owner = useMemo(() => {
+    // Detached owners can still have pending work when this store returns.
+    return createMutationExecutionOwner({ store, id: ownerId, observation });
+  }, [store, ownerId, observation]);
 
   useLayoutEffect(() => {
     owner.attach();
@@ -65,6 +72,7 @@ export function useBlockingMutation<
   useInsertionEffect(() => {
     owner.configure(blockingConfig);
   }, [owner, blockingConfig]);
+
   useLayoutEffect(() => {
     owner.refresh();
   }, [owner, blockingConfig]);
