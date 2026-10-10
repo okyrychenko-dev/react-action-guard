@@ -1,5 +1,56 @@
 # Changelog
 
+## 0.4.0
+
+### Minor Changes
+
+- f75e05e: Block query initial loading only while pending and actively fetching. Disabled idle and offline paused queries no longer block by default across single, infinite, and collection hooks. Background refetch and pagination blocking remain opt-in, and mutation pending behavior is unchanged. See the TanStack README migration guidance for workflows that previously relied on pending queries without active work.
+
+### Patch Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 583ec47: Route TanStack blocking hooks through the nearest `UIBlockingProvider` store while preserving the global-store fallback when no provider is present.
+- d7f6739: Protect all unsettled calls initiated through one useBlockingMutation hook, including concurrent calls, native awaited callbacks, retries, pauses, and queues. Preserve native result observation and callback behavior. Reset and mutation-key changes retain pending ownership; unmount retains pending protection until settlement or timeout. Timeouts end an aggregate registration episode without cancelling work or allowing rerenders and additional calls to revive expired protection.
+
+  Strengthen Query and Mutation registration tests to require blocker existence before checking metadata.
+
+  Share latest-call/error observation across replacement blocking owners that retain the same native mutation observer, while keeping pending accounting and timeout episodes local to each owner. Retained invocations and reset cannot leave stale error protection in another store.
+
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- e0b58e3: Reuse core action-blocker registration ownership in Query coordination, avoiding redundant lifecycle updates for equivalent configuration while preserving adapter policies and timeout behavior.
+- b050190: Centralize blocking state policy, reasons, instance identity, provider store resolution, and blocker cleanup across TanStack hooks. Use the shared type-utils toolset for reason selection. Consolidate public hook configuration and behavior documentation in the package README.
+- 6513e1e: Apply current reactive blocker configuration in core and TanStack hooks. Removed
+  scope, reason and priority values return to defaults; omitted timeout and callback
+  values clear. Metadata changes preserve unchanged deadlines and registration
+  timestamps, while changed timeouts restart and removed timeouts cancel timers.
+  Imperative updateBlocker patch behavior remains compatible. Consumers relying on
+  retained hook options must keep those options in the current configuration.
+  TanStack integration now requires core 1.0.6 or later for replacement support.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [64145c9]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [083a5b7]
+- Updated dependencies [a1b83db]
+- Updated dependencies [d07b65a]
+- Updated dependencies [bd1dc3b]
+- Updated dependencies [6513e1e]
+- Updated dependencies [303abc3]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [40e8420]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
