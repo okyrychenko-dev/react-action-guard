@@ -5,6 +5,80 @@ import { useActionBlocker, useBlockingInfo, useIsBlocked } from "../../../hooks"
 import { type BlockerConfig, normalizeScope } from "../../../store";
 
 describe("scoped metadata observation", () => {
+  it("should publish scope representation changes while the blocker still matches", () => {
+    const { result } = renderHook(
+      () => ({
+        store: useResolvedStoreApi(),
+        info: useBlockingInfo("checkout"),
+      }),
+      { wrapper: UIBlockingProvider }
+    );
+    const { store } = result.current;
+    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
+
+    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
+
+    const original = result.current.info;
+
+    expect(original).toHaveLength(1);
+    act(() => updateBlocker("save", { scope: ["checkout", "profile"] }));
+
+    const arrayResult = result.current.info;
+
+    expect(arrayResult).not.toBe(original);
+    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
+    expect(original[0]?.scope).toBe("checkout");
+
+    act(() => updateBlocker("save", { scope: ["checkout", "inventory"] }));
+
+    expect(result.current.info[0]?.scope).toEqual(["checkout", "inventory"]);
+    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
+
+    act(() => updateBlocker("save", { scope: ["checkout"] }));
+
+    expect(result.current.info[0]?.scope).toEqual(["checkout"]);
+
+    act(() => updateBlocker("save", { scope: "checkout" }));
+
+    expect(result.current.info[0]?.scope).toBe("checkout");
+    expect(result.current.info).not.toBe(arrayResult);
+
+    act(() => removeBlocker("save"));
+  });
+
+  it("should retain identical matching metadata when observation expands and follow the new scope", () => {
+    const { result, rerender } = renderHook(
+      ({ scope }) => ({
+        store: useResolvedStoreApi(),
+        info: useBlockingInfo(scope),
+      }),
+      { wrapper: UIBlockingProvider, initialProps: { scope: ["checkout"] } }
+    );
+    const { store } = result.current;
+    const { addBlocker, removeBlocker } = store.getState();
+
+    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
+
+    const original = result.current.info;
+
+    expect(original).toHaveLength(1);
+    expect(original[0]?.reason).toBe("Saving");
+
+    rerender({ scope: ["checkout", "profile"] });
+
+    expect(result.current.info).toBe(original);
+
+    act(() => addBlocker("profile", { scope: "profile", reason: "Updating profile" }));
+
+    expect(result.current.info.map(({ id }) => id)).toEqual(["save", "profile"]);
+    expect(original).toHaveLength(1);
+
+    act(() => {
+      removeBlocker("save");
+      removeBlocker("profile");
+    });
+  });
+
   it("should retain results and skip renders on unrelated lifecycle changes", () => {
     let renders = 0;
     const { result, unmount } = renderHook(
