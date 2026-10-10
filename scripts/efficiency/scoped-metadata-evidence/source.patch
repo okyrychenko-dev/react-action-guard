@@ -1,6 +1,6 @@
 diff --git a/.changeset/stable-scoped-metadata.md b/.changeset/stable-scoped-metadata.md
 new file mode 100644
-index 0000000..5e71386
+index 0000000..3ba08a3
 --- /dev/null
 +++ b/.changeset/stable-scoped-metadata.md
 @@ -0,0 +1,6 @@
@@ -9,7 +9,7 @@ index 0000000..5e71386
 +"@okyrychenko-dev/react-action-guard-ui": patch
 +---
 +
-+Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Retain production/development scale and rapid-registration benchmark evidence.
++Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules; `createTypedHooks` accepts the same arrays while rejecting unknown scope names. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Cover scope representation changes and stable metadata when observation expands. Retain production/development scale and rapid-registration benchmark evidence refreshed after the typed-hook fix, with installed-tarball declaration checks and pinned source provenance.
 diff --git a/packages/core/src/context/useResolvedStore.ts b/packages/core/src/context/useResolvedStore.ts
 index e401950..6c1d59f 100644
 --- a/packages/core/src/context/useResolvedStore.ts
@@ -69,12 +69,77 @@ index e401950..6c1d59f 100644
  }
  
  /**
+diff --git a/packages/core/src/createTypedHooks.test.tsx b/packages/core/src/createTypedHooks.test.tsx
+new file mode 100644
+index 0000000..1ca10bf
+--- /dev/null
++++ b/packages/core/src/createTypedHooks.test.tsx
+@@ -0,0 +1,46 @@
++import { act, renderHook } from "@testing-library/react";
++import { describe, expect, expectTypeOf, it } from "vitest";
++import { UIBlockingProvider, useResolvedStoreApi } from "./context";
++import { createTypedHooks } from "./createTypedHooks";
++import type { BlockerInfo } from "./store";
++import type { ScopeValue } from "./types";
++
++type AppScope = "checkout" | "profile";
++
++describe("typed metadata observation", () => {
++  it("should accept typed readonly arrays and keep rejecting unknown scope names", () => {
++    const { useBlockingInfo: useTypedBlockingInfo } = createTypedHooks<AppScope>();
++    const scopes: ReadonlyArray<AppScope> = ["checkout", "profile"];
++    const { result } = renderHook(
++      () => ({
++        store: useResolvedStoreApi(),
++        info: useTypedBlockingInfo(scopes),
++        single: useTypedBlockingInfo("checkout"),
++        empty: useTypedBlockingInfo([]),
++      }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, clearAllBlockers } = store.getState();
++
++    expectTypeOf(useTypedBlockingInfo).parameter(0).toEqualTypeOf<ScopeValue<AppScope>>();
++    expectTypeOf<"unknown">().not.toExtend<Parameters<typeof useTypedBlockingInfo>[0]>();
++    expectTypeOf<ReadonlyArray<"checkout" | "unknown">>().not.toExtend<
++      Parameters<typeof useTypedBlockingInfo>[0]
++    >();
++    expectTypeOf(result.current.info).toEqualTypeOf<ReadonlyArray<Readonly<BlockerInfo>>>();
++
++    act(() => {
++      addBlocker("checkout", { scope: "checkout" });
++      addBlocker("profile", { scope: "profile" });
++      addBlocker("maintenance", { scope: "global", priority: 50 });
++    });
++
++    const { info, single, empty } = result.current;
++
++    expect(info.map(({ id }) => id)).toEqual(["maintenance", "checkout", "profile"]);
++    expect(single.map(({ id }) => id)).toEqual(["maintenance", "checkout"]);
++    expect(empty).toEqual([]);
++    act(() => clearAllBlockers());
++  });
++});
+diff --git a/packages/core/src/createTypedHooks.ts b/packages/core/src/createTypedHooks.ts
+index 205cab7..2f6a2fd 100644
+--- a/packages/core/src/createTypedHooks.ts
++++ b/packages/core/src/createTypedHooks.ts
+@@ -40,7 +40,7 @@ export interface TypedHooks<TScope extends string> {
+   /**
+    * Type-safe version of useBlockingInfo hook
+    */
+-  useBlockingInfo: (scope: TScope) => ReturnType<typeof useBlockingInfo>;
++  useBlockingInfo: (scope: ScopeValue<TScope>) => ReturnType<typeof useBlockingInfo>;
+ }
+ 
+ /**
 diff --git a/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx b/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx
 new file mode 100644
-index 0000000..cd4ddc8
+index 0000000..a532e4a
 --- /dev/null
 +++ b/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx
-@@ -0,0 +1,281 @@
+@@ -0,0 +1,355 @@
 +import { act, renderHook } from "@testing-library/react";
 +import { describe, expect, it, vi } from "vitest";
 +import { UIBlockingProvider, useResolvedStoreApi } from "../../../context";
@@ -82,6 +147,80 @@ index 0000000..cd4ddc8
 +import { type BlockerConfig, normalizeScope } from "../../../store";
 +
 +describe("scoped metadata observation", () => {
++  it("should publish scope representation changes while the blocker still matches", () => {
++    const { result } = renderHook(
++      () => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo("checkout"),
++      }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const original = result.current.info;
++
++    expect(original).toHaveLength(1);
++    act(() => updateBlocker("save", { scope: ["checkout", "profile"] }));
++
++    const arrayResult = result.current.info;
++
++    expect(arrayResult).not.toBe(original);
++    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
++    expect(original[0]?.scope).toBe("checkout");
++
++    act(() => updateBlocker("save", { scope: ["checkout", "inventory"] }));
++
++    expect(result.current.info[0]?.scope).toEqual(["checkout", "inventory"]);
++    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
++
++    act(() => updateBlocker("save", { scope: ["checkout"] }));
++
++    expect(result.current.info[0]?.scope).toEqual(["checkout"]);
++
++    act(() => updateBlocker("save", { scope: "checkout" }));
++
++    expect(result.current.info[0]?.scope).toBe("checkout");
++    expect(result.current.info).not.toBe(arrayResult);
++
++    act(() => removeBlocker("save"));
++  });
++
++  it("should retain identical matching metadata when observation expands and follow the new scope", () => {
++    const { result, rerender } = renderHook(
++      ({ scope }) => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo(scope),
++      }),
++      { wrapper: UIBlockingProvider, initialProps: { scope: ["checkout"] } }
++    );
++    const { store } = result.current;
++    const { addBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const original = result.current.info;
++
++    expect(original).toHaveLength(1);
++    expect(original[0]?.reason).toBe("Saving");
++
++    rerender({ scope: ["checkout", "profile"] });
++
++    expect(result.current.info).toBe(original);
++
++    act(() => addBlocker("profile", { scope: "profile", reason: "Updating profile" }));
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["save", "profile"]);
++    expect(original).toHaveLength(1);
++
++    act(() => {
++      removeBlocker("save");
++      removeBlocker("profile");
++    });
++  });
++
 +  it("should retain results and skip renders on unrelated lifecycle changes", () => {
 +    let renders = 0;
 +    const { result, unmount } = renderHook(
@@ -721,120 +860,6 @@ index d4e9339..1ae5f78 100644
  
    return useMemo(() => {
      const topBlocker = isNonEmptyArray(blockers) ? blockers[0] : null;
-diff --git a/scripts/efficiency/README.md b/scripts/efficiency/README.md
-index 5cc01e0..5c70cca 100644
---- a/scripts/efficiency/README.md
-+++ b/scripts/efficiency/README.md
-@@ -1,4 +1,4 @@
--# Efficiency measurements (local tickets 15 and 16)
-+# Efficiency measurements
- 
- Run from the repository root, with Node 22+, pnpm, npm and registry access:
- 
-@@ -9,15 +9,15 @@ pnpm run measure:efficiency /tmp/guard-efficiency-new-run
- 
- Use a new or empty output directory. Without an argument, evidence is retained in a fresh `/tmp/action-guard-efficiency-*` directory. The runner prints the separate disposable consumer directory. It never edits source manifests or removes dependencies. It reuses the existing packed-cohort helper to apply pending Changesets in a disposable workspace and install actual Core/UI tarballs with strict peer resolution. The measured cohort is the planned release, not the versions currently published on npm.
- 
--The output contains production and development JSON with every raw timing and render count, bundle raw/gzip sizes, six esbuild attribution metafiles and the consumer lock. `bundles.json` is written last, after all checks pass. Keep the raw reports and lock with any conclusions; rerun after changes to package artifacts, peers or workloads. Existing output is rejected to avoid mixing successful old evidence with a failed run.
-+The output contains production and development JSON with every raw timing and render count, bundle raw/gzip sizes, six esbuild attribution metafiles and the consumer lock. Source base/diff and hashes of the diff, measured tarballs and copied fixtures identify the measured implementation. `bundles.json` is written last, after all checks pass. Keep the raw reports and lock with any conclusions; rerun after changes to package artifacts, peers or workloads. Existing output is rejected to avoid mixing successful old evidence with a failed run.
- 
- The fixtures invoke supported public hooks, providers, lifecycle/store transitions and dependency guards. The existing packed provider suite checks nested/adjacent/independent roots, cleanup, SSR request isolation and hydration. The strict TypeScript fixture checks nonempty-array indexing, optional/unknown narrowing, assertion narrowing and middleware-preserving selector subscription types. A runtime toolkit probe checks selector subscription behavior and release.
- 
- Each workload uses 5 warmups and 20 measured samples. `performance.now()` measures wall time; validation, setup/reset and teardown are excluded, except fresh-root mount itself. Production React has no Strict Mode wrapper; the separately reported development run uses Strict Mode. React commits use `flushSync`. These are Happy DOM measurements on Node, not native browser layout, paint, input latency or a cross-machine performance guarantee. The p95 is the nineteenth sorted sample; use repeated runs for a decision, not tiny differences between noisy values.
- 
--Three workloads seed 10, 100 and 500 concurrent blockers, split between checkout and inventory, plus one high-priority blocker in each scope. They mount 20, 100 and 200 consumers **per kind** (boolean, scoped metadata, guarded button): 60, 300 and 600 components in total. Observer counts are 0, 5 and 5. Observers are public lifecycle/store observation leases; the Devtools panel is not mounted. Workloads intentionally stress metadata consumers observing the same scope; applications with sparse consumers may differ substantially.
-+The retained workloads seed 10, 100 and 500 concurrent blockers, split between checkout and inventory, plus one high-priority blocker in each scope. They mount 20, 100 and 200 consumers **per kind** (boolean, scoped metadata, guarded button): 60, 300 and 600 components in total. Observer counts are 0, 5 and 5. Feedback tickets 18 + 19 add 1000 seeded blockers / 200 controls per kind / 5 observers, and a separate 100 seeded blockers / 100 controls per kind / 100 observers workload to isolate observation growth. The existing 100-blocker workload is reused rather than duplicated. Observers are public lifecycle/store observation leases; the Devtools panel is not mounted. Workloads intentionally stress metadata consumers observing the same scope; applications with sparse consumers may differ substantially.
- 
--Measurements separate lifecycle update plus immutable snapshot publication, cached snapshot retrieval (1000 reads/sample), scoped filtering plus sorting (100 reads/sample), fresh provider/control mount, related/unrelated reason update plus React commit, and an availability toggle. The toggle uses one blocker, with untimed restoration, rather than pretending to unblock checkout while other checkout blockers remain. Priority, scoped counts, observed availability/reason, observer delivery and cleanup are checked. The transition and React measurements use different boundaries and must not be subtracted to invent exact phase costs.
-+Measurements separate lifecycle update plus immutable snapshot publication, cached snapshot retrieval (1000 reads/sample), scoped filtering plus sorting (100 reads/sample), fresh provider/control mount, related/unrelated reason update plus React commit, and an availability toggle. The toggle uses one blocker, with untimed restoration, rather than pretending to unblock checkout while other checkout blockers remain. Each size also measures 50 rapid scoped register/remove pairs per sample, validating snapshot counts, top reasons and exact publication/event counts. A single medium React workload adds 10 unrelated register/remove pairs per sample with separate synchronous commits; repeating this at every size would duplicate the same seam. Rapid cases include one additional phase-capture subscriber in the timed interval; assertions run outside it. Untimed setup now seeds the captured Provider before attaching consumers, avoiding repeated filtering during preparation. Fresh empty-control mount samples and all update/churn boundaries are unchanged. Priority, scoped counts, observed availability/reason, observer delivery and cleanup are checked. Every unrelated metadata/churn sample must render zero boolean, metadata and guarded-button consumers; every related metadata sample must render each metadata/button consumer once in production or twice in development Strict Mode. The transition and React measurements use different boundaries and must not be subtracted to invent exact phase costs.
- 
- The minified browser-target ESM consumers invoke `useActionBlocker` and either `useIsBlocked` or `useGuardedButton` under a provider. Core also executes a lifecycle add/remove availability check. SSR smoke invokes these components; it does not claim effects run on the server. Client availability is verified by the benchmark workload. React/DOM are external, Zustand and the two runtime dependencies are included. Esbuild targets ES2022, defines production mode and uses default gzip compression. Metafiles show attribution; gzip contributions are not additive.
- 
-@@ -26,3 +26,5 @@ The externalized type-utils/toolkit variants are **cost estimates**, not removal
- Prior art: the sibling `react-modal-manager/scripts/benchmark-lifecycle.mjs` informed warmup/setup separation; its packed checker and this repository's publication runner informed isolation and bundle measurement. No sibling byte claims were copied.
- 
- See [the recorded assessment](assessment.md) and [raw evidence](evidence/) for conclusions and limitations.
-+
-+The original [assessment](assessment.md) and `evidence/` remain unchanged historical evidence, including the dependency-retention conclusion. See [the scoped-metadata follow-up](scoped-metadata-assessment.md) for the new implementation, workload inventory, results and remaining limits.
-diff --git a/scripts/efficiency/scoped-metadata-assessment.md b/scripts/efficiency/scoped-metadata-assessment.md
-new file mode 100644
-index 0000000..828c446
---- /dev/null
-+++ b/scripts/efficiency/scoped-metadata-assessment.md
-@@ -0,0 +1,73 @@
-+# Scoped metadata follow-up — feedback tickets 18 + 19
-+
-+## Implementation and ownership
-+
-+Core `useBlockingInfo` subscribes to a scoped immutable projection instead of the entire lifecycle snapshot. UI guarded controls consume the same hook; lifecycle `getBlockingInfo` uses the same filtering and priority ordering. The public hook accepts readonly observed-scope arrays so the UI adapter can reuse it. A prepared matcher normalizes observed scopes once per selector/projection; string checks and array membership share the ordinary observation rules without normalizing every blocker on every read. Existing string calls, matching rules, global blockers, empty observations and insertion-order priority ties are preserved.
-+
-+Each hook owns a selector retaining only its last input snapshot, matching list and ordered result. Resolved subscriptions and selection retention use react-zustand-toolkit through `createResolvedStoreHooks`. Core supplies metadata equality to `useResolvedValue`, so equivalent results remain stable even if bounded normalization-cache eviction recreates a selector. This path adds no direct Zustand runtime imports. Unchanged matching metadata retains the result and skips sorting and subscription-driven React renders. Equality checks every published field, including the exact blocker scope array, timestamp, timeout and callback identity. Relevant replacement/removal remains observable; prior results and blocker scopes stay frozen. Scope normalization remains the existing bounded 256-entry cache; no global metadata cache, scope index or dependency removal is introduced. The hook's selector and subscription are released with the hook, and independent providers use independent selectors. Boolean subscriptions are unchanged.
-+
-+Public-hook tests under actual Providers cover unrelated add/update/remove, relevant metadata, replacement resetting omitted fields, globals, scope arrays and changes, priority ties, immutable prior results, equivalent observed arrays, normalization-cache eviction, provider isolation and cleanup. Both unrelated-render regressions failed on the previous implementations and passed with the new projection.
-+
-+## Retained baseline and workload inventory
-+
-+The original [assessment](assessment.md), [production](evidence/production.json), [development](evidence/development.json), bundle attribution and consumer lock remain unchanged. Their source base is `711f0d7c672cf64db619be16337aa551325f1e0f`. The recommendation to retain toolkit and type-utils is preserved; externalization is still an attribution estimate rather than a removal implementation.
-+
-+| Seeded blockers | Controls per kind | Lifecycle/event observers | Disposition                                                         |
-+| --------------- | ----------------- | ------------------------- | ------------------------------------------------------------------- |
-+| 10              | 20                | 0                         | Retained small workload                                             |
-+| 100             | 100               | 5                         | Retained medium workload; no duplicate 100-blocker scenario         |
-+| 500             | 200               | 5                         | Retained large workload                                             |
-+| 1000            | 200               | 5                         | New blocker scale with unchanged consumer/observer counts           |
-+| 100             | 100               | 100                       | New observation scale with unchanged medium blocker/consumer counts |
-+
-+All sizes also measure 50 rapid scoped add/remove pairs per sample. The medium workload alone measures 10 unrelated add/remove pairs with individual synchronous React commits per sample. Both rapid scenarios use one additional validation subscriber to capture every registration/removal phase; capture cost is inside the measured interval, assertions outside. Snapshot sizes/presence, exact publications/events, scoped counts/reasons and consumer renders are checked rather than inferring correctness solely from the final empty registration. Untimed React preparation seeds the captured Provider before attaching consumers; the empty-control mount and update/churn measurement boundaries remain unchanged. This avoids quadratic setup work from notifying every consumer during initial seeding, without removing a measured workload.
-+
-+## Evidence and environment
-+
-+Executed on 2026-10-10 against task baseline `64fd756dbae4feb62b88698af1ed765a59212691` plus the recorded [source diff](scoped-metadata-evidence/source.patch). The diff captures sources at measurement time, including then-current documentation progress; final assessment/evidence were completed afterwards. Unrelated `.gitignore` is excluded from the source diff and task commit. [Production](scoped-metadata-evidence/production.json), [development](scoped-metadata-evidence/development.json), [provenance/bundles](scoped-metadata-evidence/bundles.json), the [consumer lock](scoped-metadata-evidence/consumer-lock.json) and all six attribution metafiles are retained. Code-fixture and tarball SHA-256 values plus the source-diff hash identify this run independently of its later handoff commit.
-+
-+Node 22.20.0, pnpm 11.21.0, npm 11.19.0, React/DOM 19.2.8, Zustand 5.0.15, Happy DOM 20.11.2, esbuild 0.28.2, toolkit 1.0.0 and type-utils 0.1.2; Linux 7.0.0-38-generic x64, Intel Core i7-3610QM @ 2.30 GHz. These are measured installed versions, not claims about latest releases. The historical run used the same reported CPU, Node and runtime dependency versions; transitive/type packages and source bases are independently recorded in their locks/reports.
-+
-+`pnpm run measure:efficiency /tmp/guard-efficiency-18-19-matcher` exited successfully after strict-peer installation of planned Core 2.0.0 / UI 1.0.0 tarballs. Source package manifests were unchanged. Packed Provider isolation/SSR/hydration, strict narrowing fixture, middleware-release probe, actual consumer SSR and dependency-guard execution all passed. The retained consumer/tarballs are under `/tmp/action-guard-efficiency-mac6hH` on the measuring machine; reproduce fresh tarballs through the runner. No other expensive verification ran concurrently with final sampling. Exploratory/interrupted runs and the earlier report-finalization failure are excluded from these final results.
-+
-+## Results
-+
-+Wall-clock milliseconds, median / p95; 5 warmups, 20 measured samples. Counts below include two top blockers. Controls are per kind, so 100 controls means 300 mounted consumers. Production has no Strict Mode wrapper; development does.
-+
-+| Blockers / controls per kind / observers | Production unrelated | Production related | Development unrelated | Development related |
-+| ---------------------------------------- | -------------------- | ------------------ | --------------------- | ------------------- |
-+| 12 / 20 / 0                              | 0.244 / 0.506        | 1.813 / 2.641      | 0.223 / 0.373         | 6.306 / 8.249       |
-+| 102 / 100 / 5                            | 2.781 / 4.493        | 8.042 / 11.688     | 2.506 / 2.594         | 11.739 / 13.356     |
-+| 502 / 200 / 5                            | 25.016 / 28.138      | 45.691 / 53.420    | 23.144 / 26.524       | 73.570 / 74.861     |
-+| 1002 / 200 / 5                           | 42.941 / 44.553      | 79.567 / 84.452    | 47.183 / 60.805       | 116.671 / 130.753   |
-+| 102 / 100 / 100                          | 2.550 / 2.752        | 5.938 / 8.284      | 3.226 / 4.775         | 20.721 / 23.512     |
-+
-+Historical unrelated-update p95 comparison (separate runs, not an isolated experiment):
-+
-+| Blockers / controls per kind | Prior production | New production | Reduction | Prior development | New development | Reduction |
-+| ---------------------------- | ---------------- | -------------- | --------- | ----------------- | --------------- | --------- |
-+| 12 / 20                      | 4.819            | 0.506          | 89.5%     | 14.101            | 0.373           | 97.4%     |
-+| 102 / 100                    | 61.479           | 4.493          | 92.7%     | 144.870           | 2.594           | 98.2%     |
-+| 502 / 200                    | 629.761          | 28.138         | 95.5%     | 3027.278          | 26.524          | 99.1%     |
-+
-+Every unrelated metadata and rapid React sample rendered **zero** boolean, metadata and guarded-button consumers in both modes. Related metadata samples rendered each metadata/button consumer once in production and twice in development, while boolean consumers rendered zero. Availability removal made all checkout buttons available and metadata empty. Relevant reason/count/priority checks, registration/removal phase visibility, exact publication/event counts and cleanup passed for every workload.
-+
-+Rapid scoped lifecycle registration/removal, **50 pairs per sample**, with one phase-capture subscriber included:
-+
-+| Blockers / controls per kind / observers | Production median / p95 | Development median / p95 |
-+| ---------------------------------------- | ----------------------- | ------------------------ |
-+| 12 / 20 / 0                              | 1.163 / 1.996           | 1.053 / 1.213            |
-+| 102 / 100 / 5                            | 2.569 / 4.005           | 2.541 / 3.841            |
-+| 502 / 200 / 5                            | 11.236 / 11.968         | 10.290 / 11.210          |
-+| 1002 / 200 / 5                           | 22.159 / 23.128         | 21.509 / 23.460          |
-+| 102 / 100 / 100                          | 4.640 / 10.284          | 3.823 / 8.420            |
-+
-+The medium React rapid scenario performs **10 pairs / 20 individual commits per sample**: production 60.409 / 83.291 ms, development 52.387 / 53.198 ms. Both have zero consumer renders and validate each snapshot-size transition. These are batch durations, not per-transition timings.
-+
-+The retained medium synthetic p95 improves by more than 50% and is below 16 ms in this run. The 500/1000-blocker production cases still exceed 16 ms despite zero unrelated renders: eliminating renders does not eliminate linear filtering/comparison work across many consumers. The 100-observer case passes exact event counts; its timing difference from the 5-observer case is noisy and does not isolate observer cost from scheduling/GC. Lifecycle transition/read/mount/removal and bundle costs remain available in the raw reports; do not subtract scenarios to invent phase attribution.
-+
-+## Limits and future thresholds
-+
-+Happy DOM on Node measures synthetic wall time through `flushSync` React commits, not native browser frames, paint or input latency. Development Strict Mode is reported separately from production. Warmups, 20 raw samples, validation outside the timer and matching workload boundaries are retained. Historical/follow-up comparisons are observations from separate runs and package bases, not an isolated causal experiment or cross-machine guarantee. The added scale/churn scenarios have no historical timing baseline.
-+
-+The prior decision threshold remains: investigate unwanted unrelated renders or unrelated p95 above 16 ms at about 100 blockers / 100 controls per kind in an application's representative workload. A future optimization should show at least 50% lower unrelated p95 on the same target browser/hardware while preserving semantic checks. This follow-up's synthetic comparison does not establish a browser frame budget. Filtering still scales with blockers and consumers; there is no constant-time matching claim. Repeat the application workload on its real browser/hardware before deciding whether any further indexing or shared caching is justified. Dependency removal and browser performance guarantees remain outside these tickets.
 diff --git a/scripts/efficiency/subscriptions.mjs b/scripts/efficiency/subscriptions.mjs
 index 4816275..d2265c6 100644
 --- a/scripts/efficiency/subscriptions.mjs
@@ -1018,8 +1043,44 @@ index 4816275..d2265c6 100644
    sampleCount,
    warmups,
    scenarios,
+diff --git a/scripts/efficiency/typedMetadata.utils.ts b/scripts/efficiency/typedMetadata.utils.ts
+new file mode 100644
+index 0000000..2564f31
+--- /dev/null
++++ b/scripts/efficiency/typedMetadata.utils.ts
+@@ -0,0 +1,30 @@
++import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
++import type { BlockerInfo, ScopeValue, TypedHooks } from "@okyrychenko-dev/react-action-guard";
++
++type AppScope = "checkout" | "profile";
++type DeclaredScope = Parameters<TypedHooks<AppScope>["useBlockingInfo"]>[0];
++type RequireTrue<T extends true> = T;
++
++export type AcceptedScopesStayBounded = RequireTrue<
++  DeclaredScope extends ScopeValue<AppScope> ? true : false
++>;
++export type ScopeArraysAreAccepted = RequireTrue<
++  ScopeValue<AppScope> extends DeclaredScope ? true : false
++>;
++export type UnknownScopeIsRejected = RequireTrue<"unknown" extends DeclaredScope ? false : true>;
++export type UnknownArrayMemberIsRejected = RequireTrue<
++  ReadonlyArray<"checkout" | "unknown"> extends DeclaredScope ? false : true
++>;
++
++// Compile only against installed public declarations; this hook is never executed.
++export function useTypedMetadataContract(): ReadonlyArray<Readonly<BlockerInfo>> {
++  const { useBlockingInfo } = createTypedHooks<AppScope>();
++  const scopes: ReadonlyArray<AppScope> = ["checkout", "profile"];
++  const info = useBlockingInfo(scopes);
++
++  useBlockingInfo("checkout");
++  useBlockingInfo(["checkout", "profile"]);
++  useBlockingInfo([]);
++
++  return info;
++}
 diff --git a/scripts/measure-efficiency.mjs b/scripts/measure-efficiency.mjs
-index 7e0e19b..16249c9 100644
+index 7e0e19b..1e0aee5 100644
 --- a/scripts/measure-efficiency.mjs
 +++ b/scripts/measure-efficiency.mjs
 @@ -1,5 +1,6 @@
@@ -1029,20 +1090,74 @@ index 7e0e19b..16249c9 100644
  import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
  import { tmpdir } from "node:os";
  import { join, resolve } from "node:path";
-@@ -14,6 +15,12 @@ const output = resolve(process.argv[2] ?? temporary);
+@@ -9,10 +10,44 @@ import { build } from "esbuild";
+ import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
+ 
+ const repository = fileURLToPath(new URL("../", import.meta.url));
++const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
++  cwd: repository,
++  encoding: "utf8",
++}).trim();
++const sourceBase = execFileSync(
++  "git",
++  ["rev-parse", "--verify", `${process.argv[3] ?? sourceCommit}^{commit}`],
++  {
++    cwd: repository,
++    encoding: "utf8",
++  }
++).trim();
++const sourceDirty = execFileSync("git", ["status", "--porcelain"], {
++  cwd: repository,
++  encoding: "utf8",
++}).trim();
+ const temporary = mkdtempSync(join(tmpdir(), "action-guard-efficiency-"));
+ const output = resolve(process.argv[2] ?? temporary);
  mkdirSync(output, { recursive: true });
  assert.equal(readdirSync(output).length, 0, "Use an empty evidence directory for each run");
- const { tarballs } = preparePackedCohort(repository, temporary);
 +const sourceDiff = execFileSync(
 +  "git",
-+  ["diff", "HEAD", "--", "packages/core", "packages/ui", "scripts", ".changeset"],
++  [
++    "diff",
++    sourceBase,
++    "--",
++    "packages/core",
++    "packages/ui",
++    "scripts/measure-efficiency.mjs",
++    "scripts/compatibility/cohort.utils.mjs",
++    "scripts/compatibility/provider.test.mjs",
++    ":(glob)scripts/efficiency/*.mjs",
++    ":(glob)scripts/efficiency/*.ts",
++    ".changeset",
++  ],
 +  { cwd: repository, encoding: "utf8" }
 +);
 +writeFileSync(join(output, "source.patch"), sourceDiff);
+ const { tarballs } = preparePackedCohort(repository, temporary);
  const consumer = join(temporary, "consumer");
  mkdirSync(consumer);
- const localVersion = (path) =>
-@@ -196,7 +203,24 @@ writeFileSync(
+@@ -60,6 +95,7 @@ execFileSync(
+   [
+     join(repository, "node_modules/typescript/bin/tsc"),
+     "fixtures/narrowing.utils.ts",
++    "fixtures/typedMetadata.utils.ts",
+     "--noEmit",
+     "--strict",
+     "--noUncheckedIndexedAccess",
+@@ -185,18 +221,30 @@ writeFileSync(
+   JSON.stringify(
+     {
+       timestamp: new Date().toISOString(),
+-      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
+-        cwd: repository,
+-        encoding: "utf8",
+-      }).trim(),
+-      sourceDirty: execFileSync("git", ["status", "--porcelain"], {
+-        cwd: repository,
+-        encoding: "utf8",
+-      }).trim(),
++      sourceCommit,
++      sourceBase,
++      sourceDirty,
        node: process.version,
        esbuild: localVersion("node_modules/esbuild"),
        packages: Object.fromEntries(
@@ -1068,3 +1183,11 @@ index 7e0e19b..16249c9 100644
        ),
        resolvedVersions: Object.fromEntries(
          Object.entries(JSON.parse(lock).packages).map(([name, entry]) => [name, entry.version])
+@@ -212,6 +260,7 @@ writeFileSync(
+       },
+       retainedConsumerSSR: "passed",
+       providerIsolationAndHydration: "passed (existing packed provider suite)",
++      typedMetadataDeclarations: "passed (installed Core tarball, strict NodeNext)",
+       toolkitMiddlewareHandle: "passed",
+     },
+     null,

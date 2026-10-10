@@ -10,17 +10,45 @@ import { build } from "esbuild";
 import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
+const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: repository,
+  encoding: "utf8",
+}).trim();
+const sourceBase = execFileSync(
+  "git",
+  ["rev-parse", "--verify", `${process.argv[3] ?? sourceCommit}^{commit}`],
+  {
+    cwd: repository,
+    encoding: "utf8",
+  }
+).trim();
+const sourceDirty = execFileSync("git", ["status", "--porcelain"], {
+  cwd: repository,
+  encoding: "utf8",
+}).trim();
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-efficiency-"));
 const output = resolve(process.argv[2] ?? temporary);
 mkdirSync(output, { recursive: true });
 assert.equal(readdirSync(output).length, 0, "Use an empty evidence directory for each run");
-const { tarballs } = preparePackedCohort(repository, temporary);
 const sourceDiff = execFileSync(
   "git",
-  ["diff", "HEAD", "--", "packages/core", "packages/ui", "scripts", ".changeset"],
+  [
+    "diff",
+    sourceBase,
+    "--",
+    "packages/core",
+    "packages/ui",
+    "scripts/measure-efficiency.mjs",
+    "scripts/compatibility/cohort.utils.mjs",
+    "scripts/compatibility/provider.test.mjs",
+    ":(glob)scripts/efficiency/*.mjs",
+    ":(glob)scripts/efficiency/*.ts",
+    ".changeset",
+  ],
   { cwd: repository, encoding: "utf8" }
 );
 writeFileSync(join(output, "source.patch"), sourceDiff);
+const { tarballs } = preparePackedCohort(repository, temporary);
 const consumer = join(temporary, "consumer");
 mkdirSync(consumer);
 const localVersion = (path) =>
@@ -67,6 +95,7 @@ execFileSync(
   [
     join(repository, "node_modules/typescript/bin/tsc"),
     "fixtures/narrowing.utils.ts",
+    "fixtures/typedMetadata.utils.ts",
     "--noEmit",
     "--strict",
     "--noUncheckedIndexedAccess",
@@ -192,14 +221,9 @@ writeFileSync(
   JSON.stringify(
     {
       timestamp: new Date().toISOString(),
-      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
-        cwd: repository,
-        encoding: "utf8",
-      }).trim(),
-      sourceDirty: execFileSync("git", ["status", "--porcelain"], {
-        cwd: repository,
-        encoding: "utf8",
-      }).trim(),
+      sourceCommit,
+      sourceBase,
+      sourceDirty,
       node: process.version,
       esbuild: localVersion("node_modules/esbuild"),
       packages: Object.fromEntries(
@@ -236,6 +260,7 @@ writeFileSync(
       },
       retainedConsumerSSR: "passed",
       providerIsolationAndHydration: "passed (existing packed provider suite)",
+      typedMetadataDeclarations: "passed (installed Core tarball, strict NodeNext)",
       toolkitMiddlewareHandle: "passed",
     },
     null,

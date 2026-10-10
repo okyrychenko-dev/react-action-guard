@@ -5,8 +5,8 @@
   "packages": {
     "": {
       "dependencies": {
-        "@okyrychenko-dev/react-action-guard": "file:/tmp/action-guard-efficiency-eRtOAK/core.tgz",
-        "@okyrychenko-dev/react-action-guard-ui": "file:/tmp/action-guard-efficiency-eRtOAK/ui.tgz",
+        "@okyrychenko-dev/react-action-guard": "file:/tmp/action-guard-efficiency-FUCS7X/core.tgz",
+        "@okyrychenko-dev/react-action-guard-ui": "file:/tmp/action-guard-efficiency-FUCS7X/ui.tgz",
         "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
         "@okyrychenko-dev/type-utils": "0.1.2",
         "@types/react": "19.2.18",
@@ -19,7 +19,7 @@
     "node_modules/@okyrychenko-dev/react-action-guard": {
       "version": "2.0.0",
       "resolved": "file:../core.tgz",
-      "integrity": "sha512-91tcrR/ZRs1/s88Ygh6Bqv2+I1yvy5Ddr8qryn+Tsw9UmpN7EtOcwKFikXtdrp43dYWa27ApMKBsHH/ZBT4/VA==",
+      "integrity": "sha512-ZSXWYBU65je8oC2ciSFm2J+flrDGR/6ByKpoirZ+8w+53ztm18WwclRe3KQwq3ESWxKu9Uu1Ts3jIXWLzkfkfg==",
       "license": "MIT",
       "dependencies": {
         "@okyrychenko-dev/react-zustand-toolkit": "^1.0.0",

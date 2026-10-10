@@ -1,14 +1,15 @@
 {
-  "timestamp": "2026-10-10T18:32:41.204Z",
-  "sourceCommit": "64fd756dbae4feb62b88698af1ed765a59212691",
-  "sourceDirty": "A  .changeset/stable-scoped-metadata.md\n M .gitignore\nM  packages/core/src/context/useResolvedStore.ts\nA  packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx\nM  packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts\nA  packages/core/src/store/blockingInfo/blockingInfo.utils.ts\nA  packages/core/src/store/blockingInfo/index.ts\nM  packages/core/src/store/blockingLifecycle/blockingLifecycle.ts\nM  packages/core/src/store/scope/index.ts\nM  packages/core/src/store/scope/scope.utils.ts\nM  packages/docs/src/packages/react-action-guard/api/hooks.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/createBlockingLifecycle.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/scopeAffectsObservation.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/scopeMatchesTarget.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/useBlockingInfo.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/useResolvedStoreApi.md\nM  packages/docs/src/packages/react-action-guard/api/typedoc/functions/useResolvedValue.md\nM  packages/docs/src/packages/react-action-guard/reference.md\nA  packages/ui/src/ui/hooks/useGuardedControl/useGuardedControl.stability.test.tsx\nM  packages/ui/src/ui/hooks/useTopBlocker/useTopBlocker.ts\nM  scripts/efficiency/README.md\nAM scripts/efficiency/scoped-metadata-assessment.md\nM  scripts/efficiency/subscriptions.mjs\nM  scripts/measure-efficiency.mjs\n?? scripts/efficiency/scoped-metadata-evidence/",
+  "timestamp": "2026-10-10T19:28:58.042Z",
+  "sourceCommit": "9f9988db4691a4c9227fac8b33030bccd71c0744",
+  "sourceBase": "64fd756dbae4feb62b88698af1ed765a59212691",
+  "sourceDirty": "M  .changeset/stable-scoped-metadata.md\nM  .gitignore\nM  scripts/efficiency/README.md\nA  scripts/efficiency/typedMetadata.utils.ts\nM  scripts/measure-efficiency.mjs",
   "node": "v22.20.0",
   "esbuild": "0.28.2",
   "packages": {
     "core": {
       "name": "@okyrychenko-dev/react-action-guard",
       "version": "2.0.0",
-      "sha256": "e899c4be11c21a3caa2728368040c890dd73389995cfed36f01da06c765f7a62"
+      "sha256": "ea618d11bdf7cdb9465fe997d8adda1eec825a06fe4cd7b84e0fe2d2d6d8af0b"
     },
     "ui": {
       "name": "@okyrychenko-dev/react-action-guard-ui",
@@ -16,7 +17,7 @@
       "sha256": "aea1a9c5c0aa3cc5dc4d573947b5e6659e9280f0287bd93f528ce9b02dda8a8c"
     }
   },
-  "sourceDiffSha256": "ca1edc0b0762b324eef02e97e8a20e0f2b7d3894a81eb16c0512b5866797c17e",
+  "sourceDiffSha256": "57e7ef729fa5e53057fd9dea645bba2f7f599eafafe5240718b82fcc26bf4d2b",
   "fixtures": {
     "consumers.mjs": "631533c9670eb3e856acaa4295e7dd2266c831b3dc73759bd8fce91fc315504e",
     "core-consumer.mjs": "834be9b3f096838c03e211ce4a7a2599c692db074a2b7f4c1c669347d9a0e661",
@@ -25,6 +26,7 @@
     "provider.test.mjs": "812291022a6ab79d100539674ae64a2e2635cba13b49354624212c381fa3592c",
     "subscriptions.mjs": "d618aefb2ffc240e26aab5ba5a7271b35367aa32defcda8618889fb26d3aa944",
     "toolkit.mjs": "cf60268fd986cf5b4a765d788a483b3da06618f0fb2aa50c5ba3652bee63277e",
+    "typedMetadata.utils.ts": "3276b5620645200141a2ecf9d78c6c74e9e54d7e23106a74e8cd0993290f9047",
     "ui-consumer.mjs": "560bd53e92d704f3e109d87d55c86332f1be7569ab7b82dc1b97bf7608eb1b5f"
   },
   "resolvedVersions": {
@@ -101,5 +103,6 @@
   },
   "retainedConsumerSSR": "passed",
   "providerIsolationAndHydration": "passed (existing packed provider suite)",
+  "typedMetadataDeclarations": "passed (installed Core tarball, strict NodeNext)",
   "toolkitMiddlewareHandle": "passed"
 }

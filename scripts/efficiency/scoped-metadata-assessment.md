@@ -24,11 +24,11 @@ All sizes also measure 50 rapid scoped add/remove pairs per sample. The medium w
 
 ## Evidence and environment
 
-Executed on 2026-10-10 against task baseline `64fd756dbae4feb62b88698af1ed765a59212691` plus the recorded [source diff](scoped-metadata-evidence/source.patch). The diff captures sources at measurement time, including then-current documentation progress; final assessment/evidence were completed afterwards. Unrelated `.gitignore` is excluded from the source diff and task commit. [Production](scoped-metadata-evidence/production.json), [development](scoped-metadata-evidence/development.json), [provenance/bundles](scoped-metadata-evidence/bundles.json), the [consumer lock](scoped-metadata-evidence/consumer-lock.json) and all six attribution metafiles are retained. Code-fixture and tarball SHA-256 values plus the source-diff hash identify this run independently of its later handoff commit.
+Regenerated on 2026-10-10 after all runtime/declaration changes, including typed-hook fix commit `9f9988db4691a4c9227fac8b33030bccd71c0744` (`sourceCommit`). The recorded comparison base is `64fd756dbae4feb62b88698af1ed765a59212691` (`sourceBase`). The [source diff](scoped-metadata-evidence/source.patch) now includes the reviewed `createTypedHooks.ts` change, its test, coverage follow-ups and the final measurement recipe. Committed changes are identified by the starting commit and comparison patch; `sourceDirty` records only additional working-tree changes at capture, so committed typed-hook files need not appear in that field. Generated evidence/assessment documents and unrelated `.gitignore` are excluded from the source diff. Capture occurs before packing; the final assessment/evidence were updated afterwards. [Production](scoped-metadata-evidence/production.json), [development](scoped-metadata-evidence/development.json), [provenance/bundles](scoped-metadata-evidence/bundles.json), the [consumer lock](scoped-metadata-evidence/consumer-lock.json) and all six attribution metafiles replace the earlier run. Nine code-fixture hashes, Core/UI tarball SHA-256 values and the source-diff hash identify the measured artifacts; every packed `dist` file, including the widened declarations, matches the rebuilt reviewed tree.
 
 Node 22.20.0, pnpm 11.21.0, npm 11.19.0, React/DOM 19.2.8, Zustand 5.0.15, Happy DOM 20.11.2, esbuild 0.28.2, toolkit 1.0.0 and type-utils 0.1.2; Linux 7.0.0-38-generic x64, Intel Core i7-3610QM @ 2.30 GHz. These are measured installed versions, not claims about latest releases. The historical run used the same reported CPU, Node and runtime dependency versions; transitive/type packages and source bases are independently recorded in their locks/reports.
 
-`pnpm run measure:efficiency /tmp/guard-efficiency-18-19-toolkit` exited successfully after strict-peer installation of planned Core 2.0.0 / UI 1.0.0 tarballs. Source package manifests were unchanged. Packed Provider isolation/SSR/hydration, strict narrowing fixture, middleware-release probe, actual consumer SSR and dependency-guard execution all passed. The retained consumer/tarballs are under `/tmp/action-guard-efficiency-eRtOAK` on the measuring machine; reproduce fresh tarballs through the runner. No other expensive verification ran concurrently with final sampling. Exploratory/interrupted runs and the earlier report-finalization failure are excluded from these final results.
+`pnpm run measure:efficiency /tmp/guard-efficiency-18-19-post-typed 64fd756dbae4feb62b88698af1ed765a59212691` exited successfully after strict-peer installation of planned Core 2.0.0 / UI 1.0.0 tarballs. Source package manifests were unchanged. Packed Provider isolation/SSR/hydration, strict narrowing and typed-metadata declaration fixtures, middleware-release probe, actual consumer SSR and dependency-guard execution all passed. The retained consumer/tarballs are under `/tmp/action-guard-efficiency-FUCS7X` on the measuring machine; reproduce fresh tarballs through the runner. The typed declaration fixture accepts readonly/literal/empty scope arrays and uses normal type constraints to reject unknown names and array members; it has no compiler-suppression directives or casts. It reproduced errors against the previous retained tarball and passed against the rebuilt tarball. No other expensive verification ran concurrently with final sampling. Exploratory/interrupted runs and the earlier report-finalization failure are excluded from these final results.
 
 ## Results
 
@@ -36,19 +36,19 @@ Wall-clock milliseconds, median / p95; 5 warmups, 20 measured samples. Counts be
 
 | Blockers / controls per kind / observers | Production unrelated | Production related | Development unrelated | Development related |
 | ---------------------------------------- | -------------------- | ------------------ | --------------------- | ------------------- |
-| 12 / 20 / 0                              | 0.247 / 0.342        | 1.692 / 1.931      | 0.245 / 0.403         | 6.253 / 8.713       |
-| 102 / 100 / 5                            | 2.938 / 3.168        | 6.767 / 7.951      | 3.147 / 6.495         | 13.607 / 22.527     |
-| 502 / 200 / 5                            | 25.323 / 26.168      | 45.158 / 47.467    | 24.776 / 25.641       | 76.971 / 77.811     |
-| 1002 / 200 / 5                           | 47.518 / 48.807      | 83.451 / 86.248    | 50.296 / 53.753       | 113.577 / 129.754   |
-| 102 / 100 / 100                          | 2.740 / 3.063        | 6.677 / 9.206      | 2.895 / 3.065         | 11.961 / 21.490     |
+| 12 / 20 / 0                              | 0.246 / 0.285        | 1.722 / 2.003      | 0.294 / 0.491         | 6.602 / 9.632       |
+| 102 / 100 / 5                            | 2.869 / 3.237        | 6.686 / 8.049      | 3.016 / 4.342         | 23.439 / 27.397     |
+| 502 / 200 / 5                            | 24.816 / 26.149      | 45.310 / 46.448    | 24.842 / 27.081       | 77.105 / 80.130     |
+| 1002 / 200 / 5                           | 48.258 / 49.831      | 86.944 / 101.574   | 47.816 / 49.305       | 118.436 / 125.161   |
+| 102 / 100 / 100                          | 2.900 / 4.774        | 6.818 / 9.415      | 3.287 / 4.292         | 22.691 / 30.934     |
 
 Historical unrelated-update p95 comparison (separate runs, not an isolated experiment):
 
 | Blockers / controls per kind | Prior production | New production | Reduction | Prior development | New development | Reduction |
 | ---------------------------- | ---------------- | -------------- | --------- | ----------------- | --------------- | --------- |
-| 12 / 20                      | 4.819            | 0.342          | 92.9%     | 14.101            | 0.403           | 97.1%     |
-| 102 / 100                    | 61.479           | 3.168          | 94.8%     | 144.870           | 6.495           | 95.5%     |
-| 502 / 200                    | 629.761          | 26.168         | 95.8%     | 3027.278          | 25.641          | 99.2%     |
+| 12 / 20                      | 4.819            | 0.285          | 94.1%     | 14.101            | 0.491           | 96.5%     |
+| 102 / 100                    | 61.479           | 3.237          | 94.7%     | 144.870           | 4.342           | 97.0%     |
+| 502 / 200                    | 629.761          | 26.149         | 95.8%     | 3027.278          | 27.081          | 99.1%     |
 
 Every unrelated metadata and rapid React sample rendered **zero** boolean, metadata and guarded-button consumers in both modes. Related metadata samples rendered each metadata/button consumer once in production and twice in development, while boolean consumers rendered zero. Availability removal made all checkout buttons available and metadata empty. Relevant reason/count/priority checks, registration/removal phase visibility, exact publication/event counts and cleanup passed for every workload.
 
@@ -56,13 +56,13 @@ Rapid scoped lifecycle registration/removal, **50 pairs per sample**, with one p
 
 | Blockers / controls per kind / observers | Production median / p95 | Development median / p95 |
 | ---------------------------------------- | ----------------------- | ------------------------ |
-| 12 / 20 / 0                              | 1.031 / 1.217           | 1.118 / 1.248            |
-| 102 / 100 / 5                            | 2.549 / 4.321           | 2.567 / 3.973            |
-| 502 / 200 / 5                            | 10.440 / 11.631         | 11.045 / 11.484          |
-| 1002 / 200 / 5                           | 20.934 / 21.709         | 21.290 / 23.681          |
-| 102 / 100 / 100                          | 3.898 / 9.252           | 3.699 / 9.875            |
+| 12 / 20 / 0                              | 0.902 / 1.127           | 1.169 / 2.095            |
+| 102 / 100 / 5                            | 2.585 / 4.043           | 2.738 / 4.026            |
+| 502 / 200 / 5                            | 10.339 / 11.020         | 11.632 / 14.521          |
+| 1002 / 200 / 5                           | 21.373 / 22.817         | 21.648 / 23.843          |
+| 102 / 100 / 100                          | 5.738 / 9.340           | 3.814 / 8.904            |
 
-The medium React rapid scenario performs **10 pairs / 20 individual commits per sample**: production 57.291 / 58.459 ms, development 58.135 / 59.661 ms. Both have zero consumer renders and validate each snapshot-size transition. These are batch durations, not per-transition timings.
+The medium React rapid scenario performs **10 pairs / 20 individual commits per sample**: production 56.272 / 58.254 ms, development 60.485 / 64.417 ms. Both have zero consumer renders and validate each snapshot-size transition. These are batch durations, not per-transition timings.
 
 The retained medium synthetic p95 improves by more than 50% and is below 16 ms in this run. The 500/1000-blocker production cases still exceed 16 ms despite zero unrelated renders: eliminating renders does not eliminate linear filtering/comparison work across many consumers. The 100-observer case passes exact event counts; its timing difference from the 5-observer case is noisy and does not isolate observer cost from scheduling/GC. Lifecycle transition/read/mount/removal and bundle costs remain available in the raw reports; do not subtract scenarios to invent phase attribution.
 

@@ -1,21 +1,21 @@
 {
   "inputs": {
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js": {
       "bytes": 6210,
       "imports": [],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/middleware.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs": {
       "bytes": 16310,
       "imports": [],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
       "bytes": 1652,
       "imports": [],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/react/shallow.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react/shallow.mjs": {
       "bytes": 312,
       "imports": [
         {
@@ -24,30 +24,30 @@
           "external": true
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
           "kind": "import-statement",
           "original": "zustand/vanilla/shallow"
         }
       ],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/shallow.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs": {
       "bytes": 103,
       "imports": [
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
           "kind": "import-statement",
           "original": "zustand/vanilla/shallow"
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/react/shallow.mjs",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react/shallow.mjs",
           "kind": "import-statement",
           "original": "zustand/react/shallow"
         }
       ],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
       "bytes": 34513,
       "imports": [
         {
@@ -56,12 +56,12 @@
           "external": true
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js",
           "kind": "import-statement",
           "original": "@okyrychenko-dev/type-utils"
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/middleware.mjs",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs",
           "kind": "import-statement",
           "original": "zustand/middleware"
         },
@@ -76,14 +76,14 @@
           "external": true
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/shallow.mjs",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs",
           "kind": "import-statement",
           "original": "zustand/shallow"
         }
       ],
       "format": "esm"
     },
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/fixtures/core-consumer.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/core-consumer.mjs": {
       "bytes": 723,
       "imports": [
         {
@@ -92,7 +92,7 @@
           "external": true
         },
         {
-          "path": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js",
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js",
           "kind": "import-statement",
           "original": "@okyrychenko-dev/react-action-guard"
         }
@@ -101,7 +101,7 @@
     }
   },
   "outputs": {
-    "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/core-toolkit-external.mjs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/core-toolkit-external.mjs": {
       "imports": [
         {
           "path": "react",
@@ -125,24 +125,24 @@
         }
       ],
       "exports": ["App", "exercise"],
-      "entryPoint": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/fixtures/core-consumer.mjs",
+      "entryPoint": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/core-consumer.mjs",
       "inputs": {
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/fixtures/core-consumer.mjs": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/core-consumer.mjs": {
           "bytesInOutput": 333
         },
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
           "bytesInOutput": 6291
         },
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/type-utils/dist/index.js": {
           "bytesInOutput": 249
         },
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/middleware.mjs": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs": {
           "bytesInOutput": 3600
         },
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
           "bytesInOutput": 709
         },
-        "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/node_modules/zustand/esm/shallow.mjs": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs": {
           "bytesInOutput": 0
         }
       },
