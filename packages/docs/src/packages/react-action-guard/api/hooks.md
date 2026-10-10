@@ -214,16 +214,16 @@ function Form() {
 Gets detailed information about all active blockers for a specific scope.
 
 ```typescript
-function useBlockingInfo(scope?: string): ReadonlyArray<BlockerInfo>
+function useBlockingInfo(scope?: string | ReadonlyArray<string>): ReadonlyArray<Readonly<BlockerInfo>>
 ```
 
 **Parameters:**
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `scope` | `string` | `'global'` | Scope to get information for |
+| `scope` | `string` or `ReadonlyArray<string>` | `'global'` | Scope(s) to observe; empty array observes nothing |
 
-**Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information, sorted by priority (highest first), then timestamp (oldest first)
+**Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information, sorted by priority (highest first), with registration order retained for ties. The frozen result remains stable on unrelated or semantically unchanged metadata updates
 
 **BlockerInfo:**
 

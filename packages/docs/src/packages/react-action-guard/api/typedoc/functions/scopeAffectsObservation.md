@@ -8,7 +8,7 @@
 
 > **scopeAffectsObservation**(`blockerScope`, `observedScope`): `boolean`
 
-Defined in: [store/scope/scope.utils.ts:89](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/scope/scope.utils.ts#L89)
+Defined in: [store/scope/scope.utils.ts:107](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/scope/scope.utils.ts#L107)
 
 Checks ordinary observation semantics.
 A global blocker affects every observed scope and otherwise any shared scope is a match.

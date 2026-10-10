@@ -1,6 +1,7 @@
 export { DEFAULT_SCOPE } from "./scope.constants";
 export type { Scope } from "./scope.types";
 export {
+  createScopeObservationMatcher,
   normalizeScope,
   resolveScope,
   scopeAffectsObservation,

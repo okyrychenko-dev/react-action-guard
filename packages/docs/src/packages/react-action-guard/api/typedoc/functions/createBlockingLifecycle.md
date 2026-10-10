@@ -8,7 +8,7 @@
 
 > **createBlockingLifecycle**(): [`BlockingLifecycle`](../interfaces/BlockingLifecycle.md)
 
-Defined in: [store/blockingLifecycle/blockingLifecycle.ts:45](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts#L45)
+Defined in: [store/blockingLifecycle/blockingLifecycle.ts:46](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts#L46)
 
 Owns one independent store's blockers, timers, snapshots, and transition events.
 

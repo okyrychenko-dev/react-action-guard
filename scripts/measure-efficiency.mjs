@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -14,6 +15,12 @@ const output = resolve(process.argv[2] ?? temporary);
 mkdirSync(output, { recursive: true });
 assert.equal(readdirSync(output).length, 0, "Use an empty evidence directory for each run");
 const { tarballs } = preparePackedCohort(repository, temporary);
+const sourceDiff = execFileSync(
+  "git",
+  ["diff", "HEAD", "--", "packages/core", "packages/ui", "scripts", ".changeset"],
+  { cwd: repository, encoding: "utf8" }
+);
+writeFileSync(join(output, "source.patch"), sourceDiff);
 const consumer = join(temporary, "consumer");
 mkdirSync(consumer);
 const localVersion = (path) =>
@@ -196,7 +203,24 @@ writeFileSync(
       node: process.version,
       esbuild: localVersion("node_modules/esbuild"),
       packages: Object.fromEntries(
-        ["core", "ui"].map((id) => [id, { name: tarballs[id].name, version: tarballs[id].version }])
+        ["core", "ui"].map((id) => {
+          const { name, version, tarball } = tarballs[id];
+          const sha256 = createHash("sha256").update(readFileSync(tarball)).digest("hex");
+
+          return [id, { name, version, sha256 }];
+        })
+      ),
+      sourceDiffSha256: createHash("sha256").update(sourceDiff).digest("hex"),
+      fixtures: Object.fromEntries(
+        readdirSync(join(consumer, "fixtures"), { withFileTypes: true })
+          .filter((entry) => entry.isFile())
+          .filter(({ name }) => name.endsWith(".mjs") || name.endsWith(".ts"))
+          .map(({ name }) => [
+            name,
+            createHash("sha256")
+              .update(readFileSync(join(consumer, "fixtures", name)))
+              .digest("hex"),
+          ])
       ),
       resolvedVersions: Object.fromEntries(
         Object.entries(JSON.parse(lock).packages).map(([name, entry]) => [name, entry.version])

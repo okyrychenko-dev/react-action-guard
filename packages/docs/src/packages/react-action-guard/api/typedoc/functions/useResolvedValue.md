@@ -6,13 +6,13 @@
 
 # Function: useResolvedValue()
 
-> **useResolvedValue**\<`T`\>(`selector`): `T`
+> **useResolvedValue**\<`T`\>(`selector`, `equalityFn?`): `T`
 
-Defined in: [context/useResolvedStore.ts:42](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/useResolvedStore.ts#L42)
+Defined in: [context/useResolvedStore.ts:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/useResolvedStore.ts#L34)
 
 Hook to use the resolved store with a selector
 
-Automatically applies shallow comparison to prevent unnecessary re-renders.
+Uses toolkit shallow comparison by default, or the supplied domain equality.
 
 ## Type Parameters
 
@@ -27,6 +27,12 @@ Automatically applies shallow comparison to prevent unnecessary re-renders.
 (`state`) => `T`
 
 Selector function to pick state from the store
+
+### equalityFn?
+
+(`left`, `right`) => `boolean`
+
+Optional comparison retaining equivalent selected values
 
 ## Returns
 

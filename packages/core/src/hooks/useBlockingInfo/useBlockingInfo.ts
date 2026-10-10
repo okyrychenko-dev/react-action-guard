@@ -1,11 +1,13 @@
 import { useMemo } from "react";
-import { useStore } from "zustand";
-import { useResolvedStoreApi } from "../../context";
-import { DEFAULT_SCOPE } from "../../store";
+import { useResolvedValue } from "../../context";
+import { DEFAULT_SCOPE, normalizeScope } from "../../store";
+import { areBlockingInfosEqual, createBlockingInfoSelector } from "../../store/blockingInfo";
 import type { BlockerInfo } from "../../store";
+import type { Scope } from "../../store/scope";
 
 /**
- * Gets detailed information about all active blockers for a specific scope.
+ * Gets immutable, priority-ordered information about blockers affecting the observed scopes.
+ * Unrelated lifecycle changes preserve the result and do not trigger a render.
  *
  * @public
  * @since 0.6.0
@@ -14,15 +16,13 @@ import type { BlockerInfo } from "../../store";
  * @see {@link BlockerInfo} for the structure of blocker information objects
  */
 export function useBlockingInfo(
-  scope: string = DEFAULT_SCOPE
+  scope: Scope = DEFAULT_SCOPE
 ): ReadonlyArray<Readonly<BlockerInfo>> {
-  const store = useResolvedStoreApi();
+  const checkedScopes = normalizeScope(scope);
 
-  const blockingSnapshot = useStore(store, (state) => state.blockingSnapshot);
+  const selector = useMemo(() => {
+    return createBlockingInfoSelector(checkedScopes);
+  }, [checkedScopes]);
 
-  // Recompute only when the immutable lifecycle projection or scope changes
-  return useMemo(() => {
-    return store.getState().getBlockingInfo(scope);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockingSnapshot, scope, store]);
+  return useResolvedValue(selector, areBlockingInfosEqual);
 }

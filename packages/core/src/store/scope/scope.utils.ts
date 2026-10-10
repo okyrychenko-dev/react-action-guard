@@ -82,24 +82,39 @@ export function resolveScope(explicitScope?: Scope, inheritedScope?: Scope): Opt
   return explicitScope;
 }
 
+function matchesObservedScopes(
+  blockerScope: Scope,
+  observedScopes: ReadonlyArray<string>
+): boolean {
+  if (!isNonEmptyArray(observedScopes)) {
+    return false;
+  }
+
+  if (isString(blockerScope)) {
+    return blockerScope === DEFAULT_SCOPE || observedScopes.includes(blockerScope);
+  }
+
+  return (
+    blockerScope.includes(DEFAULT_SCOPE) ||
+    observedScopes.some((scope) => blockerScope.includes(scope))
+  );
+}
+
 /**
  * Checks ordinary observation semantics.
  * A global blocker affects every observed scope and otherwise any shared scope is a match.
  */
 export function scopeAffectsObservation(blockerScope: Scope, observedScope: Scope): boolean {
+  return matchesObservedScopes(blockerScope, normalizeScope(observedScope));
+}
+
+/** @internal Prepare one observation without repeatedly normalizing every blocker. */
+export function createScopeObservationMatcher(
+  observedScope: Scope
+): (blockerScope: Scope) => boolean {
   const observedScopes = normalizeScope(observedScope);
 
-  if (!isNonEmptyArray(observedScopes)) {
-    return false;
-  }
-
-  const blockerScopes = normalizeScope(blockerScope);
-
-  if (blockerScopes.includes(DEFAULT_SCOPE)) {
-    return true;
-  }
-
-  return observedScopes.some((scope) => blockerScopes.includes(scope));
+  return (blockerScope) => matchesObservedScopes(blockerScope, observedScopes);
 }
 
 /**

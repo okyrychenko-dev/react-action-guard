@@ -1,4 +1,5 @@
 import { isDefined, isString, isUndefined } from "@okyrychenko-dev/type-utils";
+import { projectBlockingInfo } from "../blockingInfo";
 import { scopeAffectsObservation, scopeMatchesTarget } from "../scope";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
 import type { Middleware } from "../../middleware";
@@ -307,11 +308,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
   }
 
   function getBlockingInfo(scope: string): BlockingLifecycleSnapshot {
-    return Object.freeze(
-      getSnapshot()
-        .filter((blocker) => scopeAffectsObservation(blocker.scope, scope))
-        .sort((a, b) => b.priority - a.priority)
-    );
+    return projectBlockingInfo(getSnapshot(), scope);
   }
 
   function subscribe(listener: (snapshot: BlockingLifecycleSnapshot) => void): VoidFunction {
