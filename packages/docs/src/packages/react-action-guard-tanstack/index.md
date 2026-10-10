@@ -24,6 +24,7 @@ npm install @okyrychenko-dev/react-action-guard-tanstack @tanstack/react-query
 ```
 
 **Peer Dependencies:**
+
 - `@okyrychenko-dev/react-action-guard` ^0.6.0
 - `@tanstack/react-query` ^5.0.0
 - `react` ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -31,27 +32,27 @@ npm install @okyrychenko-dev/react-action-guard-tanstack @tanstack/react-query
 ## Quick Start
 
 ```tsx
-import { useBlockingQuery } from '@okyrychenko-dev/react-action-guard-tanstack';
+import { useBlockingQuery } from "@okyrychenko-dev/react-action-guard-tanstack";
 
 function UserProfile({ userId }: { userId: string }) {
   const query = useBlockingQuery({
-    queryKey: ['user', userId],
+    queryKey: ["user", userId],
     queryFn: () => fetchUser(userId),
     blockingConfig: {
-      scope: 'profile',
-      reasonOnLoading: 'Loading profile...',
+      scope: "profile",
+      reasonOnLoading: "Loading profile...",
       onLoading: true,
-    }
+    },
   });
-  
+
   if (query.error) {
     return <div>Error: {query.error.message}</div>;
   }
-  
+
   if (!query.data) {
     return null;
   }
-  
+
   return <div>{query.data.name}</div>;
 }
 ```
@@ -65,26 +66,26 @@ This integration goes beyond simple automatic blocking - it enables powerful pat
 Different UI sections block independently:
 
 ```tsx
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
 // Query blocks 'users-table' scope
 function UserTableLoader() {
   useBlockingQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: fetchUsers,
-    blockingConfig: { scope: 'users-table' }
+    blockingConfig: { scope: "users-table" },
   });
 }
 
 // Table reacts to its scope
 function UserTable() {
-  const isBlocked = useIsBlocked('users-table');
+  const isBlocked = useIsBlocked("users-table");
   // Blocked during load
 }
 
 // Sidebar stays interactive (different scope)
 function Sidebar() {
-  const isBlocked = useIsBlocked('sidebar');
+  const isBlocked = useIsBlocked("sidebar");
   // isBlocked === false ✅
 }
 ```
@@ -94,17 +95,17 @@ function Sidebar() {
 React to blocking state from any component:
 
 ```tsx
-import { useIsBlocked, useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+import { useIsBlocked, useBlockingInfo } from "@okyrychenko-dev/react-action-guard";
 
 function StatusBar() {
-  const blockers = useBlockingInfo('dashboard');
+  const blockers = useBlockingInfo("dashboard");
   if (blockers.length > 0) {
     return <div>{blockers[0].reason}</div>; // "Loading dashboard..."
   }
 }
 
 function ActionButton() {
-  const isBlocked = useIsBlocked('checkout');
+  const isBlocked = useIsBlocked("checkout");
   return <button disabled={isBlocked}>Proceed</button>;
 }
 ```
@@ -117,15 +118,15 @@ One query/mutation coordinates many components:
 // Component A: Sets blocking
 const mutation = useBlockingMutation({
   mutationFn: saveData,
-  blockingConfig: { scope: 'edit-mode' }
+  blockingConfig: { scope: "edit-mode" },
 });
 
 // Components B, C, D: All react automatically
 function FormInputs() {
-  const isBlocked = useIsBlocked('edit-mode'); // disabled during save
+  const isBlocked = useIsBlocked("edit-mode"); // disabled during save
 }
 function CancelButton() {
-  const isBlocked = useIsBlocked('edit-mode'); // disabled during save
+  const isBlocked = useIsBlocked("edit-mode"); // disabled during save
 }
 
 // No prop drilling! 🎯
@@ -140,19 +141,19 @@ Drop-in replacement for `useQuery` with automatic blocking:
 ```typescript
 const query = useBlockingQuery({
   // Standard TanStack Query options
-  queryKey: ['users'],
+  queryKey: ["users"],
   queryFn: fetchUsers,
   staleTime: 5000,
-  
+
   // Blocking configuration
   blockingConfig: {
-    scope: 'users',
-    reasonOnLoading: 'Loading users...',
-    reasonOnFetching: 'Refreshing users...',
+    scope: "users",
+    reasonOnLoading: "Loading users...",
+    reasonOnFetching: "Refreshing users...",
     priority: 10,
     onLoading: true,
     onFetching: false,
-  }
+  },
 });
 ```
 
@@ -160,15 +161,15 @@ const query = useBlockingQuery({
 
 ```typescript
 interface BlockingConfig {
-  scope?: string | string[];        // Scope to block (default: 'global')
-  reasonOnLoading?: string;         // Reason during initial load
-  reasonOnFetching?: string;        // Reason during background refresh
-  reasonOnError?: string;           // Reason during error state
-  priority?: number;                // Priority level (default: 10)
-  timeout?: number;                 // Auto-remove timeout
-  onLoading?: boolean;              // Block during loading (default: true)
-  onFetching?: boolean;             // Block during fetching (default: false)
-  onError?: boolean;                // Block during error (default: false)
+  scope?: string | string[]; // Scope to block (default: 'global')
+  reasonOnLoading?: string; // Reason during initial load
+  reasonOnFetching?: string; // Reason during background refresh
+  reasonOnError?: string; // Reason during error state
+  priority?: number; // Priority level (default: 10)
+  timeout?: number; // Auto-remove timeout
+  onLoading?: boolean; // Block during loading (default: true)
+  onFetching?: boolean; // Block during fetching (default: false)
+  onError?: boolean; // Block during error (default: false)
 }
 ```
 
@@ -200,32 +201,32 @@ blockingConfig: {
 Multi-component coordination - one mutation, many reactions:
 
 ```tsx
-import { useBlockingMutation } from '@okyrychenko-dev/react-action-guard-tanstack';
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useBlockingMutation } from "@okyrychenko-dev/react-action-guard-tanstack";
+import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
 // Component A: Mutation blocks scope
 function SaveButton() {
   const mutation = useBlockingMutation({
     mutationFn: (data) => saveUser(data),
     blockingConfig: {
-      scope: 'user-form',
-      reasonOnPending: 'Saving user...',
+      scope: "user-form",
+      reasonOnPending: "Saving user...",
       priority: 50,
-    }
+    },
   });
-  
+
   return <button onClick={() => mutation.mutate(formData)}>Save</button>;
 }
 
 // Component B: Form inputs react automatically
 function FormInputs() {
-  const isBlocked = useIsBlocked('user-form');
+  const isBlocked = useIsBlocked("user-form");
   return <input disabled={isBlocked} />;
 }
 
 // Component C: Cancel button reacts
 function CancelButton() {
-  const isBlocked = useIsBlocked('user-form');
+  const isBlocked = useIsBlocked("user-form");
   return <button disabled={isBlocked}>Cancel</button>;
 }
 
@@ -254,14 +255,14 @@ function InfiniteList() {
       onFetching: false, // Don't block "load more"
     }
   });
-  
+
   const blockers = useBlockingInfo('items');
-  
+
   if (blockers.length > 0) {
     // Initial load: show full-page loading
     return <div>{blockers[0].reason}</div>; // "Loading items..."
   }
-  
+
   // Background pagination: show inline spinner
   return (
     <div>
@@ -277,20 +278,20 @@ function InfiniteList() {
 Block during multiple parallel queries:
 
 ```tsx
-import { useBlockingQueries } from '@okyrychenko-dev/react-action-guard-tanstack';
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+import { useBlockingQueries } from "@okyrychenko-dev/react-action-guard-tanstack";
+import { useBlockingInfo } from "@okyrychenko-dev/react-action-guard";
 
 // Component A: Load data
 function DashboardLoader() {
   const queries = useBlockingQueries(
     [
-      { queryKey: ['user'], queryFn: fetchUser },
-      { queryKey: ['posts'], queryFn: fetchPosts },
-      { queryKey: ['stats'], queryFn: fetchStats },
+      { queryKey: ["user"], queryFn: fetchUser },
+      { queryKey: ["posts"], queryFn: fetchPosts },
+      { queryKey: ["stats"], queryFn: fetchStats },
     ],
     {
-      scope: 'dashboard',
-      reasonOnLoading: 'Loading dashboard...',
+      scope: "dashboard",
+      reasonOnLoading: "Loading dashboard...",
     }
   );
   return null;
@@ -298,13 +299,13 @@ function DashboardLoader() {
 
 // Component B: Dashboard reacts
 function Dashboard() {
-  const blockers = useBlockingInfo('dashboard');
-  
+  const blockers = useBlockingInfo("dashboard");
+
   if (blockers.length > 0) {
     // Blocked until ALL 3 queries complete
     return <div>{blockers[0].reason}</div>;
   }
-  
+
   return <div>{/* dashboard content */}</div>;
 }
 ```
@@ -314,20 +315,20 @@ function Dashboard() {
 ### Pattern 1: Scope Isolation
 
 ```tsx
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
 // Product catalog (independent scope)
 function ProductCatalog() {
   useBlockingInfiniteQuery({
-    queryKey: ['products'],
+    queryKey: ["products"],
     queryFn: fetchProducts,
-    blockingConfig: { scope: 'product-list' }
+    blockingConfig: { scope: "product-list" },
   });
 }
 
 // Product grid blocks during load
 function ProductGrid() {
-  const isBlocked = useIsBlocked('product-list');
+  const isBlocked = useIsBlocked("product-list");
   if (isBlocked) {
     return <Skeleton />;
   }
@@ -336,7 +337,7 @@ function ProductGrid() {
 
 // Filters stay interactive
 function ProductFilters() {
-  const isBlocked = useIsBlocked('filters');
+  const isBlocked = useIsBlocked("filters");
   // isBlocked === false - always works! ✅
 }
 ```
@@ -344,31 +345,31 @@ function ProductFilters() {
 ### Pattern 2: Priority System
 
 ```tsx
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+import { useBlockingInfo } from "@okyrychenko-dev/react-action-guard";
 
 // High priority payment
 const payment = useBlockingMutation({
   mutationFn: processPayment,
   blockingConfig: {
-    scope: 'checkout',
+    scope: "checkout",
     priority: 100, // Highest
-    reasonOnPending: 'Processing payment...',
-  }
+    reasonOnPending: "Processing payment...",
+  },
 });
 
 // Lower priority query
 const query = useBlockingQuery({
-  queryKey: ['cart'],
+  queryKey: ["cart"],
   queryFn: fetchCart,
   blockingConfig: {
-    scope: 'checkout',
+    scope: "checkout",
     priority: 50, // Lower
-  }
+  },
 });
 
 // Shows highest priority reason
 function Status() {
-  const blockers = useBlockingInfo('checkout');
+  const blockers = useBlockingInfo("checkout");
   return <div>{blockers[0]?.reason}</div>; // "Processing payment..."
 }
 ```
@@ -376,24 +377,24 @@ function Status() {
 ### Pattern 3: Background Refresh
 
 ```tsx
-import { useBlockingInfo } from '@okyrychenko-dev/react-action-guard';
+import { useBlockingInfo } from "@okyrychenko-dev/react-action-guard";
 
 function LiveDashboard() {
   const query = useBlockingQuery({
-    queryKey: ['metrics'],
+    queryKey: ["metrics"],
     queryFn: fetchMetrics,
     refetchInterval: 5000,
     blockingConfig: {
-      scope: 'dashboard',
-      reasonOnLoading: 'Loading...',
-      reasonOnFetching: 'Updating...',
-      onLoading: true,   // Block initial
+      scope: "dashboard",
+      reasonOnLoading: "Loading...",
+      reasonOnFetching: "Updating...",
+      onLoading: true, // Block initial
       onFetching: false, // Don't block refresh ✅
-    }
+    },
   });
-  
-  const blockers = useBlockingInfo('dashboard');
-  
+
+  const blockers = useBlockingInfo("dashboard");
+
   // Initial: blockers.length > 0, full loading
   // Refresh: blockers.length === 0, subtle indicator
 }
@@ -402,28 +403,28 @@ function LiveDashboard() {
 ### Pattern 4: Multi-Scope Coordination
 
 ```tsx
-import { useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
 
 // Mutation blocks multiple scopes
 function CheckoutSubmit() {
   const mutation = useBlockingMutation({
     mutationFn: submitOrder,
     blockingConfig: {
-      scope: ['checkout', 'navigation', 'forms'],
-      reasonOnPending: 'Processing order...',
+      scope: ["checkout", "navigation", "forms"],
+      reasonOnPending: "Processing order...",
       priority: 100,
-    }
+    },
   });
 }
 
 // Components check their relevant scopes
 function Header() {
-  const isBlocked = useIsBlocked('navigation');
+  const isBlocked = useIsBlocked("navigation");
   // Navigation disabled
 }
 
 function CheckoutForm() {
-  const isBlocked = useIsBlocked('forms');
+  const isBlocked = useIsBlocked("forms");
   // All inputs disabled
 }
 ```
@@ -435,16 +436,20 @@ function CheckoutForm() {
 ```tsx
 function Component() {
   const query = useQuery({
-    queryKey: ['data'],
+    queryKey: ["data"],
     queryFn: fetchData,
   });
-  
+
   // Manual blocking
-  useActionBlocker('fetch-data', {
-    scope: 'content',
-    reason: 'Loading...',
-  }, query.isLoading);
-  
+  useActionBlocker(
+    "fetch-data",
+    {
+      scope: "content",
+      reason: "Loading...",
+    },
+    query.isLoading
+  );
+
   return <div>{/* ... */}</div>;
 }
 ```
@@ -454,14 +459,14 @@ function Component() {
 ```tsx
 function Component() {
   const query = useBlockingQuery({
-    queryKey: ['data'],
+    queryKey: ["data"],
     queryFn: fetchData,
     blockingConfig: {
-      scope: 'content',
-      reasonOnLoading: 'Loading...',
-    }
+      scope: "content",
+      reasonOnLoading: "Loading...",
+    },
   });
-  
+
   // Blocking is automatic!
   return <div>{/* ... */}</div>;
 }
@@ -472,7 +477,7 @@ function Component() {
 Full type inference from TanStack Query:
 
 ```typescript
-import type { BlockingConfig } from '@okyrychenko-dev/react-action-guard-tanstack';
+import type { BlockingConfig } from "@okyrychenko-dev/react-action-guard-tanstack";
 
 interface User {
   id: string;
@@ -480,12 +485,12 @@ interface User {
 }
 
 const query = useBlockingQuery({
-  queryKey: ['user'],
+  queryKey: ["user"],
   queryFn: (): Promise<User> => fetchUser(),
   blockingConfig: {
-    scope: 'user',
-    reasonOnLoading: 'Loading...',
-  }
+    scope: "user",
+    reasonOnLoading: "Loading...",
+  },
 });
 
 // query.data is typed as User | undefined
@@ -507,3 +512,10 @@ const query = useBlockingQuery({
 ## License
 
 MIT © Oleksii Kyrychenko
+
+## Canonical learning path
+
+Read [concepts](/concepts), [guides](/guides/workflows), [mutation lifetimes](/guides/mutations),
+[ownership](/advanced/ownership), [SSR](/advanced/ssr) and [observability](/advanced/observability).
+See the [Core contract](/packages/react-action-guard/contract) and [migration](/packages/react-action-guard/migration)
+for current source versus planned stabilization.

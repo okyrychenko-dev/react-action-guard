@@ -24,19 +24,20 @@ npm install -D @okyrychenko-dev/react-action-guard-devtools
 ```
 
 **Peer Dependencies:**
+
 - `@okyrychenko-dev/react-action-guard` ^0.6.0
 - `react` ^17.0.0 || ^18.0.0 || ^19.0.0
 
 ## Quick Start
 
 ```tsx
-import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
+import { ActionGuardDevtools } from "@okyrychenko-dev/react-action-guard-devtools";
 
 function App() {
   return (
     <>
       <YourApp />
-      
+
       {/* Add DevTools - auto-disabled in production */}
       <ActionGuardDevtools />
     </>
@@ -52,11 +53,11 @@ That's it! The DevTools will appear in the bottom-right corner.
 
 ```typescript
 interface ActionGuardDevtoolsProps {
-  position?: 'left' | 'right';  // Default: 'right'
-  defaultOpen?: boolean;         // Default: false
-  maxEvents?: number;            // Default: 200
-  showInProduction?: boolean;    // Default: false
-  store?: UIBlockingStoreApi;    // For custom stores
+  position?: "left" | "right"; // Default: 'right'
+  defaultOpen?: boolean; // Default: false
+  maxEvents?: number; // Default: 200
+  showInProduction?: boolean; // Default: false
+  store?: UIBlockingStoreApi; // For custom stores
 }
 ```
 
@@ -88,6 +89,7 @@ Shows chronological list of all blocking events:
 - **🟠 Orange** - "timeout" / "cancel" events (auto-removed)
 
 Each event shows:
+
 - Blocker ID
 - Action type
 - Timestamp
@@ -98,6 +100,7 @@ Each event shows:
 ### Active Blockers Panel
 
 Real-time view of currently active blockers:
+
 - Sorted by priority (highest first)
 - Shows scope, reason, priority
 - Time since activation
@@ -106,11 +109,13 @@ Real-time view of currently active blockers:
 ### Search & Filtering
 
 **Search Box:**
+
 - Filter by blocker ID
 - Filter by reason text
 - Filter by scope
 
 **Advanced** (via store API):
+
 - Filter by action type
 - Filter by priority range
 - Filter by time range
@@ -127,6 +132,7 @@ Real-time view of currently active blockers:
 ### Keyboard Shortcuts
 
 When panel is open (focus not in input):
+
 - `Esc` - Close panel
 - `Space` - Pause/Resume recording
 - `C` -Clear all events
@@ -161,7 +167,7 @@ function App() {
     <>
       <YourApp />
       {/* Tree-shaking: DevTools code won't be in production bundle */}
-      {process.env.NODE_ENV === 'development' && <ActionGuardDevtools />}
+      {process.env.NODE_ENV === "development" && <ActionGuardDevtools />}
     </>
   );
 }
@@ -171,9 +177,9 @@ function App() {
 
 ```tsx
 function App() {
-  const showDevtools = process.env.NODE_ENV === 'development' || 
-                       localStorage.getItem('debug') === 'true';
-  
+  const showDevtools =
+    process.env.NODE_ENV === "development" || localStorage.getItem("debug") === "true";
+
   return (
     <>
       <YourApp />
@@ -183,11 +189,11 @@ function App() {
 }
 ```
 
-###  With Provider
+### With Provider
 
 ```tsx
-import { UIBlockingProvider, useUIBlockingContext } from '@okyrychenko-dev/react-action-guard';
-import { ActionGuardDevtools } from '@okyrychenko-dev/react-action-guard-devtools';
+import { UIBlockingProvider, useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
+import { ActionGuardDevtools } from "@okyrychenko-dev/react-action-guard-devtools";
 
 function DevtoolsWrapper() {
   const store = useUIBlockingContext();
@@ -209,11 +215,11 @@ function App() {
 ### Accessing DevTools Store
 
 ```tsx
-import { useDevtoolsStore } from '@okyrychenko-dev/react-action-guard-devtools';
+import { useDevtoolsStore } from "@okyrychenko-dev/react-action-guard-devtools";
 
 function CustomDevtoolsUI() {
   const { events, isOpen, toggleOpen, clearEvents } = useDevtoolsStore();
-  
+
   return (
     <div>
       <button onClick={toggleOpen}>Toggle Devtools</button>
@@ -227,20 +233,20 @@ function CustomDevtoolsUI() {
 ### Store Selectors
 
 ```tsx
-import { 
-  useDevtoolsStore, 
+import {
+  useDevtoolsStore,
   selectFilteredEvents,
-  selectUniqueScopes 
-} from '@okyrychenko-dev/react-action-guard-devtools';
+  selectUniqueScopes,
+} from "@okyrychenko-dev/react-action-guard-devtools";
 
 function EventStats() {
   const filteredEvents = useDevtoolsStore(selectFilteredEvents);
   const uniqueScopes = useDevtoolsStore(selectUniqueScopes);
-  
+
   return (
     <div>
       <p>Filtered Events: {filteredEvents.length}</p>
-      <p>Unique Scopes: {uniqueScopes.join(', ')}</p>
+      <p>Unique Scopes: {uniqueScopes.join(", ")}</p>
     </div>
   );
 }
@@ -249,10 +255,8 @@ function EventStats() {
 ### Manual Middleware Registration
 
 ```tsx
-import { 
-  createDevtoolsMiddleware,
-} from '@okyrychenko-dev/react-action-guard-devtools';
-import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
+import { createDevtoolsMiddleware } from "@okyrychenko-dev/react-action-guard-devtools";
+import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 
 // Register manually
 const middleware = createDevtoolsMiddleware();
@@ -268,6 +272,7 @@ release();
 ### DevTools Not Appearing
 
 **Check:**
+
 1. Component is rendered
 2. Not in production (unless `showInProduction={true}`)
 3. No CSS conflicts hiding the toggle button
@@ -276,6 +281,7 @@ release();
 ### Events Not Showing
 
 **Check:**
+
 1. Blockers are actually being added/removed
 2. DevTools is not paused
 3. Search filter is not hiding events
@@ -283,7 +289,8 @@ release();
 
 ### Performance Issues
 
-**Solutions:**  
+**Solutions:**
+
 1. Reduce `maxEvents` (default: 200)
 2. Clear events periodically
 3. Disable in production
@@ -308,7 +315,7 @@ import type {
   DevtoolsPosition,
   DevtoolsState,
   DevtoolsActions,
-} from '@okyrychenko-dev/react-action-guard-devtools';
+} from "@okyrychenko-dev/react-action-guard-devtools";
 ```
 
 ## Related
@@ -319,3 +326,10 @@ import type {
 ## License
 
 MIT © Oleksii Kyrychenko
+
+## Canonical learning path
+
+Read [concepts](/concepts), [guides](/guides/workflows), [mutation lifetimes](/guides/mutations),
+[ownership](/advanced/ownership), [SSR](/advanced/ssr) and [observability](/advanced/observability).
+See the [Core contract](/packages/react-action-guard/contract) and [migration](/packages/react-action-guard/migration)
+for current source versus planned stabilization.

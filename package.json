@@ -19,7 +19,7 @@
     "test:run": "pnpm run test:config && pnpm --filter @okyrychenko-dev/react-action-guard run build && pnpm -r run test:run",
     "test:coverage": "pnpm --filter @okyrychenko-dev/react-action-guard run build && pnpm -r run test:coverage",
     "test:config": "vitest run config/config.test.ts",
-    "check": "pnpm run check:toolkit-version && pnpm run build && pnpm run lint && pnpm run typecheck && pnpm run test:run",
+    "check": "pnpm run check:toolkit-version && pnpm run build && pnpm run docs:check && pnpm run lint && pnpm run typecheck && pnpm run test:run",
     "check:toolkit-version": "node scripts/check-react-zustand-toolkit-version.mjs",
     "changeset": "changeset",
     "version-packages": "changeset version",
@@ -28,7 +28,8 @@
     "test:packed": "node scripts/check-packed-compatibility.mjs",
     "package:check": "node scripts/check-packed-publication.mjs",
     "measure:efficiency": "node scripts/measure-efficiency.mjs",
-    "release:check": "pnpm run check && pnpm run format:check && pnpm run package:check && pnpm run test:packed"
+    "release:check": "pnpm run check && pnpm run format:check && pnpm run package:check && pnpm run test:packed",
+    "docs:check": "node scripts/check-documentation.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "0.18.5",

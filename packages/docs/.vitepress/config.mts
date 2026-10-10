@@ -48,8 +48,6 @@ export default defineConfig({
     "./../internals/middleware-architecture",
     "./../internals/performance",
     "./guides/getting-started",
-    "./testing",
-    "./../examples/ssr",
   ],
 
   themeConfig: {
@@ -59,68 +57,79 @@ export default defineConfig({
       { text: "Packages", link: "/packages/react-action-guard/" },
     ],
 
-    sidebar: {
-      "/packages/react-action-guard/": [
-        {
-          text: "react-action-guard",
-          items: [
-            { text: "Overview", link: "/packages/react-action-guard/" },
-            { text: "API Reference", link: "/packages/react-action-guard/api/typedoc/README" },
-          ],
-        },
-      ],
-      "/packages/react-action-guard-devtools/": [
-        {
-          text: "react-action-guard-devtools",
-          items: [
-            { text: "Overview", link: "/packages/react-action-guard-devtools/" },
-            {
-              text: "API Reference",
-              link: "/packages/react-action-guard-devtools/api/typedoc/README",
-            },
-          ],
-        },
-      ],
-      "/packages/react-action-guard-tanstack/": [
-        {
-          text: "react-action-guard-tanstack",
-          items: [
-            { text: "Overview", link: "/packages/react-action-guard-tanstack/" },
-            {
-              text: "API Reference",
-              link: "/packages/react-action-guard-tanstack/api/typedoc/README",
-            },
-          ],
-        },
-      ],
-      "/packages/react-zustand-toolkit/": [
-        {
-          text: "react-zustand-toolkit",
-          items: [
-            { text: "Overview", link: "/packages/react-zustand-toolkit/" },
-            { text: "API Reference", link: "/packages/react-zustand-toolkit/api/typedoc/README" },
-          ],
-        },
-      ],
-      "/": [
-        {
-          text: "Introduction",
-          items: [
-            { text: "Getting Started", link: "/getting-started" },
-            { text: "Architecture", link: "/architecture/" },
-          ],
-        },
-        {
-          text: "Packages",
-          items: [
-            { text: "react-action-guard", link: "/packages/react-action-guard/" },
-            { text: "react-action-guard-devtools", link: "/packages/react-action-guard-devtools/" },
-            { text: "react-action-guard-tanstack", link: "/packages/react-action-guard-tanstack/" },
-            { text: "react-zustand-toolkit", link: "/packages/react-zustand-toolkit/" },
-          ],
-        },
-      ],
-    },
+    sidebar: [
+      {
+        text: "Start",
+        items: [
+          { text: "Getting started", link: "/getting-started" },
+          { text: "Concepts", link: "/concepts" },
+        ],
+      },
+      {
+        text: "Guides",
+        items: [
+          { text: "Forms and saves", link: "/guides/forms" },
+          { text: "Queries and mutations", link: "/guides/mutations" },
+          { text: "Navigation", link: "/guides/navigation" },
+          { text: "Workflows", link: "/guides/workflows" },
+          { text: "Registration lifecycle", link: "/guides/lifecycle" },
+          { text: "Best practices", link: "/guides/best-practices" },
+        ],
+      },
+      {
+        text: "Integrations",
+        items: [
+          { text: "UI controls", link: "/packages/react-action-guard-ui/" },
+          { text: "UI reference", link: "/packages/react-action-guard-ui/reference" },
+          { text: "Router overview", link: "/packages/react-action-guard-router/" },
+          {
+            text: "React Router / Remix",
+            link: "/packages/react-action-guard-router/react-router",
+          },
+          { text: "TanStack Router", link: "/packages/react-action-guard-router/tanstack-router" },
+          { text: "Next Pages Router", link: "/packages/react-action-guard-router/next-pages" },
+          { text: "Next App Router", link: "/packages/react-action-guard-router/next-app" },
+          { text: "Router reference", link: "/packages/react-action-guard-router/reference" },
+          { text: "TanStack Query", link: "/packages/react-action-guard-tanstack/" },
+          { text: "Devtools", link: "/packages/react-action-guard-devtools/" },
+        ],
+      },
+      {
+        text: "Advanced",
+        items: [
+          { text: "Providers and typed hooks", link: "/advanced/ownership" },
+          { text: "SSR and hydration", link: "/advanced/ssr" },
+          { text: "Observability", link: "/advanced/observability" },
+          { text: "Architecture", link: "/architecture/" },
+        ],
+      },
+      {
+        text: "Core and reference",
+        items: [
+          { text: "Core overview", link: "/packages/react-action-guard/" },
+          { text: "Core reference and recipes", link: "/packages/react-action-guard/reference" },
+          { text: "Stable Core contract", link: "/packages/react-action-guard/contract" },
+          { text: "Migration", link: "/packages/react-action-guard/migration" },
+          { text: "Hooks", link: "/packages/react-action-guard/api/hooks" },
+          { text: "Store", link: "/packages/react-action-guard/api/store" },
+          { text: "Middleware", link: "/packages/react-action-guard/api/middleware" },
+          { text: "Core generated API", link: "/packages/react-action-guard/api/typedoc/README" },
+          {
+            text: "Query generated API",
+            link: "/packages/react-action-guard-tanstack/api/typedoc/README",
+          },
+          {
+            text: "Devtools generated API",
+            link: "/packages/react-action-guard-devtools/api/typedoc/README",
+          },
+          { text: "Zustand Toolkit", link: "/packages/react-zustand-toolkit/" },
+          {
+            text: "Toolkit generated API",
+            link: "/packages/react-zustand-toolkit/api/typedoc/README",
+          },
+        ],
+      },
+    ],
 
     socialLinks: [
       { icon: "github", link: "https://github.com/okyrychenko-dev/react-action-guard" },

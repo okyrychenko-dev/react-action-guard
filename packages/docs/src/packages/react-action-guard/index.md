@@ -9,21 +9,27 @@ React Action Guard is a comprehensive solution for managing UI blocking states i
 ## Key Features
 
 ### 🎯 Priority-Based Blocking
+
 Manage multiple concurrent blockers with configurable priorities. Priority orders reasons; every matching active blocker retains protection, including lower-priority ones.
 
 ### 🔒 Scoped Blocking
+
 Block specific areas of your UI rather than everything. Use named scopes like `'form'`, `'navigation'`, or `'checkout'`, or block multiple scopes simultaneously.
 
 ### ⏱️ Timeout Mechanism
+
 Prevent infinite blocking with automatic timeouts. Blockers can be configured to auto-remove after a specified duration with optional callbacks.
 
 ### 🧹 Automatic Cleanup
+
 No manual cleanup needed. Blockers are automatically removed when components unmount, preventing memory leaks.
 
 ### 🏗️ Provider Pattern
+
 Create isolated store instances for SSR, testing, and micro-frontends. Each provider maintains independent blocking state.
 
 ### 🔌 Middleware System
+
 Powerful middleware for analytics, logging, and performance monitoring with built-in integrations for Google Analytics, Mixpanel, and Amplitude.
 
 ## Installation
@@ -33,23 +39,32 @@ npm install @okyrychenko-dev/react-action-guard zustand
 ```
 
 **Peer Dependencies:**
+
 - React: ^17.0.0 || ^18.0.0 || ^19.0.0
 - Zustand: ^4.5.7 || ^5.0.0
 
 ## Quick Start
 
 ```tsx
-import { useState } from 'react';
-import { UIBlockingProvider, useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useState } from "react";
+import {
+  UIBlockingProvider,
+  useActionBlocker,
+  useIsBlocked,
+} from "@okyrychenko-dev/react-action-guard";
 
 function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
   const [isSaving, setIsSaving] = useState(false);
-  useActionBlocker('save-operation', {
-    scope: 'form',
-    reason: 'Saving data...',
-  }, isSaving);
-  const isBlocked = useIsBlocked('form');
-  
+  useActionBlocker(
+    "save-operation",
+    {
+      scope: "form",
+      reason: "Saving data...",
+    },
+    isSaving
+  );
+  const isBlocked = useIsBlocked("form");
+
   async function handleSave() {
     setIsSaving(true);
     try {
@@ -58,12 +73,20 @@ function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
       setIsSaving(false);
     }
   }
-  
-  return <button disabled={isBlocked} onClick={handleSave}>Save</button>;
+
+  return (
+    <button disabled={isBlocked} onClick={handleSave}>
+      Save
+    </button>
+  );
 }
 
 export function App({ saveData }: { saveData: () => Promise<void> }) {
-  return <UIBlockingProvider><SaveButton saveData={saveData} /></UIBlockingProvider>;
+  return (
+    <UIBlockingProvider>
+      <SaveButton saveData={saveData} />
+    </UIBlockingProvider>
+  );
 }
 ```
 
@@ -80,13 +103,17 @@ A blocker is a temporary state that indicates the UI should be blocked. Each blo
 - **Timeout**: Optional auto-removal duration
 
 ```tsx
-useActionBlocker('blocker-id', {
-  scope: ['form', 'navigation'],
-  priority: 50,
-  reason: 'Critical operation',
-  timeout: 30000, // 30 seconds
-  onTimeout: (id) => console.warn(`${id} timed out`)
-}, isActive);
+useActionBlocker(
+  "blocker-id",
+  {
+    scope: ["form", "navigation"],
+    priority: 50,
+    reason: "Critical operation",
+    timeout: 30000, // 30 seconds
+    onTimeout: (id) => console.warn(`${id} timed out`),
+  },
+  isActive
+);
 ```
 
 ### Scopes
@@ -95,20 +122,20 @@ Scopes define **what** gets blocked:
 
 ```tsx
 // Block form only
-useActionBlocker('save', { scope: 'form' }, isSaving);
+useActionBlocker("save", { scope: "form" }, isSaving);
 
 // Block multiple scopes
-useActionBlocker('checkout', { scope: ['form', 'navigation'] }, isCheckingOut);
+useActionBlocker("checkout", { scope: ["form", "navigation"] }, isCheckingOut);
 
 // Block everything
-useActionBlocker('critical', { scope: 'global' }, isCritical);
+useActionBlocker("critical", { scope: "global" }, isCritical);
 ```
 
 Check if a scope is blocked:
 
 ```tsx
-const isFormBlocked = useIsBlocked('form');
-const isAnyBlocked = useIsBlocked(['form', 'navigation']); // true if ANY are blocked
+const isFormBlocked = useIsBlocked("form");
+const isAnyBlocked = useIsBlocked(["form", "navigation"]); // true if ANY are blocked
 ```
 
 ### Priorities
@@ -117,16 +144,16 @@ When multiple blockers target the same scope, priority determines which one's re
 
 ```tsx
 // Lower priority
-useActionBlocker('bg-task', { scope: 'global', priority: 5 }, isBgRunning);
+useActionBlocker("bg-task", { scope: "global", priority: 5 }, isBgRunning);
 
 // Higher priority - reason listed first
-useActionBlocker('important', { scope: 'global', priority: 100 }, isImportantRunning);
+useActionBlocker("important", { scope: "global", priority: 100 }, isImportantRunning);
 ```
 
 Get blocker information sorted by priority:
 
 ```tsx
-const blockers = useBlockingInfo('global');
+const blockers = useBlockingInfo("global");
 const topBlocker = blockers[0]; // Highest priority
 console.log(topBlocker.reason);
 ```
@@ -169,7 +196,7 @@ React Action Guard is built on [Zustand](https://zustand-demo.pmnd.rs/) for stat
 interface UIBlockingStore {
   // State
   readonly blockingSnapshot: ReadonlyArray<Readonly<BlockerInfo>>;
-  
+
   // Actions
   addBlocker: (id: string, config: BlockerConfig) => void;
   removeBlocker: (id: string) => void;
@@ -191,18 +218,24 @@ interface UIBlockingStore {
 ```tsx
 function UserForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
-  useActionBlocker('form-submit', {
-    scope: 'form',
-    reason: 'Submitting...',
-  }, isSubmitting);
-  
-  const isBlocked = useIsBlocked('form');
-  
+
+  useActionBlocker(
+    "form-submit",
+    {
+      scope: "form",
+      reason: "Submitting...",
+    },
+    isSubmitting
+  );
+
+  const isBlocked = useIsBlocked("form");
+
   return (
     <form>
       <input disabled={isBlocked} />
-      <button disabled={isBlocked} type="submit">Submit</button>
+      <button disabled={isBlocked} type="submit">
+        Submit
+      </button>
     </form>
   );
 }
@@ -212,13 +245,14 @@ function UserForm() {
 
 ```tsx
 function DataLoader() {
-  const executeWithBlocking = useAsyncAction('load-data', 'content');
-  
-  const loadData = () => executeWithBlocking(async () => {
-    const data = await fetchData();
-    setData(data);
-  });
-  
+  const executeWithBlocking = useAsyncAction("load-data", "content");
+
+  const loadData = () =>
+    executeWithBlocking(async () => {
+      const data = await fetchData();
+      setData(data);
+    });
+
   return <button onClick={loadData}>Load Data</button>;
 }
 ```
@@ -227,15 +261,12 @@ function DataLoader() {
 
 ```tsx
 function FormWithWarning() {
-  const { execute, isDialogOpen, onConfirm, onCancel } = useConfirmableBlocker(
-    'unsaved-changes',
-    {
-      scope: 'navigation',
-      confirmMessage: 'You have unsaved changes. Discard them?',
-      onConfirm: () => navigate('/away'),
-    }
-  );
-  
+  const { execute, isDialogOpen, onConfirm, onCancel } = useConfirmableBlocker("unsaved-changes", {
+    scope: "navigation",
+    confirmMessage: "You have unsaved changes. Discard them?",
+    onConfirm: () => navigate("/away"),
+  });
+
   return (
     <>
       <form>{/* ... */}</form>
@@ -264,3 +295,13 @@ function FormWithWarning() {
 ## License
 
 MIT © Oleksii Kyrychenko
+
+## Canonical learning path
+
+Read [concepts](/concepts), [guides](/guides/workflows), [mutation lifetimes](/guides/mutations),
+[ownership](/advanced/ownership), [SSR](/advanced/ssr) and [observability](/advanced/observability).
+See the [Core contract](/packages/react-action-guard/contract) and [migration](/packages/react-action-guard/migration)
+for current source versus planned stabilization.
+
+The [Core reference and recipes](./reference) contains the detailed package README material,
+including specialized hooks, store control, middleware, typed scopes and advanced workflows.
