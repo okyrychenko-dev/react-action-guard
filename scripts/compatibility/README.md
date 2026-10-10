@@ -45,8 +45,11 @@ Run `pnpm run build && pnpm run package:check` for publication checks, or `pnpm 
 
 The runner retains `publication.json`, raw ATTW reports, consumers and resolved locks under its printed temporary directory; CI uploads reports and locks. A success record is written only after all checks pass. Versioned [publication evidence](publication-evidence.json) and [compatibility evidence](evidence.json) record the executed checks. Refresh those records after meaningful artifact, dependency or release-plan changes.
 
-Exclusions: no complete version Cartesian product, Next application/browser/RSC
+Exclusions for this matrix: no complete version Cartesian product, Next application/browser/RSC
 runtime, native browser prompt UI, cross-document history, or older peer versions.
+The separate [packed Next runtime runner](../next-runtime/README.md) now verifies production
+Pages/App fixtures and native reload prompts at one selected Next/Chrome version; its
+[dated evidence](../next-runtime/evidence.json) does not upgrade the evidence of this matrix.
 Next floor checks establish loading and declarations only. The existing browser
 suite separately establishes Chrome same-document TanStack history behavior.
 

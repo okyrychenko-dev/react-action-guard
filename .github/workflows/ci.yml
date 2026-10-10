@@ -104,6 +104,37 @@ jobs:
             /tmp/action-guard-compatibility-*/${{ matrix.target }}/package-lock.json
           if-no-files-found: ignore
 
+  next-runtime:
+    name: Packed Next Pages and App runtime
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.6.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run build
+      - run: pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome
+      - run: pnpm run test:next-runtime
+      - name: Upload production Next evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-runtime-results
+          path: |
+            /tmp/action-guard-next-runtime-*/result.json
+            /tmp/action-guard-next-runtime-*/core.tgz
+            /tmp/action-guard-next-runtime-*/router.tgz
+            /tmp/action-guard-next-runtime-*/consumer/package-lock.json
+            /tmp/action-guard-next-runtime-*/consumer/browser-results.json
+            /tmp/action-guard-next-runtime-*/consumer/artifacts
+          if-no-files-found: ignore
+
   verify:
     name: Verify (Node ${{ matrix.node }})
     runs-on: ubuntu-latest

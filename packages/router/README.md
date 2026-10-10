@@ -332,7 +332,7 @@ Compatibility tests exercise the public hook at 1.170.41 with real memory histor
 
 ### Next.js Pages Router
 
-Full support with Next.js router events.
+Limited interception through Next.js router events.
 
 ```tsx
 // pages/edit.tsx
@@ -350,6 +350,8 @@ function EditPage() {
 Pages Router does not allow pausing transitions. When you return a Promise from `onConfirm`, the hook cancels the current navigation and re-attempts it via `router.push(url)` if confirmed. This may not preserve original transition options (e.g., `shallow`, `scroll`, `locale`).
 
 Only the current confirmation attempt can resume navigation. Cleanup, disabling protection, or changing the protected scope or message invalidates pending answers. Callback rerenders and equivalent scopes preserve the current attempt. `onAllow` fires once for an accepted attempt; the replay permission is consumed once and cleared when the retry finishes or another URL is attempted.
+
+Selected packed Next 15.5.23 production Pages/App browser evidence and its limitations are recorded in the [runtime guide](../../scripts/next-runtime/README.md) and [capability matrix](../../CAPABILITIES.md). This does not establish every supported peer or navigation option.
 
 ### Next.js App Router
 
