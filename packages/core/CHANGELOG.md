@@ -1,5 +1,56 @@
 # Changelog
 
+## 2.0.0
+
+### Major Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+
+### Minor Changes
+
+- 39fb3de: Introduce a public Blocking lifecycle interface that owns blocker transitions, timers, immutable reads, and isolated observation while preserving the existing Zustand store interface through a compatibility adapter.
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools now subscribe to those snapshots. Devtools requires core 1.1.0 or newer for the snapshot API. This compatibility drop, together with the Node.js 20 minimum in the pending type-utils migration, releases Devtools as 0.4.0 instead of a 0.3.x patch.
+- 4363609: Expose anonymous, ownership-safe lifecycle event observation through global and provider-scoped stores. Provider middleware and automatic Devtools observation now use release leases without registry names, while legacy named middleware remains available for compatibility and runs without awaiting earlier observers.
+
+  Observers registered while an event is being delivered begin receiving events with the next delivery, preventing self-replacing named middleware from processing the same event twice.
+
+  Observers released before their turn in an event are skipped, and replacing named middleware keeps its original delivery position.
+
+  Named middleware replacements made during an event take effect on the next event. Direct compatibility calls to `runMiddlewares` invoke middleware concurrently and settle after all complete.
+
+  Global Devtools observation keeps the current event when manual Devtools middleware registers during delivery, while manual registrations already participating in that event remain authoritative, even if they unregister themselves after handling it.
+
+### Patch Changes
+
+- 32264e4: Centralize scope normalization, inheritance, observation, and targeted-clear semantics in the core package, preserve empty observed scopes, and migrate guarded UI controls to use the shared behavior. The UI package now requires the core release that exports these helpers.
+- 5d403d8: Migrate the Core and Devtools store integrations to `@okyrychenko-dev/react-zustand-toolkit` 1.0.0 while preserving React Action Guard's public store and provider APIs.
+- 64145c9: Keep conditional blocker configuration current while the condition remains true, including scope, reason, priority, timestamp and timeout options. Preserve unchanged timeout deadlines and use the latest timeout callback. A timeout ends the current registration episode until a polled false-to-true condition transition or a new ID or Provider attachment starts another episode.
+- 083a5b7: Warn in development when active useActionBlocker hooks share an ID in the same store. Track registrations through cleanup and Strict Mode without warning for equal IDs in isolated stores. Shared IDs still require consumer correction; production registration and cleanup behavior is unchanged.
+- a1b83db: Freeze normalized scope arrays so JavaScript mutation cannot corrupt cached results shared by other consumers. Stable identity, sorting, deduplication, default and empty scope semantics, and bounded cache eviction are preserved.
+- d07b65a: Treat array-form global blocker scopes consistently across store scope queries and targeted clears.
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- 6513e1e: Apply current reactive blocker configuration in core and TanStack hooks. Removed
+  scope, reason and priority values return to defaults; omitted timeout and callback
+  values clear. Metadata changes preserve unchanged deadlines and registration
+  timestamps, while changed timeouts restart and removed timeouts cancel timers.
+  Imperative updateBlocker patch behavior remains compatible. Consumers relying on
+  retained hook options must keep those options in the current configuration.
+  TanStack integration now requires core 1.0.6 or later for replacement support.
+- 303abc3: Keep scheduled blocker configuration current during active windows and honor timeout options without restarting unchanged deadlines. Preserve scheduled end notifications after blocker timeout.
+- eefba30: Prevent repeated confirmation calls from executing the same action more than once per hook
+  instance. Concurrent callers share its outcome; reopening and cancellation are ignored while
+  execution is pending. Success and failure both allow retry. Existing timeout and unmount
+  behavior remains unchanged.
+- 40e8420: Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules; `createTypedHooks` accepts the same arrays while rejecting unknown scope names. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Cover scope representation changes and stable metadata when observation expands. Retain production/development scale and rapid-registration benchmark evidence refreshed after the typed-hook fix, with installed-tarball declaration checks and pinned source provenance.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),

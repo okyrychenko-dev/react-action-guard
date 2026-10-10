@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard-devtools",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Developer tools for @okyrychenko-dev/react-action-guard",
   "engines": {
@@ -71,7 +71,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "@okyrychenko-dev/react-action-guard": "^1.1.0",
+    "@okyrychenko-dev/react-action-guard": "^2.0.0",
     "react": "^18.0.0 || ^19.0.0",
     "zustand": "^5.0.0"
   },

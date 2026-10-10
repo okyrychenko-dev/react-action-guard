@@ -1,5 +1,58 @@
 # Changelog
 
+## 1.0.0
+
+### Minor Changes
+
+- b4945b0: Restore TanStack navigation blocking using native useBlocker. Confirmed transitions keep protection armed, failed confirmations deny navigation, and superseded or unmounted attempts cannot allow navigation. Require TanStack Router >=1.170.41 within v1, the verified compatibility floor, and use native unload protection with a one-shot bypass after accepted document navigation, avoiding a duplicate browser prompt.
+
+  Invalidate pending confirmations when when or scope changes, including replacements that leave the computed blocking state active.
+
+  Preserve pending confirmations when observer callbacks onBlock or onAllow change during a rerender.
+
+  Compare scopes by normalized contents so equivalent arrays, including reordered or duplicated entries, preserve pending confirmations while effective scope changes invalidate them.
+
+  Document and test the native not-found limitation at TanStack Router 1.170.41: unmatched-to-matched navigation skips adapter callbacks even with an active condition or scope; subsequent matched-route navigation remains guarded.
+
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+
+### Patch Changes
+
+- 06df6f3: Use shared confirmation ownership in React Router so only the latest attached navigation attempt can proceed or notify permission. Invalidate pending answers when the evaluated protection state, scope, or message changes, while preserving them across callback rerenders and equivalent scopes.
+
+  Reset the current blocked transition and clear its pending confirmation when protection configuration changes, without resuming stale approvals or resetting superseding attempts.
+
+  Retain ownership of synchronous denials and silent blocking when they replace an async prompt, so later protection changes reset the current blocked transition rather than consulting the obsolete prompt.
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 369b2c0: Prevent stale Pages Router confirmations from resuming navigation and notify permission once across async acceptance and route replay.
+- 691ea3e: Settle pending custom confirmation dialogs as false on effect teardown, including unmount and hiding a preserved React Activity subtree. Clear preserved dialog state so it cannot reappear after effects reconnect. Dialog-specific resolvers now close their own dialog exactly once and cannot affect a replacement dialog. Stable hook-level controls continue to act on the current dialog.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [64145c9]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [083a5b7]
+- Updated dependencies [a1b83db]
+- Updated dependencies [d07b65a]
+- Updated dependencies [bd1dc3b]
+- Updated dependencies [6513e1e]
+- Updated dependencies [303abc3]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [40e8420]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
