@@ -73,8 +73,8 @@ when independent features need consistent interaction rules; it adds no server e
 
 ## Verify
 
-The typecheck command builds core first, so it also works in a clean checkout before
-the workspace build. Runtime tests, lint and the example build then use that public output:
+Typechecking and both test commands build core first, so each works independently in a
+clean checkout before the workspace build. Lint and the example build use that public output:
 
 ```bash
 pnpm --filter react-action-guard-core-example run typecheck

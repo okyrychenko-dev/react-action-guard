@@ -8,5 +8,9 @@ Clarify scope matching, execution lifetime and when local state is sufficient.
 Build core before typechecking the example so clean-checkout verification resolves
 the package's public declarations without relying on existing build output.
 Include the example's rendered workflow tests in recursive CI coverage checks.
+Build core before both example test commands so standalone and recursive tests
+also work without existing package output.
+Run the example first in root test commands so its prerequisite build finishes
+before the remaining packages test against core in parallel.
 These documentation and private-example changes do not alter runtime behavior or
 public APIs; no package release is required.
