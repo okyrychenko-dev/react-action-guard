@@ -73,8 +73,9 @@ when independent features need consistent interaction rules; it adds no server e
 
 ## Verify
 
-Typechecking and both test commands build core first, so each works independently in a
-clean checkout before the workspace build. Lint and the example build use that public output:
+Both test commands resolve core's public source entry through a test-only alias, so each works
+without existing build output. Typechecking builds core first and checks its public declarations.
+Lint and the example build use that built output; Vite's application build does not use the test alias:
 
 ```bash
 pnpm --filter react-action-guard-core-example run typecheck
