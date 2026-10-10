@@ -31,7 +31,11 @@ import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router
 
 export function LeaveDialog() {
   const { dialogState, confirm, onConfirm, onCancel } = useDialogState();
-  useNavigationBlocker({ scope: "navigation", onConfirm: confirm });
+  useNavigationBlocker({
+    scope: "navigation",
+    message: "Leave this page and discard unsaved changes?",
+    onConfirm: confirm,
+  });
   if (!dialogState) return null;
   return (
     <div role="dialog" aria-modal="true" aria-label="Leave page?">
