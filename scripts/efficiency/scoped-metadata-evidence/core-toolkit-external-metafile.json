@@ -124,10 +124,7 @@
           "external": true
         }
       ],
-      "exports": [
-        "App",
-        "exercise"
-      ],
+      "exports": ["App", "exercise"],
       "entryPoint": "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/fixtures/core-consumer.mjs",
       "inputs": {
         "../../../../../../tmp/action-guard-efficiency-eRtOAK/consumer/fixtures/core-consumer.mjs": {

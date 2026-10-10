@@ -55,70 +55,42 @@
       "variant": "retained",
       "bytes": 13098,
       "gzipBytes": 5096,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*"
-      ]
+      "external": ["react", "react-dom", "react-dom/*"]
     },
     {
       "id": "core",
       "variant": "type-utils-external",
       "bytes": 13078,
       "gzipBytes": 5139,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*",
-        "@okyrychenko-dev/type-utils"
-      ]
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/type-utils"]
     },
     {
       "id": "core",
       "variant": "toolkit-external",
       "bytes": 11216,
       "gzipBytes": 4447,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*",
-        "@okyrychenko-dev/react-zustand-toolkit"
-      ]
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/react-zustand-toolkit"]
     },
     {
       "id": "ui",
       "variant": "retained",
       "bytes": 18837,
       "gzipBytes": 6836,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*"
-      ]
+      "external": ["react", "react-dom", "react-dom/*"]
     },
     {
       "id": "ui",
       "variant": "type-utils-external",
       "bytes": 18344,
       "gzipBytes": 6665,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*",
-        "@okyrychenko-dev/type-utils"
-      ]
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/type-utils"]
     },
     {
       "id": "ui",
       "variant": "toolkit-external",
       "bytes": 16950,
       "gzipBytes": 6192,
-      "external": [
-        "react",
-        "react-dom",
-        "react-dom/*",
-        "@okyrychenko-dev/react-zustand-toolkit"
-      ]
+      "external": ["react", "react-dom", "react-dom/*", "@okyrychenko-dev/react-zustand-toolkit"]
     }
   ],
   "guardSet": {
