@@ -40,7 +40,7 @@ export interface TypedHooks<TScope extends string> {
   /**
    * Type-safe version of useBlockingInfo hook
    */
-  useBlockingInfo: (scope: TScope) => ReturnType<typeof useBlockingInfo>;
+  useBlockingInfo: (scope: ScopeValue<TScope>) => ReturnType<typeof useBlockingInfo>;
 }
 
 /**
