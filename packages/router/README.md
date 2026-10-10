@@ -8,6 +8,11 @@ See the [versioned capability matrix](https://github.com/okyrychenko-dev/react-a
 
 > Router integration for React Action Guard - navigation blocking for React Router, Remix, TanStack Router, and Next.js
 
+Start with the [core-only coordination example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
+to see one operation affect two independent controls. Add this package when you need its
+integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
+provide the next learning step.
+
 ## Features
 
 - 🛣️ **Multi-Router Support** - React Router v6.19+, Remix, TanStack Router, limited Next.js Pages Router interception, and App Router unload-only protection
@@ -89,6 +94,9 @@ function EditForm() {
   });
 }
 ```
+
+<details>
+<summary>Detailed reference and integration patterns</summary>
 
 ## API Reference
 
@@ -515,6 +523,8 @@ import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router
 - Next.js adapter: ~3 KB
 
 ---
+
+</details>
 
 ## Development
 

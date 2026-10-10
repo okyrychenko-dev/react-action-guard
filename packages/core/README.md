@@ -4,21 +4,14 @@
 [![npm downloads](https://img.shields.io/npm/dm/@okyrychenko-dev/react-action-guard.svg)](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-> Coordinate shared UI interaction locks in form-heavy and workflow-heavy React applications
+A save can affect an editor and a navigation control owned by different components.
+Core lets the operation publish scopes and reasons, so both consumers react without receiving
+its pending state as props. Unrelated controls remain available.
 
-`react-action-guard` is for interfaces where one operation must disable or inform several unrelated components. It coordinates UI availability for conflicting actions, navigation-sensitive workflows, and non-network blockers through shared scopes. The application owns execution exclusion and cancellation.
-
-For a button with one local loading state, React state or your data-fetching library is usually enough. This package becomes useful when multiple independent operations and components need to agree on what is blocked, where, and why.
-
-## When It Fits
-
-- Large or multi-step forms with duplicate-submit and conflicting-action risks
-- Dashboards where independent widgets react to the same in-flight operation
-- Enterprise workflows that need blocker reasons, priorities, and centralized visibility
-- Non-network rules such as scheduled, conditional, or confirmable blocking
-- SSR, tests, and micro-frontends that need provider-isolated blocking state
-
-It complements TanStack Query and similar server-state tools: they track requests and mutations, while `react-action-guard` coordinates the UI interaction policy around them.
+For one local loading button, React state or mutation observation is usually sufficient.
+Use shared scopes when independent features need a common availability policy. React Context
+can also coordinate a small workflow; this library supplies blocker registration, scope matching,
+ordered reasons and lifecycle cleanup rather than requiring you to build that model yourself.
 
 ## Installation
 
@@ -35,55 +28,119 @@ This package requires the following peer dependencies:
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
 
-## 1.0 Migration
-
-`1.0.0` removes public re-exports of internal `react-zustand-toolkit` helpers from the root package.
-
-If you previously imported `createShallowStore`, `createStoreToolkit`, `createStoreProvider`, or `createResolvedStoreHooks` from `@okyrychenko-dev/react-action-guard`, import them directly from `@okyrychenko-dev/react-zustand-toolkit` instead.
-
 ## Quick Start
 
-Choose a store boundary, register work, observe its scope, then apply that state to a control.
-`UIBlockingProvider` isolates this workflow; without it, hooks use the shared global store.
+One producer, two independent consumers, one real Provider. Paste this into a React application's
+`App.tsx`; the simulated save takes 1.2 seconds:
 
 ```tsx
-import type { ReactElement } from "react";
 import {
   UIBlockingProvider,
   useAsyncAction,
+  useBlockingInfo,
   useIsBlocked,
 } from "@okyrychenko-dev/react-action-guard";
+import { useState, type ReactElement } from "react";
 
 function SaveButton(): ReactElement {
-  const runSave = useAsyncAction<void>("save-profile", "form");
-  const isSaving = useIsBlocked("form");
+  const runSave = useAsyncAction("save-profile", ["profile", "navigation"]);
+  const blocked = useIsBlocked("profile");
+  const [status, setStatus] = useState("Ready");
 
-  const handleClick = async (): Promise<void> => {
+  async function save(): Promise<void> {
     try {
-      await runSave(async () => {
-        const response = await fetch("/api/profile", { method: "POST" });
-        if (!response.ok) {
-          throw new Error("Save failed");
-        }
-      });
-    } catch (error) {
-      console.error(error);
+      await runSave(() => new Promise<void>((resolve) => setTimeout(resolve, 1200)));
+      setStatus("Saved");
+    } catch {
+      setStatus("Save failed; try again");
     }
-  };
+  }
 
-  return <button onClick={handleClick} disabled={isSaving}>Save</button>;
+  return (
+    <>
+      <button
+        disabled={blocked}
+        onClick={() => {
+          void save();
+        }}
+      >
+        Save profile
+      </button>
+      <p role="status">{status}</p>
+    </>
+  );
 }
 
-export function App(): ReactElement {
-  return <UIBlockingProvider><SaveButton /></UIBlockingProvider>;
+function ProfileEditor(): ReactElement {
+  const blockers = useBlockingInfo("profile");
+
+  return (
+    <>
+      <label>
+        Display name <input disabled={blockers.length > 0} />
+      </label>
+      <p role="status">{blockers[0]?.reason ?? "Editing available"}</p>
+    </>
+  );
+}
+
+function NavigationControl(): ReactElement {
+  const blockers = useBlockingInfo("navigation");
+  const [page, setPage] = useState("Profile");
+
+  return (
+    <>
+      <button disabled={blockers.length > 0} onClick={() => setPage("Dashboard")}>
+        Open dashboard
+      </button>
+      <p role="status">{blockers[0]?.reason ?? "Navigation available"}</p>
+      <p>{page}</p>
+    </>
+  );
+}
+
+export default function App(): ReactElement {
+  return (
+    <UIBlockingProvider>
+      <SaveButton />
+      <ProfileEditor />
+      <NavigationControl />
+      <button onClick={() => alert("Help remains available")}>Help</button>
+    </UIBlockingProvider>
+  );
 }
 ```
 
-For existing boolean state, register with `useActionBlocker` instead. Read reasons with
-`useBlockingInfo`; for richer control state and accessibility relationships, use
-[`useGuardedButton` and the other guarded controls](../ui/README.md).
-A disabled control communicates UI availability. Every call to `runSave` still executes;
-use an application-owned synchronous gate when repeat submission must be excluded.
+The save publishes both explicit scopes. Each consumer reads only its own scope and displays
+`Executing save-profile` while protected. Names match literally: `profile.name` does not inherit
+`profile`. A `global` blocker affects ordinary scopes; omitted scopes default to `global`.
+
+`useAsyncAction` releases each execution's blocker after success or failure. If its producer
+unmounts, pending work stays protected until settlement; unmount does not cancel the operation.
+Every call still executes. Applications own repeat-submit exclusion, cancellation and backend
+permissions. The navigation control above changes local UI; it does not intercept browser navigation.
+
+Prefer `UIBlockingProvider` for explicit ownership and SSR, using fresh state per request.
+Without a Provider, hooks use a shared global fallback that does not isolate server requests.
+For existing boolean state, register it with `useActionBlocker` instead.
+
+## Run the complete example
+
+The [core-only example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
+adds success/failure, retry, producer detachment and unrelated help. From a repository checkout:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm --filter @okyrychenko-dev/react-action-guard run build
+pnpm --filter react-action-guard-core-example run dev
+```
+
+## Next steps
+
+- [Canonical documentation and local site instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs): concepts, Provider ownership, examples and API reference.
+- [UI controls](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/ui): richer control state and accessible reason relationships.
+- [Router integration](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/router): browser navigation protection with adapter-specific limits.
+- [Enterprise showcase and local run instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/enterprise-demo): checkout coordination, isolated sessions and Query integration.
 
 ## Core Concepts
 
@@ -112,15 +169,14 @@ Use shared scopes when one component starts work and another component should re
 
 Recommend `UIBlockingProvider` for production ownership and SSR, with a fresh store for each request, test, or micro-frontend. The global fallback is shared convenience state, not request isolation.
 
-## Documentation
+<details>
+<summary>Hook reference, advanced ownership and usage patterns</summary>
 
-📚 **Interactive Storybook Documentation** - Run locally to explore live examples and detailed guides for all hooks
+## 1.0 Migration
 
-To run Storybook locally (from the monorepo root):
-
-```bash
-pnpm --filter @okyrychenko-dev/react-action-guard run storybook
-```
+`1.0.0` removes public re-exports of internal `react-zustand-toolkit` helpers.
+Import `createShallowStore`, `createStoreToolkit`, `createStoreProvider` and
+`createResolvedStoreHooks` directly from `@okyrychenko-dev/react-zustand-toolkit`.
 
 ## API Reference
 
@@ -343,9 +399,12 @@ export function PaymentButton(): ReactElement {
   const run = useAsyncAction<void>("payment", "payment", { timeout: 5000 });
   const blocked = useIsBlocked("payment");
 
-  useEffect(() => () => {
-    active.current?.abort();
-  }, []);
+  useEffect(
+    () => () => {
+      active.current?.abort();
+    },
+    []
+  );
 
   const pay = async (): Promise<void> => {
     if (active.current !== null) {
@@ -377,10 +436,14 @@ export function PaymentButton(): ReactElement {
     }
   };
 
-  return <>
-    <button disabled={blocked} onClick={pay}>Pay</button>
-    <button onClick={() => active.current?.abort()}>Cancel payment</button>
-  </>;
+  return (
+    <>
+      <button disabled={blocked} onClick={pay}>
+        Pay
+      </button>
+      <button onClick={() => active.current?.abort()}>Cancel payment</button>
+    </>
+  );
 }
 ```
 
@@ -931,7 +994,8 @@ import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
 type AppScopes = "global" | "form" | "navigation" | "checkout";
 
-const { useActionBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } = createTypedHooks<AppScopes>();
+const { useActionBlocker, useIsBlocked, useAsyncAction, useBlockingInfo } =
+  createTypedHooks<AppScopes>();
 
 useActionBlocker("save", { scope: "form" }); // OK
 useActionBlocker("save", { scope: "typo" }); // Type error
@@ -1222,6 +1286,8 @@ function SessionManager() {
   );
 }
 ```
+
+</details>
 
 ## Development
 

@@ -1,0 +1,68 @@
+:root {
+  font-family: system-ui, sans-serif;
+  color: #152b3c;
+  background: #f2f5f6;
+  line-height: 1.6;
+}
+body {
+  margin: 0;
+}
+main {
+  max-width: 850px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+h1 {
+  line-height: 1.15;
+}
+h2 {
+  font-size: 1.2rem;
+}
+section {
+  background: white;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  border: 1px solid #d3dfe4;
+  border-radius: 12px;
+}
+.consumers {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+label {
+  display: block;
+}
+button,
+input {
+  font: inherit;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid #637b8b;
+  border-radius: 6px;
+}
+button {
+  cursor: pointer;
+  background: #163e55;
+  color: white;
+}
+button:disabled {
+  background: #65737c;
+  cursor: default;
+}
+input:disabled {
+  background: #eef1f3;
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #0085b8;
+  outline-offset: 3px;
+}
+footer {
+  font-size: 0.9rem;
+}
+@media (max-width: 600px) {
+  .consumers {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
