@@ -8,7 +8,7 @@
 
 > **useResolvedStoreApi**(): `StoreApi`\<[`UIBlockingStore`](../type-aliases/UIBlockingStore.md)\>
 
-Defined in: [context/useResolvedStore.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/useResolvedStore.ts#L27)
+Defined in: [context/useResolvedStore.ts:21](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/useResolvedStore.ts#L21)
 
 Hook that resolves to either the context store or global store
 

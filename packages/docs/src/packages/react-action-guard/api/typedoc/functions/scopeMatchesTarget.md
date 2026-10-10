@@ -8,7 +8,7 @@
 
 > **scopeMatchesTarget**(`blockerScope`, `targetScope`): `boolean`
 
-Defined in: [store/scope/scope.utils.ts:110](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/scope/scope.utils.ts#L110)
+Defined in: [store/scope/scope.utils.ts:125](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/scope/scope.utils.ts#L125)
 
 Checks targeted-clear semantics.
 Global blockers never match a target, including the global target; otherwise any shared scope

@@ -119,13 +119,15 @@ function SubmitButton() {
 
 #### `useBlockingInfo(scope)`
 
-Gets detailed information about all active blockers for a specific scope.
+Gets detailed information about all active blockers affecting the observed scopes.
 
 **Parameters:**
 
-- `scope?: string` - Scope to get blocking information for (default: "global")
+- `scope?: string | ReadonlyArray<string>` - Scope(s) to observe (default: "global"); an empty array observes nothing
 
 **Returns:** `ReadonlyArray<BlockerInfo>` - Array of blocker information objects, sorted by priority (highest first). Priority orders reasons; every matching active blocker retains protection, including lower-priority ones
+
+The hook retains its frozen result and skips subscription-driven renders when the matching metadata is unchanged. Global blockers affect every nonempty observation. Equal priorities retain registration order.
 
 **BlockerInfo:**
 

@@ -35,6 +35,8 @@ for (const { blockers, controls, observers } of [
   { blockers: 10, controls: 20, observers: 0 },
   { blockers: 100, controls: 100, observers: 5 },
   { blockers: 500, controls: 200, observers: 5 },
+  { blockers: 1000, controls: 200, observers: 5 },
+  { blockers: 100, controls: 100, observers: 100 },
 ]) {
   console.log(
     `${process.env.NODE_ENV}: ${blockers} seeded blockers, ${controls} controls per kind`
@@ -90,6 +92,45 @@ for (const { blockers, controls, observers } of [
       }
     ),
   });
+  const transitionsPerSample = 100;
+  const initialPublications = publications;
+  const initialEvents = events;
+  let rapidVisibility = [];
+  const stopRapidCapture = lifecycle.subscribe((snapshot) => {
+    rapidVisibility.push({
+      blockers: snapshot.length,
+      hasRapid: snapshot.some(({ id }) => id === "rapid"),
+    });
+  });
+
+  scenarios.push({
+    name: "rapid scoped registration/removal (50 pairs per sample)",
+    workload,
+    transitionsPerSample,
+    validationSubscribers: 1,
+    ...measure(
+      () => {
+        rapidVisibility = [];
+        for (let index = 0; index < transitionsPerSample / 2; index++) {
+          lifecycle.add("rapid", { scope: ["checkout", "inventory"], priority: 50 });
+          lifecycle.remove("rapid");
+        }
+      },
+      (index) => {
+        assert.equal(lifecycle.getSnapshot().length, blockers + 2);
+        assert.equal(lifecycle.getBlockingInfo("checkout")[0].id, "related");
+        assert.equal(lifecycle.getBlockingInfo("inventory")[0].id, "unrelated");
+        assert.equal(publications - initialPublications, (index + 1) * transitionsPerSample);
+        assert.equal(events - initialEvents, (index + 1) * transitionsPerSample * observers);
+        assert.equal(rapidVisibility.length, transitionsPerSample);
+        rapidVisibility.forEach(({ blockers: visibleBlockers, hasRapid }, phase) => {
+          assert.equal(hasRapid, phase % 2 === 0);
+          assert.equal(visibleBlockers, blockers + 2 + (phase % 2 === 0 ? 1 : 0));
+        });
+      }
+    ),
+  });
+  stopRapidCapture();
   unsubscribe();
   releases.forEach((dispose) => dispose());
   lifecycle.clear();
@@ -100,14 +141,13 @@ for (const { blockers, controls, observers } of [
   let root;
   let store;
   const counts = { boolean: 0, info: 0, button: 0 };
-  const children = [
-    createElement(Capture, {
-      key: "capture",
-      capture: (value) => {
-        store = value;
-      },
-    }),
-  ];
+  const capture = createElement(Capture, {
+    key: "capture",
+    capture: (value) => {
+      store = value;
+    },
+  });
+  const children = [capture];
   for (let index = 0; index < controls; index++) {
     children.push(createElement(BooleanConsumer, { key: `boolean-${index}`, counts }));
     children.push(createElement(InfoConsumer, { key: `info-${index}`, counts }));
@@ -131,11 +171,19 @@ for (const { blockers, controls, observers } of [
   });
   root = createRoot(container);
   console.log("Mount samples validated");
-  flushSync(() => root.render(development ? createElement(StrictMode, null, tree) : tree));
+  // Untimed preparation: populate the same Provider before attaching metadata consumers.
+  // Fresh empty-control mount samples above retain their original measured boundary.
+  const preparationTree = createElement(UIBlockingProvider, null, capture);
+  flushSync(() =>
+    root.render(development ? createElement(StrictMode, null, preparationTree) : preparationTree)
+  );
   assert.ok(store, "Provider exposes a store");
   const { addBlocker, updateBlocker, removeBlocker, clearAllBlockers, observeBlockingEvents } =
     store.getState();
   flushSync(() => seed(addBlocker, blockers));
+  flushSync(() => root.render(development ? createElement(StrictMode, null, tree) : tree));
+  assert.equal(container.querySelectorAll("button:disabled").length, controls);
+  console.log("Untimed seed and consumer setup validated");
   const disposeObservers = Array.from({ length: observers }, () => observeBlockingEvents(() => {}));
 
   for (const target of ["unrelated", "related"]) {
@@ -158,8 +206,17 @@ for (const { blockers, controls, observers } of [
             `render-${index}`
           );
         }
-        if (!development)
-          assert.equal(counts.boolean, 0, "Stable boolean consumers must not rerender");
+        assert.equal(counts.boolean, 0, "Stable boolean consumers must not rerender");
+        const expectedMetadataRenders = target === "related" ? controls * (development ? 2 : 1) : 0;
+        assert.equal(counts.info, expectedMetadataRenders);
+        assert.equal(counts.button, expectedMetadataRenders);
+        if (target === "unrelated") {
+          assert.equal(container.querySelector("button").getAttribute("data-reason"), "original");
+          assert.equal(
+            container.querySelector("[data-info]").getAttribute("data-reason"),
+            "original"
+          );
+        }
         if (index >= warmups) renderCounts.push({ ...counts });
       }
     );
@@ -169,6 +226,51 @@ for (const { blockers, controls, observers } of [
       renderCounts,
       ...timings,
     });
+  }
+  // One medium workload covers rapid rendered churn; repeating it at every size adds no new seam.
+  if (blockers === 100 && observers === 5) {
+    const rapidRenderCounts = [];
+    let rapidSizes = [];
+    const stopRapidSizes = store.subscribe(({ blockingSnapshot }) => {
+      rapidSizes.push(blockingSnapshot.length);
+    });
+
+    scenarios.push({
+      name: "rapid unrelated registration/removal and synchronous React commits (10 pairs per sample)",
+      workload,
+      transitionsPerSample: 20,
+      validationSubscribers: 1,
+      renderCounts: rapidRenderCounts,
+      ...measure(
+        () => {
+          counts.boolean = counts.info = counts.button = 0;
+          rapidSizes = [];
+          for (let index = 0; index < 10; index++) {
+            flushSync(() => addBlocker("rapid", { scope: "inventory", priority: 50 }));
+            flushSync(() => removeBlocker("rapid"));
+          }
+        },
+        (index) => {
+          const { blockingSnapshot } = store.getState();
+
+          assert.equal(blockingSnapshot.length, blockers + 2);
+          assert.equal(container.querySelectorAll("button:disabled").length, controls);
+          assert.equal(
+            container.querySelector("[data-info]").getAttribute("data-info"),
+            String(blockers / 2 + 1)
+          );
+          assert.equal(counts.boolean, 0);
+          assert.equal(counts.info, 0);
+          assert.equal(counts.button, 0);
+          assert.equal(rapidSizes.length, 20);
+          rapidSizes.forEach((size, phase) => {
+            assert.equal(size, blockers + 2 + (phase % 2 === 0 ? 1 : 0));
+          });
+          if (index >= warmups) rapidRenderCounts.push({ ...counts });
+        }
+      ),
+    });
+    stopRapidSizes();
   }
   // Isolate the availability toggle from the concurrent metadata workload.
   flushSync(() => {
@@ -220,7 +322,7 @@ const result = {
     ),
   },
   method:
-    "Built packed public APIs; Happy DOM, not browser paint. performance.now wall clock; validation/reset excluded. 5 warmups and 20 raw samples; fresh-root mount measured separately; transition and flushSync+React commit are distinct workloads, not additive phase estimates. Observation leases are public lifecycle/store observers, not the Devtools panel.",
+    "Built packed public APIs; Happy DOM, not browser paint. performance.now wall clock; validation/reset excluded; rapid snapshot-phase capture included. Initial seeding precedes consumer attachment outside the timer; empty mount/update/churn boundaries unchanged. 5 warmups and 20 raw samples; fresh-root mount measured separately; transition and flushSync+React commit are distinct workloads, not additive phase estimates. Observation leases are public lifecycle/store observers, not the Devtools panel.",
   sampleCount,
   warmups,
   scenarios,

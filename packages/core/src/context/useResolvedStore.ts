@@ -1,17 +1,11 @@
-import { type StoreApi, useStore } from "zustand";
-import { useShallow } from "zustand/shallow";
+import { createResolvedStoreHooks } from "@okyrychenko-dev/react-zustand-toolkit";
 import { uiBlockingStoreApi } from "../store/uiBlockingStore.store";
 import { useOptionalUIBlockingContext } from "./UIBlockingContext";
-import type { Nullable } from "@okyrychenko-dev/type-utils";
+import type { StoreApi } from "zustand";
 import type { UIBlockingStore } from "../store/uiBlockingStore.types";
 
-/**
- * Hook to get the optional context store (returns null if not inside provider)
- * @internal
- */
-function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
-  return useOptionalUIBlockingContext();
-}
+const { useResolvedStoreApi: useToolkitStoreApi, useResolvedValue: useToolkitValue } =
+  createResolvedStoreHooks(uiBlockingStoreApi, useOptionalUIBlockingContext);
 
 /**
  * Hook that resolves to either the context store or global store
@@ -25,24 +19,23 @@ function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
  * @returns The resolved store API
  */
 export function useResolvedStoreApi(): StoreApi<UIBlockingStore> {
-  const contextStore = useOptionalContextStore();
-
-  // Return context store if inside Provider, otherwise global store
-  return contextStore ?? uiBlockingStoreApi;
+  return useToolkitStoreApi();
 }
 
 /**
  * Hook to use the resolved store with a selector
  *
- * Automatically applies shallow comparison to prevent unnecessary re-renders.
+ * Uses toolkit shallow comparison by default, or the supplied domain equality.
  *
  * @param selector - Selector function to pick state from the store
+ * @param equalityFn - Optional comparison retaining equivalent selected values
  * @returns Selected state value
  */
-export function useResolvedValue<T>(selector: (state: UIBlockingStore) => T): T {
-  const store = useResolvedStoreApi();
-
-  return useStore(store, useShallow(selector));
+export function useResolvedValue<T>(
+  selector: (state: UIBlockingStore) => T,
+  equalityFn?: (left: T, right: T) => boolean
+): T {
+  return useToolkitValue(selector, equalityFn);
 }
 
 /**

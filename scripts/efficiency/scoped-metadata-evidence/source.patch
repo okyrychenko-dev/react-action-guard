@@ -1,0 +1,1193 @@
+diff --git a/.changeset/stable-scoped-metadata.md b/.changeset/stable-scoped-metadata.md
+new file mode 100644
+index 0000000..3ba08a3
+--- /dev/null
++++ b/.changeset/stable-scoped-metadata.md
+@@ -0,0 +1,6 @@
++---
++"@okyrychenko-dev/react-action-guard": patch
++"@okyrychenko-dev/react-action-guard-ui": patch
++---
++
++Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules; `createTypedHooks` accepts the same arrays while rejecting unknown scope names. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Cover scope representation changes and stable metadata when observation expands. Retain production/development scale and rapid-registration benchmark evidence refreshed after the typed-hook fix, with installed-tarball declaration checks and pinned source provenance.
+diff --git a/packages/core/src/context/useResolvedStore.ts b/packages/core/src/context/useResolvedStore.ts
+index e401950..6c1d59f 100644
+--- a/packages/core/src/context/useResolvedStore.ts
++++ b/packages/core/src/context/useResolvedStore.ts
+@@ -1,17 +1,11 @@
+-import { type StoreApi, useStore } from "zustand";
+-import { useShallow } from "zustand/shallow";
++import { createResolvedStoreHooks } from "@okyrychenko-dev/react-zustand-toolkit";
+ import { uiBlockingStoreApi } from "../store/uiBlockingStore.store";
+ import { useOptionalUIBlockingContext } from "./UIBlockingContext";
+-import type { Nullable } from "@okyrychenko-dev/type-utils";
++import type { StoreApi } from "zustand";
+ import type { UIBlockingStore } from "../store/uiBlockingStore.types";
+ 
+-/**
+- * Hook to get the optional context store (returns null if not inside provider)
+- * @internal
+- */
+-function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
+-  return useOptionalUIBlockingContext();
+-}
++const { useResolvedStoreApi: useToolkitStoreApi, useResolvedValue: useToolkitValue } =
++  createResolvedStoreHooks(uiBlockingStoreApi, useOptionalUIBlockingContext);
+ 
+ /**
+  * Hook that resolves to either the context store or global store
+@@ -25,24 +19,23 @@ function useOptionalContextStore(): Nullable<StoreApi<UIBlockingStore>> {
+  * @returns The resolved store API
+  */
+ export function useResolvedStoreApi(): StoreApi<UIBlockingStore> {
+-  const contextStore = useOptionalContextStore();
+-
+-  // Return context store if inside Provider, otherwise global store
+-  return contextStore ?? uiBlockingStoreApi;
++  return useToolkitStoreApi();
+ }
+ 
+ /**
+  * Hook to use the resolved store with a selector
+  *
+- * Automatically applies shallow comparison to prevent unnecessary re-renders.
++ * Uses toolkit shallow comparison by default, or the supplied domain equality.
+  *
+  * @param selector - Selector function to pick state from the store
++ * @param equalityFn - Optional comparison retaining equivalent selected values
+  * @returns Selected state value
+  */
+-export function useResolvedValue<T>(selector: (state: UIBlockingStore) => T): T {
+-  const store = useResolvedStoreApi();
+-
+-  return useStore(store, useShallow(selector));
++export function useResolvedValue<T>(
++  selector: (state: UIBlockingStore) => T,
++  equalityFn?: (left: T, right: T) => boolean
++): T {
++  return useToolkitValue(selector, equalityFn);
+ }
+ 
+ /**
+diff --git a/packages/core/src/createTypedHooks.test.tsx b/packages/core/src/createTypedHooks.test.tsx
+new file mode 100644
+index 0000000..1ca10bf
+--- /dev/null
++++ b/packages/core/src/createTypedHooks.test.tsx
+@@ -0,0 +1,46 @@
++import { act, renderHook } from "@testing-library/react";
++import { describe, expect, expectTypeOf, it } from "vitest";
++import { UIBlockingProvider, useResolvedStoreApi } from "./context";
++import { createTypedHooks } from "./createTypedHooks";
++import type { BlockerInfo } from "./store";
++import type { ScopeValue } from "./types";
++
++type AppScope = "checkout" | "profile";
++
++describe("typed metadata observation", () => {
++  it("should accept typed readonly arrays and keep rejecting unknown scope names", () => {
++    const { useBlockingInfo: useTypedBlockingInfo } = createTypedHooks<AppScope>();
++    const scopes: ReadonlyArray<AppScope> = ["checkout", "profile"];
++    const { result } = renderHook(
++      () => ({
++        store: useResolvedStoreApi(),
++        info: useTypedBlockingInfo(scopes),
++        single: useTypedBlockingInfo("checkout"),
++        empty: useTypedBlockingInfo([]),
++      }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, clearAllBlockers } = store.getState();
++
++    expectTypeOf(useTypedBlockingInfo).parameter(0).toEqualTypeOf<ScopeValue<AppScope>>();
++    expectTypeOf<"unknown">().not.toExtend<Parameters<typeof useTypedBlockingInfo>[0]>();
++    expectTypeOf<ReadonlyArray<"checkout" | "unknown">>().not.toExtend<
++      Parameters<typeof useTypedBlockingInfo>[0]
++    >();
++    expectTypeOf(result.current.info).toEqualTypeOf<ReadonlyArray<Readonly<BlockerInfo>>>();
++
++    act(() => {
++      addBlocker("checkout", { scope: "checkout" });
++      addBlocker("profile", { scope: "profile" });
++      addBlocker("maintenance", { scope: "global", priority: 50 });
++    });
++
++    const { info, single, empty } = result.current;
++
++    expect(info.map(({ id }) => id)).toEqual(["maintenance", "checkout", "profile"]);
++    expect(single.map(({ id }) => id)).toEqual(["maintenance", "checkout"]);
++    expect(empty).toEqual([]);
++    act(() => clearAllBlockers());
++  });
++});
+diff --git a/packages/core/src/createTypedHooks.ts b/packages/core/src/createTypedHooks.ts
+index 205cab7..2f6a2fd 100644
+--- a/packages/core/src/createTypedHooks.ts
++++ b/packages/core/src/createTypedHooks.ts
+@@ -40,7 +40,7 @@ export interface TypedHooks<TScope extends string> {
+   /**
+    * Type-safe version of useBlockingInfo hook
+    */
+-  useBlockingInfo: (scope: TScope) => ReturnType<typeof useBlockingInfo>;
++  useBlockingInfo: (scope: ScopeValue<TScope>) => ReturnType<typeof useBlockingInfo>;
+ }
+ 
+ /**
+diff --git a/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx b/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx
+new file mode 100644
+index 0000000..a532e4a
+--- /dev/null
++++ b/packages/core/src/hooks/useBlockingInfo/__tests__/useBlockingInfo.stability.test.tsx
+@@ -0,0 +1,355 @@
++import { act, renderHook } from "@testing-library/react";
++import { describe, expect, it, vi } from "vitest";
++import { UIBlockingProvider, useResolvedStoreApi } from "../../../context";
++import { useActionBlocker, useBlockingInfo, useIsBlocked } from "../../../hooks";
++import { type BlockerConfig, normalizeScope } from "../../../store";
++
++describe("scoped metadata observation", () => {
++  it("should publish scope representation changes while the blocker still matches", () => {
++    const { result } = renderHook(
++      () => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo("checkout"),
++      }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const original = result.current.info;
++
++    expect(original).toHaveLength(1);
++    act(() => updateBlocker("save", { scope: ["checkout", "profile"] }));
++
++    const arrayResult = result.current.info;
++
++    expect(arrayResult).not.toBe(original);
++    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
++    expect(original[0]?.scope).toBe("checkout");
++
++    act(() => updateBlocker("save", { scope: ["checkout", "inventory"] }));
++
++    expect(result.current.info[0]?.scope).toEqual(["checkout", "inventory"]);
++    expect(arrayResult[0]?.scope).toEqual(["checkout", "profile"]);
++
++    act(() => updateBlocker("save", { scope: ["checkout"] }));
++
++    expect(result.current.info[0]?.scope).toEqual(["checkout"]);
++
++    act(() => updateBlocker("save", { scope: "checkout" }));
++
++    expect(result.current.info[0]?.scope).toBe("checkout");
++    expect(result.current.info).not.toBe(arrayResult);
++
++    act(() => removeBlocker("save"));
++  });
++
++  it("should retain identical matching metadata when observation expands and follow the new scope", () => {
++    const { result, rerender } = renderHook(
++      ({ scope }) => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo(scope),
++      }),
++      { wrapper: UIBlockingProvider, initialProps: { scope: ["checkout"] } }
++    );
++    const { store } = result.current;
++    const { addBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const original = result.current.info;
++
++    expect(original).toHaveLength(1);
++    expect(original[0]?.reason).toBe("Saving");
++
++    rerender({ scope: ["checkout", "profile"] });
++
++    expect(result.current.info).toBe(original);
++
++    act(() => addBlocker("profile", { scope: "profile", reason: "Updating profile" }));
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["save", "profile"]);
++    expect(original).toHaveLength(1);
++
++    act(() => {
++      removeBlocker("save");
++      removeBlocker("profile");
++    });
++  });
++
++  it("should retain results and skip renders on unrelated lifecycle changes", () => {
++    let renders = 0;
++    const { result, unmount } = renderHook(
++      () => {
++        const store = useResolvedStoreApi();
++        const info = useBlockingInfo("checkout");
++        const isBlocked = useIsBlocked("checkout");
++
++        renders++;
++
++        return { store, info, isBlocked };
++      },
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const previous = result.current.info;
++    const previousRenders = renders;
++
++    expect(previous).toHaveLength(1);
++    expect(previous[0]?.reason).toBe("Saving");
++
++    act(() => addBlocker("sync", { scope: "inventory" }));
++    act(() => updateBlocker("sync", { reason: "Syncing" }));
++    act(() => removeBlocker("sync"));
++
++    expect(result.current.info).toBe(previous);
++    expect(result.current.isBlocked).toBe(true);
++    expect(renders).toBe(previousRenders);
++
++    unmount();
++
++    act(() => updateBlocker("save", { reason: "Finished" }));
++    expect(renders).toBe(previousRenders);
++  });
++
++  it("should observe metadata, ties, array/global matching and removal without mutating old results", () => {
++    const { result, rerender } = renderHook(
++      ({ scope }) => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo(scope),
++      }),
++      { wrapper: UIBlockingProvider, initialProps: { scope: ["checkout", "profile"] } }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++    const onTimeout = vi.fn();
++
++    act(() => {
++      addBlocker("first", {
++        scope: ["checkout", "inventory"],
++        reason: "Saving",
++        priority: 20,
++        timestamp: 2,
++      });
++      addBlocker("second", { scope: "profile", priority: 20, timestamp: 1 });
++      addBlocker("global", { scope: ["global", "other"], priority: 10 });
++    });
++
++    const original = result.current.info;
++
++    expect(original.map(({ id }) => id)).toEqual(["first", "second", "global"]);
++    expect(Object.isFrozen(original)).toBe(true);
++    expect(Object.isFrozen(original[0])).toBe(true);
++    expect(Object.isFrozen(original[0]?.scope)).toBe(true);
++
++    act(() =>
++      updateBlocker("first", { reason: "Uploading", timestamp: 3, timeout: 100000, onTimeout })
++    );
++
++    expect(result.current.info[0]).toMatchObject({
++      reason: "Uploading",
++      timestamp: 3,
++      timeout: 100000,
++      onTimeout,
++    });
++    expect(original[0]).toMatchObject({ reason: "Saving", timestamp: 2, timeout: undefined });
++
++    act(() => updateBlocker("second", { priority: 30 }));
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["second", "first", "global"]);
++
++    act(() => updateBlocker("first", { scope: "inventory" }));
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["second", "global"]);
++
++    act(() => updateBlocker("global", { reason: "Maintenance" }));
++
++    expect(result.current.info[1]?.reason).toBe("Maintenance");
++
++    act(() => removeBlocker("second"));
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["global"]);
++
++    rerender({ scope: [] });
++
++    expect(result.current.info).toEqual([]);
++
++    rerender({ scope: ["inventory"] });
++
++    expect(result.current.info.map(({ id }) => id)).toEqual(["first", "global"]);
++
++    act(() => removeBlocker("first"));
++    act(() => removeBlocker("global"));
++
++    expect(result.current.info).toEqual([]);
++  });
++
++  it("should retain semantically unchanged metadata and equivalent observed scope arrays", () => {
++    let renders = 0;
++    const { result, rerender } = renderHook(
++      ({ scope }) => {
++        const store = useResolvedStoreApi();
++        const info = useBlockingInfo(scope);
++
++        renders++;
++
++        return { store, info };
++      },
++      { wrapper: UIBlockingProvider, initialProps: { scope: ["checkout", "profile"] } }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++    const onTimeout = vi.fn();
++
++    act(() => addBlocker("save", { scope: ["checkout", "profile"], timestamp: 1, onTimeout }));
++
++    const previous = result.current.info;
++    const previousRenders = renders;
++
++    act(() => updateBlocker("save", { scope: ["checkout", "profile"], timestamp: 1, onTimeout }));
++
++    expect(result.current.info).toBe(previous);
++    expect(renders).toBe(previousRenders);
++
++    rerender({ scope: ["profile", "checkout", "checkout"] });
++
++    expect(result.current.info).toBe(previous);
++
++    const changedCallback = vi.fn();
++
++    act(() => updateBlocker("save", { onTimeout: changedCallback }));
++
++    expect(result.current.info[0]?.onTimeout).toBe(changedCallback);
++    expect(result.current.info).not.toBe(previous);
++
++    act(() => removeBlocker("save"));
++  });
++
++  it("should isolate identical observed scopes across providers and release subscriptions on cleanup", () => {
++    let firstRenders = 0;
++    const first = renderHook(
++      () => {
++        const store = useResolvedStoreApi();
++        const info = useBlockingInfo("checkout");
++
++        firstRenders++;
++
++        return { store, info };
++      },
++      { wrapper: UIBlockingProvider }
++    );
++    const second = renderHook(
++      () => ({ store: useResolvedStoreApi(), info: useBlockingInfo("checkout") }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store: firstStore } = first.result.current;
++    const { store: secondStore } = second.result.current;
++    const { addBlocker: addFirst, removeBlocker: removeFirst } = firstStore.getState();
++    const { addBlocker: addSecond, removeBlocker: removeSecond } = secondStore.getState();
++
++    act(() => addFirst("save", { scope: "checkout", reason: "First" }));
++
++    const firstResult = first.result.current.info;
++    const previousRenders = firstRenders;
++
++    act(() => addSecond("save", { scope: "checkout", reason: "Second" }));
++
++    expect(first.result.current.info).toBe(firstResult);
++    expect(firstRenders).toBe(previousRenders);
++    expect(second.result.current.info[0]?.reason).toBe("Second");
++
++    first.unmount();
++
++    act(() => removeFirst("save"));
++
++    expect(firstRenders).toBe(previousRenders);
++    expect(second.result.current.info[0]?.reason).toBe("Second");
++
++    act(() => removeSecond("save"));
++
++    second.unmount();
++  });
++
++  it("should observe metadata replacement when a producer omits previous configuration", () => {
++    const onTimeout = vi.fn();
++    const config: BlockerConfig = {
++      scope: "checkout",
++      reason: "Saving",
++      priority: 20,
++      timeout: 100000,
++      onTimeout,
++    };
++    const { result, rerender, unmount } = renderHook(
++      ({ config: currentConfig }) => {
++        useActionBlocker("save", currentConfig, true);
++
++        return useBlockingInfo("checkout");
++      },
++      { wrapper: UIBlockingProvider, initialProps: { config } }
++    );
++    const original = result.current;
++
++    expect(original).toHaveLength(1);
++
++    const { onTimeout: registeredOnTimeout } = original[0];
++
++    expect(registeredOnTimeout).toBeTypeOf("function");
++    expect(original[0]).toMatchObject({ timeout: 100000, onTimeout: registeredOnTimeout });
++
++    rerender({ config: { scope: "checkout", reason: "Saving", priority: 20 } });
++
++    expect(result.current).not.toBe(original);
++    expect(result.current[0]).toMatchObject({
++      reason: "Saving",
++      timeout: undefined,
++      onTimeout: undefined,
++    });
++    expect(original[0]).toMatchObject({ timeout: 100000, onTimeout: registeredOnTimeout });
++
++    rerender({ config: { scope: "checkout" } });
++
++    expect(result.current[0]).toMatchObject({ reason: "Unknown", priority: 0 });
++
++    unmount();
++  });
++
++  it("should retain the hook-owned result after unrelated scope normalization activity", () => {
++    const { result, rerender } = renderHook(
++      () => ({
++        store: useResolvedStoreApi(),
++        info: useBlockingInfo("checkout"),
++        arrayInfo: useBlockingInfo(["checkout", "profile"]),
++      }),
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, removeBlocker } = store.getState();
++
++    act(() => addBlocker("save", { scope: "checkout", reason: "Saving" }));
++
++    const { info: previous, arrayInfo: previousArray } = result.current;
++
++    expect(previous).toHaveLength(1);
++
++    act(() => addBlocker("sync", { scope: "inventory" }));
++    expect(result.current.info).toBe(previous);
++
++    for (let index = 0; index < 300; index++) {
++      normalizeScope(`unrelated-${String(index)}`);
++    }
++
++    rerender();
++
++    expect(result.current.info).toBe(previous);
++    expect(result.current.arrayInfo).toBe(previousArray);
++
++    act(() => removeBlocker("sync"));
++    act(() => removeBlocker("save"));
++  });
++});
+diff --git a/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts b/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts
+index ec75785..a9fc734 100644
+--- a/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts
++++ b/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts
+@@ -1,11 +1,13 @@
+ import { useMemo } from "react";
+-import { useStore } from "zustand";
+-import { useResolvedStoreApi } from "../../context";
+-import { DEFAULT_SCOPE } from "../../store";
++import { useResolvedValue } from "../../context";
++import { DEFAULT_SCOPE, normalizeScope } from "../../store";
++import { areBlockingInfosEqual, createBlockingInfoSelector } from "../../store/blockingInfo";
+ import type { BlockerInfo } from "../../store";
++import type { Scope } from "../../store/scope";
+ 
+ /**
+- * Gets detailed information about all active blockers for a specific scope.
++ * Gets immutable, priority-ordered information about blockers affecting the observed scopes.
++ * Unrelated lifecycle changes preserve the result and do not trigger a render.
+  *
+  * @public
+  * @since 0.6.0
+@@ -14,15 +16,13 @@ import type { BlockerInfo } from "../../store";
+  * @see {@link BlockerInfo} for the structure of blocker information objects
+  */
+ export function useBlockingInfo(
+-  scope: string = DEFAULT_SCOPE
++  scope: Scope = DEFAULT_SCOPE
+ ): ReadonlyArray<Readonly<BlockerInfo>> {
+-  const store = useResolvedStoreApi();
++  const checkedScopes = normalizeScope(scope);
+ 
+-  const blockingSnapshot = useStore(store, (state) => state.blockingSnapshot);
++  const selector = useMemo(() => {
++    return createBlockingInfoSelector(checkedScopes);
++  }, [checkedScopes]);
+ 
+-  // Recompute only when the immutable lifecycle projection or scope changes
+-  return useMemo(() => {
+-    return store.getState().getBlockingInfo(scope);
+-    // eslint-disable-next-line react-hooks/exhaustive-deps
+-  }, [blockingSnapshot, scope, store]);
++  return useResolvedValue(selector, areBlockingInfosEqual);
+ }
+diff --git a/packages/core/src/store/blockingInfo/blockingInfo.utils.ts b/packages/core/src/store/blockingInfo/blockingInfo.utils.ts
+new file mode 100644
+index 0000000..39bc7a6
+--- /dev/null
++++ b/packages/core/src/store/blockingInfo/blockingInfo.utils.ts
+@@ -0,0 +1,108 @@
++import { type Optional, isDefined, isString } from "@okyrychenko-dev/type-utils";
++import { createScopeObservationMatcher } from "../scope";
++import type { BlockingLifecycleSnapshot } from "../blockingLifecycle";
++import type { Scope } from "../scope";
++import type { BlockerInfo, UIBlockingStore } from "../uiBlockingStore.types";
++
++function sameScope(first: Scope, second: Scope): boolean {
++  if (first === second) {
++    return true;
++  }
++  if (isString(first) || isString(second)) {
++    return false;
++  }
++
++  return first.length === second.length && first.every((scope, index) => scope === second[index]);
++}
++
++function sameBlocker(first: BlockerInfo, second: BlockerInfo): boolean {
++  if (first === second) {
++    return true;
++  }
++
++  const { id, scope, reason, priority, timestamp, timeout, onTimeout } = first;
++  const {
++    id: previousId,
++    scope: previousScope,
++    reason: previousReason,
++    priority: previousPriority,
++    timestamp: previousTimestamp,
++    timeout: previousTimeout,
++    onTimeout: previousOnTimeout,
++  } = second;
++
++  return (
++    id === previousId &&
++    sameScope(scope, previousScope) &&
++    reason === previousReason &&
++    priority === previousPriority &&
++    timestamp === previousTimestamp &&
++    timeout === previousTimeout &&
++    onTimeout === previousOnTimeout
++  );
++}
++
++export function areBlockingInfosEqual(
++  first: BlockingLifecycleSnapshot,
++  second: BlockingLifecycleSnapshot
++): boolean {
++  return (
++    first === second ||
++    (first.length === second.length &&
++      first.every((blocker, index) => {
++        const previous = second[index];
++
++        return isDefined(previous) && sameBlocker(blocker, previous);
++      }))
++  );
++}
++
++function matchingBlockers(
++  snapshot: BlockingLifecycleSnapshot,
++  matchesScope: ReturnType<typeof createScopeObservationMatcher>
++): Array<BlockerInfo> {
++  return snapshot.filter(({ scope }) => matchesScope(scope));
++}
++
++function orderedBlockers(blockers: Array<BlockerInfo>): BlockingLifecycleSnapshot {
++  return Object.freeze(
++    blockers.sort(({ priority: first }, { priority: second }) => second - first)
++  );
++}
++
++export function projectBlockingInfo(
++  snapshot: BlockingLifecycleSnapshot,
++  scope: Scope
++): BlockingLifecycleSnapshot {
++  const matchesScope = createScopeObservationMatcher(scope);
++
++  return orderedBlockers(matchingBlockers(snapshot, matchesScope));
++}
++
++/** One hook-owned last snapshot/projection; released with its selector, never cached globally. */
++export function createBlockingInfoSelector(
++  scope: Scope
++): (state: UIBlockingStore) => BlockingLifecycleSnapshot {
++  const matchesScope = createScopeObservationMatcher(scope);
++  let previousSnapshot: Optional<BlockingLifecycleSnapshot>;
++  let previousMatches: ReadonlyArray<BlockerInfo> = [];
++  let result: BlockingLifecycleSnapshot = Object.freeze([]);
++
++  return ({ blockingSnapshot }) => {
++    if (blockingSnapshot === previousSnapshot) {
++      return result;
++    }
++
++    const matches = matchingBlockers(blockingSnapshot, matchesScope);
++    const unchanged = areBlockingInfosEqual(matches, previousMatches);
++
++    previousSnapshot = blockingSnapshot;
++
++    if (!unchanged) {
++      previousMatches = matches;
++      result = orderedBlockers([...matches]);
++    }
++
++    return result;
++  };
++}
+diff --git a/packages/core/src/store/blockingInfo/index.ts b/packages/core/src/store/blockingInfo/index.ts
+new file mode 100644
+index 0000000..f41528b
+--- /dev/null
++++ b/packages/core/src/store/blockingInfo/index.ts
+@@ -0,0 +1,5 @@
++export {
++  areBlockingInfosEqual,
++  createBlockingInfoSelector,
++  projectBlockingInfo,
++} from "./blockingInfo.utils";
+diff --git a/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts b/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts
+index 156c07f..f22ebbc 100644
+--- a/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts
++++ b/packages/core/src/store/blockingLifecycle/blockingLifecycle.ts
+@@ -1,4 +1,5 @@
+ import { isDefined, isString, isUndefined } from "@okyrychenko-dev/type-utils";
++import { projectBlockingInfo } from "../blockingInfo";
+ import { scopeAffectsObservation, scopeMatchesTarget } from "../scope";
+ import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
+ import type { Middleware } from "../../middleware";
+@@ -307,11 +308,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
+   }
+ 
+   function getBlockingInfo(scope: string): BlockingLifecycleSnapshot {
+-    return Object.freeze(
+-      getSnapshot()
+-        .filter((blocker) => scopeAffectsObservation(blocker.scope, scope))
+-        .sort((a, b) => b.priority - a.priority)
+-    );
++    return projectBlockingInfo(getSnapshot(), scope);
+   }
+ 
+   function subscribe(listener: (snapshot: BlockingLifecycleSnapshot) => void): VoidFunction {
+diff --git a/packages/core/src/store/scope/index.ts b/packages/core/src/store/scope/index.ts
+index 245c0da..6f1ef76 100644
+--- a/packages/core/src/store/scope/index.ts
++++ b/packages/core/src/store/scope/index.ts
+@@ -1,6 +1,7 @@
+ export { DEFAULT_SCOPE } from "./scope.constants";
+ export type { Scope } from "./scope.types";
+ export {
++  createScopeObservationMatcher,
+   normalizeScope,
+   resolveScope,
+   scopeAffectsObservation,
+diff --git a/packages/core/src/store/scope/scope.utils.ts b/packages/core/src/store/scope/scope.utils.ts
+index f828273..7b6c34c 100644
+--- a/packages/core/src/store/scope/scope.utils.ts
++++ b/packages/core/src/store/scope/scope.utils.ts
+@@ -82,24 +82,39 @@ export function resolveScope(explicitScope?: Scope, inheritedScope?: Scope): Opt
+   return explicitScope;
+ }
+ 
++function matchesObservedScopes(
++  blockerScope: Scope,
++  observedScopes: ReadonlyArray<string>
++): boolean {
++  if (!isNonEmptyArray(observedScopes)) {
++    return false;
++  }
++
++  if (isString(blockerScope)) {
++    return blockerScope === DEFAULT_SCOPE || observedScopes.includes(blockerScope);
++  }
++
++  return (
++    blockerScope.includes(DEFAULT_SCOPE) ||
++    observedScopes.some((scope) => blockerScope.includes(scope))
++  );
++}
++
+ /**
+  * Checks ordinary observation semantics.
+  * A global blocker affects every observed scope and otherwise any shared scope is a match.
+  */
+ export function scopeAffectsObservation(blockerScope: Scope, observedScope: Scope): boolean {
+-  const observedScopes = normalizeScope(observedScope);
+-
+-  if (!isNonEmptyArray(observedScopes)) {
+-    return false;
+-  }
+-
+-  const blockerScopes = normalizeScope(blockerScope);
++  return matchesObservedScopes(blockerScope, normalizeScope(observedScope));
++}
+ 
+-  if (blockerScopes.includes(DEFAULT_SCOPE)) {
+-    return true;
+-  }
++/** @internal Prepare one observation without repeatedly normalizing every blocker. */
++export function createScopeObservationMatcher(
++  observedScope: Scope
++): (blockerScope: Scope) => boolean {
++  const observedScopes = normalizeScope(observedScope);
+ 
+-  return observedScopes.some((scope) => blockerScopes.includes(scope));
++  return (blockerScope) => matchesObservedScopes(blockerScope, observedScopes);
+ }
+ 
+ /**
+diff --git a/packages/ui/src/ui/hooks/useGuardedControl/useGuardedControl.stability.test.tsx b/packages/ui/src/ui/hooks/useGuardedControl/useGuardedControl.stability.test.tsx
+new file mode 100644
+index 0000000..78de2ff
+--- /dev/null
++++ b/packages/ui/src/ui/hooks/useGuardedControl/useGuardedControl.stability.test.tsx
+@@ -0,0 +1,63 @@
++import { UIBlockingProvider, useResolvedStoreApi } from "@okyrychenko-dev/react-action-guard";
++import { act, renderHook } from "@testing-library/react";
++import { describe, expect, it } from "vitest";
++import { useGuardedControl } from "./useGuardedControl";
++
++describe("guarded metadata observation", () => {
++  it("should skip unrelated renders and keep observing reasons through inline scope arrays", () => {
++    let renders = 0;
++    const { result, rerender, unmount } = renderHook(
++      () => {
++        const store = useResolvedStoreApi();
++        const control = useGuardedControl({
++          kind: "action",
++          scope: ["checkout", "profile"],
++          reasonMode: "visible",
++        });
++
++        renders++;
++
++        return { store, control };
++      },
++      { wrapper: UIBlockingProvider }
++    );
++    const { store } = result.current;
++    const { addBlocker, updateBlocker, removeBlocker } = store.getState();
++
++    act(() =>
++      addBlocker("save", { scope: ["checkout", "profile"], reason: "Saving", priority: 20 })
++    );
++
++    const { control: originalControl } = result.current;
++    const { blocker: originalBlocker } = originalControl;
++    const { blockers: previous } = originalBlocker;
++    const previousRenders = renders;
++
++    expect(previous).toHaveLength(1);
++    expect(originalControl.reasonContent).toBe("Saving");
++    act(() => addBlocker("sync", { scope: "inventory" }));
++    act(() => updateBlocker("sync", { reason: "Syncing" }));
++    act(() => removeBlocker("sync"));
++    expect(result.current.control.blocker.blockers).toBe(previous);
++    expect(renders).toBe(previousRenders);
++
++    rerender();
++    expect(result.current.control.blocker.blockers).toBe(previous);
++    act(() => updateBlocker("save", { reason: "Uploading" }));
++
++    const { control: uploadingControl } = result.current;
++    const { reasonContent: uploadingReason, controlState: uploadingState } = uploadingControl;
++
++    expect(uploadingReason).toBe("Uploading");
++    expect(uploadingState.disabled).toBe(true);
++    expect(previous[0]?.reason).toBe("Saving");
++    act(() => removeBlocker("save"));
++
++    const { control: idleControl } = result.current;
++    const { controlState: idleState, reasonContent: idleReason } = idleControl;
++
++    expect(idleState.disabled).toBe(false);
++    expect(idleReason).toBeNull();
++    unmount();
++  });
++});
+diff --git a/packages/ui/src/ui/hooks/useTopBlocker/useTopBlocker.ts b/packages/ui/src/ui/hooks/useTopBlocker/useTopBlocker.ts
+index d4e9339..1ae5f78 100644
+--- a/packages/ui/src/ui/hooks/useTopBlocker/useTopBlocker.ts
++++ b/packages/ui/src/ui/hooks/useTopBlocker/useTopBlocker.ts
+@@ -1,30 +1,10 @@
+-import {
+-  type BlockerInfo,
+-  normalizeScope,
+-  scopeAffectsObservation,
+-  useResolvedValue,
+-} from "@okyrychenko-dev/react-action-guard";
++import { useBlockingInfo } from "@okyrychenko-dev/react-action-guard";
+ import { isNonEmptyArray, isNull } from "@okyrychenko-dev/type-utils";
+ import { useMemo } from "react";
+ import type { GuardedScope, UseTopBlockerReturn } from "../../types";
+ 
+ export function useTopBlocker(scope?: GuardedScope): UseTopBlockerReturn {
+-  const blockingSnapshot = useResolvedValue((state) => state.blockingSnapshot);
+-  const checkedScopes = useMemo(() => normalizeScope(scope), [scope]);
+-
+-  const blockers = useMemo(() => {
+-    const scopedBlockers: Array<BlockerInfo> = [];
+-
+-    for (const blocker of blockingSnapshot) {
+-      if (scopeAffectsObservation(blocker.scope, checkedScopes)) {
+-        scopedBlockers.push(blocker);
+-      }
+-    }
+-
+-    scopedBlockers.sort((first, second) => second.priority - first.priority);
+-
+-    return scopedBlockers;
+-  }, [blockingSnapshot, checkedScopes]);
++  const blockers = useBlockingInfo(scope);
+ 
+   return useMemo(() => {
+     const topBlocker = isNonEmptyArray(blockers) ? blockers[0] : null;
+diff --git a/scripts/efficiency/subscriptions.mjs b/scripts/efficiency/subscriptions.mjs
+index 4816275..d2265c6 100644
+--- a/scripts/efficiency/subscriptions.mjs
++++ b/scripts/efficiency/subscriptions.mjs
+@@ -35,6 +35,8 @@ for (const { blockers, controls, observers } of [
+   { blockers: 10, controls: 20, observers: 0 },
+   { blockers: 100, controls: 100, observers: 5 },
+   { blockers: 500, controls: 200, observers: 5 },
++  { blockers: 1000, controls: 200, observers: 5 },
++  { blockers: 100, controls: 100, observers: 100 },
+ ]) {
+   console.log(
+     `${process.env.NODE_ENV}: ${blockers} seeded blockers, ${controls} controls per kind`
+@@ -90,6 +92,45 @@ for (const { blockers, controls, observers } of [
+       }
+     ),
+   });
++  const transitionsPerSample = 100;
++  const initialPublications = publications;
++  const initialEvents = events;
++  let rapidVisibility = [];
++  const stopRapidCapture = lifecycle.subscribe((snapshot) => {
++    rapidVisibility.push({
++      blockers: snapshot.length,
++      hasRapid: snapshot.some(({ id }) => id === "rapid"),
++    });
++  });
++
++  scenarios.push({
++    name: "rapid scoped registration/removal (50 pairs per sample)",
++    workload,
++    transitionsPerSample,
++    validationSubscribers: 1,
++    ...measure(
++      () => {
++        rapidVisibility = [];
++        for (let index = 0; index < transitionsPerSample / 2; index++) {
++          lifecycle.add("rapid", { scope: ["checkout", "inventory"], priority: 50 });
++          lifecycle.remove("rapid");
++        }
++      },
++      (index) => {
++        assert.equal(lifecycle.getSnapshot().length, blockers + 2);
++        assert.equal(lifecycle.getBlockingInfo("checkout")[0].id, "related");
++        assert.equal(lifecycle.getBlockingInfo("inventory")[0].id, "unrelated");
++        assert.equal(publications - initialPublications, (index + 1) * transitionsPerSample);
++        assert.equal(events - initialEvents, (index + 1) * transitionsPerSample * observers);
++        assert.equal(rapidVisibility.length, transitionsPerSample);
++        rapidVisibility.forEach(({ blockers: visibleBlockers, hasRapid }, phase) => {
++          assert.equal(hasRapid, phase % 2 === 0);
++          assert.equal(visibleBlockers, blockers + 2 + (phase % 2 === 0 ? 1 : 0));
++        });
++      }
++    ),
++  });
++  stopRapidCapture();
+   unsubscribe();
+   releases.forEach((dispose) => dispose());
+   lifecycle.clear();
+@@ -100,14 +141,13 @@ for (const { blockers, controls, observers } of [
+   let root;
+   let store;
+   const counts = { boolean: 0, info: 0, button: 0 };
+-  const children = [
+-    createElement(Capture, {
+-      key: "capture",
+-      capture: (value) => {
+-        store = value;
+-      },
+-    }),
+-  ];
++  const capture = createElement(Capture, {
++    key: "capture",
++    capture: (value) => {
++      store = value;
++    },
++  });
++  const children = [capture];
+   for (let index = 0; index < controls; index++) {
+     children.push(createElement(BooleanConsumer, { key: `boolean-${index}`, counts }));
+     children.push(createElement(InfoConsumer, { key: `info-${index}`, counts }));
+@@ -131,11 +171,19 @@ for (const { blockers, controls, observers } of [
+   });
+   root = createRoot(container);
+   console.log("Mount samples validated");
+-  flushSync(() => root.render(development ? createElement(StrictMode, null, tree) : tree));
++  // Untimed preparation: populate the same Provider before attaching metadata consumers.
++  // Fresh empty-control mount samples above retain their original measured boundary.
++  const preparationTree = createElement(UIBlockingProvider, null, capture);
++  flushSync(() =>
++    root.render(development ? createElement(StrictMode, null, preparationTree) : preparationTree)
++  );
+   assert.ok(store, "Provider exposes a store");
+   const { addBlocker, updateBlocker, removeBlocker, clearAllBlockers, observeBlockingEvents } =
+     store.getState();
+   flushSync(() => seed(addBlocker, blockers));
++  flushSync(() => root.render(development ? createElement(StrictMode, null, tree) : tree));
++  assert.equal(container.querySelectorAll("button:disabled").length, controls);
++  console.log("Untimed seed and consumer setup validated");
+   const disposeObservers = Array.from({ length: observers }, () => observeBlockingEvents(() => {}));
+ 
+   for (const target of ["unrelated", "related"]) {
+@@ -158,8 +206,17 @@ for (const { blockers, controls, observers } of [
+             `render-${index}`
+           );
+         }
+-        if (!development)
+-          assert.equal(counts.boolean, 0, "Stable boolean consumers must not rerender");
++        assert.equal(counts.boolean, 0, "Stable boolean consumers must not rerender");
++        const expectedMetadataRenders = target === "related" ? controls * (development ? 2 : 1) : 0;
++        assert.equal(counts.info, expectedMetadataRenders);
++        assert.equal(counts.button, expectedMetadataRenders);
++        if (target === "unrelated") {
++          assert.equal(container.querySelector("button").getAttribute("data-reason"), "original");
++          assert.equal(
++            container.querySelector("[data-info]").getAttribute("data-reason"),
++            "original"
++          );
++        }
+         if (index >= warmups) renderCounts.push({ ...counts });
+       }
+     );
+@@ -170,6 +227,51 @@ for (const { blockers, controls, observers } of [
+       ...timings,
+     });
+   }
++  // One medium workload covers rapid rendered churn; repeating it at every size adds no new seam.
++  if (blockers === 100 && observers === 5) {
++    const rapidRenderCounts = [];
++    let rapidSizes = [];
++    const stopRapidSizes = store.subscribe(({ blockingSnapshot }) => {
++      rapidSizes.push(blockingSnapshot.length);
++    });
++
++    scenarios.push({
++      name: "rapid unrelated registration/removal and synchronous React commits (10 pairs per sample)",
++      workload,
++      transitionsPerSample: 20,
++      validationSubscribers: 1,
++      renderCounts: rapidRenderCounts,
++      ...measure(
++        () => {
++          counts.boolean = counts.info = counts.button = 0;
++          rapidSizes = [];
++          for (let index = 0; index < 10; index++) {
++            flushSync(() => addBlocker("rapid", { scope: "inventory", priority: 50 }));
++            flushSync(() => removeBlocker("rapid"));
++          }
++        },
++        (index) => {
++          const { blockingSnapshot } = store.getState();
++
++          assert.equal(blockingSnapshot.length, blockers + 2);
++          assert.equal(container.querySelectorAll("button:disabled").length, controls);
++          assert.equal(
++            container.querySelector("[data-info]").getAttribute("data-info"),
++            String(blockers / 2 + 1)
++          );
++          assert.equal(counts.boolean, 0);
++          assert.equal(counts.info, 0);
++          assert.equal(counts.button, 0);
++          assert.equal(rapidSizes.length, 20);
++          rapidSizes.forEach((size, phase) => {
++            assert.equal(size, blockers + 2 + (phase % 2 === 0 ? 1 : 0));
++          });
++          if (index >= warmups) rapidRenderCounts.push({ ...counts });
++        }
++      ),
++    });
++    stopRapidSizes();
++  }
+   // Isolate the availability toggle from the concurrent metadata workload.
+   flushSync(() => {
+     clearAllBlockers();
+@@ -220,7 +322,7 @@ const result = {
+     ),
+   },
+   method:
+-    "Built packed public APIs; Happy DOM, not browser paint. performance.now wall clock; validation/reset excluded. 5 warmups and 20 raw samples; fresh-root mount measured separately; transition and flushSync+React commit are distinct workloads, not additive phase estimates. Observation leases are public lifecycle/store observers, not the Devtools panel.",
++    "Built packed public APIs; Happy DOM, not browser paint. performance.now wall clock; validation/reset excluded; rapid snapshot-phase capture included. Initial seeding precedes consumer attachment outside the timer; empty mount/update/churn boundaries unchanged. 5 warmups and 20 raw samples; fresh-root mount measured separately; transition and flushSync+React commit are distinct workloads, not additive phase estimates. Observation leases are public lifecycle/store observers, not the Devtools panel.",
+   sampleCount,
+   warmups,
+   scenarios,
+diff --git a/scripts/efficiency/typedMetadata.utils.ts b/scripts/efficiency/typedMetadata.utils.ts
+new file mode 100644
+index 0000000..2564f31
+--- /dev/null
++++ b/scripts/efficiency/typedMetadata.utils.ts
+@@ -0,0 +1,30 @@
++import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
++import type { BlockerInfo, ScopeValue, TypedHooks } from "@okyrychenko-dev/react-action-guard";
++
++type AppScope = "checkout" | "profile";
++type DeclaredScope = Parameters<TypedHooks<AppScope>["useBlockingInfo"]>[0];
++type RequireTrue<T extends true> = T;
++
++export type AcceptedScopesStayBounded = RequireTrue<
++  DeclaredScope extends ScopeValue<AppScope> ? true : false
++>;
++export type ScopeArraysAreAccepted = RequireTrue<
++  ScopeValue<AppScope> extends DeclaredScope ? true : false
++>;
++export type UnknownScopeIsRejected = RequireTrue<"unknown" extends DeclaredScope ? false : true>;
++export type UnknownArrayMemberIsRejected = RequireTrue<
++  ReadonlyArray<"checkout" | "unknown"> extends DeclaredScope ? false : true
++>;
++
++// Compile only against installed public declarations; this hook is never executed.
++export function useTypedMetadataContract(): ReadonlyArray<Readonly<BlockerInfo>> {
++  const { useBlockingInfo } = createTypedHooks<AppScope>();
++  const scopes: ReadonlyArray<AppScope> = ["checkout", "profile"];
++  const info = useBlockingInfo(scopes);
++
++  useBlockingInfo("checkout");
++  useBlockingInfo(["checkout", "profile"]);
++  useBlockingInfo([]);
++
++  return info;
++}
+diff --git a/scripts/measure-efficiency.mjs b/scripts/measure-efficiency.mjs
+index 7e0e19b..1e0aee5 100644
+--- a/scripts/measure-efficiency.mjs
++++ b/scripts/measure-efficiency.mjs
+@@ -1,5 +1,6 @@
+ import assert from "node:assert/strict";
+ import { execFileSync } from "node:child_process";
++import { createHash } from "node:crypto";
+ import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
+ import { tmpdir } from "node:os";
+ import { join, resolve } from "node:path";
+@@ -9,10 +10,44 @@ import { build } from "esbuild";
+ import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
+ 
+ const repository = fileURLToPath(new URL("../", import.meta.url));
++const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
++  cwd: repository,
++  encoding: "utf8",
++}).trim();
++const sourceBase = execFileSync(
++  "git",
++  ["rev-parse", "--verify", `${process.argv[3] ?? sourceCommit}^{commit}`],
++  {
++    cwd: repository,
++    encoding: "utf8",
++  }
++).trim();
++const sourceDirty = execFileSync("git", ["status", "--porcelain"], {
++  cwd: repository,
++  encoding: "utf8",
++}).trim();
+ const temporary = mkdtempSync(join(tmpdir(), "action-guard-efficiency-"));
+ const output = resolve(process.argv[2] ?? temporary);
+ mkdirSync(output, { recursive: true });
+ assert.equal(readdirSync(output).length, 0, "Use an empty evidence directory for each run");
++const sourceDiff = execFileSync(
++  "git",
++  [
++    "diff",
++    sourceBase,
++    "--",
++    "packages/core",
++    "packages/ui",
++    "scripts/measure-efficiency.mjs",
++    "scripts/compatibility/cohort.utils.mjs",
++    "scripts/compatibility/provider.test.mjs",
++    ":(glob)scripts/efficiency/*.mjs",
++    ":(glob)scripts/efficiency/*.ts",
++    ".changeset",
++  ],
++  { cwd: repository, encoding: "utf8" }
++);
++writeFileSync(join(output, "source.patch"), sourceDiff);
+ const { tarballs } = preparePackedCohort(repository, temporary);
+ const consumer = join(temporary, "consumer");
+ mkdirSync(consumer);
+@@ -60,6 +95,7 @@ execFileSync(
+   [
+     join(repository, "node_modules/typescript/bin/tsc"),
+     "fixtures/narrowing.utils.ts",
++    "fixtures/typedMetadata.utils.ts",
+     "--noEmit",
+     "--strict",
+     "--noUncheckedIndexedAccess",
+@@ -185,18 +221,30 @@ writeFileSync(
+   JSON.stringify(
+     {
+       timestamp: new Date().toISOString(),
+-      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
+-        cwd: repository,
+-        encoding: "utf8",
+-      }).trim(),
+-      sourceDirty: execFileSync("git", ["status", "--porcelain"], {
+-        cwd: repository,
+-        encoding: "utf8",
+-      }).trim(),
++      sourceCommit,
++      sourceBase,
++      sourceDirty,
+       node: process.version,
+       esbuild: localVersion("node_modules/esbuild"),
+       packages: Object.fromEntries(
+-        ["core", "ui"].map((id) => [id, { name: tarballs[id].name, version: tarballs[id].version }])
++        ["core", "ui"].map((id) => {
++          const { name, version, tarball } = tarballs[id];
++          const sha256 = createHash("sha256").update(readFileSync(tarball)).digest("hex");
++
++          return [id, { name, version, sha256 }];
++        })
++      ),
++      sourceDiffSha256: createHash("sha256").update(sourceDiff).digest("hex"),
++      fixtures: Object.fromEntries(
++        readdirSync(join(consumer, "fixtures"), { withFileTypes: true })
++          .filter((entry) => entry.isFile())
++          .filter(({ name }) => name.endsWith(".mjs") || name.endsWith(".ts"))
++          .map(({ name }) => [
++            name,
++            createHash("sha256")
++              .update(readFileSync(join(consumer, "fixtures", name)))
++              .digest("hex"),
++          ])
+       ),
+       resolvedVersions: Object.fromEntries(
+         Object.entries(JSON.parse(lock).packages).map(([name, entry]) => [name, entry.version])
+@@ -212,6 +260,7 @@ writeFileSync(
+       },
+       retainedConsumerSSR: "passed",
+       providerIsolationAndHydration: "passed (existing packed provider suite)",
++      typedMetadataDeclarations: "passed (installed Core tarball, strict NodeNext)",
+       toolkitMiddlewareHandle: "passed",
+     },
+     null,

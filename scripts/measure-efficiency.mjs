@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
@@ -9,10 +10,44 @@ import { build } from "esbuild";
 import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
+const sourceCommit = execFileSync("git", ["rev-parse", "HEAD"], {
+  cwd: repository,
+  encoding: "utf8",
+}).trim();
+const sourceBase = execFileSync(
+  "git",
+  ["rev-parse", "--verify", `${process.argv[3] ?? sourceCommit}^{commit}`],
+  {
+    cwd: repository,
+    encoding: "utf8",
+  }
+).trim();
+const sourceDirty = execFileSync("git", ["status", "--porcelain"], {
+  cwd: repository,
+  encoding: "utf8",
+}).trim();
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-efficiency-"));
 const output = resolve(process.argv[2] ?? temporary);
 mkdirSync(output, { recursive: true });
 assert.equal(readdirSync(output).length, 0, "Use an empty evidence directory for each run");
+const sourceDiff = execFileSync(
+  "git",
+  [
+    "diff",
+    sourceBase,
+    "--",
+    "packages/core",
+    "packages/ui",
+    "scripts/measure-efficiency.mjs",
+    "scripts/compatibility/cohort.utils.mjs",
+    "scripts/compatibility/provider.test.mjs",
+    ":(glob)scripts/efficiency/*.mjs",
+    ":(glob)scripts/efficiency/*.ts",
+    ".changeset",
+  ],
+  { cwd: repository, encoding: "utf8" }
+);
+writeFileSync(join(output, "source.patch"), sourceDiff);
 const { tarballs } = preparePackedCohort(repository, temporary);
 const consumer = join(temporary, "consumer");
 mkdirSync(consumer);
@@ -60,6 +95,7 @@ execFileSync(
   [
     join(repository, "node_modules/typescript/bin/tsc"),
     "fixtures/narrowing.utils.ts",
+    "fixtures/typedMetadata.utils.ts",
     "--noEmit",
     "--strict",
     "--noUncheckedIndexedAccess",
@@ -185,18 +221,30 @@ writeFileSync(
   JSON.stringify(
     {
       timestamp: new Date().toISOString(),
-      sourceCommit: execFileSync("git", ["rev-parse", "HEAD"], {
-        cwd: repository,
-        encoding: "utf8",
-      }).trim(),
-      sourceDirty: execFileSync("git", ["status", "--porcelain"], {
-        cwd: repository,
-        encoding: "utf8",
-      }).trim(),
+      sourceCommit,
+      sourceBase,
+      sourceDirty,
       node: process.version,
       esbuild: localVersion("node_modules/esbuild"),
       packages: Object.fromEntries(
-        ["core", "ui"].map((id) => [id, { name: tarballs[id].name, version: tarballs[id].version }])
+        ["core", "ui"].map((id) => {
+          const { name, version, tarball } = tarballs[id];
+          const sha256 = createHash("sha256").update(readFileSync(tarball)).digest("hex");
+
+          return [id, { name, version, sha256 }];
+        })
+      ),
+      sourceDiffSha256: createHash("sha256").update(sourceDiff).digest("hex"),
+      fixtures: Object.fromEntries(
+        readdirSync(join(consumer, "fixtures"), { withFileTypes: true })
+          .filter((entry) => entry.isFile())
+          .filter(({ name }) => name.endsWith(".mjs") || name.endsWith(".ts"))
+          .map(({ name }) => [
+            name,
+            createHash("sha256")
+              .update(readFileSync(join(consumer, "fixtures", name)))
+              .digest("hex"),
+          ])
       ),
       resolvedVersions: Object.fromEntries(
         Object.entries(JSON.parse(lock).packages).map(([name, entry]) => [name, entry.version])
@@ -212,6 +260,7 @@ writeFileSync(
       },
       retainedConsumerSSR: "passed",
       providerIsolationAndHydration: "passed (existing packed provider suite)",
+      typedMetadataDeclarations: "passed (installed Core tarball, strict NodeNext)",
       toolkitMiddlewareHandle: "passed",
     },
     null,

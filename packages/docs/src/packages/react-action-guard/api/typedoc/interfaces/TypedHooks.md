@@ -144,7 +144,7 @@ Type-safe version of useBlockingInfo hook
 
 ##### scope
 
-`TScope`
+[`ScopeValue`](../type-aliases/ScopeValue.md)\<`TScope`\>
 
 #### Returns
 

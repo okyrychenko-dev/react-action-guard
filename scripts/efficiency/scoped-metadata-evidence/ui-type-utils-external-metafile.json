@@ -1,0 +1,295 @@
+{
+  "inputs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla.mjs": {
+      "bytes": 1001,
+      "imports": [],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react.mjs": {
+      "bytes": 739,
+      "imports": [
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla.mjs",
+          "kind": "import-statement",
+          "original": "zustand/vanilla"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/index.mjs": {
+      "bytes": 64,
+      "imports": [
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla.mjs",
+          "kind": "import-statement",
+          "original": "zustand/vanilla"
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react.mjs",
+          "kind": "import-statement",
+          "original": "zustand/react"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
+      "bytes": 1652,
+      "imports": [],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react/shallow.mjs": {
+      "bytes": 312,
+      "imports": [
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
+          "kind": "import-statement",
+          "original": "zustand/vanilla/shallow"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs": {
+      "bytes": 103,
+      "imports": [
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs",
+          "kind": "import-statement",
+          "original": "zustand/vanilla/shallow"
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react/shallow.mjs",
+          "kind": "import-statement",
+          "original": "zustand/react/shallow"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-zustand-toolkit/dist/index.js": {
+      "bytes": 4808,
+      "imports": [
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/index.mjs",
+          "kind": "import-statement",
+          "original": "zustand"
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs",
+          "kind": "import-statement",
+          "original": "zustand/shallow"
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs": {
+      "bytes": 16310,
+      "imports": [],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
+      "bytes": 34513,
+      "imports": [
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-zustand-toolkit/dist/index.js",
+          "kind": "import-statement",
+          "original": "@okyrychenko-dev/react-zustand-toolkit"
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs",
+          "kind": "import-statement",
+          "original": "zustand/middleware"
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs",
+          "kind": "import-statement",
+          "original": "zustand/shallow"
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard-ui/dist/index.js": {
+      "bytes": 13414,
+      "imports": [
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js",
+          "kind": "import-statement",
+          "original": "@okyrychenko-dev/react-action-guard"
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js",
+          "kind": "import-statement",
+          "original": "@okyrychenko-dev/react-action-guard"
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "format": "esm"
+    },
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/ui-consumer.mjs": {
+      "bytes": 550,
+      "imports": [
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js",
+          "kind": "import-statement",
+          "original": "@okyrychenko-dev/react-action-guard"
+        },
+        {
+          "path": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard-ui/dist/index.js",
+          "kind": "import-statement",
+          "original": "@okyrychenko-dev/react-action-guard-ui"
+        }
+      ],
+      "format": "esm"
+    }
+  },
+  "outputs": {
+    "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/ui-type-utils-external.mjs": {
+      "imports": [
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "react/jsx-runtime",
+          "kind": "import-statement",
+          "external": true
+        },
+        {
+          "path": "@okyrychenko-dev/type-utils",
+          "kind": "import-statement",
+          "external": true
+        }
+      ],
+      "exports": ["App"],
+      "entryPoint": "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/ui-consumer.mjs",
+      "inputs": {
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/fixtures/ui-consumer.mjs": {
+          "bytesInOutput": 224
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla.mjs": {
+          "bytesInOutput": 319
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/react.mjs": {
+          "bytesInOutput": 211
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-zustand-toolkit/dist/index.js": {
+          "bytesInOutput": 1533
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/vanilla/shallow.mjs": {
+          "bytesInOutput": 712
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/shallow.mjs": {
+          "bytesInOutput": 0
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard/dist/index.js": {
+          "bytesInOutput": 7002
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/zustand/esm/middleware.mjs": {
+          "bytesInOutput": 3604
+        },
+        "../../../../../../tmp/action-guard-efficiency-FUCS7X/consumer/node_modules/@okyrychenko-dev/react-action-guard-ui/dist/index.js": {
+          "bytesInOutput": 4720
+        }
+      },
+      "bytes": 18344
+    }
+  }
+}

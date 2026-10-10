@@ -1,0 +1,2422 @@
+{
+  "environment": {
+    "timestamp": "2026-10-10T19:28:32.764Z",
+    "node": "v22.20.0",
+    "react": "19.2.8",
+    "mode": "production",
+    "strictMode": false,
+    "cpu": "Intel(R) Core(TM) i7-3610QM CPU @ 2.30GHz",
+    "platform": "linux",
+    "release": "7.0.0-38-generic",
+    "arch": "x64",
+    "versions": {
+      "node_modules/@okyrychenko-dev/react-action-guard": "2.0.0",
+      "node_modules/@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+      "node_modules/@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+      "node_modules/@okyrychenko-dev/type-utils": "0.1.2",
+      "node_modules/@types/node": "26.6.5",
+      "node_modules/@types/react": "19.2.18",
+      "node_modules/@types/whatwg-mimetype": "3.0.2",
+      "node_modules/@types/ws": "8.18.2",
+      "node_modules/buffer-image-size": "0.6.4",
+      "node_modules/csstype": "3.2.3",
+      "node_modules/entities": "7.0.1",
+      "node_modules/happy-dom": "20.11.2",
+      "node_modules/react": "19.2.8",
+      "node_modules/react-dom": "19.2.8",
+      "node_modules/scheduler": "0.27.0",
+      "node_modules/undici-types": "8.9.0",
+      "node_modules/whatwg-mimetype": "3.0.0",
+      "node_modules/ws": "8.22.0",
+      "node_modules/zustand": "5.0.15"
+    }
+  },
+  "method": "Built packed public APIs; Happy DOM, not browser paint. performance.now wall clock; validation/reset excluded; rapid snapshot-phase capture included. Initial seeding precedes consumer attachment outside the timer; empty mount/update/churn boundaries unchanged. 5 warmups and 20 raw samples; fresh-root mount measured separately; transition and flushSync+React commit are distinct workloads, not additive phase estimates. Observation leases are public lifecycle/store observers, not the Devtools panel.",
+  "sampleCount": 20,
+  "warmups": 5,
+  "scenarios": [
+    {
+      "name": "lifecycle transition including immutable snapshot publication",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "rawMs": [
+        0.024154999999950633, 0.01723000000004049, 0.0165630000000192, 0.08655899999996564,
+        0.03898700000002009, 0.0152419999999438, 0.011387000000013359, 0.010265000000003965,
+        0.010233999999968546, 0.010748000000035063, 0.011789000000021588, 0.010776999999961845,
+        0.010098999999968328, 0.010132999999996173, 0.009672000000023218, 0.009942999999907443,
+        0.010129000000006272, 0.010049000000094566, 0.0099240000000691, 0.011360000000081527
+      ],
+      "medianMs": 0.010748000000035063,
+      "p95Ms": 0.03898700000002009,
+      "maximumMs": 0.08655899999996564
+    },
+    {
+      "name": "cached snapshot read (1000 reads per sample)",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "rawMs": [
+        0.04685699999993176, 0.04760800000008203, 0.10046799999997802, 0.03138899999999012,
+        0.031607000000008156, 0.03170299999999315, 0.031259000000090964, 0.03147799999999279,
+        0.05302000000006046, 0.026809999999954925, 0.03844200000003184, 0.0327429999999822,
+        0.02705300000002353, 0.026182999999946333, 0.02617299999997158, 0.02648399999998219,
+        0.026184999999941283, 0.026175999999964006, 0.06542899999999463, 0.002458999999930711
+      ],
+      "medianMs": 0.03138899999999012,
+      "p95Ms": 0.06542899999999463,
+      "maximumMs": 0.10046799999997802
+    },
+    {
+      "name": "scoped metadata filtering and priority sorting (100 reads per sample)",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "rawMs": [
+        0.6202529999999342, 0.5774020000000064, 0.588435000000004, 0.5757409999999936,
+        0.522438999999963, 0.5055129999999508, 0.5108380000000352, 0.5034220000000005,
+        0.5125439999999344, 0.5006479999999556, 0.5104159999999638, 0.5137789999999995,
+        0.5687599999999975, 0.5903870000000779, 0.527198999999996, 0.5454930000000786,
+        0.5155600000000504, 0.5269030000000612, 0.5274140000000216, 0.5348979999999983
+      ],
+      "medianMs": 0.5269030000000612,
+      "p95Ms": 0.5903870000000779,
+      "maximumMs": 0.6202529999999342
+    },
+    {
+      "name": "rapid scoped registration/removal (50 pairs per sample)",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "transitionsPerSample": 100,
+      "validationSubscribers": 1,
+      "rawMs": [
+        0.9370509999999967, 0.8767599999999902, 0.8681970000000092, 0.8831280000000561,
+        0.807280999999989, 0.855907000000002, 0.8544559999999137, 0.758254000000079,
+        0.7754840000000058, 1.120708000000036, 1.1265339999999924, 1.057403000000022,
+        1.1082239999999501, 1.0883090000000948, 0.91728999999998, 0.8996300000000019,
+        0.9216590000000906, 0.9021559999999909, 0.9447870000000194, 3.2555429999999888
+      ],
+      "medianMs": 0.9021559999999909,
+      "p95Ms": 1.1265339999999924,
+      "maximumMs": 3.2555429999999888
+    },
+    {
+      "name": "provider and empty controls mount (fresh root per sample)",
+      "workload": {
+        "blockers": 0,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "rawMs": [
+        3.6582200000000284, 3.7834830000000466, 4.266734000000042, 4.5821699999999055,
+        5.115162000000055, 4.691724999999906, 4.36961400000007, 3.996921999999927,
+        4.131862999999953, 3.572915999999964, 3.660987999999975, 3.179220999999984,
+        3.1849500000000717, 3.8292690000000675, 3.8478380000000243, 3.828887000000009,
+        4.531365000000051, 3.9963180000000875, 4.112190000000055, 4.06259399999999
+      ],
+      "medianMs": 3.9963180000000875,
+      "p95Ms": 4.691724999999906,
+      "maximumMs": 5.115162000000055
+    },
+    {
+      "name": "unrelated metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        0.24950599999999667, 0.24640999999996893, 0.24688700000001518, 0.2604740000000447,
+        0.25637800000004063, 0.2510540000000674, 0.30883399999993344, 0.2817170000000715,
+        0.24296900000001642, 0.2420479999999543, 0.26898399999993217, 0.2435769999999593,
+        0.24163899999996374, 0.28506000000004406, 0.21224000000006527, 0.22328399999992143,
+        0.1938030000000026, 0.18841899999995348, 0.261572000000001, 0.1726170000000593
+      ],
+      "medianMs": 0.24640999999996893,
+      "p95Ms": 0.28506000000004406,
+      "maximumMs": 0.30883399999993344
+    },
+    {
+      "name": "related metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 12,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 0,
+          "info": 20,
+          "button": 20
+        }
+      ],
+      "rawMs": [
+        2.1633919999999307, 1.860275999999999, 1.722419000000059, 1.7236669999999776,
+        1.6866899999999987, 1.8683619999999337, 1.9010190000000193, 1.6868309999999838,
+        1.9238009999999122, 1.7200239999999667, 2.0029800000000932, 1.6204349999999295,
+        1.707685999999967, 1.9232650000000149, 1.5441809999999805, 1.7693590000000086,
+        1.8934199999999919, 1.6983129999999846, 1.6273230000000467, 1.5071379999999408
+      ],
+      "medianMs": 1.722419000000059,
+      "p95Ms": 2.0029800000000932,
+      "maximumMs": 2.1633919999999307
+    },
+    {
+      "name": "related availability removal and synchronous React commit",
+      "workload": {
+        "blockers": 1,
+        "controlsPerKind": 20,
+        "observers": 0
+      },
+      "renderCounts": [
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        },
+        {
+          "boolean": 20,
+          "info": 20,
+          "button": 20
+        }
+      ],
+      "rawMs": [
+        1.4784140000000434, 1.5662190000000464, 2.31784499999992, 2.013327000000004,
+        1.2472359999999298, 1.6609129999999368, 1.301202000000103, 1.2315619999999399,
+        1.4689200000000255, 1.4541659999999865, 1.694925000000012, 1.9361449999998968,
+        2.3899690000000646, 0.9652589999999464, 0.9390059999999494, 0.8715660000000298,
+        1.1271510000000262, 0.9790679999999838, 1.1076309999999694, 0.9424730000000636
+      ],
+      "medianMs": 1.301202000000103,
+      "p95Ms": 2.31784499999992,
+      "maximumMs": 2.3899690000000646
+    },
+    {
+      "name": "lifecycle transition including immutable snapshot publication",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "rawMs": [
+        0.02464800000007017, 0.02696400000002086, 0.025233999999954904, 0.024929000000042834,
+        0.024876999999946747, 0.026570999999989908, 0.025196999999934633, 0.025914999999940846,
+        0.02505899999994199, 0.025391999999897052, 0.026110000000016953, 0.024920999999949345,
+        0.025129999999990105, 0.02519900000004327, 0.024806000000012318, 0.033542000000011285,
+        0.0247190000000046, 0.024537000000009357, 0.02463999999997668, 0.025353999999992993
+      ],
+      "medianMs": 0.025129999999990105,
+      "p95Ms": 0.02696400000002086,
+      "maximumMs": 0.033542000000011285
+    },
+    {
+      "name": "cached snapshot read (1000 reads per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "rawMs": [
+        0.03157900000007885, 0.03159000000005108, 0.031866000000036365, 0.03154699999993227,
+        0.03154599999993479, 0.031783000000018546, 0.03158399999995254, 0.03152599999998529,
+        0.031658999999990556, 0.03197499999998854, 0.03161499999998796, 0.03165799999999308,
+        0.031982000000084554, 0.031571999999982836, 0.03175099999998565, 0.03187400000001617,
+        0.03152999999997519, 0.031636000000048625, 0.05374400000005153, 0.031528000000093925
+      ],
+      "medianMs": 0.03161499999998796,
+      "p95Ms": 0.031982000000084554,
+      "maximumMs": 0.05374400000005153
+    },
+    {
+      "name": "scoped metadata filtering and priority sorting (100 reads per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "rawMs": [
+        3.611246000000051, 1.725744000000077, 1.7098829999999907, 1.9301450000000386,
+        3.0775469999999814, 1.7167910000000575, 1.6952099999999746, 1.654135999999994,
+        1.574795999999992, 1.627860999999939, 1.5797749999999269, 1.5865139999999656,
+        1.6596640000000207, 1.655544999999961, 1.5935739999999896, 1.6012299999999868,
+        1.6826000000000931, 1.6793030000000044, 1.66824500000007, 1.62982999999997
+      ],
+      "medianMs": 1.6596640000000207,
+      "p95Ms": 3.0775469999999814,
+      "maximumMs": 3.611246000000051
+    },
+    {
+      "name": "rapid scoped registration/removal (50 pairs per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "transitionsPerSample": 100,
+      "validationSubscribers": 1,
+      "rawMs": [
+        4.681773000000021, 2.9289110000000846, 2.975317000000018, 2.632387000000108,
+        2.6103489999999283, 2.405462000000057, 2.8144009999999753, 2.6219879999999876,
+        4.043362999999999, 2.5662670000001526, 2.5851979999999912, 2.58137899999997,
+        2.4985629999998764, 2.373839000000089, 2.522228000000041, 2.4242729999998573,
+        3.6881980000000567, 2.455124000000069, 2.429016000000047, 2.655960999999934
+      ],
+      "medianMs": 2.5851979999999912,
+      "p95Ms": 4.043362999999999,
+      "maximumMs": 4.681773000000021
+    },
+    {
+      "name": "provider and empty controls mount (fresh root per sample)",
+      "workload": {
+        "blockers": 0,
+        "controlsPerKind": 100,
+        "observers": 0
+      },
+      "rawMs": [
+        8.899902999999995, 11.787642000000005, 7.236996999999974, 7.261005999999952,
+        12.472799000000123, 7.307671000000028, 6.136257000000114, 6.134039999999914,
+        6.798855999999887, 10.000919999999951, 6.528428000000076, 5.9339769999999135,
+        6.142747000000099, 5.288035000000036, 14.168191999999863, 5.971521000000166,
+        5.502330999999913, 8.591503999999986, 5.4375830000001315, 5.81562299999996
+      ],
+      "medianMs": 6.528428000000076,
+      "p95Ms": 12.472799000000123,
+      "maximumMs": 14.168191999999863
+    },
+    {
+      "name": "unrelated metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        2.7918500000000677, 2.8694430000000466, 2.7229030000000876, 2.664463000000069,
+        3.020768000000089, 3.123087999999825, 3.2374959999999646, 3.0009919999999966,
+        2.77139800000009, 6.985848000000033, 3.2285309999999754, 2.853362999999945,
+        2.718845999999985, 2.646250999999893, 2.8942270000000008, 2.6819370000000617,
+        2.7918590000001586, 2.884751000000051, 2.9359370000001945, 3.063083000000006
+      ],
+      "medianMs": 2.8694430000000466,
+      "p95Ms": 3.2374959999999646,
+      "maximumMs": 6.985848000000033
+    },
+    {
+      "name": "related metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        }
+      ],
+      "rawMs": [
+        6.3062139999999545, 6.099258999999847, 7.197416000000203, 6.108809999999949,
+        7.0848459999999704, 8.889122000000043, 6.783423000000084, 6.274732999999969,
+        6.686328999999887, 7.019270000000006, 6.288422999999966, 6.963428000000022,
+        7.996062000000165, 6.762112999999999, 6.819189000000051, 6.559880000000021,
+        6.274814000000106, 6.5668490000000475, 8.049226999999973, 6.0029910000000655
+      ],
+      "medianMs": 6.686328999999887,
+      "p95Ms": 8.049226999999973,
+      "maximumMs": 8.889122000000043
+    },
+    {
+      "name": "rapid unrelated registration/removal and synchronous React commits (10 pairs per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "transitionsPerSample": 20,
+      "validationSubscribers": 1,
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        55.636141999999836, 57.64405500000021, 55.857036999999764, 58.25276699999995,
+        56.272253999999975, 56.00088400000004, 56.349055000000135, 58.2539670000001,
+        56.80741799999987, 55.88780200000019, 55.795165, 56.31330100000014, 54.8742299999999,
+        56.984002999999575, 60.15863399999989, 57.353071, 56.174942999999985, 58.035609999999906,
+        56.21408399999973, 55.52614500000027
+      ],
+      "medianMs": 56.272253999999975,
+      "p95Ms": 58.2539670000001,
+      "maximumMs": 60.15863399999989
+    },
+    {
+      "name": "related availability removal and synchronous React commit",
+      "workload": {
+        "blockers": 1,
+        "controlsPerKind": 100,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        }
+      ],
+      "rawMs": [
+        3.701647000000321, 3.9925459999999475, 3.9109619999999268, 3.5365240000000995,
+        3.2059290000001965, 5.42412000000013, 3.3090830000001006, 3.2627449999999953,
+        6.339011000000028, 3.9113039999997454, 3.3101230000002033, 3.6991029999999228,
+        4.702224000000115, 3.274449999999888, 4.030708999999661, 4.104255000000194,
+        6.612566000000243, 3.2672959999999875, 3.4746039999999994, 5.350699000000077
+      ],
+      "medianMs": 3.701647000000321,
+      "p95Ms": 6.339011000000028,
+      "maximumMs": 6.612566000000243
+    },
+    {
+      "name": "lifecycle transition including immutable snapshot publication",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        0.07513599999992948, 0.07561000000032436, 0.07610099999965314, 0.07539700000006633,
+        0.08719299999984287, 0.07600400000001173, 0.07797900000014124, 0.07646400000021458,
+        0.07294499999989057, 0.07207199999993463, 0.07395400000041263, 0.07924700000012308,
+        0.07809899999983827, 0.0893420000002152, 0.0753909999998541, 0.07830899999999019,
+        0.07305599999972401, 0.07219100000020262, 0.07139099999994869, 0.07364800000004834
+      ],
+      "medianMs": 0.07539700000006633,
+      "p95Ms": 0.08719299999984287,
+      "maximumMs": 0.0893420000002152
+    },
+    {
+      "name": "cached snapshot read (1000 reads per sample)",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        0.010134999999991123, 0.010086000000228523, 0.010093000000324537, 0.01011900000003152,
+        0.010140999999748601, 0.010150000000066939, 0.010128999999778898, 0.010103000000071916,
+        0.010103999999955704, 0.010085999999773776, 0.01634199999989505, 0.010104000000410451,
+        0.010139999999864813, 0.010091000000102213, 0.010115000000041618, 0.010087000000112312,
+        0.010094000000208325, 0.010122000000137632, 0.010122000000137632, 0.010080000000016298
+      ],
+      "medianMs": 0.010104000000410451,
+      "p95Ms": 0.010150000000066939,
+      "maximumMs": 0.01634199999989505
+    },
+    {
+      "name": "scoped metadata filtering and priority sorting (100 reads per sample)",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        8.019496000000345, 7.895645999999942, 9.242787000000135, 7.544932000000244,
+        7.686846999999943, 7.561083999999937, 8.054360000000088, 7.582296000000042,
+        7.557346000000052, 7.5734590000001845, 7.952491999999893, 8.071329999999762,
+        7.840408000000025, 7.893257000000176, 7.998718000000281, 7.841345999999703,
+        8.511027000000013, 7.8260589999999866, 7.548301999999694, 7.820969999999761
+      ],
+      "medianMs": 7.840408000000025,
+      "p95Ms": 8.511027000000013,
+      "maximumMs": 9.242787000000135
+    },
+    {
+      "name": "rapid scoped registration/removal (50 pairs per sample)",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "transitionsPerSample": 100,
+      "validationSubscribers": 1,
+      "rawMs": [
+        10.905158999999912, 9.707945000000109, 10.376839000000018, 10.051793999999973,
+        10.874429999999847, 10.115725999999995, 10.339042999999947, 11.020086999999876,
+        10.098597000000154, 10.75379699999985, 9.907448000000386, 10.758616999999958,
+        10.008268000000044, 10.792459000000235, 9.807663999999932, 10.974758000000293,
+        9.804372999999941, 11.37368400000014, 10.12171699999999, 10.903063000000202
+      ],
+      "medianMs": 10.339042999999947,
+      "p95Ms": 11.020086999999876,
+      "maximumMs": 11.37368400000014
+    },
+    {
+      "name": "provider and empty controls mount (fresh root per sample)",
+      "workload": {
+        "blockers": 0,
+        "controlsPerKind": 200,
+        "observers": 0
+      },
+      "rawMs": [
+        20.96653900000001, 27.56580699999995, 24.61465500000031, 11.665166000000227,
+        16.648921999999857, 16.95392899999979, 22.744116000000304, 21.43262700000014,
+        24.052779999999984, 22.965103000000454, 28.933139000000665, 21.03855999999996,
+        20.679485999999997, 20.849662000000535, 20.23663099999976, 21.155853000000207,
+        22.123583999999937, 20.877355999999963, 21.616621999999552, 22.03448600000047
+      ],
+      "medianMs": 21.155853000000207,
+      "p95Ms": 27.56580699999995,
+      "maximumMs": 28.933139000000665
+    },
+    {
+      "name": "unrelated metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        24.497371000000385, 24.809030999999777, 24.35739900000044, 24.875538000000233,
+        24.030394000000342, 24.13785900000039, 24.52501200000006, 24.84993100000065,
+        24.816170999999486, 25.244268000000375, 24.860114000000067, 25.15790399999969,
+        24.778723999999784, 24.601502000000437, 26.44428599999992, 25.046911999999793,
+        24.854111999999986, 24.344694999999774, 25.46115699999973, 26.148893999999927
+      ],
+      "medianMs": 24.816170999999486,
+      "p95Ms": 26.148893999999927,
+      "maximumMs": 26.44428599999992
+    },
+    {
+      "name": "related metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 502,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        }
+      ],
+      "rawMs": [
+        45.857271999999284, 42.94557199999963, 46.49560100000053, 46.28961799999979,
+        45.29454600000008, 42.982718000000204, 46.18259699999999, 46.114949000000706,
+        43.12255600000026, 45.985781999999745, 45.99024999999983, 45.86115299999983,
+        42.175938000000315, 46.447964999999385, 45.309863000000405, 44.66313900000023,
+        42.99207999999999, 45.533198000000084, 44.935749000000214, 41.32274099999995
+      ],
+      "medianMs": 45.309863000000405,
+      "p95Ms": 46.447964999999385,
+      "maximumMs": 46.49560100000053
+    },
+    {
+      "name": "related availability removal and synchronous React commit",
+      "workload": {
+        "blockers": 1,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        }
+      ],
+      "rawMs": [
+        10.559252000000015, 7.436063999999533, 7.676669999999831, 7.376095999999961,
+        8.041971000000558, 7.701011999999537, 10.196838000000753, 10.653524000000289,
+        10.356192000000192, 7.718152999999802, 7.646056999999928, 7.39655700000003,
+        7.681161999999858, 7.5388160000002244, 10.754014000000097, 10.310801999999967,
+        10.869220999999925, 7.429987999999867, 7.541487999999845, 8.075990000000274
+      ],
+      "medianMs": 7.701011999999537,
+      "p95Ms": 10.754014000000097,
+      "maximumMs": 10.869220999999925
+    },
+    {
+      "name": "lifecycle transition including immutable snapshot publication",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        0.1516940000001341, 0.17251299999952607, 0.15325000000029831, 0.2246820000000298,
+        0.1669419999998354, 0.2113520000002609, 0.14737700000023324, 0.1378340000001117,
+        0.13743799999974726, 0.13765799999964656, 0.13946599999962928, 0.13749899999947957,
+        0.15670799999952578, 0.14066599999932805, 0.14056800000071235, 0.13994000000002416,
+        0.14767699999993056, 0.13890400000036607, 0.13771799999994982, 0.16865400000006048
+      ],
+      "medianMs": 0.14066599999932805,
+      "p95Ms": 0.2113520000002609,
+      "maximumMs": 0.2246820000000298
+    },
+    {
+      "name": "cached snapshot read (1000 reads per sample)",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        0.03400899999996909, 0.03463000000010652, 0.03402700000060577, 0.034007000000201515,
+        0.034324999999626016, 0.03400099999998929, 0.03399699999954464, 0.04380999999921187,
+        0.0350879999996323, 0.035090000000309374, 0.03512899999986985, 0.035358000000087486,
+        0.04249499999968975, 0.03509500000018306, 0.03552399999989575, 0.03510499999993044,
+        0.035143999999490916, 0.03544499999952677, 0.0351040000005014, 0.03508700000020326
+      ],
+      "medianMs": 0.035090000000309374,
+      "p95Ms": 0.04249499999968975,
+      "maximumMs": 0.04380999999921187
+    },
+    {
+      "name": "scoped metadata filtering and priority sorting (100 reads per sample)",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "rawMs": [
+        15.83797499999946, 15.62352700000065, 15.414437000000362, 15.044804000000113,
+        15.33039699999972, 14.965549999999894, 16.938020999999935, 15.419857000000775,
+        15.463389000000461, 14.906011000000035, 15.282976000000417, 15.775170999999318,
+        15.377521999999772, 15.084640000000036, 15.900466000000051, 15.266953999999714,
+        15.021765000000414, 15.918502000000444, 15.529526999999689, 15.330664999999499
+      ],
+      "medianMs": 15.377521999999772,
+      "p95Ms": 15.918502000000444,
+      "maximumMs": 16.938020999999935
+    },
+    {
+      "name": "rapid scoped registration/removal (50 pairs per sample)",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "transitionsPerSample": 100,
+      "validationSubscribers": 1,
+      "rawMs": [
+        20.799966000000495, 21.942533999999796, 21.449141999999483, 20.882856000000174,
+        21.01034499999969, 20.947377999999844, 21.146262000000206, 21.719044999999824,
+        20.839202000000114, 20.74331600000005, 20.76922099999956, 21.721293999999943,
+        21.48170399999981, 22.817281999999977, 21.94342499999948, 22.93764800000008,
+        21.46608699999979, 22.470906999999897, 20.69848700000057, 21.373281999999563
+      ],
+      "medianMs": 21.373281999999563,
+      "p95Ms": 22.817281999999977,
+      "maximumMs": 22.93764800000008
+    },
+    {
+      "name": "provider and empty controls mount (fresh root per sample)",
+      "workload": {
+        "blockers": 0,
+        "controlsPerKind": 200,
+        "observers": 0
+      },
+      "rawMs": [
+        28.866342999999688, 21.72098300000016, 25.090374999999767, 25.730266999999913, 22.809663,
+        28.226072999999815, 27.697430000000168, 20.879674999999224, 27.401612999999998,
+        31.0817619999998, 29.205563000001348, 26.87263499999972, 27.627551999999923,
+        28.644365000000107, 29.43601900000067, 28.215940000000046, 24.953138999999283,
+        26.24644999999873, 25.337670999999318, 25.769462000000203
+      ],
+      "medianMs": 26.87263499999972,
+      "p95Ms": 29.43601900000067,
+      "maximumMs": 31.0817619999998
+    },
+    {
+      "name": "unrelated metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        47.57589299999927, 47.2744189999994, 47.839664000000994, 48.339098999998896,
+        47.698222999999416, 48.01456400000097, 48.948270000000775, 47.87398699999903,
+        48.25819899999988, 49.36445000000094, 47.774445000000924, 47.69286600000123,
+        49.53856799999994, 51.32105899999988, 49.83077899999989, 48.02619500000037,
+        49.06403000000137, 48.28166600000077, 49.38182699999925, 49.415720000000874
+      ],
+      "medianMs": 48.25819899999988,
+      "p95Ms": 49.83077899999989,
+      "maximumMs": 51.32105899999988
+    },
+    {
+      "name": "related metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 1002,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 0,
+          "info": 200,
+          "button": 200
+        }
+      ],
+      "rawMs": [
+        82.56004699999903, 83.32314899999983, 82.4143239999994, 82.56422500000008,
+        85.41341099999954, 92.1020410000001, 86.94409700000142, 87.46038500000031,
+        88.34283300000061, 86.230289000001, 85.38483900000028, 84.50445500000023, 84.46397900000011,
+        91.1474390000003, 86.94714400000157, 98.11227700000018, 101.5744399999985,
+        101.98890199999914, 99.80891300000076, 88.0640540000004
+      ],
+      "medianMs": 86.94409700000142,
+      "p95Ms": 101.5744399999985,
+      "maximumMs": 101.98890199999914
+    },
+    {
+      "name": "related availability removal and synchronous React commit",
+      "workload": {
+        "blockers": 1,
+        "controlsPerKind": 200,
+        "observers": 5
+      },
+      "renderCounts": [
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        },
+        {
+          "boolean": 200,
+          "info": 200,
+          "button": 200
+        }
+      ],
+      "rawMs": [
+        9.580673999998908, 9.723202999999558, 11.786510999998427, 16.91443100000106,
+        18.87024300000121, 14.495160000000396, 8.105389000000287, 8.131922999999006,
+        8.716425999999046, 8.70911999999953, 8.004711999999927, 12.026388000000225,
+        11.851222000001144, 11.655690999999933, 8.79071599999952, 8.564865000000282,
+        8.55028300000049, 8.082898999999088, 15.2385749999994, 13.60403100000076
+      ],
+      "medianMs": 9.580673999998908,
+      "p95Ms": 16.91443100000106,
+      "maximumMs": 18.87024300000121
+    },
+    {
+      "name": "lifecycle transition including immutable snapshot publication",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "rawMs": [
+        0.03668000000106986, 0.03623400000105903, 0.03681200000028184, 0.03598500000043714,
+        0.03798599999936414, 0.044896999999764375, 0.03544999999940046, 0.06359100000008766,
+        0.033610000000408036, 0.03388900000027206, 0.03356499999972584, 0.035952000000179396,
+        0.036729000001287204, 0.03345900000022084, 0.044504999999844586, 0.034940999999889755,
+        0.03462500000023283, 0.03584000000046217, 0.03409699999974691, 0.0346319999989646
+      ],
+      "medianMs": 0.03584000000046217,
+      "p95Ms": 0.044896999999764375,
+      "maximumMs": 0.06359100000008766
+    },
+    {
+      "name": "cached snapshot read (1000 reads per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "rawMs": [
+        0.003923999998733052, 0.003931999999622349, 0.0039240000005520415, 0.003928999998606741,
+        0.003918999998859363, 0.00392199999987497, 0.00392199999987497, 0.003930000000764267,
+        0.003920999999536434, 0.003926999999748659, 0.003920999999536434, 0.00392199999987497,
+        0.003920000001016888, 0.0039259999994101236, 0.003919000000678352, 0.003964000001360546,
+        0.003927000001567649, 0.003925000000890577, 0.0039259999994101236, 0.003926999999748659
+      ],
+      "medianMs": 0.0039240000005520415,
+      "p95Ms": 0.003931999999622349,
+      "maximumMs": 0.003964000001360546
+    },
+    {
+      "name": "scoped metadata filtering and priority sorting (100 reads per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "rawMs": [
+        1.6384680000010121, 1.6340389999986655, 1.6228179999998247, 1.633893000000171,
+        1.682238999999754, 1.8115359999992506, 1.6965749999999389, 1.7039180000010674,
+        1.6994889999987208, 1.6747560000003432, 1.637842999998611, 1.6015000000006694,
+        1.5903789999993023, 1.6784030000017083, 1.6287740000007034, 1.9327520000006189,
+        2.0459809999993013, 1.7173099999999977, 1.9088040000006004, 1.6927260000011302
+      ],
+      "medianMs": 1.6784030000017083,
+      "p95Ms": 1.9327520000006189,
+      "maximumMs": 2.0459809999993013
+    },
+    {
+      "name": "rapid scoped registration/removal (50 pairs per sample)",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "transitionsPerSample": 100,
+      "validationSubscribers": 1,
+      "rawMs": [
+        9.339711000000534, 3.7804680000008375, 9.08006800000112, 5.738408999999592,
+        8.90106200000082, 6.210815000000366, 3.862975000000006, 9.157938999998805,
+        3.724755000001096, 8.620215000000826, 3.879713999998785, 9.07209999999941,
+        3.7624510000005102, 3.7836019999995187, 8.745224000000235, 3.6784279999992577,
+        13.73431999999957, 4.3847290000012435, 9.059570999999778, 3.8125770000006014
+      ],
+      "medianMs": 5.738408999999592,
+      "p95Ms": 9.339711000000534,
+      "maximumMs": 13.73431999999957
+    },
+    {
+      "name": "provider and empty controls mount (fresh root per sample)",
+      "workload": {
+        "blockers": 0,
+        "controlsPerKind": 100,
+        "observers": 0
+      },
+      "rawMs": [
+        16.304637000001094, 5.609470999999758, 5.427960999999414, 9.115041000000929,
+        5.460581999999704, 5.987236000000848, 5.34114800000134, 5.70073500000035, 8.590588999999454,
+        7.603237000001172, 5.6405850000010105, 5.448008000001209, 5.178203000001304,
+        13.328944000000774, 5.139654000000519, 5.045717000000877, 9.589734000001044,
+        5.440400999999838, 5.25602599999911, 5.387574999998833
+      ],
+      "medianMs": 5.460581999999704,
+      "p95Ms": 13.328944000000774,
+      "maximumMs": 16.304637000001094
+    },
+    {
+      "name": "unrelated metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        },
+        {
+          "boolean": 0,
+          "info": 0,
+          "button": 0
+        }
+      ],
+      "rawMs": [
+        2.773214000000735, 4.7741320000004634, 4.605485999998564, 3.067604999998366,
+        2.8827089999995223, 3.1256279999997787, 2.7050529999996797, 2.63774100000046,
+        2.7968650000002526, 2.9000820000001113, 2.719302000001335, 4.793478999999934,
+        3.4750629999998637, 2.908932000000277, 3.011504000000059, 3.0241209999985585,
+        2.787083999999595, 2.72140600000057, 3.0408820000011474, 2.8917569999994157
+      ],
+      "medianMs": 2.9000820000001113,
+      "p95Ms": 4.7741320000004634,
+      "maximumMs": 4.793478999999934
+    },
+    {
+      "name": "related metadata update and synchronous React commit",
+      "workload": {
+        "blockers": 102,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "renderCounts": [
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 0,
+          "info": 100,
+          "button": 100
+        }
+      ],
+      "rawMs": [
+        9.261405999999624, 6.83520000000135, 6.637647999999899, 9.281333000000814,
+        8.680890999999974, 6.53452500000094, 6.989244000000326, 6.452254999998331, 9.41472800000156,
+        9.346387999999934, 6.351329000000987, 6.414918000000398, 10.167914999999994,
+        6.8795719999998255, 6.169807000000219, 5.78235499999937, 9.06347900000037,
+        6.818425999999818, 6.342777999998361, 5.8882919999996375
+      ],
+      "medianMs": 6.818425999999818,
+      "p95Ms": 9.41472800000156,
+      "maximumMs": 10.167914999999994
+    },
+    {
+      "name": "related availability removal and synchronous React commit",
+      "workload": {
+        "blockers": 1,
+        "controlsPerKind": 100,
+        "observers": 100
+      },
+      "renderCounts": [
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        },
+        {
+          "boolean": 100,
+          "info": 100,
+          "button": 100
+        }
+      ],
+      "rawMs": [
+        5.502950000000055, 7.588814000000639, 3.5509840000013355, 3.4511180000008608,
+        3.6664099999998143, 3.3464569999996456, 3.40139999999883, 3.7275250000002416,
+        3.4795890000004874, 6.443540999998731, 3.9003410000004806, 3.6485970000012458,
+        6.045473999998649, 3.765556000000288, 3.6618149999994785, 3.8297569999995176,
+        3.8267070000001695, 3.243873999999778, 3.3953070000006846, 3.9949499999984255
+      ],
+      "medianMs": 3.6664099999998143,
+      "p95Ms": 6.443540999998731,
+      "maximumMs": 7.588814000000639
+    }
+  ],
+  "finishedAt": 13871.140261
+}

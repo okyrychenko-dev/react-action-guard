@@ -8,15 +8,16 @@
 
 > **useBlockingInfo**(`scope?`): readonly `Readonly`\<[`BlockerInfo`](../interfaces/BlockerInfo.md)\>[]
 
-Defined in: [hooks/useBlockingInfo/useBlockingInfo.ts:16](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts#L16)
+Defined in: [hooks/useBlockingInfo/useBlockingInfo.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useBlockingInfo/useBlockingInfo.ts#L18)
 
-Gets detailed information about all active blockers for a specific scope.
+Gets immutable, priority-ordered information about blockers affecting the observed scopes.
+Unrelated lifecycle changes preserve the result and do not trigger a render.
 
 ## Parameters
 
 ### scope?
 
-`string` = `DEFAULT_SCOPE`
+[`Scope`](../type-aliases/Scope.md) = `DEFAULT_SCOPE`
 
 ## Returns
 
