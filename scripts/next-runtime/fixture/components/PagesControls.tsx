@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import PagesGuard from "./PagesGuard";
 
 export default function PagesControls() {
-  const router = useRouter();
+  const { push } = useRouter();
   const [attached, setAttached] = useState(true);
   const [blocks, setBlocks] = useState(0);
   const [allows, setAllows] = useState(0);
@@ -36,10 +36,10 @@ export default function PagesControls() {
       <p data-testid="prompts">{prompts}</p>
       <p data-testid="answers">{answers}</p>
       <Link href="/pages-target?via=link">Link target</Link>
-      <button onClick={() => void router.push("/pages-target?via=first").catch(() => {})}>
+      <button onClick={() => void push("/pages-target?via=first").catch(() => {})}>
         Push first
       </button>
-      <button onClick={() => void router.push("/pages-target?via=second").catch(() => {})}>
+      <button onClick={() => void push("/pages-target?via=second").catch(() => {})}>
         Push second
       </button>
       <button onClick={() => answer(true)}>Approve oldest</button>
