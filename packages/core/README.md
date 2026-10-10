@@ -169,7 +169,7 @@ Use shared scopes when one component starts work and another component should re
 
 Recommend `UIBlockingProvider` for production ownership and SSR, with a fresh store for each request, test, or micro-frontend. The global fallback is shared convenience state, not request isolation.
 
-## Reference and recipes
+## API Reference
 
 Continue in the [canonical Core reference and recipes](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/reference.md)
 for hook options, specialized helpers, provider/context APIs, store actions, middleware,
