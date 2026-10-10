@@ -23,7 +23,9 @@ shallow, scroll, locale and history semantics may be lost during replay. Route-e
 not imply complete back/forward or every navigation path coverage. Unload protection remains
 browser-controlled. `isBlocking` reports active policy, not complete interception.
 
-Real packed Next build/start/browser verification remains pending. Existing hook and declaration
-checks establish only their stated evidence kinds; see the [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md).
+Packed production Next 15.5.23 / React 19.2.8 / Chrome 155.0.8059.39 checks passed on 2026-10-10:
+async cancel/approve, Link/push replay, exact callbacks, single-use permission, replacement/detach
+stale answers and native reload prompt accept/dismiss/cleanup. Other peers and navigation options
+remain unverified; see the [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md).
 Prefer the explicit `usePagesRouterBlocker` name; the entry's `useNavigationBlocker` compatibility
 export also selects Pages. [App Router](./next-app) has a different, unload-only contract.

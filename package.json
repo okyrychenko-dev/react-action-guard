@@ -26,6 +26,7 @@
     "release": "pnpm run build && changeset publish",
     "prepare": "husky",
     "test:packed": "node scripts/check-packed-compatibility.mjs",
+    "test:next-runtime": "node scripts/check-next-runtime.mjs",
     "package:check": "node scripts/check-packed-publication.mjs",
     "measure:efficiency": "node scripts/measure-efficiency.mjs",
     "release:check": "pnpm run check && pnpm run format:check && pnpm run package:check && pnpm run test:packed",

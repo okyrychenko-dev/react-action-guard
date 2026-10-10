@@ -23,6 +23,8 @@ Render inside the Next application and a [client provider boundary](../../advanc
 browser tab-close/reload confirmation subject to browser policy and user activation. Custom text
 may be ignored. Turning off `blockBrowserUnload` removes this adapter's only protection.
 
-Real packed Next App build/start/browser verification remains pending; declarations and mocked
-hooks do not supply it. See the [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md).
+Packed production Next 15.5.23 / React 19.2.8 / Chrome 155.0.8059.39 checks passed on 2026-10-10:
+the client provider boundary builds, Link/push/router and browser back/forward stay in one document
+without interception, and user-activated native reload prompts support accept/dismiss and cleanup.
+This does not establish other peers, browsers, tab close or arbitrary RSC compositions. See the [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md).
 Use the explicit hook; `/nextjs` default `useNavigationBlocker` is the [Pages adapter](./next-pages).

@@ -1,0 +1,94 @@
+{
+  "sourceBase": "f31f114f31d66755fd78dc26c7e6193beb954301",
+  "packageSourceDiffSha256": "650645c434af150b5913563b0f646d90cfe738e299e9049a2d9d81913db80a43",
+  "date": "2026-10-10T17:03:17.433Z",
+  "node": "v22.20.0",
+  "strictPeers": true,
+  "evaluated": {
+    "next": "15.5.23",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zustand": "5.0.0",
+    "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+    "@okyrychenko-dev/type-utils": "0.1.2",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
+    "@types/node": "22.20.0",
+    "typescript": "5.6.3",
+    "@playwright/test": "1.63.0",
+    "@okyrychenko-dev/react-action-guard": "2.0.0",
+    "@okyrychenko-dev/react-action-guard-router": "1.0.0"
+  },
+  "packages": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0",
+      "sha256": "a256162d89aa4df7db104f6da48b6c86cd4aa840ca2e5eecf165457f0078ac2e"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "sha256": "d2c8bfad89c1e425e0f6745aa9a994a7df3d8598b0f539c23f598c1097740a3f"
+    }
+  ],
+  "build": "next build and tsc --noEmit passed",
+  "server": "next start (production)",
+  "fixtureSha256": "32af88e572bf6732286736d31d4ca6ddadfabff7a5af712a8a051c1b3d852098",
+  "browser": {
+    "channel": "chrome",
+    "version": "155.0.8059.39"
+  },
+  "scenarios": [
+    {
+      "file": "app.pw.mjs",
+      "title": "should leave App Link, push, back and forward navigation unintercepted in one document",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "pages.pw.mjs",
+      "title": "should cancel a Pages attempt then allow the next attempt exactly once",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "pages.pw.mjs",
+      "title": "should discard a superseded Pages answer and approve only the latest URL",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "pages.pw.mjs",
+      "title": "should invalidate a Pages answer after owner detach and protect a fresh owner",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "pages.pw.mjs",
+      "title": "should approve a Pages Link once and ask again for a subsequent navigation",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "unload.pw.mjs",
+      "title": "should request a native Pages unload prompt and remove it after cleanup",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    },
+    {
+      "file": "unload.pw.mjs",
+      "title": "should request a native App unload prompt and remove it after cleanup",
+      "passed": true,
+      "browserVersion": "155.0.8059.39"
+    }
+  ],
+  "results": {
+    "startTime": "2026-10-10T17:03:09.522Z",
+    "duration": 7854.809000000001,
+    "expected": 7,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  },
+  "scope": "Selected Next peer only; Pages and App cases recorded independently in browser-results.json. Planned Changesets cohort, no registry publication."
+}
