@@ -54,3 +54,12 @@ Run `pnpm run check` for builds, lint, package typechecks, configuration tests a
 Run the docs package `typedoc` command separately from its VitePress build. Scan generated core declarations
 for removed compatibility interfaces before release. Historical changelog entries describe older
 versions and are not current interfaces.
+
+## Consumer migration path
+
+The [canonical migration guide](../docs/src/packages/react-action-guard/migration.md) provides
+current public-name, provider, observation-lease and registration/mutation migration examples.
+The [bounded Core contract](../docs/src/packages/react-action-guard/contract.md) distinguishes
+supported responsibilities from future identity, factory, headless-entry and telemetry decisions.
+These describe current source and planned Core 2.0 stabilization; registry publication and
+release-cohort verification remain separate work.

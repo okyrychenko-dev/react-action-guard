@@ -198,6 +198,12 @@ function SaveButton({ onSave, scope }: { onSave: () => Promise<void>; scope: str
 }
 ```
 
+## Canonical reference
+
+Read the [public reference](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-ui/reference.md)
+and [integration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-ui/index.md).
+The expandable material below remains available for existing links.
+
 ## API Reference
 
 ### Scope Context

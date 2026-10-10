@@ -17,35 +17,35 @@ features:
   - icon: 🎯
     title: Priority-Based Blocking
     details: Manage multiple blockers with configurable priorities. Priority orders reasons; every matching active blocker retains protection.
-    
+
   - icon: 🔒
     title: Scoped Blocking
     details: Block specific areas of your UI (forms, navigation, global) or multiple scopes at once. Precise control over what gets blocked.
-    
+
   - icon: ⏱️
     title: Timeout Mechanism
     details: Automatic blocker removal after specified time. Prevent infinite blocking with configurable timeouts and callbacks.
-    
+
   - icon: 🧹
     title: Automatic Cleanup
-    details: Blockers are automatically removed when components unmount. No manual cleanup needed, no memory leaks.
-    
+    details: Mounted registrations release on detach; async actions and owned mutations retain pending protection until settlement or timeout.
+
   - icon: 🏗️
     title: Provider Pattern
     details: Isolated store instances for SSR, testing, and micro-frontends. Each provider gets its own independent state.
-    
+
   - icon: 🔌
     title: Middleware System
     details: Powerful middleware for analytics, logging, and performance monitoring. Built-in integrations for Google Analytics, Mixpanel, and Amplitude.
-    
+
   - icon: 📊
     title: DevTools Integration
     details: Visual debugging with real-time timeline, event filtering, and active blocker monitoring. See exactly what's blocking and why.
-    
+
   - icon: ⚡
     title: TanStack Query Integration
     details: Seamless integration with TanStack Query. Automatic UI blocking based on query and mutation states.
-    
+
   - icon: 🛠️
     title: Zustand Toolkit
     details: Powerful toolkit for creating type-safe Zustand stores with automatic shallow comparison and provider patterns.
@@ -53,12 +53,19 @@ features:
 
 ## Packages Overview
 
-This documentation covers four interconnected packages:
+Start with [concepts](/concepts), then choose [workflow guides](/guides/workflows), optional
+[UI](/packages/react-action-guard-ui/) or [Router](/packages/react-action-guard-router/) integrations,
+and [advanced ownership](/advanced/ownership). The [Core contract](/packages/react-action-guard/contract)
+and [migration guide](/packages/react-action-guard/migration) distinguish current source from planned releases.
+
+This documentation covers core and optional integrations:
 
 ### [@okyrychenko-dev/react-action-guard](/packages/react-action-guard/)
+
 The core library providing UI blocking management with priorities, scopes, and automatic cleanup.
 
 **Key Features:**
+
 - Priority-based blocking system
 - Scoped blocking (global, specific areas, multiple scopes)
 - Automatic cleanup on unmount
@@ -68,9 +75,11 @@ The core library providing UI blocking management with priorities, scopes, and a
 - Middleware system for analytics and logging
 
 ### [@okyrychenko-dev/react-action-guard-devtools](/packages/react-action-guard-devtools/)
+
 Developer tools for visualizing, debugging, and monitoring UI blocking events in real-time.
 
 **Key Features:**
+
 - Real-time timeline of blocking events
 - Active blockers view
 - Event filtering and search
@@ -79,9 +88,11 @@ Developer tools for visualizing, debugging, and monitoring UI blocking events in
 - Production-safe (auto-disabled in production)
 
 ### [@okyrychenko-dev/react-action-guard-tanstack](/packages/react-action-guard-tanstack/)
+
 TanStack Query integration for seamless UI blocking based on queries and mutations.
 
 **Key Features:**
+
 - Automatic blocking based on query/mutation states
 - Dynamic reasons for different states
 - Priority system for multiple operations
@@ -89,9 +100,11 @@ TanStack Query integration for seamless UI blocking based on queries and mutatio
 - All TanStack Query hooks covered
 
 ### [@okyrychenko-dev/react-zustand-toolkit](/packages/react-zustand-toolkit/)
+
 A powerful toolkit for creating type-safe Zustand stores with automatic shallow comparison and provider patterns.
 
 **Key Features:**
+
 - Automatic shallow equality checks
 - Provider pattern for isolated instances
 - Smart resolution between global and context stores
@@ -101,17 +114,25 @@ A powerful toolkit for creating type-safe Zustand stores with automatic shallow 
 ## Quick Example
 
 ```tsx
-import { useState } from 'react';
-import { UIBlockingProvider, useActionBlocker, useIsBlocked } from '@okyrychenko-dev/react-action-guard';
+import { useState } from "react";
+import {
+  UIBlockingProvider,
+  useActionBlocker,
+  useIsBlocked,
+} from "@okyrychenko-dev/react-action-guard";
 
 function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
   const [isSaving, setIsSaving] = useState(false);
-  useActionBlocker('save-operation', {
-    scope: 'form',
-    reason: 'Saving data...',
-  }, isSaving);
-  const isBlocked = useIsBlocked('form');
-  
+  useActionBlocker(
+    "save-operation",
+    {
+      scope: "form",
+      reason: "Saving data...",
+    },
+    isSaving
+  );
+  const isBlocked = useIsBlocked("form");
+
   async function handleSave() {
     setIsSaving(true);
     try {
@@ -120,12 +141,20 @@ function SaveButton({ saveData }: { saveData: () => Promise<void> }) {
       setIsSaving(false);
     }
   }
-  
-  return <button disabled={isBlocked} onClick={handleSave}>Save</button>;
+
+  return (
+    <button disabled={isBlocked} onClick={handleSave}>
+      Save
+    </button>
+  );
 }
 
 export function App({ saveData }: { saveData: () => Promise<void> }) {
-  return <UIBlockingProvider><SaveButton saveData={saveData} /></UIBlockingProvider>;
+  return (
+    <UIBlockingProvider>
+      <SaveButton saveData={saveData} />
+    </UIBlockingProvider>
+  );
 }
 ```
 
@@ -148,7 +177,9 @@ npm install @okyrychenko-dev/react-zustand-toolkit zustand
 ## Why React Action Guard?
 
 ### Problem
+
 Managing UI blocking states in React apps is complex:
+
 - Multiple async operations can run simultaneously
 - Need to coordinate blocking across different UI areas
 - Risk of infinite blocking if operations fail
@@ -156,7 +187,9 @@ Managing UI blocking states in React apps is complex:
 - Difficulty debugging blocking states
 
 ### Solution
+
 React Action Guard provides a centralized, declarative approach:
+
 - **Automatic Management**: Hooks handle lifecycle automatically
 - **Priority System**: Order reasons from matching active blockers
 - **Scoped Blocking**: Block specific UI areas, not everything
@@ -175,7 +208,7 @@ flowchart TB
     E --> C
     E --> D
     D --> F["@tanstack/react-query"]
-    
+
     style A fill:#e1f5ff
     style B fill:#bbdefb
     style C fill:#90caf9
@@ -185,6 +218,7 @@ flowchart TB
 ```
 
 **Package Relationships:**
+
 - `react-zustand-toolkit` provides the store foundation
 - `react-action-guard` builds the blocking system on top
 - `react-action-guard-devtools` adds debugging capabilities

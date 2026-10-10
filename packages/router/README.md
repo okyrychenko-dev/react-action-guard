@@ -98,6 +98,12 @@ function EditForm() {
 <details>
 <summary>Detailed reference and integration patterns</summary>
 
+## Canonical reference
+
+Read the [public reference](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-router/reference.md)
+and [integration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-router/index.md).
+The expandable material below remains available for existing links.
+
 ## API Reference
 
 ### Hooks

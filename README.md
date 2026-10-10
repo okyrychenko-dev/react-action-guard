@@ -132,3 +132,14 @@ npm.
 ## License
 
 [MIT](LICENSE) © [Oleksii Kyrychenko](https://github.com/okyrychenko-dev)
+
+## Canonical guides and stabilized Core
+
+Follow [concepts](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/concepts.md),
+[workflow guides](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/guides/workflows.md),
+[UI integration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-ui/index.md),
+[Router integrations](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard-router/index.md),
+and [advanced ownership](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/advanced/ownership.md).
+The [Core contract](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/contract.md)
+and [migration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md)
+describe current source and planned stabilization, rather than asserting registry publication.
