@@ -12,15 +12,11 @@ export {
   createBlockerId,
   isDefined,
   normalizeScope,
+  createScopeKey,
   isThenable,
   resolveConfirmResult,
 } from "./utils";
 export { ROUTE_ERRORS } from "./constants";
-export {
-  handleConfirmation,
-  type ConfirmationResult,
-  type ConfirmationCallbacks,
-} from "./utils/handleConfirmation";
 export type {
   BaseNavigationBlockerOptions,
   BeforeUnloadOptions,

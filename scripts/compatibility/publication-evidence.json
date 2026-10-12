@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-12T16:10:15.390Z",
+  "date": "2026-10-12T17:52:25.972Z",
   "node": "v22.20.0",
   "tools": {
     "publint": "0.3.24",
@@ -85,20 +85,20 @@
       "symbol": "createBlockingLifecycle",
       "artifacts": {
         "./dist/index.js": {
-          "bytes": 34513,
-          "gzipBytes": 7781
+          "bytes": 34778,
+          "gzipBytes": 7825
         },
         "./dist/index.cjs": {
-          "bytes": 35866,
-          "gzipBytes": 7905
+          "bytes": 36141,
+          "gzipBytes": 7950
         },
         "./dist/index.d.ts": {
           "bytes": 21599,
-          "gzipBytes": 5614
+          "gzipBytes": 5618
         },
         "./dist/index.d.cts": {
           "bytes": 21599,
-          "gzipBytes": 5614
+          "gzipBytes": 5618
         }
       },
       "minimalConsumer": {
@@ -260,12 +260,12 @@
       "symbol": "useNavigationBlocker",
       "artifacts": {
         "./dist/react-router/index.js": {
-          "bytes": 6650,
-          "gzipBytes": 1977
+          "bytes": 6717,
+          "gzipBytes": 1993
         },
         "./dist/react-router/index.cjs": {
-          "bytes": 6835,
-          "gzipBytes": 2005
+          "bytes": 6902,
+          "gzipBytes": 2020
         },
         "./dist/react-router/index.d.ts": {
           "bytes": 1502,
@@ -277,8 +277,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 13457,
-        "gzipBytes": 5352
+        "bytes": 13485,
+        "gzipBytes": 5357
       },
       "importSideEffects": "passed",
       "external": [
@@ -295,12 +295,12 @@
       "symbol": "useNavigationBlocker",
       "artifacts": {
         "./dist/tanstack-router/index.js": {
-          "bytes": 4251,
-          "gzipBytes": 1388
+          "bytes": 4318,
+          "gzipBytes": 1399
         },
         "./dist/tanstack-router/index.cjs": {
-          "bytes": 4361,
-          "gzipBytes": 1403
+          "bytes": 4428,
+          "gzipBytes": 1418
         },
         "./dist/tanstack-router/index.d.ts": {
           "bytes": 602,
@@ -312,8 +312,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 12718,
-        "gzipBytes": 5060
+        "bytes": 12746,
+        "gzipBytes": 5066
       },
       "importSideEffects": "passed",
       "external": [
@@ -330,12 +330,12 @@
       "symbol": "usePagesRouterBlocker",
       "artifacts": {
         "./dist/nextjs/index.js": {
-          "bytes": 7436,
-          "gzipBytes": 2091
+          "bytes": 7503,
+          "gzipBytes": 2107
         },
         "./dist/nextjs/index.cjs": {
-          "bytes": 7572,
-          "gzipBytes": 2110
+          "bytes": 7639,
+          "gzipBytes": 2123
         },
         "./dist/nextjs/index.d.ts": {
           "bytes": 854,
@@ -347,8 +347,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 13766,
-        "gzipBytes": 5397
+        "bytes": 13794,
+        "gzipBytes": 5400
       },
       "importSideEffects": "passed",
       "external": [
@@ -361,31 +361,24 @@
       ]
     }
   ],
-  "sourceBase": "63543da72f0761bf235f78c9b26a5b8ad07d788c",
-  "scope": "PR 13 release-documentation follow-up on sourceBase plus sourceFiles/pendingChangesets below. All five planned Changesets-versioned packages, strict installation, packed README links/peers/engines, declarations, bundles and import probes. No publication.",
+  "sourceBase": "743c6f4f004c59ea507ae5c465cff7cb1f34e596",
+  "reviewBase": "v1.0.5",
+  "packageSourceDiffSha256": "2727f00e92a8588b8f35a442ff2d74868e352ad430ef5eb92adeaa154e2580b8",
+  "scope": "Release stability audit: sourceBase plus the recorded working-tree input hashes. All five planned Changesets-versioned packages; strict peers, packed README links and types, declaration analysis, bundle and import probes. No registry publication.",
   "packages": [
     {
       "name": "@okyrychenko-dev/react-action-guard",
       "version": "2.0.0",
-      "sha256": "e7cdf2912604e48117ffd59f89b5e60d3f642d922c7f291d13b2136279c4cb94",
+      "sha256": "4c7ec532a8ba4bbdd3ccbfd01d21340aa8895c7b767e9a58af8a6e5e76a51fff",
       "peerDependencies": {
         "react": "^18.0.0 || ^19.0.0",
         "zustand": "^5.0.0"
       }
     },
     {
-      "name": "@okyrychenko-dev/react-action-guard-ui",
-      "version": "1.0.0",
-      "sha256": "da31aa93827037f0be36bfb18f3a4c594f846f8cd527aef9fa62da5293d50402",
-      "peerDependencies": {
-        "react": "^18.0.0 || ^19.0.0",
-        "@okyrychenko-dev/react-action-guard": "^2.0.0"
-      }
-    },
-    {
       "name": "@okyrychenko-dev/react-action-guard-devtools",
       "version": "1.0.0",
-      "sha256": "3b46494475db2519e3276cd422a5b7d0a450523222c714a3f17539eec7a010f8",
+      "sha256": "fd720b5fcbda9e673d1c359591fc8da91b3c969e9950bbff157eb1e12cea6fba",
       "peerDependencies": {
         "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "react": "^18.0.0 || ^19.0.0",
@@ -393,9 +386,21 @@
       }
     },
     {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "sha256": "80d756ecd358ce324afbcd0f37127a777bb1c68b355e91c3bdc9ebb05186c7a1",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "@tanstack/react-router": "^1.170.41",
+        "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-router-dom": "^6.19.0 || ^7.0.0"
+      }
+    },
+    {
       "name": "@okyrychenko-dev/react-action-guard-tanstack",
       "version": "0.4.0",
-      "sha256": "0a51229727aeacde113a450f8574ae4e38d247eee97fad907fae5342daf8d93c",
+      "sha256": "25035df857f62d7c66836ab43bfd2bad589e83e4222e514bc9362bf3eae8a8ce",
       "peerDependencies": {
         "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "@tanstack/react-query": "^5.90.10",
@@ -403,15 +408,12 @@
       }
     },
     {
-      "name": "@okyrychenko-dev/react-action-guard-router",
+      "name": "@okyrychenko-dev/react-action-guard-ui",
       "version": "1.0.0",
-      "sha256": "1b2545db04b11a5c810cf1e784dfb1e840ecb14b4d6b500c25ba53c25d7f9430",
+      "sha256": "38bc72f074f184dfdfb2a62918867d391ae3a782b14fb3304cf6c75e13cce5f0",
       "peerDependencies": {
-        "@okyrychenko-dev/react-action-guard": "^2.0.0",
-        "@tanstack/react-router": "^1.170.41",
-        "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
         "react": "^18.0.0 || ^19.0.0",
-        "react-router-dom": "^6.19.0 || ^7.0.0"
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
       }
     }
   ],
@@ -553,8 +555,16 @@
       "sha256": "ad72a57b19648e03c48a4ac0b9ac03413e5d8c74a784970f2003092884219406"
     },
     {
+      "file": "release-audit-scheduling.md",
+      "sha256": "5f031580af71adc896ff573d577e99ce5d1d81506fcf55dcb046f6faf80478a5"
+    },
+    {
       "file": "release-documentation-consistency.md",
       "sha256": "3fb375818919482a9a1f9da66d647fa248b672fb794b813ee85af07082463857"
+    },
+    {
+      "file": "scheduled-notification-cleanup.md",
+      "sha256": "42a464f8aacf30f96c1bc1431984735e0a97b177b928a205e435c90273f5283c"
     },
     {
       "file": "scheduled-registration-ownership.md",
@@ -585,6 +595,10 @@
       "sha256": "3da5cfa7bec64c8a72e0175da6ac7262f469f1e34a6aa668a14c59a04779aba5"
     },
     {
+      "file": "supported-store-cleanup-docs.md",
+      "sha256": "7414d092b9677b2bcce373e8db0cb799e83a509e9848c80755f038e9ae74a3e0"
+    },
+    {
       "file": "tame-lions-sneeze.md",
       "sha256": "2a6293319345cd0c558070db268d51e839786159598e6740d382ba6bd50a21d0"
     },
@@ -605,22 +619,142 @@
       "sha256": "1687f6fd01f9021f50361da0811c67373ab21b18778284887d35ce80c2e68772"
     },
     {
+      "file": "version-pr-ci-check.md",
+      "sha256": "340a6eba3ad62622cea11fb38ea972acc168c2e1d9e01efeb8613f9d7f8f4fd8"
+    },
+    {
       "file": "workflow-pilot-learning-materials.md",
       "sha256": "8e363da3217a64c4102ae07c7571b81045924864443fdf7225462dc7dc5f8ce0"
     }
   ],
   "sourceFiles": [
     {
+      "path": ".changeset/release-audit-scheduling.md",
+      "sha256": "5f031580af71adc896ff573d577e99ce5d1d81506fcf55dcb046f6faf80478a5"
+    },
+    {
+      "path": "examples/enterprise-demo/browser/navigation.pw.ts",
+      "sha256": "08e57a52c56935e65af5fe59f51e604c1dbf3393dfe5b80f28788c7caee14409"
+    },
+    {
+      "path": "examples/enterprise-demo/src/app/navigation.test.tsx",
+      "sha256": "cb8a838bb8d7832d91d95f2a4b3500181b8b99e516428049a82073b0a627f544"
+    },
+    {
+      "path": "examples/enterprise-demo/vite.config.ts",
+      "sha256": "48515d8d490fd121aae6c1997bdf61c28f7c9143c02e4ba0c601fd71817a2b3d"
+    },
+    {
       "path": "package.json",
       "sha256": "e7cfd88cb19377e39f3583c3c493945fa0b6683bca8f100567b9460bab54f346"
     },
     {
-      "path": "scripts/release/version.utils.mjs",
-      "sha256": "e51d28e1cb3444400a4f09020149cb86b5947e9a0d2dee83170d6e0ef302da3f"
+      "path": "packages/core/README.md",
+      "sha256": "73e0f82fb02b814aef39c605bb171c0a9dff711584a89d745848e57e7599575c"
     },
     {
-      "path": "scripts/version-packages.mjs",
-      "sha256": "32bf6039c3efe6f0cadcc40909021723d06f18fbfbe3d0b0b8146ee3a6d1fa9b"
+      "path": "packages/core/package.json",
+      "sha256": "2f854477d784a074d3aed9f9265130e40483537b46266cc6fb4168b466c50df4"
+    },
+    {
+      "path": "packages/core/src/hooks/useActionBlocker/index.ts",
+      "sha256": "f612c4d3d2757af2a1a6bcd7523f159da74974a988e8ace2a252717a8e1d606a"
+    },
+    {
+      "path": "packages/core/src/hooks/useActionBlocker/useActionBlocker.utils.ts",
+      "sha256": "a58f862151704d5ba717719a133c162e3b224e28a1af8d791d5a61fe0b848c32"
+    },
+    {
+      "path": "packages/core/src/hooks/useScheduledBlocker/__tests__/useScheduledBlocker.test.tsx",
+      "sha256": "8e7444e2bb325f85ad5993a077d5081a7d659a2801e592b220b548f8d3b3c2e2"
+    },
+    {
+      "path": "packages/core/src/hooks/useScheduledBlocker/__tests__/useScheduledBlocker.utils.test.ts",
+      "sha256": "175dbbf86e709578c496903b9c8156342e0c22736013088a353b9197b03b5320"
+    },
+    {
+      "path": "packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.ts",
+      "sha256": "3a8342357c36e186ab7767c6be8612513cd168cb6d085fa921baa0c591e06c77"
+    },
+    {
+      "path": "packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.utils.ts",
+      "sha256": "23f5b650bd15d84c4bc50e02cd8d61265bfeb95a77be1376a94e4c8785e18646"
+    },
+    {
+      "path": "packages/core/src/index.ts",
+      "sha256": "6a5361a6ac755fbcf324dcf92418fec3a427211097d6e382738d00ec005e0281"
+    },
+    {
+      "path": "packages/devtools/README.md",
+      "sha256": "5484d7243df771297a8395c499aa6e2a7d2690d09ba344f8faf31e9573fe8458"
+    },
+    {
+      "path": "packages/devtools/package.json",
+      "sha256": "7aa1362e20e6d7c4c7f75123a0e19856d7356867797655ab4234dac7f8128034"
+    },
+    {
+      "path": "packages/docs/README.md",
+      "sha256": "0e88bd61b8af765059a94405757cb1657fafe1779c6f625c0351eaa5c9b42243"
+    },
+    {
+      "path": "packages/docs/package.json",
+      "sha256": "b763a2ab16e3eadcf6a3a7984232c5eaf803e10ca075f519bce90483270956ba"
+    },
+    {
+      "path": "packages/router/README.md",
+      "sha256": "587daa38ce6098e19362b8d422804a96e2e1fc96b087995cc7a9078a0fba2ee0"
+    },
+    {
+      "path": "packages/router/package.json",
+      "sha256": "f4e1cb041916aac8351660b28e3b1f596ac207882631f13121d75b7223998df2"
+    },
+    {
+      "path": "packages/router/src/core/__tests__/handleConfirmation.test.ts",
+      "deleted": true
+    },
+    {
+      "path": "packages/router/src/core/index.ts",
+      "sha256": "cc4c2a7b5a15be707b14f057da81b8f30f46a677d025d36de0eb9aaedd891168"
+    },
+    {
+      "path": "packages/router/src/core/utils.ts",
+      "sha256": "fe68f21b5c055c764e23719348774715326e93d26a0f73b09a2af998e2bdf8ad"
+    },
+    {
+      "path": "packages/router/src/core/utils/handleConfirmation.ts",
+      "deleted": true
+    },
+    {
+      "path": "packages/router/src/nextjs/useAppRouterBlocker.ts",
+      "sha256": "c75c7125fcbac657df61d4f1629e5c0e0a32f85e99d7919b42220389710c1d5f"
+    },
+    {
+      "path": "packages/router/src/nextjs/usePagesRouterBlocker.ts",
+      "sha256": "67f83102be97a1fdf25e646a1953d8ccb3a1236a73e80d06fda48b3d9a42b024"
+    },
+    {
+      "path": "packages/router/src/react-router/useNavigationBlocker.ts",
+      "sha256": "1dd90b094b95b80270ab76aad1530a9aa90ab8976361ae3387be6e64fe47e09d"
+    },
+    {
+      "path": "packages/router/src/tanstack-router/useNavigationBlocker.ts",
+      "sha256": "181d6d4118ba4b48f27a3b8192793d61b1ec4641685703be351d27a5e555c559"
+    },
+    {
+      "path": "packages/tanstack/README.md",
+      "sha256": "d5bbc8c5ff7c901207b54ed35f453cf9ffe8355c8828ae2533041c846afd715c"
+    },
+    {
+      "path": "packages/tanstack/package.json",
+      "sha256": "1b3e4aaa009934d1d4db528a2e59bb5fd2ecc1fa88465b66446e471b0965556f"
+    },
+    {
+      "path": "packages/ui/README.md",
+      "sha256": "43126473be2459bdaef5bf35bfb955e915ec065dd590cfc47d939e731e272109"
+    },
+    {
+      "path": "packages/ui/package.json",
+      "sha256": "30fca2ae774c05775831a37bf0d1e6ef73c16981f56892b4874931dd3dc70b99"
     },
     {
       "path": "scripts/check-packed-publication.mjs",
@@ -631,52 +765,12 @@
       "sha256": "f320d26758dec8309f6e0b49780dd19baf6af81701e8cc9c42ac8976eb36bbe7"
     },
     {
-      "path": "packages/core/package.json",
-      "sha256": "2f854477d784a074d3aed9f9265130e40483537b46266cc6fb4168b466c50df4"
+      "path": "scripts/release/version.utils.mjs",
+      "sha256": "e51d28e1cb3444400a4f09020149cb86b5947e9a0d2dee83170d6e0ef302da3f"
     },
     {
-      "path": "packages/devtools/package.json",
-      "sha256": "7aa1362e20e6d7c4c7f75123a0e19856d7356867797655ab4234dac7f8128034"
-    },
-    {
-      "path": "packages/docs/package.json",
-      "sha256": "b763a2ab16e3eadcf6a3a7984232c5eaf803e10ca075f519bce90483270956ba"
-    },
-    {
-      "path": "packages/router/package.json",
-      "sha256": "f4e1cb041916aac8351660b28e3b1f596ac207882631f13121d75b7223998df2"
-    },
-    {
-      "path": "packages/tanstack/package.json",
-      "sha256": "1b3e4aaa009934d1d4db528a2e59bb5fd2ecc1fa88465b66446e471b0965556f"
-    },
-    {
-      "path": "packages/ui/package.json",
-      "sha256": "30fca2ae774c05775831a37bf0d1e6ef73c16981f56892b4874931dd3dc70b99"
-    },
-    {
-      "path": "packages/core/README.md",
-      "sha256": "73e0f82fb02b814aef39c605bb171c0a9dff711584a89d745848e57e7599575c"
-    },
-    {
-      "path": "packages/devtools/README.md",
-      "sha256": "5484d7243df771297a8395c499aa6e2a7d2690d09ba344f8faf31e9573fe8458"
-    },
-    {
-      "path": "packages/docs/README.md",
-      "sha256": "0e88bd61b8af765059a94405757cb1657fafe1779c6f625c0351eaa5c9b42243"
-    },
-    {
-      "path": "packages/router/README.md",
-      "sha256": "44481123c08dde2367c86fa7f843b59e2d9d3f86fc05d85ffe00d33eb786af24"
-    },
-    {
-      "path": "packages/tanstack/README.md",
-      "sha256": "d5bbc8c5ff7c901207b54ed35f453cf9ffe8355c8828ae2533041c846afd715c"
-    },
-    {
-      "path": "packages/ui/README.md",
-      "sha256": "43126473be2459bdaef5bf35bfb955e915ec065dd590cfc47d939e731e272109"
+      "path": "scripts/version-packages.mjs",
+      "sha256": "32bf6039c3efe6f0cadcc40909021723d06f18fbfbe3d0b0b8146ee3a6d1fa9b"
     }
   ]
 }

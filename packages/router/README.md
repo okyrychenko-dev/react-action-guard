@@ -483,11 +483,9 @@ TypeScript-friendly API surface:
 ```typescript
 import type {
   // Core types
-  UseNavigationBlockerOptions,
+  BaseNavigationBlockerOptions,
   NavigationBlockerReturn,
   DialogState,
-  ConfirmationResult,
-  ConfirmationCallbacks,
 } from "@okyrychenko-dev/react-action-guard-router";
 
 // Router-specific types

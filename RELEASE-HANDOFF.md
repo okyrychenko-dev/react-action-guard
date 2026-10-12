@@ -1,8 +1,10 @@
 # Planned release cohort handoff
 
-This handoff concerns source baseline `001da8a1f9bd7e83656208ae3f4953384137176f`
-and the pending Changesets on `chore/30-release-readiness`. It is release preparation,
-not a registry publication record or a statement that the Release workflow has run.
+The latest candidate is source baseline `743c6f4f004c59ea507ae5c465cff7cb1f34e596`
+plus the release audit changes on `chore/release-stability-audit`. The final audit
+section identifies its inputs and evidence. Earlier verification sections retain
+historical context. This is release preparation, not a registry publication record
+or a statement that the Release workflow has run.
 
 ## Version provenance
 
@@ -109,3 +111,90 @@ and all 13 packed targets after the fixes. `pnpm run test:next-runtime` passed a
 and `/tmp/action-guard-next-runtime-uHSCHu`. Package versions in the planned cohort
 remain unchanged from the earlier handoff. The earlier interrupted verification
 attempts are not used as success evidence.
+
+## Release stability audit
+
+The review compares local release tag `v1.0.5`
+(`212f3e268b76cde12719e93037cb329124692f89`) with baseline
+`743c6f4f004c59ea507ae5c465cff7cb1f34e596` and the audit working tree.
+The monorepo diff includes imported adapter history; the review considered the
+current shipped implementations, local specifications and accepted ADRs rather
+than treating imported commits as newly introduced behavior.
+
+### Standards
+
+- Shared the repeated scope identity calculation across React Router, TanStack
+  Router and Next Pages. Sorting and duplicate elimination remain unchanged.
+- Removed three unused internal helpers: the old confirmation dispatcher,
+  blocker-config projection and redundant past-schedule predicate. Removed their
+  obsolete direct tests where present; none was a supported package export.
+- Re-exported the three deprecated Core context hooks from their existing owner
+  instead of maintaining duplicate implementations. Built declarations preserve
+  the public names, signatures and deprecation annotations.
+- Corrected App Router's type import to use the Core directory entry point and
+  removed unsupported root types from the Router README example.
+
+Separate adapter navigation behavior and independently built Storybook examples
+remain separate. Pending Changesets are retained for the existing release pipeline.
+
+### Spec and runtime findings
+
+Two inherited scheduling defects were reproduced before correction: a delayed
+start callback delivered after the entire window could leave protection active
+indefinitely, and an end delay exceeding 2,147,483,647 ms could release protection
+immediately. Elapsed windows are now skipped and long windows use bounded deadline
+rechecks. Start rechecks also retain scheduled work when the wall clock moves
+backwards. The public hook suite passes all 32 scenarios, including notification
+errors, timeout episodes, current callbacks, schedule replacement and cleanup.
+
+The reviewed registration, navigation ownership and mutation execution contracts
+match the accepted specifications. No additional blocking violation was confirmed
+in those runtime paths. This assessment is bounded by the executed tests and
+documented capability limits; it is not certification of every peer combination.
+
+### Final candidate verification
+
+On 2026-10-12, `pnpm run release:check` passed build, documentation validation,
+lint, typecheck, all **849 tests**, formatting, publication validation for all five
+packages and all **13 packed consumer targets**. The test total excludes nine
+obsolete tests belonging to removed internal helpers and includes three added
+schedule scenarios, relative to the corrected baseline's 855 tests.
+
+`pnpm run test:next-runtime` passed production Next 15.5.23 build, consumer
+typecheck and **7 Chrome scenarios**, without skips. Router browser history passed
+**2 scenarios**, without skips. Refreshed JSON records above identify this baseline,
+the package source diff SHA-256, selected peers and artifact hashes. Source maps
+from publication, compatibility, Next and demo tarballs matched the current
+Core/Router sources (52 source entries per cohort).
+
+The enterprise demo installed the final local cohort with `setup:local` and passed
+public import verification, its ordinary `npm run check` (**75 tests**), production
+build and all **11 Chrome scenarios**, without skips. Earlier unrestricted parallel
+component runs had timeout/transient-state failures; the isolated failing cases
+passed, and two full runs with two workers passed all 75 tests without extending
+timeouts. The demo now limits Vitest to two workers. Navigation tests explicitly
+wait for cancellation to close the dialog and for the next dialog to appear;
+the initial browser run had one failed sidebar scenario, whereas the final full
+browser run passed. Initial failed runs are retained as diagnostic evidence, not
+counted as successful verification.
+
+Existing nonblocking diagnostics remain: legacy Next minimum-version fixtures
+emit npm deprecation/security warnings, the demo component suite emits HeroUI
+accessibility warnings, and its production bundle emits Vite's size warning.
+Compatibility testing of historical version floors is not a recommendation to
+deploy those versions. These diagnostics were not silenced by the audit.
+
+Raw successful consumers and reports are retained locally at
+`/tmp/action-guard-publication-lpciz5`, `/tmp/action-guard-compatibility-7D68Ha` and
+`/tmp/action-guard-next-runtime-Ufcrvc`. The package source diff SHA-256 is
+`2727f00e92a8588b8f35a442ff2d74868e352ad430ef5eb92adeaa154e2580b8`.
+The unrelated user change to `.gitignore` is preserved and excluded from package
+input provenance. Sandbox attempts failed at subprocess execution or consumer
+installation; the successful release and Next runs were outside the sandbox.
+
+Local validation used Node 22.20.0, pnpm 11.21.0 and npm 11.19.0. CI must rerun on
+the final committed candidate, including its configured pnpm 12.6.0 and Node 24
+job. Selected Chrome and memory-router scenarios do not extend the existing
+capability matrix. In particular, Next App Router remains unload-only. No registry
+publication, release merge, manifest version override or dependency removal was
+performed.

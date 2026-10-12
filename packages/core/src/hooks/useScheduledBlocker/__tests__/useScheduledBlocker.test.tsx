@@ -624,7 +624,7 @@ describe("useScheduledBlocker", () => {
     expect(isBlocked("test")).toBe(true);
   });
 
-  it("should keep blocking when end time is no longer in the future during scheduling", () => {
+  it("should skip protection when the window expires before activation", () => {
     const now = Date.now();
     const dateNowSpy = vi.spyOn(Date, "now");
 
@@ -641,13 +641,102 @@ describe("useScheduledBlocker", () => {
       })
     );
 
-    expect(readIsBlocked("test")).toBe(true);
+    expect(readIsBlocked("test")).toBe(false);
 
     act(() => {
       vi.advanceTimersByTime(10);
     });
 
+    expect(readIsBlocked("test")).toBe(false);
+  });
+
+  it("should skip an elapsed window when its start timer is delivered late", () => {
+    const now = Date.now();
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() =>
+      useScheduledBlocker("delayed-start", {
+        scope: "test",
+        schedule: { start: now + 100, duration: 100 },
+        onScheduleStart,
+        onScheduleEnd,
+      })
+    );
+
+    act(() => {
+      vi.setSystemTime(now + 1000);
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it("should wait for the start timestamp when the wall clock moves backwards", () => {
+    const now = Date.now();
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() =>
+      useScheduledBlocker("clock-adjustment", {
+        scope: "test",
+        schedule: { start: now + 100, duration: 100 },
+        onScheduleStart,
+        onScheduleEnd,
+      })
+    );
+
+    act(() => {
+      vi.setSystemTime(now - 1000);
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
     expect(readIsBlocked("test")).toBe(true);
+    expect(onScheduleStart).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleEnd).toHaveBeenCalledTimes(1);
+  });
+
+  it("should retain a long window until its deadline without overflowing the end timer", () => {
+    const now = Date.now();
+    const maximumDelay = 2_147_483_647;
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() =>
+      useScheduledBlocker("long-window", {
+        scope: "test",
+        schedule: { start: now, duration: maximumDelay + 1000 },
+        onScheduleEnd,
+      })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(readIsBlocked("test")).toBe(true);
+    act(() => {
+      vi.advanceTimersByTime(maximumDelay - 1);
+    });
+    expect(readIsBlocked("test")).toBe(true);
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleEnd).toHaveBeenCalledTimes(1);
   });
 
   it("should ignore past schedule", () => {

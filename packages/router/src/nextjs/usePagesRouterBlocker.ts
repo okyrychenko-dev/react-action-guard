@@ -4,7 +4,7 @@ import {
   DEFAULT_UNLOAD_MESSAGE,
   ROUTE_ERRORS,
   createConfirmationOwner,
-  normalizeScope,
+  createScopeKey,
   resolveConfirmResult,
   useBeforeUnload,
   useShouldBlock,
@@ -33,7 +33,7 @@ export function useNavigationBlocker(
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when, scope);
 
-  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
+  const scopeKey = createScopeKey(scope);
 
   // Replace protection and its listener before layout-triggered navigation can run.
   useInsertionEffect(() => {

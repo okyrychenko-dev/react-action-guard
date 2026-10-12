@@ -7,8 +7,6 @@ import {
   useUIBlockingContext,
   useUIBlockingStoreFromContext,
 } from "./context";
-import type { StoreApi } from "zustand";
-import type { UIBlockingStore } from "./store/uiBlockingStore.types";
 
 // Core hooks
 export {
@@ -96,23 +94,5 @@ export {
 };
 export type { UIBlockingProviderProps } from "./context";
 
-/**
- * @deprecated Use `useOptionalUIBlockingContext`.
- */
-export function useOptionalContext(): ReturnType<typeof useOptionalUIBlockingContext> {
-  return useOptionalUIBlockingContext();
-}
-
-/**
- * @deprecated Use `useResolvedStoreApi`.
- */
-export function useResolvedStore(): StoreApi<UIBlockingStore> {
-  return useResolvedStoreApi();
-}
-
-/**
- * @deprecated Use `useResolvedValue`.
- */
-export function useResolvedStoreWithSelector<T>(selector: (state: UIBlockingStore) => T): T {
-  return useResolvedValue(selector);
-}
+// eslint-disable-next-line @typescript-eslint/no-deprecated -- Kept as public compatibility aliases.
+export { useOptionalContext, useResolvedStore, useResolvedStoreWithSelector } from "./context";

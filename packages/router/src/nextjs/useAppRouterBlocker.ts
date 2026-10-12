@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { DEFAULT_UNLOAD_MESSAGE, useBeforeUnload, useShouldBlock } from "../core";
-import type { NavigationBlockerReturn } from "../core/types";
+import type { NavigationBlockerReturn } from "../core";
 import type { UseNavigationBlockerOptions } from "./types";
 
 /**
