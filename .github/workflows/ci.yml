@@ -15,6 +15,11 @@ jobs:
     name: Changeset check
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    env:
+      CHANGESETS_VERSION_PR: >-
+        ${{ github.event.pull_request.user.login == 'github-actions[bot]' &&
+            github.event.pull_request.head.repo.full_name == github.repository &&
+            github.head_ref == format('changeset-release/{0}', github.base_ref) }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -32,7 +37,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       - name: Require a changeset for package changes
+        if: env.CHANGESETS_VERSION_PR != 'true'
         run: pnpm exec changeset status --since=origin/main
+
+      - name: Changesets already applied in the version PR
+        if: env.CHANGESETS_VERSION_PR == 'true'
+        run: echo "The generated version PR has already consumed its changesets."
 
   publication:
     name: Packed publication checks
