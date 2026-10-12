@@ -37,7 +37,7 @@ pnpm add @okyrychenko-dev/react-action-guard-router @okyrychenko-dev/react-actio
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^1.0.1 - The core UI blocking library
+- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^2.0.0 - The core UI blocking library
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - One of:
   - [react-router-dom](https://reactrouter.com/) ^6.19.0 - For React Router or Remix
@@ -351,7 +351,7 @@ Pages Router does not allow pausing transitions. When you return a Promise from 
 
 Only the current confirmation attempt can resume navigation. Cleanup, disabling protection, or changing the protected scope or message invalidates pending answers. Callback rerenders and equivalent scopes preserve the current attempt. `onAllow` fires once for an accepted attempt; the replay permission is consumed once and cleared when the retry finishes or another URL is attempted.
 
-Selected packed Next 15.5.23 production Pages/App browser evidence and its limitations are recorded in the [runtime guide](../../scripts/next-runtime/README.md) and [capability matrix](../../CAPABILITIES.md). This does not establish every supported peer or navigation option.
+Selected packed Next 15.5.23 production Pages/App browser evidence and its limitations are recorded in the [runtime guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/next-runtime/README.md) and [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md). This does not establish every supported peer or navigation option.
 
 ### Next.js App Router
 

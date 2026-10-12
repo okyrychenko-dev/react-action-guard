@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { build } from "esbuild";
@@ -79,6 +79,30 @@ execFileSync(
   ],
   { cwd: consumer, stdio: "inherit", timeout: 240_000 }
 );
+const documentationChecks = [];
+for (const { name } of Object.values(tarballs)) {
+  const packageRoot = join(consumer, "node_modules", name);
+  const manifest = JSON.parse(readFileSync(join(packageRoot, "package.json"), "utf8"));
+  assert.equal(manifest.engines?.node, ">=20", `${name} must declare its Node 20 floor`);
+  const readme = readFileSync(join(packageRoot, "README.md"), "utf8");
+  let checkedLinks = 0;
+  for (const [, destination] of readme.matchAll(/\]\(([^)]+)\)/g)) {
+    if (/^(https?:|mailto:|#)/.test(destination)) continue;
+    const target = resolve(packageRoot, destination.split(/[?#]/)[0]);
+    const path = relative(packageRoot, target);
+    assert.ok(!path.startsWith(".."), `${name} README link escapes its package: ${destination}`);
+    assert.ok(existsSync(target), `${name} README link is not packed: ${destination}`);
+    checkedLinks++;
+  }
+  const corePeer = manifest.peerDependencies?.["@okyrychenko-dev/react-action-guard"];
+  if (corePeer) {
+    const requirement = readme
+      .split("\n")
+      .find((line) => line.startsWith("- [@okyrychenko-dev/react-action-guard]"));
+    assert.ok(requirement?.includes(corePeer), `${name} README must document Core ${corePeer}`);
+  }
+  documentationChecks.push({ name, checkedLinks, corePeer, node: manifest.engines.node });
+}
 const measuredEntries = [
   { id: "core", path: tarballs.core.name, symbol: "createBlockingLifecycle" },
   { id: "ui", path: tarballs.ui.name, symbol: "useGuardedButton" },
@@ -199,6 +223,7 @@ const result = {
     ])
   ),
   checks,
+  documentationChecks,
   measurements,
 };
 writeFileSync(join(temporary, "publication.json"), JSON.stringify(result, null, 2));

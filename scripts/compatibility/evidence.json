@@ -1,10 +1,10 @@
 {
-  "sourceBase": "001da8a1f9bd7e83656208ae3f4953384137176f",
-  "scope": "Ticket 30 full 13-target Changesets-versioned cohort refresh. Strict peer installation, ESM/CJS loading and NodeNext declarations for every target; behavior only as specified in README.md. No registry publication.",
+  "sourceBase": "63543da72f0761bf235f78c9b26a5b8ad07d788c",
+  "scope": "PR 13 release-documentation follow-up; source/input hashes recorded in publication-evidence.json. Full 13-target planned Changesets cohort; strict peers, ESM/CJS loading and NodeNext declarations. Behavior only as specified in README.md. No publication.",
   "results": [
     {
       "target": "next-13-floor",
-      "date": "2026-10-12T15:45:04.956Z",
+      "date": "2026-10-12T16:11:18.634Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -26,7 +26,7 @@
     },
     {
       "target": "next-14-floor",
-      "date": "2026-10-12T15:45:13.770Z",
+      "date": "2026-10-12T16:11:27.598Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -48,7 +48,7 @@
     },
     {
       "target": "next-15-floor",
-      "date": "2026-10-12T15:45:23.531Z",
+      "date": "2026-10-12T16:11:37.358Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -70,7 +70,7 @@
     },
     {
       "target": "next-current",
-      "date": "2026-10-12T15:45:33.861Z",
+      "date": "2026-10-12T16:11:47.023Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -92,7 +92,7 @@
     },
     {
       "target": "query-current",
-      "date": "2026-10-12T15:45:47.120Z",
+      "date": "2026-10-12T16:12:00.129Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -115,7 +115,7 @@
     },
     {
       "target": "query-floor",
-      "date": "2026-10-12T15:45:40.423Z",
+      "date": "2026-10-12T16:11:53.408Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -138,7 +138,7 @@
     },
     {
       "target": "react-18",
-      "date": "2026-10-12T15:44:12.860Z",
+      "date": "2026-10-12T16:10:28.204Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -159,7 +159,7 @@
     },
     {
       "target": "react-19",
-      "date": "2026-10-12T15:44:25.881Z",
+      "date": "2026-10-12T16:10:40.015Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -180,7 +180,7 @@
     },
     {
       "target": "react-19-floor",
-      "date": "2026-10-12T15:44:19.533Z",
+      "date": "2026-10-12T16:10:34.137Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -201,7 +201,7 @@
     },
     {
       "target": "react-router-7-floor",
-      "date": "2026-10-12T15:44:42.035Z",
+      "date": "2026-10-12T16:10:55.141Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -223,7 +223,7 @@
     },
     {
       "target": "react-router-current",
-      "date": "2026-10-12T15:44:48.896Z",
+      "date": "2026-10-12T16:11:01.888Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -245,7 +245,7 @@
     },
     {
       "target": "react-router-floor",
-      "date": "2026-10-12T15:44:33.430Z",
+      "date": "2026-10-12T16:10:47.465Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -267,7 +267,7 @@
     },
     {
       "target": "tanstack-router-floor",
-      "date": "2026-10-12T15:44:56.149Z",
+      "date": "2026-10-12T16:11:09.138Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {

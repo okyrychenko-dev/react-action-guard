@@ -1,6 +1,7 @@
 import { execFileSync } from "node:child_process";
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, symlinkSync } from "node:fs";
 import { join } from "node:path";
+import { applyReleaseVersions } from "../release/version.utils.mjs";
 
 // Apply the actual pending Changesets in a disposable workspace. Source manifests
 // stay untouched; only this versioned cohort is packed and installed by consumers.
@@ -27,15 +28,7 @@ export function preparePackedCohort(repository, temporary) {
   }
   // Tooling only: tested consumers never link workspace packages or dependencies.
   symlinkSync(join(repository, "node_modules"), join(cohort, "node_modules"), "dir");
-  execFileSync(
-    process.execPath,
-    [join(repository, "node_modules/@changesets/cli/bin.js"), "version"],
-    {
-      cwd: cohort,
-      stdio: "inherit",
-      timeout: 60_000,
-    }
-  );
+  applyReleaseVersions(cohort);
   const workspacePackages = new Map(
     packages.map(({ directory }) => {
       const { name } = JSON.parse(readFileSync(join(directory, "package.json"), "utf8"));

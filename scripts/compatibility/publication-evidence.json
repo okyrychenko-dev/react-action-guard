@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-12T15:43:58.850Z",
+  "date": "2026-10-12T16:10:15.390Z",
   "node": "v22.20.0",
   "tools": {
     "publint": "0.3.24",
@@ -46,6 +46,37 @@
       "attw": "passed",
       "profile": "strict",
       "excludedEntrypoints": []
+    }
+  ],
+  "documentationChecks": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "checkedLinks": 1,
+      "node": ">=20"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-devtools",
+      "checkedLinks": 1,
+      "corePeer": "^2.0.0",
+      "node": ">=20"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "checkedLinks": 0,
+      "corePeer": "^2.0.0",
+      "node": ">=20"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-tanstack",
+      "checkedLinks": 1,
+      "corePeer": "^2.0.0",
+      "node": ">=20"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "checkedLinks": 1,
+      "corePeer": "^2.0.0",
+      "node": ">=20"
     }
   ],
   "measurements": [
@@ -330,13 +361,13 @@
       ]
     }
   ],
-  "sourceBase": "001da8a1f9bd7e83656208ae3f4953384137176f",
-  "scope": "Ticket 30 refresh: all five planned Changesets-versioned packages, strict publication consumer, declarations, bundles and import probes. No registry publication.",
+  "sourceBase": "63543da72f0761bf235f78c9b26a5b8ad07d788c",
+  "scope": "PR 13 release-documentation follow-up on sourceBase plus sourceFiles/pendingChangesets below. All five planned Changesets-versioned packages, strict installation, packed README links/peers/engines, declarations, bundles and import probes. No publication.",
   "packages": [
     {
       "name": "@okyrychenko-dev/react-action-guard",
       "version": "2.0.0",
-      "sha256": "ea618d11bdf7cdb9465fe997d8adda1eec825a06fe4cd7b84e0fe2d2d6d8af0b",
+      "sha256": "e7cdf2912604e48117ffd59f89b5e60d3f642d922c7f291d13b2136279c4cb94",
       "peerDependencies": {
         "react": "^18.0.0 || ^19.0.0",
         "zustand": "^5.0.0"
@@ -345,7 +376,7 @@
     {
       "name": "@okyrychenko-dev/react-action-guard-ui",
       "version": "1.0.0",
-      "sha256": "aea1a9c5c0aa3cc5dc4d573947b5e6659e9280f0287bd93f528ce9b02dda8a8c",
+      "sha256": "da31aa93827037f0be36bfb18f3a4c594f846f8cd527aef9fa62da5293d50402",
       "peerDependencies": {
         "react": "^18.0.0 || ^19.0.0",
         "@okyrychenko-dev/react-action-guard": "^2.0.0"
@@ -354,7 +385,7 @@
     {
       "name": "@okyrychenko-dev/react-action-guard-devtools",
       "version": "1.0.0",
-      "sha256": "7fa59fa87681ddc4b9741b8a6df253eb785e3dc72a154de1b4aa02dcad834540",
+      "sha256": "3b46494475db2519e3276cd422a5b7d0a450523222c714a3f17539eec7a010f8",
       "peerDependencies": {
         "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "react": "^18.0.0 || ^19.0.0",
@@ -364,7 +395,7 @@
     {
       "name": "@okyrychenko-dev/react-action-guard-tanstack",
       "version": "0.4.0",
-      "sha256": "b0ecb0024371cb20dbe95ce833e5b78fe1bc9e74faf4209b6f2e0f9288b74e57",
+      "sha256": "0a51229727aeacde113a450f8574ae4e38d247eee97fad907fae5342daf8d93c",
       "peerDependencies": {
         "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "@tanstack/react-query": "^5.90.10",
@@ -374,7 +405,7 @@
     {
       "name": "@okyrychenko-dev/react-action-guard-router",
       "version": "1.0.0",
-      "sha256": "d2c8bfad89c1e425e0f6745aa9a994a7df3d8598b0f539c23f598c1097740a3f",
+      "sha256": "1b2545db04b11a5c810cf1e784dfb1e840ecb14b4d6b500c25ba53c25d7f9430",
       "peerDependencies": {
         "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "@tanstack/react-router": "^1.170.41",
@@ -419,7 +450,7 @@
     },
     {
       "file": "clean-blockers-publish.md",
-      "sha256": "a702123a28a86f602083466cc2af145d3e8d6a134d311c81de273119ade7b1e4"
+      "sha256": "e72e0962c0b812bb9ba1fd9c6a8b31778044237af4e99037c92a75d18652686c"
     },
     {
       "file": "core-coordination-onboarding.md",
@@ -515,11 +546,15 @@
     },
     {
       "file": "reactive-blocker-config.md",
-      "sha256": "a45c86479801f32ae756c7333fb496cd62c447c82de889373519525c1e579251"
+      "sha256": "a21df009f561a3bd8ef6281fe482e6530bf45c7095b091b3250618902bb89508"
     },
     {
       "file": "real-dogs-jog.md",
       "sha256": "ad72a57b19648e03c48a4ac0b9ac03413e5d8c74a784970f2003092884219406"
+    },
+    {
+      "file": "release-documentation-consistency.md",
+      "sha256": "3fb375818919482a9a1f9da66d647fa248b672fb794b813ee85af07082463857"
     },
     {
       "file": "scheduled-registration-ownership.md",
@@ -539,7 +574,7 @@
     },
     {
       "file": "small-dogs-observe.md",
-      "sha256": "c6f0a95dd449329f4d7b8e2bc5581408962ded7b6776065bf77f396c9de7cbcf"
+      "sha256": "bf715e1b219fce1552241456a811e0a20572ed2c74a4a62120cce4b0d6ef9cce"
     },
     {
       "file": "stable-scoped-metadata.md",
@@ -572,6 +607,76 @@
     {
       "file": "workflow-pilot-learning-materials.md",
       "sha256": "8e363da3217a64c4102ae07c7571b81045924864443fdf7225462dc7dc5f8ce0"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "package.json",
+      "sha256": "e7cfd88cb19377e39f3583c3c493945fa0b6683bca8f100567b9460bab54f346"
+    },
+    {
+      "path": "scripts/release/version.utils.mjs",
+      "sha256": "e51d28e1cb3444400a4f09020149cb86b5947e9a0d2dee83170d6e0ef302da3f"
+    },
+    {
+      "path": "scripts/version-packages.mjs",
+      "sha256": "32bf6039c3efe6f0cadcc40909021723d06f18fbfbe3d0b0b8146ee3a6d1fa9b"
+    },
+    {
+      "path": "scripts/check-packed-publication.mjs",
+      "sha256": "da12e119deba72eca56121bfa4d083741ecc81b14d5d6b5e57555e1d6de10a4b"
+    },
+    {
+      "path": "scripts/compatibility/cohort.utils.mjs",
+      "sha256": "f320d26758dec8309f6e0b49780dd19baf6af81701e8cc9c42ac8976eb36bbe7"
+    },
+    {
+      "path": "packages/core/package.json",
+      "sha256": "2f854477d784a074d3aed9f9265130e40483537b46266cc6fb4168b466c50df4"
+    },
+    {
+      "path": "packages/devtools/package.json",
+      "sha256": "7aa1362e20e6d7c4c7f75123a0e19856d7356867797655ab4234dac7f8128034"
+    },
+    {
+      "path": "packages/docs/package.json",
+      "sha256": "b763a2ab16e3eadcf6a3a7984232c5eaf803e10ca075f519bce90483270956ba"
+    },
+    {
+      "path": "packages/router/package.json",
+      "sha256": "f4e1cb041916aac8351660b28e3b1f596ac207882631f13121d75b7223998df2"
+    },
+    {
+      "path": "packages/tanstack/package.json",
+      "sha256": "1b3e4aaa009934d1d4db528a2e59bb5fd2ecc1fa88465b66446e471b0965556f"
+    },
+    {
+      "path": "packages/ui/package.json",
+      "sha256": "30fca2ae774c05775831a37bf0d1e6ef73c16981f56892b4874931dd3dc70b99"
+    },
+    {
+      "path": "packages/core/README.md",
+      "sha256": "73e0f82fb02b814aef39c605bb171c0a9dff711584a89d745848e57e7599575c"
+    },
+    {
+      "path": "packages/devtools/README.md",
+      "sha256": "5484d7243df771297a8395c499aa6e2a7d2690d09ba344f8faf31e9573fe8458"
+    },
+    {
+      "path": "packages/docs/README.md",
+      "sha256": "0e88bd61b8af765059a94405757cb1657fafe1779c6f625c0351eaa5c9b42243"
+    },
+    {
+      "path": "packages/router/README.md",
+      "sha256": "44481123c08dde2367c86fa7f843b59e2d9d3f86fc05d85ffe00d33eb786af24"
+    },
+    {
+      "path": "packages/tanstack/README.md",
+      "sha256": "d5bbc8c5ff7c901207b54ed35f453cf9ffe8355c8828ae2533041c846afd715c"
+    },
+    {
+      "path": "packages/ui/README.md",
+      "sha256": "43126473be2459bdaef5bf35bfb955e915ec065dd590cfc47d939e731e272109"
     }
   ]
 }

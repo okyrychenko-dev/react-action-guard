@@ -36,6 +36,23 @@ Both packed runners version the cohort using the same Changesets CLI/configurati
 
 ## Publication checks
 
+The installed-tarball publication check also validates declared Node >=20,
+the documented Core peer range, and every relative Markdown link in packaged
+READMEs. Relative targets must exist inside the same installed package; guides
+outside a tarball use durable repository URLs. All five packages include their
+referenced CHANGELOG.md.
+
+`pnpm version-packages` applies Changesets, advances `[Unreleased]` links using
+Changesets' monorepo package tags, and regenerates Core/Devtools/Query TypeDoc
+references after manifest versions change. The release action includes those
+generated references in its version PR. Plain version headings are retained for
+the [action v1 release-note parser](https://github.com/changesets/action/blob/maintenance/v1/src/utils.ts). For adapters moving from separate repositories,
+the first monorepo release links to its new release tag rather than comparing to
+a nonexistent old monorepo tag. Later releases use the preceding scoped tag.
+The packed cohort uses the same version/changelog step without generating the
+private documentation workspace. Source manifests and pending Changesets remain
+untouched when running the verification commands.
+
 Run `pnpm run build && pnpm run package:check` for publication checks, or `pnpm run release:check` for source checks, publication checks and the full compatibility matrix. The release workflow runs publication/compatibility checks before its release action.
 
 - `publint --strict` inspects the actual versioned tarballs, failing on errors and warnings (informational suggestions are allowed).
