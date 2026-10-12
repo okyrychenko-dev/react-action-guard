@@ -26,6 +26,112 @@ describe("useScheduledBlocker", () => {
     vi.useRealTimers();
   });
 
+  it("should end protection at the deadline when the start notification throws", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const notificationError = new Error("Start notification failed");
+    const schedule = { start: Date.now() + 100, duration: 100 };
+    const { result } = renderHook(
+      () => {
+        useScheduledBlocker("throwing-start", {
+          scope: "test",
+          schedule,
+          onScheduleStart: () => {
+            throw notificationError;
+          },
+        });
+
+        return useUIBlockingContext();
+      },
+      { wrapper }
+    );
+    const { isBlocked } = result.current.getState();
+
+    expect(isBlocked("test")).toBe(false);
+    expect(() => {
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+    }).toThrow(notificationError);
+    expect(isBlocked("test")).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(99);
+    });
+
+    expect(isBlocked("test")).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+
+    expect(isBlocked("test")).toBe(false);
+  });
+
+  it("should release protection when the end notification throws", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const notificationError = new Error("End notification failed");
+    const schedule = { start: Date.now() + 100, duration: 100 };
+    const { result } = renderHook(
+      () => {
+        useScheduledBlocker("throwing-end", {
+          scope: "test",
+          schedule,
+          onScheduleEnd: () => {
+            throw notificationError;
+          },
+        });
+
+        return useUIBlockingContext();
+      },
+      { wrapper }
+    );
+    const { isBlocked } = result.current.getState();
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(isBlocked("test")).toBe(true);
+    expect(() => {
+      act(() => {
+        vi.advanceTimersByTime(100);
+      });
+    }).toThrow(notificationError);
+    expect(isBlocked("test")).toBe(false);
+  });
+
+  it("should cancel scheduled notifications when an immediate start notification throws", () => {
+    const wrapper = ({ children }: PropsWithChildren): ReactNode => (
+      <UIBlockingProvider>{children}</UIBlockingProvider>
+    );
+    const notificationError = new Error("Immediate start notification failed");
+    const schedule = { start: Date.now(), duration: 100 };
+    const onScheduleEnd = vi.fn();
+
+    expect(() => {
+      renderHook(
+        () => {
+          useScheduledBlocker("throwing-immediate-start", {
+            scope: "test",
+            schedule,
+            onScheduleStart: () => {
+              throw notificationError;
+            },
+            onScheduleEnd,
+          });
+        },
+        { wrapper }
+      );
+    }).toThrow(notificationError);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
   it("should replace configuration during an unchanged active window", () => {
     const wrapper = ({ children }: PropsWithChildren): ReactNode => (
       <UIBlockingProvider>{children}</UIBlockingProvider>
