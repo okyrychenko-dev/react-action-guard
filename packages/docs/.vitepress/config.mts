@@ -108,6 +108,7 @@ export default defineConfig({
         text: "Advanced",
         items: [
           { text: "Providers and typed hooks", link: "/advanced/ownership" },
+          { text: "Identity and evolution decisions", link: "/advanced/evolution" },
           { text: "SSR and hydration", link: "/advanced/ssr" },
           { text: "Observability", link: "/advanced/observability" },
           { text: "Architecture", link: "/architecture/" },
