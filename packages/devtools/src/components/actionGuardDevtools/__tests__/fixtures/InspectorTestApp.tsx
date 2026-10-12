@@ -1,8 +1,8 @@
 import { useUIBlockingContext } from "@okyrychenko-dev/react-action-guard";
 import { useState } from "react";
-import { ActionGuardDevtools } from "../../../actionGuardDevtools";
+import ActionGuardDevtools from "../../ActionGuardDevtools";
 import type { ReactElement } from "react";
-import type { DevtoolsInspection } from "../../../actionGuardDevtools";
+import type { DevtoolsInspection } from "../../ActionGuardDevtools.types";
 
 interface InspectorTestAppProps {
   name: string;

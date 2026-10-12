@@ -1,5 +1,5 @@
 import { normalizeScope, scopeAffectsObservation } from "@okyrychenko-dev/react-action-guard";
-import type { InspectedScope, ScopeGraphProps } from "./ScopeGraph.types";
+import type { InspectedScope, ScopeGraphEdge, ScopeGraphProps } from "./ScopeGraph.types";
 
 export function getInspectedScopes({
   blockers,
@@ -21,4 +21,32 @@ export function getInspectedScopes({
       .filter((action) => normalizeScope(action.scope).includes(scope))
       .map(({ id }) => id),
   }));
+}
+
+export function getScopeGraphEdges(
+  blockers: ScopeGraphProps["blockers"],
+  scopes: ReadonlyArray<InspectedScope>
+): ReadonlyArray<ScopeGraphEdge> {
+  const blockerIndices = new Map<string, number>();
+  const edges: Array<ScopeGraphEdge> = [];
+
+  for (const [index, { id }] of blockers.entries()) {
+    blockerIndices.set(id, index);
+  }
+
+  for (const [scopeIndex, { scope, blockers: matchingBlockers }] of scopes.entries()) {
+    for (const { id: blockerId } of matchingBlockers) {
+      const blockerIndex = blockerIndices.get(blockerId);
+
+      if (blockerIndex !== undefined) {
+        edges.push({ blockerId, scope, blockerIndex, scopeIndex });
+      }
+    }
+  }
+
+  return edges;
+}
+
+export function formatDiagramLabel(label: string): string {
+  return label.length > 20 ? `${label.slice(0, 17)}…` : label;
 }

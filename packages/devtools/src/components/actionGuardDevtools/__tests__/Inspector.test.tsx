@@ -1,7 +1,7 @@
 import { UIBlockingProvider, uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ActionGuardDevtools } from "../../actionGuardDevtools";
+import ActionGuardDevtools from "../ActionGuardDevtools";
 import InspectorTestApp from "./fixtures/InspectorTestApp";
 
 describe("Inspector explanations", () => {
@@ -122,6 +122,9 @@ describe("Inspector explanations", () => {
     );
     fireEvent.click(screen.getByRole("button", { name: "Active Blockers" }));
     expect(screen.getByRole("img", { name: "Blockers and affected scopes" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("img", { name: "Blockers and affected scopes" })
+    ).toHaveAccessibleDescription("save blocks checkout. save blocks navigation");
 
     const protection = within(screen.getByRole("table", { name: "Scope protection" }));
 

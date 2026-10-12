@@ -22,18 +22,19 @@ interface BlockerItemProps {
 
 function ActiveBlockerItem(props: BlockerItemProps): ReactElement {
   const { id, blocker, isStuck, now, actions } = props;
+  const { scope, priority, reason, timestamp } = blocker;
 
   let affectedActions = "not declared";
 
   if (actions) {
     affectedActions =
       actions
-        .filter(({ scope }) => scopeAffectsObservation(blocker.scope, scope))
+        .filter(({ scope: actionScope }) => scopeAffectsObservation(scope, actionScope))
         .map(({ id: actionId }) => actionId)
         .join(", ") || "None";
   }
 
-  const isGlobal = normalizeScope(blocker.scope).includes(DEFAULT_SCOPE);
+  const isGlobal = normalizeScope(scope).includes(DEFAULT_SCOPE);
 
   return (
     <article
@@ -51,11 +52,11 @@ function ActiveBlockerItem(props: BlockerItemProps): ReactElement {
         )}
       </div>
       <div className={styles.blockerMeta}>
-        <span>Scope: {formatScope(blocker.scope)}</span>
-        <span>Priority: {blocker.priority}</span>
-        <span>Reason: {blocker.reason || "not provided"}</span>
-        <span>Started: {formatRelativeTime(blocker.timestamp)}</span>
-        <span>Age: {getBlockerAge(blocker, now ?? blocker.timestamp)} ms</span>
+        <span>Scope: {formatScope(scope)}</span>
+        <span>Priority: {priority}</span>
+        <span>Reason: {reason || "not provided"}</span>
+        <span>Started: {formatRelativeTime(timestamp)}</span>
+        <span>Age: {getBlockerAge(blocker, now ?? timestamp)} ms</span>
         <span>Source: unavailable</span>
         {isGlobal && <span>Global effect: all non-empty scopes</span>}
         <span>Affected actions: {affectedActions}</span>

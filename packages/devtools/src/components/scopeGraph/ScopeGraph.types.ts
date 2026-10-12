@@ -11,3 +11,10 @@ export interface InspectedScope {
   blockers: ReadonlyArray<BlockerInfo>;
   actions: ReadonlyArray<string>;
 }
+
+export interface ScopeGraphEdge {
+  blockerId: string;
+  scope: string;
+  blockerIndex: number;
+  scopeIndex: number;
+}
