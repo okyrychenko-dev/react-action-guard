@@ -16,10 +16,14 @@ describe("Checkout navigation", () => {
     expect(await screen.findByRole("dialog", { name: "Navigation blocked" })).toBeVisible();
     expect(router.state.location.pathname).toBe("/checkout");
     await user.click(screen.getByRole("button", { name: "Stay and save" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog", { name: "Navigation blocked" })).not.toBeInTheDocument()
+    );
     expect(router.state.location.pathname).toBe("/checkout");
     await user.click(within(navigation).getByRole("button", { name: /^admin/i }));
+    await screen.findByRole("dialog", { name: "Navigation blocked" });
     await user.click(await screen.findByRole("button", { name: "Leave anyway" }));
-    expect(router.state.location.pathname).toBe("/admin");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/admin"));
     router.dispose();
   });
   it("should allow saving after cancelling navigation and then leave without confirmation", async () => {
@@ -30,6 +34,9 @@ describe("Checkout navigation", () => {
     const admin = within(screen.getByRole("navigation")).getByRole("button", { name: /^admin/i });
     await user.click(admin);
     await user.click(await screen.findByRole("button", { name: "Stay and save" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog", { name: "Navigation blocked" })).not.toBeInTheDocument()
+    );
     const save = screen.getByRole("button", { name: "Save cart" });
     expect(save).toBeEnabled();
     await user.click(save);
@@ -37,7 +44,7 @@ describe("Checkout navigation", () => {
     await user.click(
       within(screen.getByRole("navigation")).getByRole("button", { name: /^admin/i })
     );
-    expect(router.state.location.pathname).toBe("/admin");
+    await waitFor(() => expect(router.state.location.pathname).toBe("/admin"));
     expect(screen.queryByRole("dialog", { name: "Navigation blocked" })).not.toBeInTheDocument();
     router.dispose();
   });

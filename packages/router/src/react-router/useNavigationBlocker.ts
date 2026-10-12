@@ -3,7 +3,7 @@ import { useBlocker } from "react-router-dom";
 import {
   DEFAULT_UNLOAD_MESSAGE,
   createConfirmationOwner,
-  normalizeScope,
+  createScopeKey,
   resolveConfirmResult,
   useBeforeUnload,
   useShouldBlock,
@@ -37,7 +37,7 @@ export function useNavigationBlocker(
   // Use shared logic to determine if blocking should be active
   const shouldBlock = useShouldBlock(when ?? block, scope);
 
-  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
+  const scopeKey = createScopeKey(scope);
 
   useEffect(() => {
     return invalidate;

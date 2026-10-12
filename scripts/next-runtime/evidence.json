@@ -1,7 +1,7 @@
 {
-  "sourceBase": "63543da72f0761bf235f78c9b26a5b8ad07d788c",
-  "packageSourceDiffSha256": "25af661492fa7c0fbcc76e09c2a86ac39c221e593e8a8ac77d288bf903cb335f",
-  "date": "2026-10-12T16:08:54.146Z",
+  "sourceBase": "743c6f4f004c59ea507ae5c465cff7cb1f34e596",
+  "packageSourceDiffSha256": "2727f00e92a8588b8f35a442ff2d74868e352ad430ef5eb92adeaa154e2580b8",
+  "date": "2026-10-12T17:51:58.559Z",
   "node": "v22.20.0",
   "strictPeers": true,
   "evaluated": {
@@ -23,12 +23,12 @@
     {
       "name": "@okyrychenko-dev/react-action-guard",
       "version": "2.0.0",
-      "sha256": "e7cdf2912604e48117ffd59f89b5e60d3f642d922c7f291d13b2136279c4cb94"
+      "sha256": "4c7ec532a8ba4bbdd3ccbfd01d21340aa8895c7b767e9a58af8a6e5e76a51fff"
     },
     {
       "name": "@okyrychenko-dev/react-action-guard-router",
       "version": "1.0.0",
-      "sha256": "1b2545db04b11a5c810cf1e784dfb1e840ecb14b4d6b500c25ba53c25d7f9430"
+      "sha256": "80d756ecd358ce324afbcd0f37127a777bb1c68b355e91c3bdc9ebb05186c7a1"
     }
   ],
   "build": "next build and tsc --noEmit passed",
@@ -83,8 +83,8 @@
     }
   ],
   "results": {
-    "startTime": "2026-10-12T16:08:37.982Z",
-    "duration": 16097.702000000001,
+    "startTime": "2026-10-12T17:51:44.298Z",
+    "duration": 14215.071,
     "expected": 7,
     "skipped": 0,
     "unexpected": 0,

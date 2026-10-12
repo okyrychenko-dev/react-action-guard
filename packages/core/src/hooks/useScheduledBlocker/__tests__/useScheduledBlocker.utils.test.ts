@@ -4,7 +4,6 @@ import {
   calculateEndTime,
   isInBlockingPeriod,
   isSafeTimeout,
-  isScheduleInPast,
   isValidTimestamp,
   parseDate,
 } from "../useScheduledBlocker.utils";
@@ -171,39 +170,6 @@ describe("useScheduledBlocker.utils", () => {
       const startTime = now + 10000;
 
       expect(isInBlockingPeriod(startTime, undefined, now)).toBe(false);
-    });
-  });
-
-  describe("isScheduleInPast", () => {
-    it("should return true if both start and end are in the past", () => {
-      const now = Date.now();
-      const startTime = now - 20000;
-      const endTime = now - 10000;
-
-      expect(isScheduleInPast(startTime, endTime, now)).toBe(true);
-    });
-
-    it("should return false if end is in the future", () => {
-      const now = Date.now();
-      const startTime = now - 10000;
-      const endTime = now + 10000;
-
-      expect(isScheduleInPast(startTime, endTime, now)).toBe(false);
-    });
-
-    it("should return false if no end time specified", () => {
-      const now = Date.now();
-      const startTime = now - 10000;
-
-      expect(isScheduleInPast(startTime, undefined, now)).toBe(false);
-    });
-
-    it("should return false if start is in the future", () => {
-      const now = Date.now();
-      const startTime = now + 10000;
-      const endTime = now + 20000;
-
-      expect(isScheduleInPast(startTime, endTime, now)).toBe(false);
     });
   });
 

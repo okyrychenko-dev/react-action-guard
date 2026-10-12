@@ -2,7 +2,7 @@ import { useBlocker } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   createConfirmationOwner,
-  normalizeScope,
+  createScopeKey,
   resolveConfirmResult,
   useShouldBlock,
 } from "../core";
@@ -16,7 +16,7 @@ export function useNavigationBlocker(
   const { when, scope, message, onBlock, onAllow, blockBrowserUnload = true, onConfirm } = options;
 
   const shouldBlock = useShouldBlock(when, scope);
-  const scopeKey = JSON.stringify([...new Set(normalizeScope(scope))].sort());
+  const scopeKey = createScopeKey(scope);
   const [confirmationOwner] = useState(createConfirmationOwner);
 
   const { begin, invalidate } = confirmationOwner;

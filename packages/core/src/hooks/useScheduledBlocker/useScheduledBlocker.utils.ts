@@ -82,23 +82,3 @@ export function isInBlockingPeriod(
 
   return endTime > now; // Check if end time hasn't passed
 }
-
-/**
- * Checks if a schedule is completely in the past.
- *
- * @param startTime - Schedule start time in milliseconds
- * @param endTime - Schedule end time in milliseconds (optional)
- * @param now - Current time in milliseconds
- * @returns True if the schedule is in the past
- */
-export function isScheduleInPast(
-  startTime: number,
-  endTime: Optional<number>,
-  now: number
-): boolean {
-  if (!endTime) {
-    return false; // No end time means it can still be active
-  }
-
-  return endTime <= now && startTime <= now;
-}

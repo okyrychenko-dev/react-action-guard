@@ -4,10 +4,10 @@ import { useBlockerRegistration } from "../useActionBlocker";
 import { useConfigRef } from "../useConfigRef";
 import { ScheduledBlockerConfig } from "./useScheduledBlocker.types";
 import {
+  MAX_TIMEOUT_MS,
   calculateEndTime,
   isInBlockingPeriod,
   isSafeTimeout,
-  isScheduleInPast,
   isValidTimestamp,
   parseDate,
 } from "./useScheduledBlocker.utils";
@@ -59,27 +59,46 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       return;
     }
 
-    const scheduleEnd = (): void => {
-      const endTime = calculateEndTime(currentConfig.schedule, startTime);
+    const endTime = calculateEndTime(currentConfig.schedule, startTime);
 
-      if (!endTime) {
+    const scheduleEnd = (): void => {
+      if (isUndefined(endTime)) {
         return;
       }
 
       const remainingTime = endTime - Date.now();
 
       if (remainingTime > 0) {
-        timeoutsRef.current.end = setTimeout(() => {
-          try {
-            configRef.current.onScheduleEnd?.();
-          } finally {
-            deactivate();
-          }
-        }, remainingTime);
+        timeoutsRef.current.end = setTimeout(scheduleEnd, Math.min(remainingTime, MAX_TIMEOUT_MS));
+
+        return;
+      }
+
+      try {
+        configRef.current.onScheduleEnd?.();
+      } finally {
+        deactivate();
       }
     };
 
     const startBlocking = (): void => {
+      const now = Date.now();
+      const remainingTime = startTime - now;
+
+      if (remainingTime > 0) {
+        timeoutsRef.current.start = setTimeout(
+          startBlocking,
+          Math.min(remainingTime, MAX_TIMEOUT_MS)
+        );
+
+        return;
+      }
+
+      // A suspended tab can deliver this timer after the entire window elapsed.
+      if (!isInBlockingPeriod(startTime, endTime, now)) {
+        return;
+      }
+
       const cfg = configRef.current;
 
       activate();
@@ -99,8 +118,6 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
     }
     // If already in blocking period or should start immediately
     else {
-      const endTime = calculateEndTime(currentConfig.schedule, startTime);
-
       if (isInBlockingPeriod(startTime, endTime, now)) {
         try {
           startBlocking();
@@ -110,8 +127,6 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
           throw error;
         }
-      } else if (isScheduleInPast(startTime, endTime, now)) {
-        return;
       }
     }
 

@@ -96,3 +96,8 @@ export function normalizeScope(scope: Optional<string | Array<string>>): Array<s
 
   return isArray(scope) ? scope : [scope];
 }
+
+/** Identifies protection independently of scope order and duplicate entries. */
+export function createScopeKey(scope: Optional<string | Array<string>>): string {
+  return JSON.stringify([...new Set(normalizeScope(scope))].sort());
+}
