@@ -1,5 +1,5 @@
 {
-  "date": "2026-10-04T19:10:56.739Z",
+  "date": "2026-10-12T15:43:58.850Z",
   "node": "v22.20.0",
   "tools": {
     "publint": "0.3.24",
@@ -54,25 +54,25 @@
       "symbol": "createBlockingLifecycle",
       "artifacts": {
         "./dist/index.js": {
-          "bytes": 31816,
-          "gzipBytes": 7149
+          "bytes": 34513,
+          "gzipBytes": 7781
         },
         "./dist/index.cjs": {
-          "bytes": 33087,
-          "gzipBytes": 7286
+          "bytes": 35866,
+          "gzipBytes": 7905
         },
         "./dist/index.d.ts": {
-          "bytes": 21294,
-          "gzipBytes": 5512
+          "bytes": 21599,
+          "gzipBytes": 5614
         },
         "./dist/index.d.cts": {
-          "bytes": 21294,
-          "gzipBytes": 5512
+          "bytes": 21599,
+          "gzipBytes": 5614
         }
       },
       "minimalConsumer": {
-        "bytes": 10942,
-        "gzipBytes": 4366
+        "bytes": 11339,
+        "gzipBytes": 4493
       },
       "importSideEffects": "passed",
       "external": [
@@ -89,12 +89,12 @@
       "symbol": "useGuardedButton",
       "artifacts": {
         "./dist/index.js": {
-          "bytes": 13941,
-          "gzipBytes": 2777
+          "bytes": 13414,
+          "gzipBytes": 2627
         },
         "./dist/index.cjs": {
-          "bytes": 14591,
-          "gzipBytes": 2889
+          "bytes": 14060,
+          "gzipBytes": 2740
         },
         "./dist/index.d.ts": {
           "bytes": 8138,
@@ -106,8 +106,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 16603,
-        "gzipBytes": 6052
+        "bytes": 17312,
+        "gzipBytes": 6280
       },
       "importSideEffects": "passed",
       "external": [
@@ -124,25 +124,25 @@
       "symbol": "ActionGuardDevtools",
       "artifacts": {
         "./dist/index.js": {
-          "bytes": 59118,
-          "gzipBytes": 12610
+          "bytes": 69842,
+          "gzipBytes": 14984
         },
         "./dist/index.cjs": {
-          "bytes": 61859,
-          "gzipBytes": 12683
+          "bytes": 73161,
+          "gzipBytes": 15037
         },
         "./dist/index.d.ts": {
-          "bytes": 6711,
-          "gzipBytes": 2170
+          "bytes": 7424,
+          "gzipBytes": 2392
         },
         "./dist/index.d.cts": {
-          "bytes": 6711,
-          "gzipBytes": 2170
+          "bytes": 7424,
+          "gzipBytes": 2392
         }
       },
       "minimalConsumer": {
-        "bytes": 37247,
-        "gzipBytes": 13226
+        "bytes": 43795,
+        "gzipBytes": 15139
       },
       "importSideEffects": "passed",
       "external": [
@@ -159,12 +159,12 @@
       "symbol": "useBlockingMutation",
       "artifacts": {
         "./dist/index.js": {
-          "bytes": 4758,
-          "gzipBytes": 1244
+          "bytes": 10383,
+          "gzipBytes": 2719
         },
         "./dist/index.cjs": {
-          "bytes": 4945,
-          "gzipBytes": 1276
+          "bytes": 10617,
+          "gzipBytes": 2733
         },
         "./dist/index.d.ts": {
           "bytes": 6540,
@@ -176,8 +176,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 12271,
-        "gzipBytes": 4911
+        "bytes": 14270,
+        "gzipBytes": 5674
       },
       "importSideEffects": "passed",
       "external": [
@@ -229,12 +229,12 @@
       "symbol": "useNavigationBlocker",
       "artifacts": {
         "./dist/react-router/index.js": {
-          "bytes": 5456,
-          "gzipBytes": 1687
+          "bytes": 6650,
+          "gzipBytes": 1977
         },
         "./dist/react-router/index.cjs": {
-          "bytes": 5635,
-          "gzipBytes": 1718
+          "bytes": 6835,
+          "gzipBytes": 2005
         },
         "./dist/react-router/index.d.ts": {
           "bytes": 1502,
@@ -246,8 +246,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 12796,
-        "gzipBytes": 5127
+        "bytes": 13457,
+        "gzipBytes": 5352
       },
       "importSideEffects": "passed",
       "external": [
@@ -281,8 +281,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 12518,
-        "gzipBytes": 5006
+        "bytes": 12718,
+        "gzipBytes": 5060
       },
       "importSideEffects": "passed",
       "external": [
@@ -299,12 +299,12 @@
       "symbol": "usePagesRouterBlocker",
       "artifacts": {
         "./dist/nextjs/index.js": {
-          "bytes": 5690,
-          "gzipBytes": 1693
+          "bytes": 7436,
+          "gzipBytes": 2091
         },
         "./dist/nextjs/index.cjs": {
-          "bytes": 5840,
-          "gzipBytes": 1716
+          "bytes": 7572,
+          "gzipBytes": 2110
         },
         "./dist/nextjs/index.d.ts": {
           "bytes": 854,
@@ -316,8 +316,8 @@
         }
       },
       "minimalConsumer": {
-        "bytes": 12890,
-        "gzipBytes": 5118
+        "bytes": 13766,
+        "gzipBytes": 5397
       },
       "importSideEffects": "passed",
       "external": [
@@ -328,6 +328,250 @@
         "@tanstack/react-query",
         "next"
       ]
+    }
+  ],
+  "sourceBase": "001da8a1f9bd7e83656208ae3f4953384137176f",
+  "scope": "Ticket 30 refresh: all five planned Changesets-versioned packages, strict publication consumer, declarations, bundles and import probes. No registry publication.",
+  "packages": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0",
+      "sha256": "ea618d11bdf7cdb9465fe997d8adda1eec825a06fe4cd7b84e0fe2d2d6d8af0b",
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0"
+      }
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "version": "1.0.0",
+      "sha256": "aea1a9c5c0aa3cc5dc4d573947b5e6659e9280f0287bd93f528ce9b02dda8a8c",
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      }
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-devtools",
+      "version": "1.0.0",
+      "sha256": "7fa59fa87681ddc4b9741b8a6df253eb785e3dc72a154de1b4aa02dcad834540",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0"
+      }
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-tanstack",
+      "version": "0.4.0",
+      "sha256": "b0ecb0024371cb20dbe95ce833e5b78fe1bc9e74faf4209b6f2e0f9288b74e57",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "@tanstack/react-query": "^5.90.10",
+        "react": "^18.0.0 || ^19.0.0"
+      }
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "sha256": "d2c8bfad89c1e425e0f6745aa9a994a7df3d8598b0f539c23f598c1097740a3f",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "@tanstack/react-router": "^1.170.41",
+        "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-router-dom": "^6.19.0 || ^7.0.0"
+      }
+    }
+  ],
+  "pendingChangesets": [
+    {
+      "file": "active-query-work.md",
+      "sha256": "43a19ca407d6b406bdadce30da37c940518f07f9b0aeb557510bc715b0aea6bc"
+    },
+    {
+      "file": "async-execution-onboarding.md",
+      "sha256": "0888b28fb110ca5a3931fbc39c356b4dabd7aafecae5dabe3090b498e01e553d"
+    },
+    {
+      "file": "bold-beers-accept.md",
+      "sha256": "d487269d2de0655a9ed127c83b0d1006d724e600385b32f4f4b39893c1e0164b"
+    },
+    {
+      "file": "bright-blockers-live.md",
+      "sha256": "5cf9a6d2cc7c3d73ed461de9b4e31a92da805e70301c425920fa5d1bae5922c1"
+    },
+    {
+      "file": "bright-scopes-align.md",
+      "sha256": "77cde14b33a99ba03422b92c5ac4d345895a22b9028825aad6394df3e61bfaa2"
+    },
+    {
+      "file": "browser-history-verification.md",
+      "sha256": "f27d34b4438a0ae49964c46bf9a74845a1f95c81d226e4af63f96c8b06caf864"
+    },
+    {
+      "file": "calm-tools-migrate.md",
+      "sha256": "5b30387b270e4f21b996fcf17ba6272c43d204e6244d0a5aed7729564807eb8a"
+    },
+    {
+      "file": "canonical-guides-core-contract.md",
+      "sha256": "7d779e5737eacaf2d733ca4167c3fb6e38350d79163e9dd215cd29e050c8c043"
+    },
+    {
+      "file": "clean-blockers-publish.md",
+      "sha256": "a702123a28a86f602083466cc2af145d3e8d6a134d311c81de273119ade7b1e4"
+    },
+    {
+      "file": "core-coordination-onboarding.md",
+      "sha256": "07b902009f162aa340f6aa683c9a24e9102181c69a5e9482754f9fafd6f6bbc0"
+    },
+    {
+      "file": "current-conditional-registration.md",
+      "sha256": "c790be61224ff77679b32f5759616c051aa8fe7d6ed2a78e7187259466f43efd"
+    },
+    {
+      "file": "current-react-router-confirmation.md",
+      "sha256": "5b038c617346abdae032bc7d37d388777d4a97d31794d0f79a8b988503dd8075"
+    },
+    {
+      "file": "deep-guards-contract.md",
+      "sha256": "cd7c051dd4366b0c3aee4ba938daa4c6a7dd0107147fc1360081f9cdf82d3887"
+    },
+    {
+      "file": "duplicate-hook-diagnostics.md",
+      "sha256": "16ccd2b0447ae2175939a7ea8562f0705084fb78c52da8cd854501a51fbfe01f"
+    },
+    {
+      "file": "empty-peer-install-config.md",
+      "sha256": "64be445b218283d2acfc228792980a140cb73c9e3fb5f3610a581fe0416f1eb6"
+    },
+    {
+      "file": "evidence-gated-evolution.md",
+      "sha256": "03130da37e0a14426c978ff571243377e45a001360ee3a112c4e122d6e0e1658"
+    },
+    {
+      "file": "explain-observed-protection.md",
+      "sha256": "8ea0ca6d66bc2eac95452b03ce229230aadf6831a972002fb28dc25a18bdf2fe"
+    },
+    {
+      "file": "explanatory-workflow-showcase.md",
+      "sha256": "bdf1554774f8147cce432e2464c8471604261cd76a538b922732c16de9142370"
+    },
+    {
+      "file": "four-lands-smash.md",
+      "sha256": "7c56ae5a251cadfbb289fdb21feef59d96ce3c88e4b64345f38482e3bd146f3e"
+    },
+    {
+      "file": "frozen-normalized-scopes.md",
+      "sha256": "e013d80f73440d33e581e16c365c198bb969de66aca30c2f9ade6554030ae730"
+    },
+    {
+      "file": "fuzzy-dingos-match.md",
+      "sha256": "794a1c9a551e175ab38beef4250a1b28db56493606027c8c025476b09ea47c28"
+    },
+    {
+      "file": "gentle-stores-resolve.md",
+      "sha256": "69d85dff389b45863c684022152cc0168064cba66018a936be1f74bb5141f5f2"
+    },
+    {
+      "file": "mutation-execution-contract.md",
+      "sha256": "b73d3c12cbd3ff35b16cace081ab68eaff43f55e800efb4802d3a449a2d419b6"
+    },
+    {
+      "file": "native-tanstack-navigation.md",
+      "sha256": "5dd10f1195ecd2764ddc01eae0df48bee0bfe77cef92c9e63562c0cf073d73a1"
+    },
+    {
+      "file": "owned-mutation-executions.md",
+      "sha256": "0d61db7d430a6f01a5e4fce96a4c42c0b3f30c852c36c5a851c069e92e8a2299"
+    },
+    {
+      "file": "packed-next-runtime-verification.md",
+      "sha256": "9e063b5cd6aea6fd88b8badc9f96dc6f3dfea460ccfef070a012258b4d7db158"
+    },
+    {
+      "file": "packed-public-compatibility.md",
+      "sha256": "f1a1cd579dfac6f6fa4274f1210244b6bf0886d60ce4763bca1bbbe34384c451"
+    },
+    {
+      "file": "pages-confirmation-ownership.md",
+      "sha256": "8b246e76c1f0ab4ece617870153129debe228c20655af7cbd7f75905fb037bf8"
+    },
+    {
+      "file": "publication-evidence-parity.md",
+      "sha256": "680acb80b7813f814bb2273be090c598ae89ff1becd1fc83c428de637b95d85a"
+    },
+    {
+      "file": "query-registration-ownership.md",
+      "sha256": "1e66bd74c52ddffca333bd372d9e3f9461993f6e9d9cb382886ad7be877cde76"
+    },
+    {
+      "file": "quiet-queries-coordinate.md",
+      "sha256": "9e1c51bd50e076d76a31298c23e16ebbad0098de1c8670a6f6ed39ea58f2692e"
+    },
+    {
+      "file": "quiet-tools-observe.md",
+      "sha256": "9f0014e339013ae3aae26ac9669a9c2cbf6c1b397b4df663e0a673673a537828"
+    },
+    {
+      "file": "reactive-blocker-config.md",
+      "sha256": "a45c86479801f32ae756c7333fb496cd62c447c82de889373519525c1e579251"
+    },
+    {
+      "file": "real-dogs-jog.md",
+      "sha256": "ad72a57b19648e03c48a4ac0b9ac03413e5d8c74a784970f2003092884219406"
+    },
+    {
+      "file": "scheduled-registration-ownership.md",
+      "sha256": "b85f337227ba7045a1601ead7de4eb67843e7c48f85292d1cec6f5c29ea3e1bb"
+    },
+    {
+      "file": "settled-custom-dialogs.md",
+      "sha256": "24c1b0bc8c19a6768801c93a4f4ae63c2ebc31e0efc66bf41754b09fcefcd2e2"
+    },
+    {
+      "file": "single-flight-confirmation.md",
+      "sha256": "c549f7866bc257ac1eb6572fae0890a5ae7286819142098c38ad043dbbde78c9"
+    },
+    {
+      "file": "slick-eggs-mix.md",
+      "sha256": "d487269d2de0655a9ed127c83b0d1006d724e600385b32f4f4b39893c1e0164b"
+    },
+    {
+      "file": "small-dogs-observe.md",
+      "sha256": "c6f0a95dd449329f4d7b8e2bc5581408962ded7b6776065bf77f396c9de7cbcf"
+    },
+    {
+      "file": "stable-scoped-metadata.md",
+      "sha256": "51457fcf09d6b8201a3b696477c4ffbfc256df00bc52e1c973f0e53740c5ad17"
+    },
+    {
+      "file": "steady-sessions-observe.md",
+      "sha256": "3da5cfa7bec64c8a72e0175da6ac7262f469f1e34a6aa668a14c59a04779aba5"
+    },
+    {
+      "file": "tame-lions-sneeze.md",
+      "sha256": "2a6293319345cd0c558070db268d51e839786159598e6740d382ba6bd50a21d0"
+    },
+    {
+      "file": "tanstack-confirmation-compatibility.md",
+      "sha256": "aeb4812c6775160524f7bc7e6983126a108cce2242f8243d7458e329830f20c7"
+    },
+    {
+      "file": "tidy-wombats-listen.md",
+      "sha256": "478fdc8e1d489b5f1acb038babae542891338faea7a552da3cc42ada4c326b52"
+    },
+    {
+      "file": "truthful-docs-and-root-license.md",
+      "sha256": "4af6c8d9d019b86e1402d32d2eb49979091eb8b60ff6d6db6ac19ee78abdbdb6"
+    },
+    {
+      "file": "verified-release-handoff.md",
+      "sha256": "1687f6fd01f9021f50361da0811c67373ab21b18778284887d35ce80c2e68772"
+    },
+    {
+      "file": "workflow-pilot-learning-materials.md",
+      "sha256": "8e363da3217a64c4102ae07c7571b81045924864443fdf7225462dc7dc5f8ce0"
     }
   ]
 }

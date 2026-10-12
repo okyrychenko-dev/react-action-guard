@@ -1,7 +1,7 @@
 {
-  "sourceBase": "67a79606cf27c324878d4c89e822265ed5132ec8",
+  "sourceBase": "001da8a1f9bd7e83656208ae3f4953384137176f",
   "packageSourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-  "date": "2026-10-10T17:09:14.152Z",
+  "date": "2026-10-12T15:44:38.624Z",
   "node": "v22.20.0",
   "strictPeers": true,
   "evaluated": {
@@ -23,7 +23,7 @@
     {
       "name": "@okyrychenko-dev/react-action-guard",
       "version": "2.0.0",
-      "sha256": "a256162d89aa4df7db104f6da48b6c86cd4aa840ca2e5eecf165457f0078ac2e"
+      "sha256": "ea618d11bdf7cdb9465fe997d8adda1eec825a06fe4cd7b84e0fe2d2d6d8af0b"
     },
     {
       "name": "@okyrychenko-dev/react-action-guard-router",
@@ -83,8 +83,8 @@
     }
   ],
   "results": {
-    "startTime": "2026-10-10T17:09:06.790Z",
-    "duration": 7332.138999999999,
+    "startTime": "2026-10-12T15:44:31.262Z",
+    "duration": 7333.799999999999,
     "expected": 7,
     "skipped": 0,
     "unexpected": 0,
