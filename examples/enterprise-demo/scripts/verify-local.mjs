@@ -24,6 +24,7 @@ const core = await import("@okyrychenko-dev/react-action-guard");
 const router = await import("@okyrychenko-dev/react-action-guard-router");
 const adapter = await import("@okyrychenko-dev/react-action-guard-router/react-router");
 const tanstack = await import("@okyrychenko-dev/react-action-guard-tanstack");
+const devtools = await import("@okyrychenko-dev/react-action-guard-devtools");
 const ui = await import("@okyrychenko-dev/react-action-guard-ui");
 for (const entry of [
   core.useResolvedStoreApi,
@@ -33,6 +34,7 @@ for (const entry of [
   adapter.useNavigationBlocker,
   tanstack.useBlockingQuery,
   ui.useGuardedButton,
+  devtools.ActionGuardDevtools,
 ]) {
   assert.equal(typeof entry, "function");
 }

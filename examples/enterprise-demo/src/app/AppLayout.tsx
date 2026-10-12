@@ -2,6 +2,7 @@ import { GuardInspector } from "@features/core/guard";
 import { Sidebar, TopBar } from "@features/navigation";
 import { Outlet } from "react-router-dom";
 import { AppProviders } from "./AppProviders";
+import { DemoDevtools } from "./DemoDevtools";
 import type { ReactElement } from "react";
 
 export function AppLayout(): ReactElement {
@@ -27,9 +28,15 @@ export function AppLayout(): ReactElement {
                   Blockers & audit trail
                 </span>
               </summary>
+              <p className="px-5 text-sm text-slate-600">
+                Open package Devtools with the shield button at the bottom right. Active Blockers
+                explains scope protection and declared actions; this live inspector retains the
+                application audit trail.
+              </p>
               <GuardInspector />
             </details>
           </aside>
+          <DemoDevtools />
         </div>
       )}
     </AppProviders>

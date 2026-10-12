@@ -1,7 +1,16 @@
 import { createTypedHooks } from "@okyrychenko-dev/react-action-guard";
 
 export type EnterpriseScope =
-  "global" | "checkout" | "payment" | "inventory" | "admin" | "navigation";
+  | "global"
+  | "checkout"
+  | "payment"
+  | "inventory"
+  | "admin"
+  | "navigation"
+  | "property"
+  | "revision"
+  | "recalculation"
+  | "help";
 
 export const {
   useAsyncAction: useGuardedAction,
@@ -17,4 +26,8 @@ export const ENTERPRISE_SCOPES: ReadonlyArray<EnterpriseScope> = [
   "inventory",
   "admin",
   "navigation",
+  "property",
+  "revision",
+  "recalculation",
+  "help",
 ];

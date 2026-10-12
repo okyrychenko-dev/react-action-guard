@@ -4,3 +4,4 @@ export { useCheckoutBlockers } from "./useCheckoutBlockers";
 export type { UseCheckoutBlockersInput, UseCheckoutBlockersReturn } from "./useCheckoutBlockers";
 export { useCheckoutState } from "./useCheckoutState";
 export type { UseCheckoutStateReturn } from "./useCheckoutState";
+export { useCheckoutAutosave } from "./useCheckoutAutosave";

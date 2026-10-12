@@ -1,5 +1,5 @@
 .panel {
-  width: 420px;
+  width: min(420px, calc(100vw - 32px));
   background: var(--ag-bg);
   border: 1px solid var(--ag-border);
   border-radius: 8px;

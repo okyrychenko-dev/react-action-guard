@@ -28,4 +28,22 @@ export const DEMO_STEPS = [
     instruction: "Enable Slow gateway, place an order, then cancel the pending operation.",
     outcome: "Turn off Slow gateway and retry. Cancellation releases the pending action.",
   },
+  {
+    number: "05",
+    opensSecondTab: false,
+    title: "Follow autosave protection",
+    instruction:
+      "Enable Autosave checkout, edit the shipping address and open package Devtools using the shield button.",
+    outcome:
+      "Active Blockers shows unsaved navigation protection, followed by the guarded save and scope release.",
+  },
+  {
+    number: "06",
+    opensSecondTab: false,
+    title: "Coordinate a user and an agent",
+    instruction:
+      "In Checkout, start an agent edit in User and agent coordination. Try manual controls and Help and chat, then complete or fail the operation.",
+    outcome:
+      "Property, revision and recalculation stay protected together; unrelated help remains available and settlement releases the scopes.",
+  },
 ];

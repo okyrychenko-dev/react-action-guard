@@ -7,7 +7,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const demoRoot = fileURLToPath(new URL("..", import.meta.url));
 const sourceRoot = resolve(process.argv[2] ?? resolve(demoRoot, "../.."));
 const artifactRoot = resolve(demoRoot, ".cache/local-packages");
-const packages = ["core", "router", "tanstack", "ui"];
+const packages = ["core", "router", "tanstack", "ui", "devtools"];
 
 function run(command, args, cwd) {
   return execFileSync(command, args, { cwd, encoding: "utf8" });

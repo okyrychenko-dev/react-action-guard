@@ -25,7 +25,7 @@ npm run dev
 ```
 
 When this repository is at `react-action-guard/examples/enterprise-demo`, the source
-path defaults to `../..`. The setup builds core, router, TanStack and UI, reuses the
+path defaults to `../..`. The setup builds core, router, TanStack, UI and Devtools, reuses the
 package repository's Changesets cohort helper to apply pending versions in a
 throwaway directory, and installs packed copies with strict peer checks. It changes
 neither source package manifests nor the demo manifest/lockfile. It records the
@@ -36,8 +36,9 @@ rerun `setup:local` afterwards. Restart Vite after replacing artifacts.
 
 The browser suite uses installed Google Chrome, matching the package repository's
 history fixture. On Linux, Chrome must be available to Playwright's `chrome` channel.
-The custom Guard Inspector observes public lifecycle events; it is not the separate
-Devtools package and makes no Devtools coverage claim.
+The custom Guard Inspector retains the application audit trail. The separate package
+Devtools panel observes the same nearest session store and receives explicit action/scope
+declarations. Open its shield button, then Active Blockers to inspect scope relationships.
 
 ## Checkout navigation
 
@@ -49,6 +50,26 @@ after which navigation proceeds without a dialog. Browser back and forward use t
 same confirmation. Unmounting a dialog cancels its pending attempt; callbacks from
 superseded dialogs cannot approve newer attempts. Browser unload uses the browser's
 native prompt; custom prompt text and that unload interaction are not verified here.
+
+## Autosave and agent/user revision coordination
+
+Autosave is opt-in. After 800 ms without address/reference edits and with checkout
+available, it invokes the existing guarded Save cart operation. Holds postpone it;
+removing a hold starts a fresh debounce. Disabling autosave, unmounting Checkout or
+resetting cancels the timer. The save protects checkout and navigation until the
+simulated save completes, clearing the unsaved navigation blocker.
+
+The separate revision panel has manual property edits, revision save, manual
+recalculation and a controllable agent edit. Both operation sources protect
+`property`, `revision`, `recalculation`; help/chat and read-only revision information
+remain available. Complete applies the captured proposal and advances revision;
+failure/cancellation releases scopes without applying it. Manual saves record the
+current revision. This uses public core/UI hooks, no external provider. The operation
+remains pending until explicitly settled; unmount/reset discards it.
+
+The pending-operation gate prevents duplicate starts in this demonstration.
+Permission, idempotency, backend exclusion and actual request cancellation remain
+application responsibilities; this is not production adoption evidence for ticket 25.
 
 ## Query policy
 
@@ -92,6 +113,8 @@ or Admin maintenance when demonstrating scope coordination across routes.
 - Real QueryClient and rendered gateway controls: idle, active fetch and refetch.
 - Public admin/checkout hooks: finance invocation counts, timeout versus running
   payment, app cancellation/retry and Strict Mode completion.
+- Rendered checkout/revision controls: autosave, shared protection, success/failure/
+  cancellation/reset and store-local Devtools action declarations.
 - Chrome: sidebar navigation and browser back/forward, with actual URL assertions.
 
 This is a simulated application. No payment backend or additional router is validated.
