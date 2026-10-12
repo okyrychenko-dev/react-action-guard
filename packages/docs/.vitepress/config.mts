@@ -95,6 +95,16 @@ export default defineConfig({
         ],
       },
       {
+        text: "Practical materials",
+        items: [
+          { text: "Drafts and distribution", link: "/learning/" },
+          { text: "Loading flags", link: "/learning/loading-flags" },
+          { text: "Conflicting actions", link: "/learning/conflicting-actions" },
+          { text: "Revision case study", link: "/learning/revision-case-study" },
+          { text: "Pilot integration plan", link: "/learning/workflow-pilot" },
+        ],
+      },
+      {
         text: "Advanced",
         items: [
           { text: "Providers and typed hooks", link: "/advanced/ownership" },

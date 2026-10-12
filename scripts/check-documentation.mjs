@@ -8,6 +8,11 @@ const source = join(root, "packages/docs/src");
 const canonicalPages = [
   "getting-started.md",
   "concepts.md",
+  "learning/index.md",
+  "learning/loading-flags.md",
+  "learning/conflicting-actions.md",
+  "learning/revision-case-study.md",
+  "learning/workflow-pilot.md",
   "guides/best-practices.md",
   "guides/forms.md",
   "guides/mutations.md",
