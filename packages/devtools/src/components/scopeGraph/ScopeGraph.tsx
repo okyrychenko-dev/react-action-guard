@@ -1,3 +1,4 @@
+import { isDefined, isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import styles from "./ScopeGraph.module.css";
 import { getInspectedScopes } from "./ScopeGraph.utils";
 import ScopeGraphDiagram from "./ScopeGraphDiagram";
@@ -29,15 +30,15 @@ function ScopeGraph(props: ScopeGraphProps): ReactElement {
           {scopes.map(({ scope, blockers: matchingBlockers, actions }) => (
             <tr key={scope}>
               <th scope="row">{scope}</th>
-              <td>{matchingBlockers.length > 0 ? "Blocked" : "Unaffected"}</td>
+              <td>{isNonEmptyArray(matchingBlockers) ? "Blocked" : "Unaffected"}</td>
               <td>{matchingBlockers.map(({ id }) => id).join(", ") || "None"}</td>
               <td>{actions.join(", ") || "None"}</td>
             </tr>
           ))}
         </tbody>
       </table>
-      {scopes.length === 0 && <p>No scopes declared or present in active blockers.</p>}
-      {!inspection?.actions && (
+      {!isNonEmptyArray(scopes) && <p>No scopes declared or present in active blockers.</p>}
+      {!isDefined(inspection?.actions) && (
         <p>Actions are not declared. Scope protection does not prove an action was attempted.</p>
       )}
     </section>

@@ -1,4 +1,5 @@
 import { normalizeScope, scopeAffectsObservation } from "@okyrychenko-dev/react-action-guard";
+import { isDefined } from "@okyrychenko-dev/type-utils";
 import type { InspectedScope, ScopeGraphEdge, ScopeGraphProps } from "./ScopeGraph.types";
 
 export function getInspectedScopes({
@@ -38,7 +39,7 @@ export function getScopeGraphEdges(
     for (const { id: blockerId } of matchingBlockers) {
       const blockerIndex = blockerIndices.get(blockerId);
 
-      if (blockerIndex !== undefined) {
+      if (isDefined(blockerIndex)) {
         edges.push({ blockerId, scope, blockerIndex, scopeIndex });
       }
     }

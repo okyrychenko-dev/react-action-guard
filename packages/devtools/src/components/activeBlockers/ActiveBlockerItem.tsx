@@ -4,6 +4,7 @@ import {
   normalizeScope,
   scopeAffectsObservation,
 } from "@okyrychenko-dev/react-action-guard";
+import { isDefined } from "@okyrychenko-dev/type-utils";
 import { clsx } from "clsx";
 import { ReactElement } from "react";
 import { formatRelativeTime, formatScope } from "../../utils";
@@ -26,7 +27,7 @@ function ActiveBlockerItem(props: BlockerItemProps): ReactElement {
 
   let affectedActions = "not declared";
 
-  if (actions) {
+  if (isDefined(actions)) {
     affectedActions =
       actions
         .filter(({ scope: actionScope }) => scopeAffectsObservation(scope, actionScope))

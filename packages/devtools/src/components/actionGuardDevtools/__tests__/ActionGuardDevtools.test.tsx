@@ -334,7 +334,9 @@ describe("ActionGuardDevtools", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Active Blockers" }));
 
-    expect(screen.getByRole("article", { name: "Blocker pre-existing-blocker" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("article", { name: "Blocker pre-existing-blocker" })
+    ).toBeInTheDocument();
     expect(events).toHaveLength(0);
   });
 

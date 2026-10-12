@@ -1,4 +1,5 @@
 import { DEFAULT_SCOPE, normalizeScope } from "@okyrychenko-dev/react-action-guard";
+import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { useId } from "react";
 import styles from "./ScopeGraph.module.css";
 import { formatDiagramLabel, getScopeGraphEdges } from "./ScopeGraph.utils";
@@ -58,12 +59,12 @@ function ScopeGraphDiagram({ blockers, scopes }: ScopeGraphDiagramProps): ReactE
         );
       })}
       {scopes.map(({ scope, blockers: matchingBlockers }, index) => {
-        const status = matchingBlockers.length > 0 ? "Blocked" : "Unaffected";
+        const status = isNonEmptyArray(matchingBlockers) ? "Blocked" : "Unaffected";
 
         return (
           <g
             key={scope}
-            className={matchingBlockers.length > 0 ? styles.blocked : styles.unaffected}
+            className={isNonEmptyArray(matchingBlockers) ? styles.blocked : styles.unaffected}
           >
             <title>
               {scope}: {status}
