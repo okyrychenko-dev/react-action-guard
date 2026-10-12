@@ -1,5 +1,4 @@
 import { ReactElement } from "react";
-import { Content } from "../shared";
 import ActiveBlockerItem from "./ActiveBlockerItem";
 import { isBlockerStuck } from "./ActiveBlockers.utils";
 import type { BlockerInfo } from "@okyrychenko-dev/react-action-guard";
@@ -16,7 +15,7 @@ function ActiveBlockersList(props: ActiveBlockersListProps): ReactElement {
   const { blockers, now, stuckThresholdMs, inspection } = props;
 
   return (
-    <Content>
+    <div>
       {blockers.map(([id, blocker]) => (
         <ActiveBlockerItem
           key={id}
@@ -27,7 +26,7 @@ function ActiveBlockersList(props: ActiveBlockersListProps): ReactElement {
           isStuck={isBlockerStuck(blocker, now, stuckThresholdMs)}
         />
       ))}
-    </Content>
+    </div>
   );
 }
 

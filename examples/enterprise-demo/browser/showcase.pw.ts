@@ -1,3 +1,4 @@
+import { assertDefined } from "@okyrychenko-dev/type-utils";
 import { expect, test } from "@playwright/test";
 
 for (const width of [390, 820, 1440]) {
@@ -65,3 +66,32 @@ test("autosave retains cancellation and allows navigation after settlement", asy
   await expect(page).toHaveURL(/\/admin$/);
   await expect(page.getByRole("dialog", { name: "Navigation blocked" })).toHaveCount(0);
 });
+
+for (const hasBlocker of [false, true]) {
+  test(`scope inspection scroll reaches the panel bottom with active blocker: ${String(hasBlocker)}`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/checkout");
+    if (hasBlocker) {
+      await page.getByRole("button", { name: "Start agent edit" }).click();
+    }
+    await page.getByTitle("Open Action Guard Devtools", { exact: true }).click();
+    await page.getByRole("button", { name: "Active Blockers" }).click();
+    const table = page.getByRole("table", { name: "Scope protection" });
+    const lastRow = table.getByRole("row").last();
+    const inspection = page.getByRole("region", { name: "Active blocker inspection" });
+    await inspection.focus();
+    await page.keyboard.press("End");
+    await expect(lastRow).toBeInViewport({ ratio: 1 });
+    const bounds = await lastRow.boundingBox();
+    assertDefined(bounds);
+    expect(bounds.y + bounds.height).toBeGreaterThan(850);
+    expect(bounds.y + bounds.height).toBeLessThanOrEqual(885);
+    const graph = page.getByRole("region", { name: "Scope relationships" });
+    expect(await graph.evaluate((element) => element.scrollHeight <= element.clientHeight)).toBe(
+      true
+    );
+    await page.screenshot({ path: `.cache/browser/scope-scroll-${String(hasBlocker)}.png` });
+  });
+}

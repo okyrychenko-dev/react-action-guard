@@ -4,6 +4,7 @@ import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
 import { ScopeGraph } from "../scopeGraph";
 import { DEFAULT_STUCK_THRESHOLD_MS, STUCK_TICK_INTERVAL_MS } from "./ActiveBlockers.constants";
+import styles from "./ActiveBlockers.module.css";
 import { getSortedBlockers } from "./ActiveBlockers.utils";
 import ActiveBlockersEmptyState from "./ActiveBlockersEmptyState";
 import ActiveBlockersList from "./ActiveBlockersList";
@@ -57,10 +58,10 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
   }
 
   return (
-    <>
+    <section className={styles.inspection} aria-label="Active blocker inspection" tabIndex={0}>
       {blockerContent}
       <ScopeGraph blockers={blockingSnapshot} inspection={inspection} />
-    </>
+    </section>
   );
 }
 
