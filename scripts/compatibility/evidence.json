@@ -1,10 +1,10 @@
 {
-  "sourceBase": "8938a97796e2c4bf8146c7846a0beb34d09e9eb2",
-  "scope": "Historical Changesets-versioned cohort records at sourceBase; targeted refreshes identify their own sourceBase and scope. Strict peer installation, imports and declarations for all recorded targets; behavior only as specified per result or in README.md.",
+  "sourceBase": "001da8a1f9bd7e83656208ae3f4953384137176f",
+  "scope": "Ticket 30 full 13-target Changesets-versioned cohort refresh. Strict peer installation, ESM/CJS loading and NodeNext declarations for every target; behavior only as specified in README.md. No registry publication.",
   "results": [
     {
       "target": "next-13-floor",
-      "date": "2026-10-04T19:13:27.106Z",
+      "date": "2026-10-12T15:45:04.956Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -26,7 +26,7 @@
     },
     {
       "target": "next-14-floor",
-      "date": "2026-10-04T19:13:36.241Z",
+      "date": "2026-10-12T15:45:13.770Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -48,7 +48,7 @@
     },
     {
       "target": "next-15-floor",
-      "date": "2026-10-04T19:13:46.101Z",
+      "date": "2026-10-12T15:45:23.531Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -70,7 +70,7 @@
     },
     {
       "target": "next-current",
-      "date": "2026-10-04T19:13:55.864Z",
+      "date": "2026-10-12T15:45:33.861Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -91,8 +91,31 @@
       }
     },
     {
+      "target": "query-current",
+      "date": "2026-10-12T15:45:47.120Z",
+      "node": "v22.20.0",
+      "strictPeers": true,
+      "evaluated": {
+        "react": "19.2.8",
+        "react-dom": "19.2.8",
+        "@types/react": "19.2.18",
+        "zustand": "5.0.0",
+        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
+        "@okyrychenko-dev/type-utils": "0.1.2",
+        "semver": "7.7.2",
+        "typescript": "5.6.3",
+        "happy-dom": "20.0.10",
+        "@tanstack/react-query": "5.104.1",
+        "@okyrychenko-dev/react-action-guard": "2.0.0",
+        "@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-router": "1.0.0",
+        "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
+      }
+    },
+    {
       "target": "query-floor",
-      "date": "2026-10-08T20:30:38.128Z",
+      "date": "2026-10-12T15:45:40.423Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -111,13 +134,11 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0",
         "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
-      },
-      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
-      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
+      }
     },
     {
       "target": "react-18",
-      "date": "2026-10-04T19:12:24.312Z",
+      "date": "2026-10-12T15:44:12.860Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -138,7 +159,7 @@
     },
     {
       "target": "react-19",
-      "date": "2026-10-04T19:12:37.157Z",
+      "date": "2026-10-12T15:44:25.881Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -159,7 +180,7 @@
     },
     {
       "target": "react-19-floor",
-      "date": "2026-10-04T19:12:30.464Z",
+      "date": "2026-10-12T15:44:19.533Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -180,7 +201,7 @@
     },
     {
       "target": "react-router-7-floor",
-      "date": "2026-10-04T19:12:54.888Z",
+      "date": "2026-10-12T15:44:42.035Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -202,7 +223,7 @@
     },
     {
       "target": "react-router-current",
-      "date": "2026-10-04T19:13:09.874Z",
+      "date": "2026-10-12T15:44:48.896Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -224,7 +245,7 @@
     },
     {
       "target": "react-router-floor",
-      "date": "2026-10-04T19:12:45.810Z",
+      "date": "2026-10-12T15:44:33.430Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -246,7 +267,7 @@
     },
     {
       "target": "tanstack-router-floor",
-      "date": "2026-10-04T19:13:18.065Z",
+      "date": "2026-10-12T15:44:56.149Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -265,36 +286,6 @@
         "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
         "@okyrychenko-dev/react-action-guard-router": "1.0.0"
       }
-    },
-    {
-      "target": "query-current",
-      "date": "2026-10-08T20:30:44.781Z",
-      "node": "v22.20.0",
-      "strictPeers": true,
-      "evaluated": {
-        "react": "19.2.8",
-        "react-dom": "19.2.8",
-        "@types/react": "19.2.18",
-        "zustand": "5.0.0",
-        "@okyrychenko-dev/react-zustand-toolkit": "1.0.0",
-        "@okyrychenko-dev/type-utils": "0.1.2",
-        "semver": "7.7.2",
-        "typescript": "5.6.3",
-        "happy-dom": "20.0.10",
-        "@tanstack/react-query": "5.104.1",
-        "@okyrychenko-dev/react-action-guard": "2.0.0",
-        "@okyrychenko-dev/react-action-guard-ui": "1.0.0",
-        "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
-        "@okyrychenko-dev/react-action-guard-router": "1.0.0",
-        "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0"
-      },
-      "sourceBase": "2b11ed7dd94c2f98a6849864ffb2d6d444d1ce56",
-      "scope": "Shared native observer follow-up working tree: strict-peer cohort, ESM/CJS imports, NodeNext mutation inference, 7 public-hook runtime checks for concurrency, reset/detach, native callback completion, cache-added reentrancy and synchronous failure snapshots."
     }
-  ],
-  "tools": {
-    "pnpm": "11.21.0",
-    "npm": "11.19.0",
-    "typescript": "5.6.3"
-  }
+  ]
 }

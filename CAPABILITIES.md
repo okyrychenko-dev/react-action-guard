@@ -1,6 +1,13 @@
 # Capabilities and compatibility evidence
 
-Evaluated **2026-10-04** for the Changesets-versioned release cohort based on `8938a97`: Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query adapter **0.4.0** and Router adapter **1.0.0**. These are the actual planned versions packed in a disposable workspace; source manifests remain unchanged. The pending lifecycle and internal peer updates determine these versions. A manifest alone establishes neither application runtime compatibility nor adoption of a sibling library.
+See the [planned release handoff](RELEASE-HANDOFF.md) for source/manifests,
+disposable Changesets tarballs, migration and the separate publication follow-up.
+The full packed/publication matrix and selected Next production fixtures were
+refreshed on **2026-10-12** at `001da8a`; the linked records identify tested
+versions, tarball hashes and scope. Older dates in the tables describe prior
+evaluations, not additional checks executed in this refresh.
+
+Evaluated **2026-10-12** for the Changesets-versioned release cohort based on `001da8a`: Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query adapter **0.4.0** and Router adapter **1.0.0**. These are the actual planned versions packed in a disposable workspace; source manifests remain unchanged. The pending lifecycle and internal peer updates determine these versions. A manifest alone establishes neither application runtime compatibility nor adoption of a sibling library.
 
 Evidence kinds follow the sibling modal-manager format:
 
