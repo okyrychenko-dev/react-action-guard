@@ -47,7 +47,7 @@ pnpm add @okyrychenko-dev/react-action-guard-devtools
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://github.com/okyrychenko-dev/react-action-guard) ^1.0.5
+- [@okyrychenko-dev/react-action-guard](https://github.com/okyrychenko-dev/react-action-guard) ^2.0.0
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0
 
@@ -132,7 +132,7 @@ refreshed every second while active blockers are visible. Supplied/updated times
 change it; it is not a measured operation duration. Priority sorts descending with stable ties.
 
 For store-local telemetry and a complete inspector example, see the
-[canonical observability guide](../docs/src/advanced/observability.md). Existing Core analytics
+[canonical observability guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/advanced/observability.md). Existing Core analytics
 exports remain supported; new integrations can use application-owned observation recipes.
 
 #### Position Options
@@ -240,7 +240,7 @@ development. When the owner releases, authority transfers to the earliest remain
 participant; its next explicit update applies configuration. Final release detaches observation
 before resetting history and runtime viewing state. Stale releases cannot affect a later session.
 
-See [architecture migration](../core/MIGRATION.md) for removed named registration.
+See [architecture migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md) for removed named registration.
 
 ### Accessing Devtools Store
 

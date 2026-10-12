@@ -78,3 +78,34 @@ upgrading planned capability statements to published guarantees.
 
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
+
+## PR 13 documentation follow-up
+
+The release documentation fixes on `fix/13-release-feedback` are based on
+`63543da72f0761bf235f78c9b26a5b8ad07d788c`. They correct Core peer requirements,
+packaged guide links and the Query adapter's Node >=20 declaration. Every tarball
+now includes CHANGELOG.md. Pending changeset descriptions reflect the final cohort
+and no longer promise removed named middleware/runMiddlewares interfaces.
+
+The release version command now advances changelog links and regenerates the
+Core, Devtools and Query TypeDoc references after updating manifests. A disposable
+copy executed the real version command, confirmed API headings for 2.0.0/1.0.0/0.4.0
+and all five changelog links, then repeated it without duplicating release links.
+Source reference headings retain source-manifest versions until the version PR
+regenerates them; they are not statements of registry publication. Existing TypeDoc
+internal-reference warnings remain, with no generation errors.
+
+The refreshed publication evidence includes checks of README relative destinations
+inside installed packages, documented Core peers and Node floors. This follow-up
+supersedes the earlier tarball hashes above; its source base and input hashes are
+recorded in the updated JSON evidence. The raw disposable version workspace is
+`/tmp/action-guard-version-feedback-g8d69s2m`; CI must execute the version command
+again when updating the release PR. No release merge or publication was performed.
+
+`pnpm run release:check` passed all source checks, 852 tests, publication validation
+and all 13 packed targets after the fixes. `pnpm run test:next-runtime` passed all
+7 production Chrome scenarios without skips. Fresh reports/consumers remain in
+`/tmp/action-guard-publication-QbVOLA`, `/tmp/action-guard-compatibility-xDO5LQ`
+and `/tmp/action-guard-next-runtime-uHSCHu`. Package versions in the planned cohort
+remain unchanged from the earlier handoff. The earlier interrupted verification
+attempts are not used as success evidence.

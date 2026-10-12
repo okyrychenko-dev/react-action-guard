@@ -38,7 +38,7 @@ pnpm add @okyrychenko-dev/react-action-guard-tanstack @okyrychenko-dev/react-act
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^1.0.4 - The core UI blocking library
+- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^2.0.0 - The core UI blocking library
 - [@tanstack/react-query](https://tanstack.com/query) ^5.90.10 - TanStack Query for data fetching
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)

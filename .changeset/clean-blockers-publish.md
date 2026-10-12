@@ -4,4 +4,4 @@
 "@okyrychenko-dev/react-action-guard-ui": patch
 ---
 
-Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools now subscribe to those snapshots. Devtools requires core 1.1.0 or newer for the snapshot API. This compatibility drop, together with the Node.js 20 minimum in the pending type-utils migration, releases Devtools as 0.4.0 instead of a 0.3.x patch.
+Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools subscribe to those snapshots. The final release cohort is Core 2.0 and Devtools 1.0 with a Core ^2.0.0 peer requirement. Node.js 20 or newer is required; prior intermediate version proposals are superseded by this cohort.

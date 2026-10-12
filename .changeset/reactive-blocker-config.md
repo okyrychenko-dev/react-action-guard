@@ -9,4 +9,4 @@ values clear. Metadata changes preserve unchanged deadlines and registration
 timestamps, while changed timeouts restart and removed timeouts cancel timers.
 Imperative updateBlocker patch behavior remains compatible. Consumers relying on
 retained hook options must keep those options in the current configuration.
-TanStack integration now requires core 1.0.6 or later for replacement support.
+The released TanStack adapter requires Core ^2.0.0, including configuration replacement support.
