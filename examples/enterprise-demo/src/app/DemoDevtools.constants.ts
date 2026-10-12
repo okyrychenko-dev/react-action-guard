@@ -4,7 +4,7 @@ import type { DevtoolsInspection } from "@okyrychenko-dev/react-action-guard-dev
 export const DEMO_INSPECTION: DevtoolsInspection = {
   scopes: ENTERPRISE_SCOPES,
   actions: [
-    { id: "save-cart", scope: "checkout" },
+    { id: "save-cart", scope: ["checkout", "navigation"] },
     { id: "apply-coupon", scope: ["checkout", "payment"] },
     { id: "place-order", scope: ["checkout", "payment", "inventory"] },
     { id: "leave-checkout", scope: "navigation" },
