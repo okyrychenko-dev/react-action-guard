@@ -23,6 +23,7 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
     maxEvents = DEFAULT_MAX_EVENTS,
     observationSession,
     stuckThresholdMs,
+    inspection,
     store: customStore,
   } = props;
 
@@ -94,6 +95,7 @@ function ActionGuardDevtoolsSession(props: ActionGuardDevtoolsSessionProps): Rea
       position={position}
       store={customStore}
       stuckThresholdMs={stuckThresholdMs}
+      inspection={inspection}
     />
   );
 }

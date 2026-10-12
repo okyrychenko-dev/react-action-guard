@@ -14,7 +14,8 @@ provide the next learning step.
 ## Features
 
 - 📊 **Real-time Timeline** - Visual timeline of all blocking events with duration tracking
-- 🎯 **Active Blockers View** - See all currently active blockers at a glance
+- 🎯 **Active Blockers View** - Inspect identity, scope, reason, priority and timestamp age
+- 🕸️ **Scope Protection Graph** - See exact/global matching beside an accessible text table; declare known areas and actions explicitly
 - 📈 **Stats View** - Aggregate counts, durations, and most frequent scopes
 - 🔍 **Filtering** - Search by blocker ID, reason, or scope (advanced filters via store API)
 - ⏸️ **Pause/Resume** - Pause event recording to inspect specific moments
@@ -88,6 +89,45 @@ The main devtools component that renders the toggle button and panel.
 | `stuckThresholdMs` | `number`             | `10000`     | Age (ms) after which an active blocker is flagged as stuck |
 | `showInProduction` | `boolean`            | `false`     | Whether to show devtools in production                     |
 | `store`            | `UIBlockingStoreApi` | `undefined` | Blocking store to observe instead of the global store      |
+
+#### Scope and action explanations
+
+Pass optional `inspection: DevtoolsInspection` to explain known areas and explicitly mapped
+application actions in the Active Blockers view:
+
+```tsx
+<ActionGuardDevtools
+  store={store}
+  inspection={{
+    scopes: ["checkout", "checkout.details", "navigation", "help"],
+    actions: [
+      { id: "submit-order", scope: "checkout" },
+      { id: "leave-checkout", scope: ["checkout", "navigation"] },
+      { id: "read-help", scope: "help" },
+    ],
+  }}
+/>
+```
+
+`store` is your explicit blocking store (for example, from `useUIBlockingContext`).
+`inspection.scopes` is a readonly string array; `inspection.actions` is a readonly array of
+`{ id: string; scope: Scope }` declarations. The exported types are `DevtoolsInspection`,
+`DevtoolsInspectedAction` and `ActionGuardDevtoolsProps`. Declarations belong to each panel and
+never register actions or alter blocking policy. All panels observing the same store still
+share one Observation session.
+
+The graph draws blockers and their affected scopes; the adjacent table names blockers, status
+and declared actions. Dotted names are exact scope names, not parent/child relationships.
+Global blockers affect all non-empty scopes; empty action scope arrays are unaffected.
+Unspecified actions are reported as **not declared**; source is **unavailable** because Core
+snapshots contain no provenance. An omitted reason retains Core's `Unknown` default; an empty
+reason displays **not provided**. Age is `max(0, now - blocker.timestamp)` milliseconds,
+refreshed every second while active blockers are visible. Supplied/updated timestamps can
+change it; it is not a measured operation duration. Priority sorts descending with stable ties.
+
+For store-local telemetry and a complete inspector example, see the
+[canonical observability guide](../docs/src/advanced/observability.md). Existing Core analytics
+exports remain supported; new integrations can use application-owned observation recipes.
 
 #### Position Options
 
