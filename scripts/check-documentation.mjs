@@ -20,6 +20,7 @@ const canonicalPages = [
   "guides/workflows.md",
   "guides/lifecycle.md",
   "advanced/ownership.md",
+  "advanced/evolution.md",
   "advanced/ssr.md",
   "advanced/observability.md",
   "packages/react-action-guard/guides/provider-pattern.md",
@@ -51,7 +52,7 @@ async function checkDestination(from, destination) {
   if (!path) return;
   const target = path.startsWith("/") ? resolve(source, "." + path) : resolve(dirname(from), path);
   const candidates = [target + ".md", join(target, "index.md")];
-  if (/\.[a-z]+$/i.test(target)) candidates.push(target);
+  if (/\.[a-z]+$/i.test(target)) candidates.unshift(target);
   for (const candidate of candidates) {
     if (await exists(candidate)) return;
   }
@@ -99,6 +100,19 @@ try {
     }
   }
   exampleCount = files.length;
+  // Decisions cite repository sources and contract tests rather than site routes.
+  for (const name of [
+    "0002-registration-identity.md",
+    "0003-guard-instance-and-headless-entry.md",
+    "0004-ecosystem-demand-gates.md",
+  ]) {
+    const path = join(root, "docs/adr", name);
+    const markdown = await readFile(path, "utf8");
+    for (const match of markdown.matchAll(/\]\(([^)\s]+)\)/g)) {
+      await checkDestination(path, match[1]);
+      linkCount++;
+    }
+  }
   // Migrated reference fragments depend on application helpers/state. Verify their public
   // imports separately; full consumer compilation applies to the self-contained guides above.
   const referencePage = "packages/react-action-guard/reference.md";

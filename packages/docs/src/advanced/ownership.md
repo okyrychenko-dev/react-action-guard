@@ -76,3 +76,6 @@ custom-store factory. Do not import private store creators or inject an arbitrar
 provider. Consumers needing custom React store wiring own that integration; there is no supported
 application guard-instance factory or standalone headless entry proposed as part of this contract.
 See [SSR](./ssr), [observation leases](./observability) and the [contract](../packages/react-action-guard/contract).
+
+See [identity and evolution decisions](./evolution) for repeated-owner ID guidance and the
+evidence required to reconsider application guard instances or standalone headless distribution.
