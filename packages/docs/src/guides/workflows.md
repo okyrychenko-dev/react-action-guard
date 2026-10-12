@@ -72,3 +72,7 @@ conflict policy; they add ownership choices and IDs to maintain.
 Try the [small runnable example](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/core-coordination)
 and [enterprise demo instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/enterprise-demo).
 Add [navigation protection](./navigation) and [diagnostics](../advanced/observability) as needed.
+
+For practical comparisons, read the [three educational drafts](../learning/index). Use the
+[revision pilot plan](../learning/workflow-pilot) to capture a real baseline before changing
+an application workflow.
