@@ -1,4 +1,4 @@
-import type { UIBlockingStore } from "@okyrychenko-dev/react-action-guard";
+import type { Scope, UIBlockingStore } from "@okyrychenko-dev/react-action-guard";
 import type { ReactNode } from "react";
 import type { StoreApi } from "zustand";
 import type { DevtoolsPosition } from "../../types";
@@ -19,7 +19,23 @@ export interface ActionGuardDevtoolsProviderProps {
 /**
  * Props for the main ActionGuardDevtools component
  */
+/** An explicitly declared action, not a runtime action registration. */
+export interface DevtoolsInspectedAction {
+  id: string;
+  scope: Scope;
+}
+
+/** Store-local inspection declarations; they do not change blocking behavior. */
+export interface DevtoolsInspection {
+  /** Include known areas even when no active blocker names them. */
+  scopes?: ReadonlyArray<string>;
+  /** Explain actions only through the scopes declared by the application. */
+  actions?: ReadonlyArray<DevtoolsInspectedAction>;
+}
+
 export interface ActionGuardDevtoolsProps {
+  /** Optional declarations for scope and action explanations in this panel. */
+  inspection?: DevtoolsInspection;
   /** Position of the toggle button and panel */
   position?: DevtoolsPosition;
   /** Whether the panel is open by default */

@@ -9,7 +9,8 @@ React Action Guard DevTools provides a visual interface for debugging blocking s
 ## Features
 
 - **📊 Real-time Timeline** - Visual timeline of all blocking events
-- **🎯 Active Blockers View** - See what's currently blocking
+- **🎯 Active Blockers View** - Inspect blocker identity, reasons, priority and timestamp age
+- **Scope Protection Graph** - View exact/global matching with an accessible table and explicit action mappings
 - **🔍 Event Filtering** - Filter by blocker ID, scope, or reason
 - **⏸️ Pause/Resume** - Freeze timeline to inspect specific moments
 - **📝 Detailed Info** - Full configuration and context for each event
@@ -58,6 +59,7 @@ interface ActionGuardDevtoolsProps {
   maxEvents?: number; // Default: 200
   showInProduction?: boolean; // Default: false
   store?: UIBlockingStoreApi; // For custom stores
+  inspection?: DevtoolsInspection; // Explicit scopes and action-to-scope mappings
 }
 ```
 
@@ -76,6 +78,23 @@ function DevtoolsWithProvider() {
   return <ActionGuardDevtools store={store} />;
 }
 ```
+
+## Scope and action explanations
+
+The Active Blockers view shows a blocker-to-scope graph and equivalent text table. Declare known
+areas, including unaffected ones, using `inspection.scopes`; map application actions explicitly
+with `inspection.actions` (`{ id: string; scope: Scope }`). These panel-local declarations do not
+register actions or alter matching. A global blocker affects every non-empty scope; dotted names
+are exact names, not hierarchy. Empty action scope arrays remain unaffected.
+
+Without action declarations, affected actions are **not declared**. Source is **unavailable**:
+current Core metadata has no provenance. Timestamp age uses `max(0, now - blocker.timestamp)`
+in milliseconds and refreshes every second while visible blockers exist; supplied or updated
+timestamps mean it is not a measured operation duration. Priority sorts descending with stable ties.
+
+See the [complete store-local inspector and telemetry recipes](../../advanced/observability).
+Existing Core analytics helpers remain supported. New telemetry uses the existing lifecycle
+observation boundary, with application-owned transport and payload selection.
 
 ## UI Features
 

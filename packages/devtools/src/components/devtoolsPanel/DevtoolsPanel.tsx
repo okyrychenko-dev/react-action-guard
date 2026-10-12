@@ -6,16 +6,17 @@ import DevtoolsPanelHeader from "./DevtoolsPanelHeader";
 import DevtoolsPanelTabs from "./DevtoolsPanelTabs";
 import type { Nullable } from "@okyrychenko-dev/type-utils";
 import type { DevtoolsPosition } from "../../types";
-import type { UIBlockingStoreApi } from "../actionGuardDevtools";
+import type { DevtoolsInspection, UIBlockingStoreApi } from "../actionGuardDevtools";
 
 interface DevtoolsPanelProps {
   position: DevtoolsPosition;
   store?: UIBlockingStoreApi;
   stuckThresholdMs?: number;
+  inspection?: DevtoolsInspection;
 }
 
 function DevtoolsPanel(props: DevtoolsPanelProps): Nullable<ReactElement> {
-  const { position, store, stuckThresholdMs } = props;
+  const { position, store, stuckThresholdMs, inspection } = props;
 
   const {
     isOpen,
@@ -64,6 +65,7 @@ function DevtoolsPanel(props: DevtoolsPanelProps): Nullable<ReactElement> {
             activeTab={activeTab}
             store={store}
             stuckThresholdMs={stuckThresholdMs}
+            inspection={inspection}
           />
         </>
       )}

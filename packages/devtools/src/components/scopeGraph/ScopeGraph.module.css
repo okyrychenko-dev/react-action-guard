@@ -1,0 +1,44 @@
+.section {
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+  border-top: 1px solid var(--ag-border);
+  color: var(--ag-text);
+  font-size: 11px;
+}
+
+.section p {
+  color: var(--ag-text-muted);
+}
+.diagram {
+  width: 100%;
+  display: block;
+}
+.diagram text {
+  fill: var(--ag-text);
+  font-size: 10px;
+}
+.diagram rect {
+  fill: var(--ag-bg-light);
+  stroke: var(--ag-primary);
+}
+.diagram line {
+  stroke: var(--ag-warning);
+}
+.blocked rect {
+  stroke: var(--ag-warning);
+}
+.unaffected rect {
+  stroke: var(--ag-success);
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th,
+.table td {
+  text-align: left;
+  padding: 6px 4px;
+  border-bottom: 1px solid var(--ag-border);
+  overflow-wrap: anywhere;
+}

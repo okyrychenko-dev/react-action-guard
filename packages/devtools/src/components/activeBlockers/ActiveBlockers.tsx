@@ -2,20 +2,22 @@ import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
 import { isNonEmptyArray } from "@okyrychenko-dev/type-utils";
 import { ReactElement, useEffect, useMemo, useState } from "react";
 import { useStore } from "zustand";
+import { ScopeGraph } from "../scopeGraph";
 import { DEFAULT_STUCK_THRESHOLD_MS, STUCK_TICK_INTERVAL_MS } from "./ActiveBlockers.constants";
 import { getSortedBlockers } from "./ActiveBlockers.utils";
 import ActiveBlockersEmptyState from "./ActiveBlockersEmptyState";
 import ActiveBlockersList from "./ActiveBlockersList";
-import type { UIBlockingStoreApi } from "../actionGuardDevtools";
+import type { DevtoolsInspection, UIBlockingStoreApi } from "../actionGuardDevtools";
 
 interface ActiveBlockersProps {
   store?: UIBlockingStoreApi;
+  inspection?: DevtoolsInspection;
   /** Age (ms) after which a blocker is flagged as stuck (default: 10000). */
   stuckThresholdMs?: number;
 }
 
 function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
-  const { store, stuckThresholdMs = DEFAULT_STUCK_THRESHOLD_MS } = props;
+  const { store, inspection, stuckThresholdMs = DEFAULT_STUCK_THRESHOLD_MS } = props;
 
   // Single subscription - use provided store or fall back to global
   const targetStore = store ?? uiBlockingStoreApi;
@@ -41,11 +43,25 @@ function ActiveBlockers(props: ActiveBlockersProps): ReactElement {
     };
   }, [hasBlockers, blockers.length]);
 
-  if (!hasBlockers) {
-    return <ActiveBlockersEmptyState />;
+  let blockerContent = <ActiveBlockersEmptyState />;
+
+  if (hasBlockers) {
+    blockerContent = (
+      <ActiveBlockersList
+        blockers={blockers}
+        now={now}
+        stuckThresholdMs={stuckThresholdMs}
+        inspection={inspection}
+      />
+    );
   }
 
-  return <ActiveBlockersList blockers={blockers} now={now} stuckThresholdMs={stuckThresholdMs} />;
+  return (
+    <>
+      {blockerContent}
+      <ScopeGraph blockers={blockingSnapshot} inspection={inspection} />
+    </>
+  );
 }
 
 export default ActiveBlockers;

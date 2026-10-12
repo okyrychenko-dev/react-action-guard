@@ -33,7 +33,7 @@ describe("ActiveBlockers", () => {
 
     renderWithProviders(<ActiveBlockers />);
 
-    expect(screen.getByText("blocker-1")).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "Blocker blocker-1" })).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
   });
 
