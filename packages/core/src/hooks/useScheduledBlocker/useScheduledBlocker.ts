@@ -70,8 +70,11 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
       if (remainingTime > 0) {
         timeoutsRef.current.end = setTimeout(() => {
-          configRef.current.onScheduleEnd?.();
-          deactivate();
+          try {
+            configRef.current.onScheduleEnd?.();
+          } finally {
+            deactivate();
+          }
         }, remainingTime);
       }
     };
@@ -80,8 +83,8 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       const cfg = configRef.current;
 
       activate();
-      cfg.onScheduleStart?.();
       scheduleEnd();
+      cfg.onScheduleStart?.();
     };
 
     // If start time hasn't arrived yet
@@ -99,7 +102,14 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
       const endTime = calculateEndTime(currentConfig.schedule, startTime);
 
       if (isInBlockingPeriod(startTime, endTime, now)) {
-        startBlocking();
+        try {
+          startBlocking();
+        } catch (error) {
+          cleanup();
+          deactivate();
+
+          throw error;
+        }
       } else if (isScheduleInPast(startTime, endTime, now)) {
         return;
       }

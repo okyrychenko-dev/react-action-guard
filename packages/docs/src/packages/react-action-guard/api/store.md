@@ -82,9 +82,9 @@ const uiBlockingStoreApi: StoreApi<UIBlockingStore>
 **Methods:**
 
 - `getState()` - Get current state
+- `getInitialState()` - Get the initial state snapshot
 - `setState()` - Update state (use carefully!)
-- `subscribe()` - Listen to changes
-- `destroy()` - Cleanup store
+- `subscribe()` - Listen to changes and return an unsubscribe function
 
 **Examples:**
 
@@ -93,26 +93,27 @@ const uiBlockingStoreApi: StoreApi<UIBlockingStore>
 import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
 
 test('blocker lifecycle', () => {
-  const store = uiBlockingStoreApi.getState();
+  const { addBlocker, removeBlocker, isBlocked } = uiBlockingStoreApi.getState();
   
-  store.addBlocker('test', { scope: 'global' });
-  expect(store.isBlocked('global')).toBe(true);
+  addBlocker('test', { scope: 'global' });
+  expect(isBlocked('global')).toBe(true);
   
-  store.removeBlocker('test');
-  expect(store.isBlocked('global')).toBe(false);
+  removeBlocker('test');
+  expect(isBlocked('global')).toBe(false);
 });
 
 // In utility functions
 function logBlockers() {
-  const state = uiBlockingStoreApi.getState();
-  const blockers = state.blockingSnapshot;
+  const { blockingSnapshot } = uiBlockingStoreApi.getState();
   
-  console.log('Active blockers:', blockers);
+  console.log('Active blockers:', blockingSnapshot);
 }
 
 // In event handlers (outside React)
 document.addEventListener('offline', () => {
-  uiBlockingStoreApi.getState().addBlocker('offline', {
+  const { addBlocker } = uiBlockingStoreApi.getState();
+
+  addBlocker('offline', {
     scope: 'global',
     reason: 'No internet connection',
     priority: 1000,
@@ -120,17 +121,43 @@ document.addEventListener('offline', () => {
 });
 
 document.addEventListener('online', () => {
-  uiBlockingStoreApi.getState().removeBlocker('offline');
+  const { removeBlocker } = uiBlockingStoreApi.getState();
+
+  removeBlocker('offline');
 });
+```
+
+### Cleanup ownership
+
+Retain the release function returned by each subscription or observation and invoke it when its
+owner finishes. Unsubscribing stops state notifications; releasing an observation stops only that
+observer's event delivery. Neither operation removes blockers.
+
+```typescript
+import { uiBlockingStoreApi } from '@okyrychenko-dev/react-action-guard';
 
 // Subscribe to changes
-const unsubscribe = uiBlockingStoreApi.subscribe((state, prevState) => {
-  console.log('Blockers changed:', state.blockingSnapshot);
+const unsubscribe = uiBlockingStoreApi.subscribe(({ blockingSnapshot }) => {
+  console.log('Blockers changed:', blockingSnapshot);
+});
+const { observeBlockingEvents, removeBlocker } = uiBlockingStoreApi.getState();
+const releaseObservation = observeBlockingEvents(({ action, blockerId }) => {
+  console.log('Blocking event:', action, blockerId);
 });
 
-// Cleanup
+// Release each owned subscription independently.
 unsubscribe();
+releaseObservation();
+
+// Remove an owned blocker separately, if this consumer registered it.
+removeBlocker('offline');
 ```
+
+Use `removeBlocker(id)` for registrations you own. `clearBlockersForScope(scope)` removes all
+matching registrations, and `clearAllBlockers()` removes every registration and its timeout in that
+store. Reserve these bulk operations for owners responsible for the whole affected scope or store,
+especially when using the shared global store. They do not release subscriptions or observers.
+The public store API has no `destroy()` method.
 
 ## Store Interface
 
