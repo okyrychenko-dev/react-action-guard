@@ -1,7 +1,5 @@
 .section {
   padding: 12px;
-  max-height: 320px;
-  overflow: auto;
   border-top: 1px solid var(--ag-border);
   color: var(--ag-text);
   font-size: 11px;

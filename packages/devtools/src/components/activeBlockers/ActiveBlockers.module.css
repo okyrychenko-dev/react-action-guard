@@ -1,3 +1,9 @@
+.inspection {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}
+
 .blockerItem {
   padding: 10px 12px;
   border-bottom: 1px solid var(--ag-border);

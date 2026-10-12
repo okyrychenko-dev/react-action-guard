@@ -11,6 +11,12 @@ to see one operation affect two independent controls. Add this package when you 
 integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
 provide the next learning step.
 
+Explore the [enterprise showcase](https://github.com/okyrychenko-dev/react-action-guard/tree/main/examples/enterprise-demo)
+for checkout, autosave, navigation confirmation and a controllable user/agent revision example.
+Its Devtools panel observes the nearest session store and declares the workflow action scopes.
+Follow `setup:local` in the demo README to use the current packed packages; no live deployment
+or production backend is implied.
+
 ## Features
 
 - 📊 **Real-time Timeline** - Visual timeline of all blocking events with duration tracking

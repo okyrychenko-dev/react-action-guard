@@ -30,8 +30,10 @@ const EVENTS: ReadonlyArray<AuditEvent> = [
 ];
 
 describe("SessionSummary utils", () => {
-  it("should calculate session summary metrics from audit events", () => {
-    expect(getSessionSummaryMetrics(EVENTS)).toEqual({
+  it("should calculate session summary metrics from rejection counts and audit events", () => {
+    expect(
+      getSessionSummaryMetrics(EVENTS, { preventedActions: 2, duplicateSubmitsSuppressed: 1 })
+    ).toEqual({
       preventedBlockers: 2,
       duplicateSubmitsSuppressed: 1,
       timedOutBlockers: 1,

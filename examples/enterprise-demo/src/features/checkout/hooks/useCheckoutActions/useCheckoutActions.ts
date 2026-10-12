@@ -48,7 +48,7 @@ export function useCheckoutActions({
   });
 
   const { fieldState: addressFieldState } = useGuardedField({ scope: "checkout" });
-  const { fieldState: paymentRefFieldState } = useGuardedField({ scope: "payment" });
+  const { fieldState: paymentRefFieldState } = useGuardedField({ scope: ["checkout", "payment"] });
   const { fieldState: couponFieldState } = useGuardedField({ scope: "checkout" });
 
   const saveCart = useGuardedAction("save-cart", ["checkout", "navigation"]);

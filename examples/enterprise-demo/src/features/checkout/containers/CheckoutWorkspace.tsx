@@ -1,4 +1,5 @@
 import { Card, Chip, Separator } from "@heroui/react";
+import { useState } from "react";
 import {
   CartTable,
   CheckoutFooter,
@@ -7,11 +8,17 @@ import {
   CheckoutToggles,
   OperationTimeline,
 } from "../components";
-import { useCheckoutActions, useCheckoutBlockers, useCheckoutState } from "../hooks";
+import {
+  useCheckoutActions,
+  useCheckoutAutosave,
+  useCheckoutBlockers,
+  useCheckoutState,
+} from "../hooks";
 import type { ReactElement } from "react";
 
 export function CheckoutWorkspace(): ReactElement {
   const state = useCheckoutState();
+  const [autosaveEnabled, setAutosaveEnabled] = useState(false);
   const blockers = useCheckoutBlockers({
     riskHold: state.checkout.riskHold,
     inventoryReserved: state.checkout.inventoryReserved,
@@ -27,6 +34,15 @@ export function CheckoutWorkspace(): ReactElement {
     onOrderPlaced: state.setLastOrderId,
     onPaymentFailureConsumed: state.consumePaymentFailure,
     onTimelineEntry: state.addTimelineEntry,
+  });
+
+  useCheckoutAutosave({
+    enabled: autosaveEnabled,
+    dirty: state.checkout.hasUnsavedChanges,
+    blocked: blockers.isCheckoutBlocked,
+    address: state.checkout.address,
+    paymentReference: state.checkout.paymentReference,
+    onSave: actions.handleSaveCart,
   });
 
   let headerChipColor: "warning" | "success" = "success";
@@ -53,6 +69,21 @@ export function CheckoutWorkspace(): ReactElement {
         </Chip>
       </Card.Header>
       <Card.Content className="flex flex-col gap-4">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={autosaveEnabled}
+            onChange={(event) => {
+              setAutosaveEnabled(event.target.checked);
+            }}
+          />
+          Autosave checkout
+        </label>
+        <p className="text-sm text-slate-600">
+          Autosave waits for 800 ms without edits and for checkout protection to clear, then uses
+          the same guarded Save cart operation. Watch its reason and navigation protection in the
+          inspector.
+        </p>
         <CheckoutForm
           address={state.checkout.address}
           paymentReference={state.checkout.paymentReference}

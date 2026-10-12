@@ -1,4 +1,5 @@
 import { CheckoutWorkspace } from "@features/checkout";
+import { CoordinationWorkspace } from "@features/coordination";
 import { useEnterpriseBlockingInfo } from "@features/core/guard/scopes";
 import { NavigationBlockModal } from "@features/navigation";
 import { useDialogState } from "@okyrychenko-dev/react-action-guard-router";
@@ -22,6 +23,7 @@ export function CheckoutPage(): ReactElement {
   return (
     <>
       <CheckoutWorkspace />
+      <CoordinationWorkspace />
       <NavigationBlockModal
         title={dialogState?.message.title}
         message={dialogState?.message.message}

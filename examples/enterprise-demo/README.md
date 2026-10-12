@@ -48,6 +48,36 @@ requires installed Google Chrome and checks navigation confirmation, browser his
 and responsive onboarding at 390, 820, and 1440 pixels. Formatting inherits the root
 `prettier.config.mjs`.
 
+## Start with these experiments
+
+1. In Checkout, edit the shipping address and navigate to Admin. **Stay and save**
+   cancels navigation; **Leave anyway** discards route-local state.
+2. Enable **Autosave checkout**, edit an address/reference, and watch the guarded
+   save after 800 ms without edits. A checkout hold postpones autosave; clearing it
+   resumes the debounce. Disable autosave to keep using **Save cart** manually.
+3. Apply a coupon, use **Inventory missing**, or enable **Slow gateway** and place
+   an order. Reasons explain affected controls; payment timeout is distinct from
+   cancelling the running application request. Integrations uses a real QueryClient
+   and query adapter for inventory refresh and gateway validation.
+4. In **User and agent coordination**, start an agent edit. Property editing,
+   saving and manual recalculation share the `property`, `revision`, `recalculation`
+   scopes; **Help and chat** and read-only revision information remain available.
+   Choose **Complete operation**, **Fail operation**, or **Cancel operation**.
+   Successful agent completion applies its proposal and advances the revision;
+   failed/cancelled proposals leave it unchanged. Try the manual recalculation too.
+5. Open package **Devtools** with the shield button at the bottom right. Select
+   **Active Blockers** for reasons and the scope/action table. It observes this
+   session's store, alongside the existing application audit inspector. Reset
+   replaces both the application and observation session.
+
+The agent example is controllable local simulation, not an external agent service
+or a production pilot. Permissions, idempotency, cancellation and conflicting
+execution exclusion remain application/backend responsibilities. Guard state tracks
+interaction availability; the demo's explicit pending-operation gate rejects repeat
+starts. Leaving Checkout or resetting discards pending proposals. The example opts
+into Devtools in production builds because this is a showcase; enable that option
+in your own application only when intended.
+
 ## What It Demonstrates
 
 This demo is designed around workflows where a single operation can affect
