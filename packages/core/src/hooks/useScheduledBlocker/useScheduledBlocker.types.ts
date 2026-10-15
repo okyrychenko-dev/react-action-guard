@@ -7,7 +7,11 @@ import type { BlockerConfig } from "../../store";
  * 1. start + duration: Block for a specific duration after start time
  * 2. start + end: Block between start and end times
  *
- * Note: If both duration and end are provided, duration takes precedence.
+ * Windows are half-open [start, end). Omit both duration and end for indefinite blocking.
+ * Zero duration or equal bounds are empty and emit no schedule notifications.
+ * Every supplied bound must be valid, even when duration takes precedence over end.
+ * Negative/nonfinite duration, invalid dates, end before start and calculated end
+ * outside the JavaScript Date range cancel the schedule with a development warning.
  */
 export interface BlockingSchedule {
   /** Start time as ISO string, Date object, or timestamp */

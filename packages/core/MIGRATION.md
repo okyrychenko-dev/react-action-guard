@@ -63,3 +63,22 @@ The [bounded Core contract](../docs/src/packages/react-action-guard/contract.md)
 supported responsibilities from future identity, factory, headless-entry and telemetry decisions.
 These describe current source and planned Core 2.0 stabilization; registry publication and
 release-cohort verification remain separate work.
+
+## Scheduled window validation
+
+Scheduled windows are half-open `[start, end)`. Omit both `duration` and `end` to
+request indefinite blocking. A zero duration or equal start/end is empty and emits
+neither start nor end notifications; an epoch-zero end is a real bound.
+
+A supplied duration takes precedence over a supplied end, but every supplied field
+is validated. Negative or nonfinite duration, invalid dates, end before start, and
+calculated ends outside the JavaScript Date range cancel the schedule and warn in
+development. Invalid or empty reconfiguration cancels timers and releases only the
+hook-owned registration without emitting completion. Keep registration IDs unique
+among owners in the same store. Long finite starts and ends use bounded timer chunks;
+a window already elapsed when its start callback runs never activates.
+
+Replace `duration: 0` with omitted duration and end when indefinite blocking is intended.
+Correct invalid bounds rather than relying on them to become indefinite. Distant future
+starts now activate at their configured time instead of being ignored. These changes
+apply to the planned source cohort; they do not establish npm publication.

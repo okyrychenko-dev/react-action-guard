@@ -5,7 +5,7 @@ import { UIBlockingProvider, useUIBlockingContext } from "../../../context";
 import { uiBlockingStoreApi } from "../../../store";
 import { useScheduledBlocker } from "../useScheduledBlocker";
 import type { PropsWithChildren, ReactNode } from "react";
-import type { ScheduledBlockerConfig } from "../useScheduledBlocker.types";
+import type { BlockingSchedule, ScheduledBlockerConfig } from "../useScheduledBlocker.types";
 
 describe("useScheduledBlocker", () => {
   const readIsBlocked = (scope: string): boolean => {
@@ -24,6 +24,197 @@ describe("useScheduledBlocker", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("should treat zero duration as an empty window", () => {
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() =>
+      useScheduledBlocker("empty", {
+        scope: "test",
+        schedule: { start: Date.now(), duration: 0 },
+        onScheduleStart,
+        onScheduleEnd,
+      })
+    );
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it.each(["zero duration", "equal bounds"])(
+    "should retain no timers for a distant future empty window with %s",
+    (kind) => {
+      const start = Date.now() + 2_147_483_647 * 3;
+      let schedule: BlockingSchedule = { start, duration: 0 };
+
+      if (kind === "equal bounds") {
+        schedule = { start, end: start };
+      }
+
+      const onScheduleStart = vi.fn();
+      const onScheduleEnd = vi.fn();
+      const initialTimerCount = vi.getTimerCount();
+      const { unmount } = renderHook(() =>
+        useScheduledBlocker("future-empty", {
+          scope: "test",
+          schedule,
+          onScheduleStart,
+          onScheduleEnd,
+        })
+      );
+
+      expect(vi.getTimerCount()).toBe(initialTimerCount);
+      expect(readIsBlocked("test")).toBe(false);
+      expect(onScheduleStart).not.toHaveBeenCalled();
+      expect(onScheduleEnd).not.toHaveBeenCalled();
+
+      unmount();
+    }
+  );
+
+  it.each<BlockingSchedule>([
+    { start: Number.NaN },
+    { start: "invalid" },
+    { start: new Date(Number.NaN) },
+    { start: 0, duration: -1 },
+    { start: 0, duration: Number.NaN },
+    { start: 0, duration: Infinity },
+    { start: 8_640_000_000_000_000, duration: 1 },
+    { start: 0, end: "invalid", duration: 100 },
+    { start: 0, end: Infinity },
+    { start: 0, end: -1, duration: 100 },
+  ])("should reject invalid supplied bounds: %j", (schedule) => {
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() =>
+      useScheduledBlocker("invalid", {
+        scope: "test",
+        schedule,
+        onScheduleStart,
+        onScheduleEnd,
+      })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+    expect(warning).toHaveBeenCalled();
+  });
+
+  it("should honor epoch-zero ends and equal bounds as empty elapsed windows", () => {
+    vi.setSystemTime(0);
+
+    const onScheduleStart = vi.fn();
+    const onScheduleEnd = vi.fn();
+
+    renderHook(() => {
+      useScheduledBlocker("epoch", {
+        scope: "test",
+        schedule: { start: -100, end: 0 },
+        onScheduleStart,
+        onScheduleEnd,
+      });
+      useScheduledBlocker("equal", {
+        scope: "test",
+        schedule: { start: 0, end: 0 },
+        onScheduleStart,
+        onScheduleEnd,
+      });
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
+    expect(onScheduleEnd).not.toHaveBeenCalled();
+  });
+
+  it.each(["invalid", "empty"])(
+    "should release only its own registration on %s reconfiguration",
+    (kind) => {
+      vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+      const start = Date.now();
+      const onScheduleEnd = vi.fn();
+      const { addBlocker, getBlockingInfo, removeBlocker } = uiBlockingStoreApi.getState();
+
+      addBlocker("other-owner", { scope: "test" });
+
+      const { rerender, unmount } = renderHook(
+        ({ schedule }: { schedule: BlockingSchedule }) =>
+          useScheduledBlocker("owned", { scope: "test", schedule, onScheduleEnd }),
+        { initialProps: { schedule: { start, duration: 1000 } } }
+      );
+
+      expect(getBlockingInfo("test")).toHaveLength(2);
+
+      let duration = 0;
+
+      if (kind === "invalid") {
+        duration = -1;
+      }
+
+      rerender({ schedule: { start, duration } });
+
+      expect(getBlockingInfo("test").map(({ id }) => id)).toEqual(["other-owner"]);
+
+      act(() => {
+        vi.advanceTimersByTime(2000);
+      });
+      expect(onScheduleEnd).not.toHaveBeenCalled();
+
+      unmount();
+      removeBlocker("other-owner");
+    }
+  );
+
+  it("should prefer a valid duration over a valid end", () => {
+    const start = Date.now();
+
+    renderHook(() =>
+      useScheduledBlocker("precedence", {
+        scope: "test",
+        schedule: { start, duration: 100, end: start + 1000 },
+      })
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+  });
+
+  it("should cancel a pending start when reconfigured to invalid bounds", () => {
+    vi.spyOn(console, "warn").mockImplementation(() => undefined);
+
+    const start = Date.now() + 100;
+    const onScheduleStart = vi.fn();
+    const { rerender } = renderHook(
+      ({ duration }) =>
+        useScheduledBlocker("pending", {
+          scope: "test",
+          schedule: { start, duration },
+          onScheduleStart,
+        }),
+      { initialProps: { duration: 100 } }
+    );
+
+    rerender({ duration: -1 });
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+    expect(onScheduleStart).not.toHaveBeenCalled();
   });
 
   it("should end protection at the deadline when the start notification throws", () => {
@@ -771,7 +962,7 @@ describe("useScheduledBlocker", () => {
     expect(readIsBlocked("test")).toBe(false);
   });
 
-  it("should ignore schedules beyond the maximum safe timeout", () => {
+  it("should activate a distant future window at its start and end at its deadline", () => {
     const now = Date.now();
     const hugeDelay = 2_147_483_648;
 
@@ -785,6 +976,18 @@ describe("useScheduledBlocker", () => {
         },
       })
     );
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+
+    expect(readIsBlocked("test")).toBe(false);
+
+    act(() => {
+      vi.advanceTimersByTime(hugeDelay - 1000);
+    });
+
+    expect(readIsBlocked("test")).toBe(true);
 
     act(() => {
       vi.advanceTimersByTime(1000);
