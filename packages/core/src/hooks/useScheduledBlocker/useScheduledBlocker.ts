@@ -63,6 +63,10 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
 
     const endTime = calculateEndTime(currentConfig.schedule, startTime);
 
+    if (!isUndefined(endTime) && endTime <= startTime) {
+      return;
+    }
+
     const scheduleEnd = (): void => {
       if (isUndefined(endTime)) {
         return;

@@ -44,6 +44,37 @@ describe("useScheduledBlocker", () => {
     expect(onScheduleEnd).not.toHaveBeenCalled();
   });
 
+  it.each(["zero duration", "equal bounds"])(
+    "should retain no timers for a distant future empty window with %s",
+    (kind) => {
+      const start = Date.now() + 2_147_483_647 * 3;
+      let schedule: BlockingSchedule = { start, duration: 0 };
+
+      if (kind === "equal bounds") {
+        schedule = { start, end: start };
+      }
+
+      const onScheduleStart = vi.fn();
+      const onScheduleEnd = vi.fn();
+      const initialTimerCount = vi.getTimerCount();
+      const { unmount } = renderHook(() =>
+        useScheduledBlocker("future-empty", {
+          scope: "test",
+          schedule,
+          onScheduleStart,
+          onScheduleEnd,
+        })
+      );
+
+      expect(vi.getTimerCount()).toBe(initialTimerCount);
+      expect(readIsBlocked("test")).toBe(false);
+      expect(onScheduleStart).not.toHaveBeenCalled();
+      expect(onScheduleEnd).not.toHaveBeenCalled();
+
+      unmount();
+    }
+  );
+
   it.each<BlockingSchedule>([
     { start: Number.NaN },
     { start: "invalid" },
