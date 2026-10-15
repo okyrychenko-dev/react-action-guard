@@ -9,6 +9,40 @@ describe("Blocking lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it.each([
+    { timeout: 100, clockShift: -86_400_000 },
+    { timeout: 4_294_967_294, clockShift: -86_400_000 },
+    { timeout: 4_294_967_294, clockShift: 86_400_000 },
+  ])(
+    "should expire after $timeout elapsed milliseconds despite a wall-clock shift of $clockShift",
+    ({ timeout, clockShift }) => {
+      vi.useFakeTimers();
+      vi.setSystemTime(100_000_000);
+
+      const lifecycle = createBlockingLifecycle();
+      const onTimeout = vi.fn();
+      const events: Array<string> = [];
+
+      lifecycle.observe(({ action }) => {
+        events.push(action);
+      });
+      lifecycle.add("save", { timeout, onTimeout });
+
+      vi.advanceTimersByTime(50);
+      vi.setSystemTime(Date.now() + clockShift);
+      vi.advanceTimersByTime(timeout - 51);
+
+      expect(lifecycle.isBlocked()).toBe(true);
+      expect(onTimeout).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+
+      expect(lifecycle.isBlocked()).toBe(false);
+      expect(onTimeout).toHaveBeenCalledExactlyOnceWith("save");
+      expect(events).toEqual(["add", "timeout", "remove"]);
+    }
+  );
+
   it.each([NaN, Infinity, -Infinity, Number.MAX_VALUE])(
     "should reject invalid timeout %s atomically on add, replacement and update",
     (timeout) => {

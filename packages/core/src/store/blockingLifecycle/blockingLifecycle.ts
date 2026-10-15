@@ -157,14 +157,15 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       return;
     }
 
-    const deadline = Date.now() + timeout;
+    const duration = timeout;
+    const startedAt = performance.now();
 
     function scheduleChunk(): void {
       if (blockers.get(id) !== blocker) {
         return;
       }
 
-      const remaining = deadline - Date.now();
+      const remaining = duration - (performance.now() - startedAt);
 
       if (remaining <= 0) {
         handleTimeout(id, blocker);
