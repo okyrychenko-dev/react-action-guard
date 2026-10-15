@@ -157,23 +157,29 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       return;
     }
 
-    const duration = timeout;
-    const startedAt = performance.now();
+    let remaining = timeout;
 
     function scheduleChunk(): void {
-      if (blockers.get(id) !== blocker) {
-        return;
-      }
+      const delay = Math.min(remaining, 2_147_483_647);
+      const startedAt = performance.now();
 
-      const remaining = duration - (performance.now() - startedAt);
+      blocker.timeoutId = setTimeout(() => {
+        if (blockers.get(id) !== blocker) {
+          return;
+        }
 
-      if (remaining <= 0) {
-        handleTimeout(id, blocker);
+        // A dispatched timer has completed its requested wait even if the
+        // monotonic clock paused during sleep. Also count observable late delivery.
+        remaining -= Math.max(delay, performance.now() - startedAt);
 
-        return;
-      }
+        if (remaining <= 0) {
+          handleTimeout(id, blocker);
 
-      blocker.timeoutId = setTimeout(scheduleChunk, Math.min(remaining, 2_147_483_647));
+          return;
+        }
+
+        scheduleChunk();
+      }, delay);
     }
 
     scheduleChunk();

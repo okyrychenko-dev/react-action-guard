@@ -328,7 +328,9 @@ Remember:
 
 Positive finite `timeout` values expire relative to registration, including delays beyond
 2,147,483,647 ms. Long waits use bounded timer chunks and expire once at the deadline.
-Elapsed time uses a monotonic clock, so system clock adjustments do not change the delay.
+Each dispatched timer credits its completed wait even if the monotonic clock paused during
+system suspension. Monotonic elapsed time also counts observable late delivery; system clock
+adjustments do not change the delay.
 Omitting `timeout`, zero, and finite negative values disable expiration. A changed timeout
 restarts the delay; an unchanged timeout preserves its deadline and uses the latest callback.
 

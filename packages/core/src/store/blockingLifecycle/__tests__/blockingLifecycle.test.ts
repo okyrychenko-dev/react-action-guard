@@ -9,6 +9,34 @@ describe("Blocking lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it.each([3_600_000, 2_147_483_648])(
+    "should count completed timer chunks for timeout %s when the monotonic clock pauses",
+    (timeout) => {
+      vi.useFakeTimers();
+      vi.spyOn(performance, "now").mockReturnValue(0);
+
+      const lifecycle = createBlockingLifecycle();
+      const onTimeout = vi.fn();
+      const events: Array<string> = [];
+
+      lifecycle.observe(({ action }) => {
+        events.push(action);
+      });
+      lifecycle.add("sleeping", { timeout, onTimeout });
+
+      vi.advanceTimersByTime(timeout - 1);
+
+      expect(lifecycle.isBlocked()).toBe(true);
+      expect(onTimeout).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(1);
+
+      expect(lifecycle.isBlocked()).toBe(false);
+      expect(onTimeout).toHaveBeenCalledExactlyOnceWith("sleeping");
+      expect(events).toEqual(["add", "timeout", "remove"]);
+    }
+  );
+
   it.each([
     { timeout: 100, clockShift: -86_400_000 },
     { timeout: 4_294_967_294, clockShift: -86_400_000 },
