@@ -2,6 +2,7 @@ import { isDefined, isString, isUndefined } from "@okyrychenko-dev/type-utils";
 import { projectBlockingInfo } from "../blockingInfo";
 import { scopeAffectsObservation, scopeMatchesTarget } from "../scope";
 import { DEFAULT_PRIORITY, DEFAULT_REASON, DEFAULT_SCOPE } from "../uiBlockingStore.constants";
+import { validateTimeout } from "./blockingLifecycle.utils";
 import type { Middleware } from "../../middleware";
 import type { BlockerConfig, BlockerInfo } from "../uiBlockingStore.types";
 import type {
@@ -156,12 +157,30 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       return;
     }
 
-    blocker.timeoutId = setTimeout(() => {
-      handleTimeout(id, blocker);
-    }, timeout);
+    const deadline = Date.now() + timeout;
+
+    function scheduleChunk(): void {
+      if (blockers.get(id) !== blocker) {
+        return;
+      }
+
+      const remaining = deadline - Date.now();
+
+      if (remaining <= 0) {
+        handleTimeout(id, blocker);
+
+        return;
+      }
+
+      blocker.timeoutId = setTimeout(scheduleChunk, Math.min(remaining, 2_147_483_647));
+    }
+
+    scheduleChunk();
   }
 
   function add(id: string, config: BlockerConfig = {}): void {
+    validateTimeout(config.timeout);
+
     const previous = blockers.get(id);
 
     if (previous) {
@@ -215,6 +234,11 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     }
 
     const timeoutChanged = nextConfig.timeout !== oldConfig.timeout;
+
+    if (timeoutChanged) {
+      validateTimeout(nextConfig.timeout);
+    }
+
     let blocker = previous;
 
     if (timeoutChanged) {

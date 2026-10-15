@@ -9,6 +9,119 @@ describe("Blocking lifecycle", () => {
     vi.useRealTimers();
   });
 
+  it.each([NaN, Infinity, -Infinity, Number.MAX_VALUE])(
+    "should reject invalid timeout %s atomically on add, replacement and update",
+    (timeout) => {
+      vi.useFakeTimers();
+
+      const lifecycle = createBlockingLifecycle();
+      const onTimeout = vi.fn();
+      const events = vi.fn<Middleware>();
+
+      lifecycle.observe(events);
+      lifecycle.add("save", { timeout: 100, onTimeout });
+
+      vi.advanceTimersByTime(40);
+
+      const snapshot = lifecycle.getSnapshot();
+
+      expect(() => lifecycle.add("other", { timeout })).toThrow(RangeError);
+      expect(() => lifecycle.add("save", { timeout })).toThrow(RangeError);
+      expect(() => lifecycle.replace("save", { timeout })).toThrow(RangeError);
+      expect(() => lifecycle.update("save", { timeout })).toThrow(RangeError);
+      expect(lifecycle.getSnapshot()).toBe(snapshot);
+      expect(events).toHaveBeenCalledTimes(1);
+
+      vi.advanceTimersByTime(60);
+
+      expect(onTimeout).toHaveBeenCalledExactlyOnceWith("save");
+      expect(lifecycle.isBlocked()).toBe(false);
+    }
+  );
+
+  it.each([undefined, 0, -1, -Number.MAX_VALUE])(
+    "should leave timeout %s active without automatic expiration",
+    (timeout) => {
+      vi.useFakeTimers();
+
+      const lifecycle = createBlockingLifecycle();
+      const onTimeout = vi.fn();
+
+      lifecycle.add("indefinite", { timeout, onTimeout });
+
+      vi.advanceTimersByTime(4_294_967_296);
+
+      expect(lifecycle.isBlocked()).toBe(true);
+      expect(onTimeout).not.toHaveBeenCalled();
+
+      lifecycle.clear();
+    }
+  );
+
+  it("should preserve a valid existing deadline near the representability limit", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(1_000);
+
+    const lifecycle = createBlockingLifecycle();
+    const timeout = Number.MAX_SAFE_INTEGER - 1_000;
+
+    lifecycle.add("save", { timeout });
+
+    vi.advanceTimersByTime(1);
+
+    expect(() => lifecycle.update("save", { reason: "updated" })).not.toThrow();
+    expect(() => lifecycle.replace("save", { timeout, reason: "replaced" })).not.toThrow();
+    expect(lifecycle.getSnapshot()[0]?.reason).toBe("replaced");
+    expect(lifecycle.isBlocked()).toBe(true);
+
+    lifecycle.clear();
+  });
+
+  it("should ignore a late chunk after replacing a long-lived registration", () => {
+    vi.useFakeTimers();
+    vi.spyOn(globalThis, "clearTimeout").mockImplementation(() => undefined);
+
+    const lifecycle = createBlockingLifecycle();
+    const onTimeout = vi.fn();
+
+    lifecycle.add("save", { timeout: 4_294_967_294, onTimeout });
+
+    vi.advanceTimersByTime(2_147_483_647);
+
+    lifecycle.add("save", { reason: "new owner" });
+
+    vi.advanceTimersByTime(2_147_483_647);
+
+    expect(onTimeout).not.toHaveBeenCalled();
+    expect(lifecycle.getSnapshot()[0]?.reason).toBe("new owner");
+
+    lifecycle.clear();
+  });
+
+  it("should keep a long timeout blocked until its exact deadline and expire once", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const onTimeout = vi.fn();
+    const events: Array<string> = [];
+
+    lifecycle.observe(({ action }) => {
+      events.push(action);
+    });
+    lifecycle.add("long", { timeout: 2_147_483_648, onTimeout });
+
+    vi.advanceTimersByTime(2_147_483_647);
+
+    expect(lifecycle.isBlocked()).toBe(true);
+    expect(onTimeout).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(1);
+
+    expect(lifecycle.isBlocked()).toBe(false);
+    expect(onTimeout).toHaveBeenCalledExactlyOnceWith("long");
+    expect(events).toEqual(["add", "timeout", "remove"]);
+  });
+
   it("should preserve reactive deadlines and invoke only the current callback", () => {
     vi.useFakeTimers();
 
@@ -503,7 +616,8 @@ describe("Blocking lifecycle", () => {
       const lifecycle = createBlockingLifecycle();
       const onTimeout = vi.fn();
 
-      lifecycle.add("save", { scope: "form", timeout: 10, onTimeout });
+      lifecycle.add("save", { scope: "form", timeout: 4_294_967_294, onTimeout });
+      vi.advanceTimersByTime(2_147_483_647);
       if (operation === "remove") {
         lifecycle.remove("save");
       } else if (operation === "clear") {
@@ -511,7 +625,7 @@ describe("Blocking lifecycle", () => {
       } else {
         lifecycle.clearScope("form");
       }
-      vi.advanceTimersByTime(20);
+      vi.advanceTimersByTime(2_147_483_647);
       expect(onTimeout).not.toHaveBeenCalled();
       expect(lifecycle.getSnapshot()).toEqual([]);
     }

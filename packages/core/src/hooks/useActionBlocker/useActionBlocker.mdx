@@ -323,3 +323,17 @@ Remember:
 - [`useIsBlocked`](/?path=/docs/hooks-useisblocked--docs) - Check if a scope is blocked
 - [`useAsyncAction`](/?path=/docs/hooks-useasyncaction--docs) - Wrap async operations with blocking
 - [`useConditionalBlocker`](/?path=/docs/hooks-useconditionalbocker--docs) - Block based on conditions
+
+### Timeout input contract
+
+Positive finite `timeout` values expire relative to registration, including delays beyond
+2,147,483,647 ms. Long waits use bounded timer chunks and expire once at the deadline.
+Omitting `timeout`, zero, and finite negative values disable expiration. A changed timeout
+restarts the delay; an unchanged timeout preserves its deadline and uses the latest callback.
+
+`NaN`, either infinity, and positive delays whose absolute deadline exceeds
+`Number.MAX_SAFE_INTEGER` throw `RangeError` before changing a registration or its timer.
+This also applies to imperative add/update and reactive replacement. For migration, replace
+infinity or `NaN` sentinels with an omitted timeout (or zero); catch invalid imperative input
+or validate application input before passing it to a hook. Timeout releases blocking only;
+it does not cancel the underlying operation.
