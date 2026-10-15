@@ -1,14 +1,14 @@
 import { useIsBlocked } from "@okyrychenko-dev/react-action-guard";
-import { isFunction } from "@okyrychenko-dev/type-utils";
+import { isDefined } from "@okyrychenko-dev/type-utils";
 import { useEffect, useMemo, useRef } from "react";
-import { isDefined, normalizeScope, resolveCondition } from "./utils";
+import { normalizeScope, resolveCondition } from "./utils";
 
 /**
  * Shared hook to determine if blocking should be active based on
  * condition and/or scope state.
  *
- * This hook uses `useMemo` for optimal performance, ensuring blocking state
- * is computed synchronously without additional re-renders.
+ * Pure function conditions are evaluated synchronously on every render.
+ * Mutating a ref alone does not trigger a render.
  *
  * @param when - Optional condition (boolean or function)
  * @param scope - Optional scope(s) to check
@@ -28,7 +28,6 @@ export function useShouldBlock(
 
   // Development-only validation
   const warnedMissingConditionRef = useRef(false);
-  const warnedFunctionRef = useRef(false);
 
   useEffect(() => {
     if (process.env.NODE_ENV !== "development") {
@@ -42,33 +41,9 @@ export function useShouldBlock(
           "This hook will always return false. Please provide at least one condition."
       );
     }
-
-    if (!warnedFunctionRef.current && isFunction(when)) {
-      warnedFunctionRef.current = true;
-      console.warn(
-        '[react-action-guard-router] useShouldBlock: "when" is a function. ' +
-          "Make sure to wrap it with useCallback to avoid unnecessary re-computations."
-      );
-    }
   }, [when, scope]);
 
-  // Compute blocking state synchronously using useMemo
-  // This avoids the useState + useEffect pattern which causes an extra render
-  const shouldBlock = useMemo(() => {
-    let blockCondition = false;
+  const blockCondition = isDefined(when) && resolveCondition(when);
 
-    // Check manual condition
-    if (isDefined(when)) {
-      blockCondition = resolveCondition(when);
-    }
-
-    // Check scope-based blocking (OR logic - block if either condition is true)
-    if (scope && isScopeBlocked) {
-      blockCondition = true;
-    }
-
-    return blockCondition;
-  }, [when, scope, isScopeBlocked]);
-
-  return shouldBlock;
+  return blockCondition || Boolean(scope && isScopeBlocked);
 }

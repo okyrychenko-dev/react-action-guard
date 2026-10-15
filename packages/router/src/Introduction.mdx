@@ -194,3 +194,11 @@ type UseAppRouterBlockerOptions = {
 - Examples/Async Confirmation
 - Integration/Scope Synchronization
 - Integration/Combined Blocking Sources
+
+## Function conditions and rerenders
+
+`when` functions must be pure and are evaluated on every React render, even when
+their identity is stable. `useCallback` is optional. A ref mutation alone does not
+trigger a render: use React state or a subscription to refresh protection.
+Protection remains active when either the condition or a selected scope blocks.
+Next App Router remains limited to document unload protection.
