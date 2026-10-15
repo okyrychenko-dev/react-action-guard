@@ -1,6 +1,8 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { UIBlockingProvider, useResolvedStoreApi } from "../../../context";
 import { uiBlockingStoreApi } from "../../../store";
+import { useIsBlocked } from "../../useIsBlocked";
 import { useActionBlocker } from "../useActionBlocker";
 import type { Middleware } from "../../../middleware";
 import type { BlockerConfig } from "../../../store";
@@ -10,6 +12,65 @@ describe("useBlocker", () => {
     const { clearAllBlockers } = uiBlockingStoreApi.getState();
 
     clearAllBlockers();
+  });
+
+  it("should honor a long deadline in a Provider and cancel it on unmount", () => {
+    vi.useFakeTimers();
+    try {
+      const onTimeout = vi.fn();
+      const events = vi.fn<Middleware>();
+      const { result, unmount } = renderHook(
+        () => {
+          useActionBlocker("long", { scope: "form", timeout: 2_147_483_648, onTimeout });
+
+          const store = useResolvedStoreApi();
+          const blocked = useIsBlocked("form");
+
+          return { store, blocked };
+        },
+        { wrapper: UIBlockingProvider }
+      );
+      const { observeBlockingEvents } = result.current.store.getState();
+      const release = observeBlockingEvents(events);
+
+      act(() => {
+        vi.advanceTimersByTime(2_147_483_647);
+      });
+
+      expect(result.current.blocked).toBe(true);
+
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+
+      expect(result.current.blocked).toBe(false);
+      expect(onTimeout).toHaveBeenCalledExactlyOnceWith("long");
+      expect(events.mock.calls.map(([event]) => event.action)).toEqual(["timeout", "remove"]);
+
+      unmount();
+      release();
+
+      const detached = renderHook(
+        () => {
+          useActionBlocker("detached", { timeout: 4_294_967_294, onTimeout });
+        },
+        { wrapper: UIBlockingProvider }
+      );
+
+      act(() => {
+        vi.advanceTimersByTime(2_147_483_647);
+      });
+
+      detached.unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(2_147_483_647);
+      });
+
+      expect(onTimeout).toHaveBeenCalledTimes(1);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("should clear omitted reactive configuration without replacing the registration", () => {

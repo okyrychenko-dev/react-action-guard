@@ -13,7 +13,11 @@ export interface BlockerConfig {
   /** Priority level (negative values are normalized to 0) */
   priority?: number;
   timestamp?: number;
-  /** Automatically remove the blocker after N milliseconds */
+  /**
+   * Remove after a positive finite delay in milliseconds, using bounded timer chunks.
+   * Omitted, zero and finite negative values disable expiration. Invalid/nonfinite values
+   * or a deadline beyond Number.MAX_SAFE_INTEGER throw RangeError before mutation.
+   */
   timeout?: number;
   /** Callback invoked when the blocker is automatically removed due to timeout */
   onTimeout?: (blockerId: string) => void;
