@@ -248,3 +248,12 @@ development. Invalid or empty reconfiguration cancels timers and releases only t
 hook-owned registration without emitting completion. Keep registration IDs unique
 among owners in the same store. Long finite starts and ends use bounded timer chunks;
 a window already elapsed when its start callback runs never activates.
+
+### Performance lifetime diagnostics
+
+`createPerformanceMiddleware` measures each registration from its add event to removal,
+timeout or bulk clear. Updates preserve the original start and refresh scope metadata;
+a replacement add starts a new lifetime. `onSlowBlock` runs once for each ended lifetime
+meeting the threshold, including every affected registration in a bulk clear. Callback
+failures are isolated. Targeted clears leave global and unrelated registrations tracked.
+These durations measure blocker lifetimes, not operation success or execution time.

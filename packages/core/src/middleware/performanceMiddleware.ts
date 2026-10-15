@@ -1,54 +1,55 @@
-import { isUndefined } from "@okyrychenko-dev/type-utils";
-import { Middleware, MiddlewareContext } from "./middleware.types";
-import { PerformanceConfig } from "./performanceMiddleware.types";
-import { handleAddAction } from "./performanceMiddleware.utils";
+import { isDefined } from "@okyrychenko-dev/type-utils";
+import { DEFAULT_SCOPE, scopeMatchesTarget } from "../store/scope";
+import { finalizeTrackedBlocks } from "./performanceMiddleware.utils";
+import type { Middleware } from "./middleware.types";
+import type { PerformanceConfig, TrackedPerformanceBlock } from "./performanceMiddleware.types";
 
 const DEFAULT_SLOW_BLOCK_THRESHOLD = 3000;
-const ACTION_ADD = "add";
-const ACTION_REMOVE = "remove";
 
 /**
- * Helper function to handle blocker removal and duration tracking.
- * @internal
- */
-function handleRemoveAction(
-  context: MiddlewareContext,
-  blockStartTimes: Map<string, number>,
-  slowBlockThreshold: number,
-  onSlowBlock?: (blockerId: string, duration: number) => void
-): void {
-  const startTime = blockStartTimes.get(context.blockerId);
-
-  if (isUndefined(startTime)) {
-    return;
-  }
-
-  const duration = context.timestamp - startTime;
-
-  blockStartTimes.delete(context.blockerId);
-
-  if (duration >= slowBlockThreshold) {
-    onSlowBlock?.(context.blockerId, duration);
-  }
-}
-
-/**
- * Creates middleware for monitoring blocker performance and detecting slow blocks.
- *
+ * Measures registration lifetimes from add until removal, timeout or bulk clear.
+ * Updates preserve the start; replacement adds restart it. Callback failures are isolated.
  * @public
  * @since 0.6.0
- * @see {@link PerformanceConfig} for configuration options
- * @see {@link configureMiddleware} for registering middleware
  */
 export function createPerformanceMiddleware(config: PerformanceConfig = {}): Middleware {
   const { slowBlockThreshold = DEFAULT_SLOW_BLOCK_THRESHOLD, onSlowBlock } = config;
-  const blockStartTimes = new Map<string, number>();
+  const trackedBlocks = new Map<string, TrackedPerformanceBlock>();
 
   return (context) => {
-    if (context.action === ACTION_ADD) {
-      handleAddAction(context.blockerId, context.timestamp, blockStartTimes);
-    } else if (context.action === ACTION_REMOVE) {
-      handleRemoveAction(context, blockStartTimes, slowBlockThreshold, onSlowBlock);
+    const { action, blockerId, timestamp, config: blockerConfig, scope } = context;
+
+    if (action === "add") {
+      trackedBlocks.set(blockerId, { timestamp, scope: blockerConfig?.scope ?? DEFAULT_SCOPE });
+    } else if (action === "update") {
+      const tracked = trackedBlocks.get(blockerId);
+
+      if (isDefined(tracked) && isDefined(blockerConfig?.scope)) {
+        tracked.scope = blockerConfig.scope;
+      }
+    } else {
+      const endedBlocks = new Map<string, TrackedPerformanceBlock>();
+
+      if (action === "remove" || action === "timeout") {
+        const tracked = trackedBlocks.get(blockerId);
+
+        if (isDefined(tracked)) {
+          endedBlocks.set(blockerId, tracked);
+          trackedBlocks.delete(blockerId);
+        }
+      } else {
+        for (const [id, tracked] of trackedBlocks) {
+          const cleared =
+            action === "clear" || (isDefined(scope) && scopeMatchesTarget(tracked.scope, scope));
+
+          if (cleared) {
+            endedBlocks.set(id, tracked);
+            trackedBlocks.delete(id);
+          }
+        }
+      }
+
+      finalizeTrackedBlocks(endedBlocks, timestamp, slowBlockThreshold, onSlowBlock);
     }
   };
 }

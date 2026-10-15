@@ -1,5 +1,6 @@
 import { act } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { createBlockingLifecycle } from "../../store/blockingLifecycle";
 import { createPerformanceMiddleware } from "../performanceMiddleware";
 import type { MiddlewareContext } from "../middleware.types";
 
@@ -11,6 +12,29 @@ describe("createPerformanceMiddleware", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("should finalize every bulk-cleared lifetime even when a callback throws", () => {
+    const lifecycle = createBlockingLifecycle();
+    const onSlowBlock = vi.fn((id: string) => {
+      if (id === "x") {
+        throw new Error("consumer failure");
+      }
+    });
+
+    lifecycle.observe(createPerformanceMiddleware({ slowBlockThreshold: 100, onSlowBlock }));
+    lifecycle.add("x", { scope: "a" });
+    lifecycle.add("y", { scope: ["a", "b"] });
+    vi.advanceTimersByTime(200);
+    lifecycle.clear();
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["x", 200],
+      ["y", 200],
+    ]);
+    lifecycle.add("x");
+    vi.advanceTimersByTime(50);
+    lifecycle.remove("x");
+    expect(onSlowBlock).toHaveBeenCalledTimes(2);
   });
 
   it("should track block duration", () => {

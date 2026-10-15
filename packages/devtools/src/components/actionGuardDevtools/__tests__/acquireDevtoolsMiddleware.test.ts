@@ -1,5 +1,6 @@
 import {
   UIBlockingProvider,
+  createPerformanceMiddleware,
   uiBlockingStoreApi,
   useUIBlockingContext,
 } from "@okyrychenko-dev/react-action-guard";
@@ -20,9 +21,194 @@ function maxEventsOf(session: ObservationSession) {
   return maxEvents;
 }
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.useRealTimers();
+});
 
 describe("Observation session participation", () => {
+  it("should preserve moved lifetimes and global exclusions in callbacks and session history", () => {
+    vi.useFakeTimers();
+
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+    const participant = session.participate();
+    const {
+      addBlocker,
+      updateBlocker,
+      removeBlocker,
+      clearBlockersForScope,
+      clearAllBlockers,
+      observeBlockingEvents,
+      isBlocked,
+    } = store.getState();
+    const onSlowBlock = vi.fn();
+    const releasePerformance = observeBlockingEvents(
+      createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+    );
+
+    addBlocker("x", { scope: "a" });
+    addBlocker("y", { scope: ["a", "c"] });
+    addBlocker("global");
+    addBlocker("global-array", { scope: ["global", "a"] });
+
+    vi.advanceTimersByTime(100);
+
+    updateBlocker("x", { scope: "b" });
+    clearBlockersForScope("a");
+
+    expect(onSlowBlock.mock.calls).toEqual([["y", 100]]);
+    expect(isBlocked("b")).toBe(true);
+
+    vi.advanceTimersByTime(100);
+
+    removeBlocker("x");
+
+    expect(
+      eventsOf(session).find((event) => event.action === "remove" && event.blockerId === "x")
+        ?.duration
+    ).toBe(200);
+
+    clearBlockersForScope("global");
+    removeBlocker("global");
+    removeBlocker("global-array");
+
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["y", 100],
+      ["x", 200],
+      ["global", 200],
+      ["global-array", 200],
+    ]);
+
+    for (const id of ["global", "global-array"]) {
+      expect(
+        eventsOf(session).find((event) => event.action === "remove" && event.blockerId === id)
+          ?.duration
+      ).toBe(200);
+    }
+
+    addBlocker("x", { scope: "a" });
+
+    vi.advanceTimersByTime(25);
+
+    clearAllBlockers();
+    addBlocker("x", { scope: "b" });
+
+    vi.advanceTimersByTime(50);
+
+    removeBlocker("x");
+
+    expect(onSlowBlock.mock.calls.slice(-2)).toEqual([
+      ["x", 25],
+      ["x", 50],
+    ]);
+    expect(
+      eventsOf(session)
+        .filter((event) => event.action === "remove" && event.blockerId === "x")
+        .map((event) => event.duration)
+    ).toEqual([50, 200]);
+    expect(
+      eventsOf(session)
+        .filter((event) => event.action === "clear" || event.action === "clear_scope")
+        .every((event) => event.duration === undefined)
+    ).toBe(true);
+
+    releasePerformance();
+    participant.release();
+
+    expect(eventsOf(session)).toEqual([]);
+  });
+
+  it("should restart replacement timing and finalize timeout only once", () => {
+    vi.useFakeTimers();
+
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+    const participant = session.participate();
+    const { addBlocker, updateBlocker, removeBlocker, observeBlockingEvents } = store.getState();
+    const onSlowBlock = vi.fn();
+    const releasePerformance = observeBlockingEvents(
+      createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+    );
+
+    addBlocker("reused", { scope: "a" });
+
+    vi.advanceTimersByTime(100);
+
+    addBlocker("reused", { scope: ["b", "c"], timeout: 200 });
+
+    vi.advanceTimersByTime(50);
+
+    updateBlocker("reused", { reason: "still pending" });
+
+    vi.advanceTimersByTime(150);
+
+    expect(onSlowBlock.mock.calls).toEqual([["reused", 200]]);
+
+    const terminal = eventsOf(session).filter(
+      (event) => event.action === "timeout" || event.action === "remove"
+    );
+
+    expect(terminal.map((event) => [event.action, event.duration])).toEqual([
+      ["remove", undefined],
+      ["timeout", 200],
+    ]);
+
+    addBlocker("reused", { scope: "c" });
+
+    vi.advanceTimersByTime(25);
+
+    removeBlocker("reused");
+
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["reused", 200],
+      ["reused", 25],
+    ]);
+    expect(eventsOf(session)[0].duration).toBe(25);
+
+    releasePerformance();
+    participant.release();
+  });
+
+  it("should keep a literal star ID separate from bulk event timing", () => {
+    vi.useFakeTimers();
+
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+    const participant = session.participate();
+    const { addBlocker, removeBlocker, clearBlockersForScope, observeBlockingEvents } =
+      store.getState();
+    const onSlowBlock = vi.fn();
+    const releasePerformance = observeBlockingEvents(
+      createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+    );
+
+    addBlocker("*", { scope: "b" });
+    addBlocker("y", { scope: "a" });
+
+    vi.advanceTimersByTime(100);
+
+    clearBlockersForScope("a");
+
+    expect(eventsOf(session)[0].duration).toBeUndefined();
+
+    vi.advanceTimersByTime(100);
+
+    removeBlocker("*");
+
+    expect(eventsOf(session)[0].duration).toBe(200);
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["y", 100],
+      ["*", 200],
+    ]);
+
+    releasePerformance();
+    participant.release();
+  });
+
   it("should share one history and observer across participants", () => {
     const session = resolveDevtoolsObservationSession();
     const first = session.participate({ defaultOpen: true, maxEvents: 10 });
@@ -61,6 +247,7 @@ describe("Observation session participation", () => {
     const { addBlocker } = firstStore.getState();
 
     addBlocker("first-only");
+
     expect(eventsOf(firstSession)).toHaveLength(1);
     expect(eventsOf(secondSession)).toHaveLength(0);
 
@@ -195,12 +382,16 @@ describe("Observation session participation", () => {
     const participant = session.participate();
 
     addBlocker("leased-event");
+
     expect(eventsOf(session).filter((event) => event.blockerId === "leased-event")).toHaveLength(1);
     expect(manual).toHaveBeenCalledOnce();
+
     participant.release();
     removeBlocker("leased-event");
+
     expect(eventsOf(session)).toEqual([]);
     expect(manual).toHaveBeenCalledTimes(2);
+
     releaseManual();
   });
 });

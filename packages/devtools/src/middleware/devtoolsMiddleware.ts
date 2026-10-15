@@ -1,4 +1,5 @@
-import { type Optional, isArray, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
+import { DEFAULT_SCOPE, scopeMatchesTarget } from "@okyrychenko-dev/react-action-guard";
+import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
 import type { DevtoolsStoreApi } from "../store";
@@ -8,12 +9,7 @@ interface TrackedBlocker {
   scope?: string | ReadonlyArray<string>;
 }
 
-const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>([
-  "remove",
-  "timeout",
-  "clear",
-  "clear_scope",
-]);
+const TERMINAL_ACTIONS = new Set<MiddlewareContext["action"]>(["remove", "timeout"]);
 
 /**
  * Creates the devtools middleware that captures and records UI blocking events.
@@ -49,12 +45,7 @@ export function createDevtoolsMiddlewareForStore(
 
   const clearScopedBlockers = (scope: string): void => {
     for (const [blockerId, trackedBlocker] of activeBlockers.entries()) {
-      if (trackedBlocker.scope === scope) {
-        activeBlockers.delete(blockerId);
-        continue;
-      }
-
-      if (isArray(trackedBlocker.scope) && trackedBlocker.scope.includes(scope)) {
+      if (scopeMatchesTarget(trackedBlocker.scope ?? DEFAULT_SCOPE, scope)) {
         activeBlockers.delete(blockerId);
       }
     }
@@ -77,30 +68,39 @@ export function createDevtoolsMiddlewareForStore(
 
   return (context: MiddlewareContext): void => {
     const { addEvent } = targetDevtoolsStore.getState();
+    const { action, blockerId, config, timestamp, prevState, scope, count } = context;
 
     // Track when blockers are added
-    if (context.action === "add") {
-      activeBlockers.set(context.blockerId, {
-        timestamp: context.timestamp,
-        scope: context.config?.scope,
+    if (action === "add") {
+      activeBlockers.set(blockerId, {
+        timestamp,
+        scope: config?.scope,
       });
     }
 
+    if (action === "update") {
+      const trackedBlocker = activeBlockers.get(blockerId);
+
+      if (isDefined(trackedBlocker) && isDefined(config?.scope)) {
+        trackedBlocker.scope = config.scope;
+      }
+    }
+
     // Calculate duration for terminal events
-    const duration = getDuration(context.action, context.blockerId, context.timestamp);
+    const duration = getDuration(action, blockerId, timestamp);
 
     clearTrackedBlockers(context);
 
     // Record the event
     addEvent({
-      action: context.action,
-      blockerId: context.blockerId,
-      config: context.config,
-      timestamp: context.timestamp,
-      prevState: context.prevState,
+      action,
+      blockerId,
+      config,
+      timestamp,
+      prevState,
       duration,
-      scope: context.scope,
-      count: context.count,
+      scope,
+      count,
     });
   };
 }
