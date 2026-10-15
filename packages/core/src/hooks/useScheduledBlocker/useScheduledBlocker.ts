@@ -7,8 +7,7 @@ import {
   MAX_TIMEOUT_MS,
   calculateEndTime,
   isInBlockingPeriod,
-  isSafeTimeout,
-  isValidTimestamp,
+  isValidSchedule,
   parseDate,
 } from "./useScheduledBlocker.utils";
 
@@ -54,8 +53,11 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
     const startTime = parseDate(currentConfig.schedule.start);
     const now = Date.now();
 
-    // Validate start time
-    if (!isValidTimestamp(startTime)) {
+    if (!isValidSchedule(currentConfig.schedule, startTime)) {
+      if (process.env.NODE_ENV !== "production") {
+        console.warn("[react-action-guard] Invalid blocking schedule:", currentConfig.schedule);
+      }
+
       return;
     }
 
@@ -110,11 +112,7 @@ export function useScheduledBlocker(blockerId: string, config: ScheduledBlockerC
     if (startTime > now) {
       const delay = startTime - now;
 
-      if (!isSafeTimeout(delay)) {
-        return;
-      }
-
-      timeoutsRef.current.start = setTimeout(startBlocking, delay);
+      timeoutsRef.current.start = setTimeout(startBlocking, Math.min(delay, MAX_TIMEOUT_MS));
     }
     // If already in blocking period or should start immediately
     else {

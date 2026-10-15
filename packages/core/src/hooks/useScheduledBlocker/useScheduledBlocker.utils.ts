@@ -1,4 +1,4 @@
-import type { Optional } from "@okyrychenko-dev/type-utils";
+import { type Optional, isUndefined } from "@okyrychenko-dev/type-utils";
 import type { BlockingSchedule } from "./useScheduledBlocker.types";
 
 /**
@@ -24,7 +24,7 @@ export function parseDate(date: string | Date | number): number {
  * @returns True if valid, false otherwise
  */
 export function isValidTimestamp(timestamp: number): boolean {
-  return !Number.isNaN(timestamp);
+  return Number.isFinite(timestamp) && Math.abs(timestamp) <= 8_640_000_000_000_000;
 }
 
 /**
@@ -36,11 +36,11 @@ export function isValidTimestamp(timestamp: number): boolean {
  * @returns End time in milliseconds, or undefined if not specified
  */
 export function calculateEndTime(schedule: BlockingSchedule, startTime: number): Optional<number> {
-  if (schedule.duration) {
+  if (!isUndefined(schedule.duration)) {
     return startTime + schedule.duration;
   }
 
-  if (schedule.end) {
+  if (!isUndefined(schedule.end)) {
     const endTime = parseDate(schedule.end);
 
     return isValidTimestamp(endTime) ? endTime : undefined;
@@ -76,9 +76,36 @@ export function isInBlockingPeriod(
     return false; // Not started yet
   }
 
-  if (!endTime) {
+  if (isUndefined(endTime)) {
     return true; // No end time means block indefinitely
   }
 
   return endTime > now; // Check if end time hasn't passed
+}
+
+/** Validate every supplied bound, including an end overridden by duration. */
+export function isValidSchedule(schedule: BlockingSchedule, startTime: number): boolean {
+  const { duration, end } = schedule;
+
+  if (!isValidTimestamp(startTime)) {
+    return false;
+  }
+
+  if (!isUndefined(end)) {
+    const suppliedEnd = parseDate(end);
+
+    if (!isValidTimestamp(suppliedEnd) || suppliedEnd < startTime) {
+      return false;
+    }
+  }
+
+  if (!isUndefined(duration)) {
+    if (!Number.isFinite(duration) || duration < 0) {
+      return false;
+    }
+
+    return isValidTimestamp(startTime + duration);
+  }
+
+  return true;
 }
