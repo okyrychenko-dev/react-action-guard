@@ -243,6 +243,20 @@ useNavigationBlocker({
 });
 ```
 
+### Render-time conditions
+
+A function passed as `when` must be a pure condition. Each React render evaluates
+it again, including a stable function created with `useCallback` or one reading a
+ref or external state. Changing a ref or external value alone does not trigger a
+render or refresh protection; arrange a React rerender or subscription.
+`useCallback` is optional and does not cache the condition's result. A true
+condition or a blocked `scope` enables protection (OR semantics).
+
+This correction affects consumers whose stable predicates previously retained a
+stale result: protection now follows the current result after rerender. Router
+capabilities are unchanged; Next App Router protects document unload only and
+does not intercept same-document navigation.
+
 #### `usePrompt(message, when)` (React Router only)
 
 Simple API similar to React Router v5's `usePrompt`.

@@ -49,7 +49,7 @@ describe("useShouldBlock", () => {
       expect(condition).toHaveBeenCalled();
     });
 
-    it("should warn about function conditions in development", () => {
+    it("should accept pure function conditions without a development warning", () => {
       vi.stubEnv("NODE_ENV", "development");
 
       const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => undefined);
@@ -59,10 +59,7 @@ describe("useShouldBlock", () => {
 
       rerender();
 
-      expect(warnSpy).toHaveBeenCalledOnce();
-      expect(warnSpy).toHaveBeenCalledWith(
-        expect.stringContaining('useShouldBlock: "when" is a function')
-      );
+      expect(warnSpy).not.toHaveBeenCalled();
     });
 
     it("should update when condition changes", () => {
@@ -148,18 +145,24 @@ describe("useShouldBlock", () => {
       expect(firstResult).toBe(secondResult);
     });
 
-    it("should only re-compute when dependencies change", () => {
-      const condition = vi.fn(() => true);
-      const { rerender } = renderHook(() => useShouldBlock(condition));
+    it("should refresh a stable predicate while preserving scope OR semantics", () => {
+      let dirty = false;
+      const condition = (): boolean => dirty;
+      const { result, rerender } = renderHook(() => useShouldBlock(condition, "editor"));
 
-      const callCountAfterFirst = condition.mock.calls.length;
-
-      // Re-render without changing dependencies
+      expect(result.current).toBe(false);
+      dirty = true;
       rerender();
-
-      // Condition should have been called same number of times
-      // (useMemo should prevent re-computation)
-      expect(condition.mock.calls.length).toBe(callCountAfterFirst);
+      expect(result.current).toBe(true);
+      dirty = false;
+      rerender();
+      expect(result.current).toBe(false);
+      mockUseIsBlocked.mockReturnValue(true);
+      rerender();
+      expect(result.current).toBe(true);
+      mockUseIsBlocked.mockReturnValue(false);
+      rerender();
+      expect(result.current).toBe(false);
     });
   });
 
