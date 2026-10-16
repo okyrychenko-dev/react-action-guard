@@ -1,5 +1,5 @@
 import { isDefined } from "@okyrychenko-dev/type-utils";
-import { DEFAULT_SCOPE, scopeMatchesTarget } from "../store/scope";
+import { normalizeScope, scopeMatchesTarget } from "../store/scope";
 import { finalizeTrackedBlocks } from "./performanceMiddleware.utils";
 import type { Middleware } from "./middleware.types";
 import type { PerformanceConfig, TrackedPerformanceBlock } from "./performanceMiddleware.types";
@@ -22,7 +22,7 @@ export function createPerformanceMiddleware(config: PerformanceConfig = {}): Mid
     const { action, blockerId, timestamp, config: blockerConfig, scope, registration } = context;
 
     if (action === "add") {
-      const tracked = { timestamp, scope: blockerConfig?.scope ?? DEFAULT_SCOPE, registration };
+      const tracked = { timestamp, scope: normalizeScope(blockerConfig?.scope), registration };
 
       trackedBlocks.set(blockerId, tracked);
 
@@ -33,7 +33,7 @@ export function createPerformanceMiddleware(config: PerformanceConfig = {}): Mid
       const tracked = trackedBlocks.get(blockerId);
 
       if (isDefined(tracked) && isDefined(blockerConfig?.scope)) {
-        tracked.scope = blockerConfig.scope;
+        tracked.scope = normalizeScope(blockerConfig.scope);
       }
     } else {
       const endedBlocks = new Map<string, TrackedPerformanceBlock>();

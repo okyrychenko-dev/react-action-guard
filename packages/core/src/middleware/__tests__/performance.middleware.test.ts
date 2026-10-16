@@ -25,15 +25,22 @@ describe("createPerformanceMiddleware", () => {
     lifecycle.observe(createPerformanceMiddleware({ slowBlockThreshold: 100, onSlowBlock }));
     lifecycle.add("x", { scope: "a" });
     lifecycle.add("y", { scope: ["a", "b"] });
+
     vi.advanceTimersByTime(200);
+
     lifecycle.clear();
+
     expect(onSlowBlock.mock.calls).toEqual([
       ["x", 200],
       ["y", 200],
     ]);
+
     lifecycle.add("x");
+
     vi.advanceTimersByTime(50);
+
     lifecycle.remove("x");
+
     expect(onSlowBlock).toHaveBeenCalledTimes(2);
   });
 
@@ -45,26 +52,56 @@ describe("createPerformanceMiddleware", () => {
     lifecycle.add("moved", { scope: "a" });
     lifecycle.add("cleared", { scope: ["a", "c"] });
     lifecycle.add("global");
+
     vi.advanceTimersByTime(100);
+
     lifecycle.update("moved", { scope: "b" });
+
     vi.advanceTimersByTime(50);
+
     lifecycle.clearScope("a");
+
     expect(onSlowBlock.mock.calls).toEqual([["cleared", 150]]);
     expect(lifecycle.getSnapshot().map(({ id }) => id)).toEqual(["moved", "global"]);
+
     vi.advanceTimersByTime(50);
+
     lifecycle.remove("moved");
+
     expect(onSlowBlock.mock.calls).toEqual([
       ["cleared", 150],
       ["moved", 200],
     ]);
+
     lifecycle.clearScope("global");
+
     vi.advanceTimersByTime(50);
+
     lifecycle.remove("global");
+
     expect(onSlowBlock.mock.calls).toEqual([
       ["cleared", 150],
       ["moved", 200],
       ["global", 250],
     ]);
+  });
+
+  it("should snapshot caller-owned scope arrays before tracking a lifetime", () => {
+    const lifecycle = createBlockingLifecycle();
+    const onSlowBlock = vi.fn();
+    const scope = ["original"];
+
+    lifecycle.observe(createPerformanceMiddleware({ slowBlockThreshold: 100, onSlowBlock }));
+    lifecycle.add("mutable-scope", { scope });
+
+    scope[0] = "mutated";
+
+    vi.advanceTimersByTime(150);
+
+    lifecycle.clearScope("original");
+
+    expect(lifecycle.getSnapshot()).toEqual([]);
+    expect(onSlowBlock.mock.calls).toEqual([["mutable-scope", 150]]);
   });
 
   it("should track block duration", () => {

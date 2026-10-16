@@ -302,6 +302,45 @@ describe("Observation session participation", () => {
     }
   );
 
+  it("should clear timing using the registered scope after the caller mutates its array", () => {
+    vi.useFakeTimers();
+
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+    const participant = session.participate();
+    const { addBlocker, clearBlockersForScope, observeBlockingEvents } = store.getState();
+    const onSlowBlock = vi.fn();
+    const releasePerformance = observeBlockingEvents(
+      createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+    );
+    const scope = ["original"];
+    let callbacksAfterClear = 0;
+
+    addBlocker("mutable-scope", {
+      scope,
+      timeout: 100,
+      onTimeout: () => {
+        scope[0] = "mutated";
+        clearBlockersForScope("original");
+        callbacksAfterClear = onSlowBlock.mock.calls.length;
+      },
+    });
+
+    vi.advanceTimersByTime(100);
+
+    expect(eventsOf(session).find((event) => event.action === "timeout")?.duration).toBeUndefined();
+
+    const { blockingSnapshot } = store.getState();
+
+    expect(blockingSnapshot).toEqual([]);
+    expect(callbacksAfterClear).toBe(1);
+    expect(onSlowBlock.mock.calls).toEqual([["mutable-scope", 100]]);
+
+    releasePerformance();
+    participant.release();
+  });
+
   it("should share one history and observer across participants", () => {
     const session = resolveDevtoolsObservationSession();
     const first = session.participate({ defaultOpen: true, maxEvents: 10 });

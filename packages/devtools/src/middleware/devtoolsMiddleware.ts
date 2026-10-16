@@ -1,4 +1,8 @@
-import { DEFAULT_SCOPE, scopeMatchesTarget } from "@okyrychenko-dev/react-action-guard";
+import {
+  DEFAULT_SCOPE,
+  normalizeScope,
+  scopeMatchesTarget,
+} from "@okyrychenko-dev/react-action-guard";
 import { type Optional, isDefined, isUndefined } from "@okyrychenko-dev/type-utils";
 import { devtoolsStoreApi } from "../store";
 import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-action-guard";
@@ -101,9 +105,10 @@ export function createDevtoolsMiddlewareForStore(
 
     // Track when blockers are added
     if (action === "add") {
-      const tracked = { timestamp, scope: config?.scope, registration };
+      const tracked = { timestamp, scope: normalizeScope(config?.scope), registration };
 
       activeBlockers.set(blockerId, tracked);
+
       if (isDefined(registration)) {
         registrations.set(registration, tracked);
       }
@@ -113,7 +118,7 @@ export function createDevtoolsMiddlewareForStore(
       const trackedBlocker = activeBlockers.get(blockerId);
 
       if (isDefined(trackedBlocker) && isDefined(config?.scope)) {
-        trackedBlocker.scope = config.scope;
+        trackedBlocker.scope = normalizeScope(config.scope);
       }
     }
 
