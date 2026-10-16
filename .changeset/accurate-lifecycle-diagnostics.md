@@ -8,3 +8,5 @@ Finalize performance lifetimes on timeout and bulk cleanup, preserve timing thro
 Preserve replacement registrations created inside timeout callbacks using opaque lifecycle registration identities; stale timeout events finalize only the expired lifetime.
 
 Snapshot tracked scopes in performance and Devtools diagnostics so caller-owned array mutations cannot prevent scoped cleanup.
+
+Read timeout metadata after the timeout callback so scope, reason and priority updates are reflected in the emitted event while preserving registration identity.

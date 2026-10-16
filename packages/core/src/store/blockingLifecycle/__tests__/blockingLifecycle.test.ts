@@ -1,12 +1,51 @@
 import { afterEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { createBlockingLifecycle } from "../blockingLifecycle";
-import type { Middleware } from "../../../middleware";
+import type { Middleware, MiddlewareContext } from "../../../middleware";
 import type { BlockingLifecycleObservation } from "../blockingLifecycle.types";
 
 describe("Blocking lifecycle", () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+
+  it("should emit the latest metadata after the timeout callback updates its registration", () => {
+    vi.useFakeTimers();
+
+    const lifecycle = createBlockingLifecycle();
+    const events: Array<MiddlewareContext> = [];
+
+    lifecycle.observe((event) => {
+      events.push(event);
+    });
+    lifecycle.add("save", {
+      scope: "original",
+      reason: "pending",
+      priority: 1,
+      timeout: 100,
+      onTimeout: () => {
+        lifecycle.update("save", {
+          scope: ["updated", "navigation"],
+          reason: "expired",
+          priority: 9,
+        });
+      },
+    });
+    vi.advanceTimersByTime(100);
+
+    const added = events.find(({ action }) => action === "add");
+    const expired = events.find(({ action }) => action === "timeout");
+
+    expect(expired?.config).toEqual({
+      scope: ["updated", "navigation"],
+      reason: "expired",
+      priority: 9,
+      timeout: 100,
+    });
+    expect(added?.registration).toBeDefined();
+    expect(expired?.registration).toBe(added?.registration);
+    expect(events.map(({ action }) => action)).toEqual(["add", "update", "timeout", "remove"]);
+    expect(lifecycle.getSnapshot()).toEqual([]);
   });
 
   it.each([3_600_000, 2_147_483_648])(
@@ -217,9 +256,13 @@ describe("Blocking lifecycle", () => {
     const onTimeout = vi.fn();
 
     lifecycle.add("save", { timeout: 100, onTimeout });
+
     vi.advanceTimersByTime(40);
+
     lifecycle.replace("save", { timeout: 100, onTimeout: undefined });
+
     vi.advanceTimersByTime(60);
+
     expect(onTimeout).not.toHaveBeenCalled();
     expect(lifecycle.getSnapshot()).toEqual([]);
   });
@@ -230,19 +273,30 @@ describe("Blocking lifecycle", () => {
     const lifecycle = createBlockingLifecycle();
 
     lifecycle.add("save", { timeout: 100 });
+
     vi.advanceTimersByTime(40);
+
     lifecycle.replace("save", { timeout: 200 });
+
     vi.advanceTimersByTime(199);
+
     expect(lifecycle.isBlocked()).toBe(true);
+
     vi.advanceTimersByTime(1);
+
     expect(lifecycle.isBlocked()).toBe(false);
 
     lifecycle.replace("save", { timeout: 50 });
+
     vi.advanceTimersByTime(20);
+
     lifecycle.replace("save", { timeout: undefined });
+
     vi.advanceTimersByTime(100);
+
     expect(lifecycle.getSnapshot()[0]?.timeout).toBeUndefined();
     expect(lifecycle.isBlocked()).toBe(true);
+
     lifecycle.clear();
   });
 
@@ -270,8 +324,11 @@ describe("Blocking lifecycle", () => {
       timeout: undefined,
       onTimeout: undefined,
     });
+
     expect(lifecycle.getSnapshot()).toEqual(initial);
+
     vi.advanceTimersByTime(60);
+
     expect(onTimeout).toHaveBeenCalledWith("save");
     expect(lifecycle.isBlocked("form")).toBe(false);
   });
@@ -297,11 +354,13 @@ describe("Blocking lifecycle", () => {
     const releaseSecond = lifecycle.subscribe(listener);
 
     lifecycle.add("first");
+
     expect(listener).toHaveBeenCalledTimes(2);
 
     releaseFirst();
     releaseFirst();
     lifecycle.remove("first");
+
     expect(listener).toHaveBeenCalledTimes(3);
 
     releaseSecond();

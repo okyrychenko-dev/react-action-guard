@@ -131,8 +131,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       return;
     }
 
-    const { config, registration } = blocker;
-    const { onTimeout } = config;
+    const { onTimeout } = blocker.config;
 
     try {
       onTimeout?.(id);
@@ -140,7 +139,8 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       // A user callback cannot prevent observation or cleanup.
     }
 
-    const { scope, reason, priority, timeout: duration } = config;
+    const { registration } = blocker;
+    const { scope, reason, priority, timeout: duration } = blocker.config;
 
     emit({
       ...event("timeout", id),
