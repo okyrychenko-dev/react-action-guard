@@ -1,9 +1,15 @@
-import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import {
+  useAsyncAction,
+  useIsBlocked,
+  useUIBlockingContext,
+} from "@okyrychenko-dev/react-action-guard";
+import { isError } from "@okyrychenko-dev/type-utils";
 import { useState } from "react";
 import { simulateSave } from "./save.utils";
 import type { ReactElement } from "react";
 
 export function SavePanel(): ReactElement {
+  const store = useUIBlockingContext();
   const runSave = useAsyncAction("save-profile", ["profile", "navigation"]);
   const blocked = useIsBlocked("profile");
   const [status, setStatus] = useState("Ready to save.");
@@ -11,14 +17,22 @@ export function SavePanel(): ReactElement {
   const [error, setError] = useState("");
 
   async function handleSave(): Promise<void> {
+    const { isBlocked } = store.getState();
+
+    if (isBlocked("profile")) {
+      setStatus("Save command blocked: profile is busy.");
+
+      return;
+    }
+
     setStatus("Saving profile…");
     setError("");
     try {
       await runSave(() => simulateSave(shouldFail));
       setStatus("Profile saved.");
-    } catch {
+    } catch (cause) {
       setStatus("Save finished with an error.");
-      setError("Save failed. Try again.");
+      setError(isError(cause) ? cause.message : "Save failed. Try again.");
     }
   }
 
@@ -45,6 +59,14 @@ export function SavePanel(): ReactElement {
       >
         Save profile
       </button>
+      <button
+        onClick={() => {
+          void handleSave();
+        }}
+      >
+        Invoke save command
+      </button>
+      <p>This enabled entry point calls the same guarded command as the disabled save button.</p>
       <p role="status">{status}</p>
       {error && <p role="alert">{error}</p>}
     </section>

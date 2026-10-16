@@ -54,6 +54,8 @@ export default defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Getting Started", link: "/getting-started" },
+      { text: "Try coordination", link: "/onboarding" },
+      { text: "Versions", link: "/versions" },
       { text: "Packages", link: "/packages/react-action-guard/" },
     ],
 
@@ -63,6 +65,8 @@ export default defineConfig({
         items: [
           { text: "Getting started", link: "/getting-started" },
           { text: "Concepts", link: "/concepts" },
+          { text: "Interactive onboarding", link: "/onboarding" },
+          { text: "Versions and migration", link: "/versions" },
         ],
       },
       {

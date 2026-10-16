@@ -7,6 +7,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const source = join(root, "packages/docs/src");
 const canonicalPages = [
   "getting-started.md",
+  "onboarding.md",
+  "versions.md",
   "concepts.md",
   "learning/index.md",
   "learning/loading-flags.md",
@@ -83,6 +85,7 @@ const origins = new Map();
 let linkCount = 0;
 try {
   const files = [];
+  const includedFiles = [];
   let exampleCount = 0;
   for (const page of canonicalPages) {
     const path = join(source, page);
@@ -91,6 +94,13 @@ try {
       const filename = join(scratch, `example-${files.length}.tsx`);
       await writeFile(filename, match[2]);
       files.push(filename);
+      origins.set(filename, page);
+    }
+    // Compile included application files in place so their relative companion imports resolve.
+    for (const match of markdown.matchAll(/^<<< (\S+)$/gm)) {
+      const filename = resolve(dirname(path), match[1]);
+      if (!(await exists(filename))) throw new Error(`Missing snippet in ${page}: ${match[1]}`);
+      includedFiles.push(filename);
       origins.set(filename, page);
     }
     const prose = markdown.replace(/```[\s\S]*?```/g, "");
@@ -152,7 +162,7 @@ try {
     linkCount++;
   }
   if (!files.length) throw new Error("No canonical examples found");
-  const program = ts.createProgram(files, {
+  const compilerOptions = {
     noEmit: true,
     strict: true,
     skipLibCheck: true,
@@ -163,8 +173,18 @@ try {
     paths,
     types: ["react"],
     typeRoots: [join(root, "packages/router/node_modules/@types")],
+  };
+  const program = ts.createProgram(files, compilerOptions);
+  // Included Vite application sources use bundler resolution, matching their own tsconfig.
+  const includedProgram = ts.createProgram(includedFiles, {
+    ...compilerOptions,
+    module: ts.ModuleKind.ESNext,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
   });
-  const diagnostics = ts.getPreEmitDiagnostics(program);
+  const diagnostics = [
+    ...ts.getPreEmitDiagnostics(program),
+    ...ts.getPreEmitDiagnostics(includedProgram),
+  ];
   if (diagnostics.length) {
     console.error(
       ts.formatDiagnosticsWithColorAndContext(diagnostics, {
@@ -176,7 +196,7 @@ try {
     process.exitCode = 1;
   } else {
     console.log(
-      `Compiled ${exampleCount} canonical examples and ${files.length - exampleCount} migrated reference imports through public exports; checked ${linkCount} documentation/navigation links.`
+      `Compiled ${exampleCount} canonical examples and ${files.length - exampleCount} migrated reference imports through public exports; compiled ${includedFiles.length} included application snippets; checked ${linkCount} documentation/navigation links.`
     );
   }
 } finally {

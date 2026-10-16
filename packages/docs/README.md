@@ -10,6 +10,7 @@ Run these commands from the monorepo root:
 
 ```bash
 pnpm install
+pnpm --filter @okyrychenko-dev/react-action-guard run build
 pnpm --filter @okyrychenko-dev/react-action-guard-docs run dev
 pnpm --filter @okyrychenko-dev/react-action-guard-docs run build
 pnpm --filter @okyrychenko-dev/react-action-guard-docs run preview
@@ -17,6 +18,19 @@ pnpm --filter @okyrychenko-dev/react-action-guard-docs run preview
 
 The development server prints its local URL. VitePress uses `http://localhost:5173/` by default
 when that port is available.
+
+## Shared interactive onboarding
+
+`/onboarding` embeds `examples/core-coordination`; dev/build compile the example against the built public Core package, then copy its output into generated `src/public/demo/coordination/`. Relative demo
+assets work under the site's deployment base. The standalone demo and `provenance.json` ship in
+the same site output. Rebuild dev/build after changing the React example; it is not a second HMR server.
+`/versions` distinguishes workspace source, the planned stable cohort and registry verification.
+
+Deploy the contents of `.vitepress/dist/` only after selecting an existing hosting destination
+with the maintainer. For a subpath, pass VitePress `--base /your-path/` to dev/build/preview.
+Verify `/onboarding.html`, a direct-route reload, `/demo/coordination/index.html`, its assets and
+provenance, keyboard controls and a narrow mobile viewport at the actual public URL. A local build
+or preview does not establish public availability; no production URL is configured by this work.
 
 ## Content layout
 

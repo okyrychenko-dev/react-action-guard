@@ -30,6 +30,10 @@ npm install @okyrychenko-dev/react-action-guard zustand
 See the [Provider-first quickstart](../../packages/core/README.md#quick-start) for a copyable app.
 This checkout uses `workspace:*` to verify current source, rather than a published-version claim.
 
+The documentation site embeds this same application on its interactive onboarding page.
+`pnpm --filter @okyrychenko-dev/react-action-guard-docs run build` prepares the demo and records
+Git/source provenance alongside its assets; no separate demo implementation is maintained.
+
 ## Try the workflow
 
 1. Click **Save profile**. The producer publishes `profile` and `navigation` scopes for 1.2 seconds.
@@ -38,14 +42,20 @@ This checkout uses `workspace:*` to verify current source, rather than a publish
 3. After success, both consumers become available and their reasons clear.
 4. Enable **Simulate save failure**, then save. Protection clears after rejection and an error
    appears. Disable failure and retry to recover.
-5. Start a save, then turn off **Show save controls**. The producer unmounts, but protection stays
+5. During a save, click **Invoke save command**. It calls the same command entry point, which
+   checks the current Provider store before starting work. UI disabling alone is insufficient.
+6. Start a save, then turn off **Show save controls**. The producer unmounts, but protection stays
    until its promise settles. Showing the controls again mounts a fresh producer.
+
+7. Enable both editor draft checkboxes, then clear A. Navigation stays blocked by B until B
+   clears too. `draft-editor-A` and `draft-editor-B` are distinct manual registration IDs.
 
 ```text
 UIBlockingProvider
 ├── SavePanel: useAsyncAction("save-profile", ["profile", "navigation"])
 ├── ProfileEditor: useBlockingInfo("profile")
 ├── NavigationControl: useBlockingInfo("navigation")
+├── DraftOwner A / B: useActionBlocker(unique ID, navigation scope)
 └── HelpControl: useIsBlocked("help")
 ```
 
@@ -57,7 +67,7 @@ The input illustrates availability; the save is a simulation and does not persis
 The navigation button changes local display state. Core does not intercept browser navigation.
 `useAsyncAction` tracks every call and releases its blocker in `finally`, including after producer
 unmount. It does not exclude concurrent executions or cancel work. Application/backend code owns
-repeat-submit exclusion, cancellation, permissions and idempotency.
+repeat-submit exclusion (shown by the command guard here), cancellation, permissions and idempotency.
 
 ## Choose the simplest state model that fits
 

@@ -10,6 +10,9 @@ hero:
       text: Get Started
       link: /getting-started
     - theme: alt
+      text: Try coordination
+      link: /onboarding
+    - theme: alt
       text: View on GitHub
       link: https://github.com/okyrychenko-dev/react-action-guard
 
