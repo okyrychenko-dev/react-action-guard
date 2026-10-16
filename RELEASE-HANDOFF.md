@@ -1,10 +1,10 @@
 # Planned release cohort handoff
 
-The corrected candidate starts at `9246f46abdb689a1f8a96060af456fbf3ac6ba8f`
-plus the release-preparation changes on `chore/07-refresh-release-evidence`.
-The corrected-cohort section below records fresh results and their inputs. Earlier
-sections are historical evidence. This is release preparation; registry publication
-and release merge require separate authorization.
+The latest tested candidate is `9c5150769aebb5ceb96eee5affa2d770a60928c9`,
+including the Router README correction. The final artifact refresh below records
+fresh publication, packed compatibility and Next production/browser checks.
+Earlier verification sections are historical. This is release preparation;
+registry publication and release merge require separate authorization.
 
 ## Version provenance
 
@@ -199,11 +199,11 @@ capability matrix. In particular, Next App Router remains unload-only. No regist
 publication, release merge, manifest version override or dependency removal was
 performed.
 
-## Corrected stabilization cohort
+## Earlier corrected stabilization cohort
 
 The tested source is `9246f46abdb689a1f8a96060af456fbf3ac6ba8f` plus the
 migration-guide updates and empty release-evidence changeset on
-`chore/07-refresh-release-evidence`. There are no runtime implementation changes
+`chore/refresh-release-evidence`. There are no runtime implementation changes
 in this preparation. The unrelated user edit to `.gitignore` is excluded. The
 JSON records inventory all 59 pending changesets and hash the lockfile and changed
 migration inputs. No accumulated package changeset was discarded; the planned
@@ -252,3 +252,37 @@ hash and exact peers. Raw reports/locks: `/tmp/action-guard-next-runtime-dMzU3n`
 Selected Chrome/Next results preserve the documented limits for other browsers,
 Pages history/options and arbitrary RSC compositions. Router browser-history and
 enterprise-demo suites were not rerun for this preparation and remain historical.
+
+## Final artifact refresh
+
+The Router README wording change is included in source commit
+`9c5150769aebb5ceb96eee5affa2d770a60928c9`. Fresh publication, compatibility and
+Next runs use that commit with no package working-tree changes. The unrelated
+`.gitignore` edit is excluded. Documentation and evidence updates produced after
+the runs do not alter packed package inputs.
+
+The refreshed records supersede the earlier artifact hashes. They inventory
+package manifests, READMEs, changelogs, licenses, the lockfile and all 59 pending
+changesets. Each artifact record reads peer dependencies from the tarball manifest,
+checks them against an installed consumer, and records the packed README SHA-256.
+All packed READMEs match the current source bytes; UI's published Core peer is
+`^2.0.0`. Source package versions and the planned cohort remain unchanged.
+
+`pnpm run package:check` passed publint, declaration analysis, installed README
+links/peers, bundle measurements and import probes for all five packages.
+`pnpm run test:packed` passed all 13 strict-peer targets with ESM/CJS loading,
+NodeNext types and the existing public behavior fixtures.
+`pnpm run test:next-runtime` passed the production build, consumer typecheck and
+all 7 Chrome scenarios without skips. Exact peers, browser version and artifact
+hashes are recorded in the refreshed JSON. Raw consumers and reports are at
+`/tmp/action-guard-publication-hm8q6H`,
+`/tmp/action-guard-compatibility-YBtjkM` and
+`/tmp/action-guard-next-runtime-aEqnDd`.
+
+The source suite was not rerun for this metadata refresh; its 904-test result above
+remains separately dated evidence. The local toolchain remains Node 22.20.0,
+pnpm 11.21.0 and npm 11.19.0. Legacy Next floor installations emit existing npm
+security/deprecation warnings; testing those floors is not a deployment recommendation.
+Selected peers and Chrome scenarios retain the existing capability limits.
+No registry publication or release merge was performed; CI must verify the final
+release commit using its configured toolchain.

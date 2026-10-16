@@ -4,8 +4,8 @@ See the [planned release handoff](RELEASE-HANDOFF.md) for source/manifests,
 disposable Changesets tarballs, migration and the separate publication follow-up.
 The packed/publication and selected Next production/browser records were refreshed
 on **2026-10-16** (Next 15.5.23, Chrome 155.0.8059.84) for the corrected cohort from
-`9246f46` plus the release-preparation input hashes. See the corrected-cohort
-section in the handoff for executed checks and limits. Earlier dates in the tables
+`9c51507`, including the Router README correction. See the corrected-cohort
+and final artifact refresh sections in the handoff for executed checks and limits. Earlier dates in the tables
 remain historical evaluations, not additional checks performed by this refresh.
 
 The planned cohort remains Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query
