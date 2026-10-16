@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: BlockerInfo
 
-Defined in: [store/uiBlockingStore.types.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L28)
+Defined in: [store/uiBlockingStore.types.ts:32](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L32)
 
 Complete blocker information including its unique identifier.
 
@@ -20,7 +20,7 @@ Complete blocker information including its unique identifier.
 
 > `readonly` **id**: `string`
 
-Defined in: [store/uiBlockingStore.types.ts:29](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L29)
+Defined in: [store/uiBlockingStore.types.ts:33](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L33)
 
 ***
 
@@ -28,7 +28,7 @@ Defined in: [store/uiBlockingStore.types.ts:29](https://github.com/okyrychenko-d
 
 > `readonly` **scope**: `string` \| readonly `string`[]
 
-Defined in: [store/uiBlockingStore.types.ts:30](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L30)
+Defined in: [store/uiBlockingStore.types.ts:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L34)
 
 ***
 
@@ -36,7 +36,7 @@ Defined in: [store/uiBlockingStore.types.ts:30](https://github.com/okyrychenko-d
 
 > `readonly` **reason**: `string`
 
-Defined in: [store/uiBlockingStore.types.ts:31](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L31)
+Defined in: [store/uiBlockingStore.types.ts:35](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L35)
 
 ***
 
@@ -44,7 +44,7 @@ Defined in: [store/uiBlockingStore.types.ts:31](https://github.com/okyrychenko-d
 
 > `readonly` **priority**: `number`
 
-Defined in: [store/uiBlockingStore.types.ts:32](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L32)
+Defined in: [store/uiBlockingStore.types.ts:36](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L36)
 
 ***
 
@@ -52,7 +52,7 @@ Defined in: [store/uiBlockingStore.types.ts:32](https://github.com/okyrychenko-d
 
 > `readonly` **timestamp**: `number`
 
-Defined in: [store/uiBlockingStore.types.ts:33](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L33)
+Defined in: [store/uiBlockingStore.types.ts:37](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L37)
 
 ***
 
@@ -60,7 +60,7 @@ Defined in: [store/uiBlockingStore.types.ts:33](https://github.com/okyrychenko-d
 
 > `readonly` `optional` **timeout?**: `number`
 
-Defined in: [store/uiBlockingStore.types.ts:34](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L34)
+Defined in: [store/uiBlockingStore.types.ts:38](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L38)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [store/uiBlockingStore.types.ts:34](https://github.com/okyrychenko-d
 
 > `readonly` `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [store/uiBlockingStore.types.ts:35](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L35)
+Defined in: [store/uiBlockingStore.types.ts:39](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L39)
 
 #### Parameters
 

@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.3.5**](../README.md)
+[**React Action Guard TanStack API v0.4.0**](../README.md)
 
 ***
 

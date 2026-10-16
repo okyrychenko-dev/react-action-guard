@@ -1,8 +1,8 @@
-**React Action Guard API v1.0.5**
+**React Action Guard API v2.0.0**
 
 ***
 
-# React Action Guard API v1.0.5
+# React Action Guard API v2.0.0
 
 ## Interfaces
 
@@ -56,6 +56,9 @@
 
 - [useUIBlockingStoreFromContext](functions/useUIBlockingStoreFromContext.md)
 - [UIBlockingProvider](functions/UIBlockingProvider.md)
+- [~~useOptionalContext~~](functions/useOptionalContext.md)
+- [~~useResolvedStore~~](functions/useResolvedStore.md)
+- [~~useResolvedStoreWithSelector~~](functions/useResolvedStoreWithSelector.md)
 - [useResolvedStoreApi](functions/useResolvedStoreApi.md)
 - [useResolvedValue](functions/useResolvedValue.md)
 - [createTypedHooks](functions/createTypedHooks.md)
@@ -66,9 +69,6 @@
 - [useConfirmableBlocker](functions/useConfirmableBlocker.md)
 - [useIsBlocked](functions/useIsBlocked.md)
 - [useScheduledBlocker](functions/useScheduledBlocker.md)
-- [~~useOptionalContext~~](functions/useOptionalContext.md)
-- [~~useResolvedStore~~](functions/useResolvedStore.md)
-- [~~useResolvedStoreWithSelector~~](functions/useResolvedStoreWithSelector.md)
 - [createAnalyticsMiddleware](functions/createAnalyticsMiddleware.md)
 - [configureMiddleware](functions/configureMiddleware.md)
 - [loggerMiddleware](functions/loggerMiddleware.md)

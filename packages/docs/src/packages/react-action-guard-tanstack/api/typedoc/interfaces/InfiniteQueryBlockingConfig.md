@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.3.5**](../README.md)
+[**React Action Guard TanStack API v0.4.0**](../README.md)
 
 ***
 
@@ -68,7 +68,7 @@ Defined in: [packages/tanstack/src/hooks/useBlockingInfiniteQuery.types.ts:17](h
 
 > `optional` **scope?**: `string` \| readonly `string`[]
 
-Defined in: [packages/tanstack/src/types/common.types.ts:5](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L5)
+Defined in: [packages/tanstack/src/types/common.types.ts:3](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L3)
 
 #### Inherited from
 
@@ -80,7 +80,7 @@ Defined in: [packages/tanstack/src/types/common.types.ts:5](https://github.com/o
 
 > `optional` **priority?**: `number`
 
-Defined in: [packages/tanstack/src/types/common.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L6)
+Defined in: [packages/tanstack/src/types/common.types.ts:4](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L4)
 
 #### Inherited from
 
@@ -92,7 +92,7 @@ Defined in: [packages/tanstack/src/types/common.types.ts:6](https://github.com/o
 
 > `optional` **reason?**: `string`
 
-Defined in: [packages/tanstack/src/types/common.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L7)
+Defined in: [packages/tanstack/src/types/common.types.ts:5](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L5)
 
 #### Inherited from
 
@@ -104,7 +104,7 @@ Defined in: [packages/tanstack/src/types/common.types.ts:7](https://github.com/o
 
 > `optional` **timeout?**: `number`
 
-Defined in: [packages/tanstack/src/types/common.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L8)
+Defined in: [packages/tanstack/src/types/common.types.ts:6](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L6)
 
 #### Inherited from
 
@@ -116,7 +116,7 @@ Defined in: [packages/tanstack/src/types/common.types.ts:8](https://github.com/o
 
 > `optional` **onTimeout?**: (`blockerId`) => `void`
 
-Defined in: [packages/tanstack/src/types/common.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L9)
+Defined in: [packages/tanstack/src/types/common.types.ts:7](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/types/common.types.ts#L7)
 
 #### Parameters
 

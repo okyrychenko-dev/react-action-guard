@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -8,9 +8,10 @@
 
 > **createPerformanceMiddleware**(`config?`): [`Middleware`](../type-aliases/Middleware.md)
 
-Defined in: [middleware/performanceMiddleware.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/performanceMiddleware.ts#L43)
+Defined in: [middleware/performanceMiddleware.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/performanceMiddleware.ts#L15)
 
-Creates middleware for monitoring blocker performance and detecting slow blocks.
+Measures registration lifetimes from add until removal, timeout or bulk clear.
+Updates preserve the start; replacement adds restart it. Callback failures are isolated.
 
 ## Parameters
 
@@ -25,8 +26,3 @@ Creates middleware for monitoring blocker performance and detecting slow blocks.
 ## Since
 
 0.6.0
-
-## See
-
- - [PerformanceConfig](../interfaces/PerformanceConfig.md) for configuration options
- - [configureMiddleware](configureMiddleware.md) for registering middleware

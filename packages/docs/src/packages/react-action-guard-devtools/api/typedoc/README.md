@@ -1,12 +1,15 @@
-**React Action Guard DevTools API v0.3.0**
+**React Action Guard DevTools API v1.0.0**
 
 ***
 
-# React Action Guard DevTools API v0.3.0
+# React Action Guard DevTools API v1.0.0
 
 ## Interfaces
 
 - [ActionGuardDevtoolsProviderProps](interfaces/ActionGuardDevtoolsProviderProps.md)
+- [DevtoolsInspectedAction](interfaces/DevtoolsInspectedAction.md)
+- [DevtoolsInspection](interfaces/DevtoolsInspection.md)
+- [ActionGuardDevtoolsProps](interfaces/ActionGuardDevtoolsProps.md)
 - [DevtoolsEvent](interfaces/DevtoolsEvent.md)
 - [DevtoolsFilter](interfaces/DevtoolsFilter.md)
 - [DevtoolsEventStats](interfaces/DevtoolsEventStats.md)

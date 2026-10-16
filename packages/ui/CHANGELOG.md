@@ -1,5 +1,52 @@
 # Changelog
 
+## 1.0.0
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-ui@1.0.0)
+
+### Patch Changes
+
+- 32264e4: Centralize scope normalization, inheritance, observation, and targeted-clear semantics in the core package, preserve empty observed scopes, and migrate guarded UI controls to use the shared behavior. The UI package now requires the core release that exports these helpers.
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools subscribe to those snapshots. The final release cohort is Core 2.0 and Devtools 1.0 with a Core ^2.0.0 peer requirement. Node.js 20 or newer is required; prior intermediate version proposals are superseded by this cohort.
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- 26cc31e: Align packaged README requirements with the Core ^2.0.0 release cohort and use durable repository URLs for migration, observability and Next runtime evidence. Declare the Query adapter's existing Node.js >=20 requirement inherited from type-utils. Reconcile superseded intermediate compatibility descriptions in pending release notes.
+
+  Include CHANGELOG.md in every package so the packaged README changelog links resolve. Generate versioned API references and advance changelog links as part of the Changesets version command.
+
+- 40e8420: Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules; `createTypedHooks` accepts the same arrays while rejecting unknown scope names. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Cover scope representation changes and stable metadata when observation expands. Retain production/development scale and rapid-registration benchmark evidence refreshed after the typed-hook fix, with installed-tarball declaration checks and pinned source provenance.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [6a08414]
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [64145c9]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [083a5b7]
+- Updated dependencies [690a3a9]
+- Updated dependencies [a1b83db]
+- Updated dependencies [d07b65a]
+- Updated dependencies [bd1dc3b]
+- Updated dependencies [6513e1e]
+- Updated dependencies [6d59289]
+- Updated dependencies [26cc31e]
+- Updated dependencies [b987ed1]
+- Updated dependencies [743c6f4]
+- Updated dependencies [303abc3]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [40e8420]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -81,10 +128,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `@okyrychenko-dev/react-action-guard` ^1.0.4
   - `react` ^18.0.0 || ^19.0.0
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-ui@1.0.0...HEAD
 [0.1.5]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-ui/releases/tag/v0.1.0
+[1.0.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-ui@1.0.0

@@ -1,5 +1,69 @@
 # Changelog
 
+## 0.4.0
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-tanstack@0.4.0)
+
+### Minor Changes
+
+- f75e05e: Block query initial loading only while pending and actively fetching. Disabled idle and offline paused queries no longer block by default across single, infinite, and collection hooks. Background refetch and pagination blocking remain opt-in, and mutation pending behavior is unchanged. See the TanStack README migration guidance for workflows that previously relied on pending queries without active work.
+
+### Patch Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+- 583ec47: Route TanStack blocking hooks through the nearest `UIBlockingProvider` store while preserving the global-store fallback when no provider is present.
+- d7f6739: Protect all unsettled calls initiated through one useBlockingMutation hook, including concurrent calls, native awaited callbacks, retries, pauses, and queues. Preserve native result observation and callback behavior. Reset and mutation-key changes retain pending ownership; unmount retains pending protection until settlement or timeout. Timeouts end an aggregate registration episode without cancelling work or allowing rerenders and additional calls to revive expired protection.
+
+  Strengthen Query and Mutation registration tests to require blocker existence before checking metadata.
+
+  Share latest-call/error observation across replacement blocking owners that retain the same native mutation observer, while keeping pending accounting and timeout episodes local to each owner. Retained invocations and reset cannot leave stale error protection in another store.
+
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- 235677a: Verify native mutation callback ordering, latest-result observation, reset and error boundaries under overlapping executions. Document the distinction between native result observation and protection for all owned calls, with differential checks against selected Query versions.
+- e0b58e3: Reuse core action-blocker registration ownership in Query coordination, avoiding redundant lifecycle updates for equivalent configuration while preserving adapter policies and timeout behavior.
+- b050190: Centralize blocking state policy, reasons, instance identity, provider store resolution, and blocker cleanup across TanStack hooks. Use the shared type-utils toolset for reason selection. Consolidate public hook configuration and behavior documentation in the package README.
+- 6513e1e: Apply current reactive blocker configuration in core and TanStack hooks. Removed
+  scope, reason and priority values return to defaults; omitted timeout and callback
+  values clear. Metadata changes preserve unchanged deadlines and registration
+  timestamps, while changed timeouts restart and removed timeouts cancel timers.
+  Imperative updateBlocker patch behavior remains compatible. Consumers relying on
+  retained hook options must keep those options in the current configuration.
+  The released TanStack adapter requires Core ^2.0.0, including configuration replacement support.
+- 26cc31e: Align packaged README requirements with the Core ^2.0.0 release cohort and use durable repository URLs for migration, observability and Next runtime evidence. Declare the Query adapter's existing Node.js >=20 requirement inherited from type-utils. Reconcile superseded intermediate compatibility descriptions in pending release notes.
+
+  Include CHANGELOG.md in every package so the packaged README changelog links resolve. Generate versioned API references and advance changelog links as part of the Changesets version command.
+
+- Updated dependencies [6a08414]
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [64145c9]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [083a5b7]
+- Updated dependencies [690a3a9]
+- Updated dependencies [a1b83db]
+- Updated dependencies [d07b65a]
+- Updated dependencies [bd1dc3b]
+- Updated dependencies [6513e1e]
+- Updated dependencies [6d59289]
+- Updated dependencies [26cc31e]
+- Updated dependencies [b987ed1]
+- Updated dependencies [743c6f4]
+- Updated dependencies [303abc3]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [40e8420]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -207,7 +271,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔍 TypeScript type definitions with detailed annotations
 - ✅ 41 unit tests with 95%+ coverage
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.5...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-tanstack@0.4.0...HEAD
 [0.3.5]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.2...v0.3.3
@@ -219,3 +283,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.2]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.2.0...v0.2.2
 [0.2.0]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/releases/tag/v0.1.0
+[0.4.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-tanstack@0.4.0

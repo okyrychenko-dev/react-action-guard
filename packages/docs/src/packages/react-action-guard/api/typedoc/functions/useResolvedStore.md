@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > **useResolvedStore**(): `StoreApi`\<[`UIBlockingStore`](../type-aliases/UIBlockingStore.md)\>
 
-Defined in: [index.ts:109](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/index.ts#L109)
+Defined in: [context/index.ts:32](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/context/index.ts#L32)
 
 ## Returns
 

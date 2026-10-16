@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -6,7 +6,7 @@
 
 # Interface: UIBlockingStoreState
 
-Defined in: [store/uiBlockingStore.types.ts:39](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L39)
+Defined in: [store/uiBlockingStore.types.ts:43](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L43)
 
 Immutable projection published by the Zustand adapter.
 
@@ -16,4 +16,4 @@ Immutable projection published by the Zustand adapter.
 
 > `readonly` **blockingSnapshot**: [`BlockingLifecycleSnapshot`](../type-aliases/BlockingLifecycleSnapshot.md)
 
-Defined in: [store/uiBlockingStore.types.ts:40](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L40)
+Defined in: [store/uiBlockingStore.types.ts:44](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/store/uiBlockingStore.types.ts#L44)

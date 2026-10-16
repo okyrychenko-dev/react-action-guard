@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > **Middleware** = (`context`) => `void` \| `Promise`\<`void`\>
 
-Defined in: [middleware/middleware.types.ts:17](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L17)
+Defined in: [middleware/middleware.types.ts:18](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L18)
 
 ## Parameters
 
