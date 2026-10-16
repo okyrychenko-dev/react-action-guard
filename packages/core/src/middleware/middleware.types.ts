@@ -5,6 +5,7 @@ export type BlockingAction = "add" | "update" | "remove" | "timeout" | "clear" |
 export type MiddlewareBlockerConfig = BlockerConfig;
 
 export interface MiddlewareContext {
+  registration?: object;
   action: BlockingAction;
   blockerId: string;
   config?: MiddlewareBlockerConfig;

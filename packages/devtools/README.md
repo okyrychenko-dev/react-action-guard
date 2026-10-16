@@ -525,3 +525,18 @@ See [CHANGELOG.md](./CHANGELOG.md) for a detailed list of changes in each versio
 ## License
 
 MIT © Oleksii Kyrychenko
+
+### History duration semantics
+
+History measures a registration from its add event. Updates refresh scopes without
+resetting that start; replacement adds restart it. Scoped clears discard timing only
+for registrations removed by Core, preserving global and unrelated registrations.
+Clear-all discards all active timing. Bulk clear events have no per-registration duration
+and do not synthesize remove events. Timeout records the duration and consumes the timing;
+the following remove event has no duration. Reused IDs start a fresh lifetime.
+Observation history remains local to its store and resets when the final observer detaches.
+These durations describe blocking lifetimes, not operation success.
+
+A replacement added inside `onTimeout` retains its own timing: the old registration's
+later timeout event records only the expired lifetime. Live lifecycle registration
+identities distinguish these lifetimes even when IDs or timestamps are equal.
