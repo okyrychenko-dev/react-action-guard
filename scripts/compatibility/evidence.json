@@ -317,7 +317,7 @@
       "version": "1.0.0",
       "sha256": "e2a143e686758c2217a5815dcad2193451d67af5cd3f77c301eb23968183ebca",
       "peerDependencies": {
-        "@okyrychenko-dev/react-action-guard": "workspace:^",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
         "react": "^18.0.0 || ^19.0.0"
       }
     }
