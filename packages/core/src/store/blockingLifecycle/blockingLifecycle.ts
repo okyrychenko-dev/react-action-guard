@@ -13,6 +13,7 @@ import type {
 } from "./blockingLifecycle.types";
 
 interface ActiveBlocker {
+  registration: object;
   config: BlockerInfo;
   timeoutId?: ReturnType<typeof setTimeout>;
 }
@@ -130,7 +131,8 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       return;
     }
 
-    const { onTimeout } = blocker.config;
+    const { config, registration } = blocker;
+    const { onTimeout } = config;
 
     try {
       onTimeout?.(id);
@@ -138,10 +140,11 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       // A user callback cannot prevent observation or cleanup.
     }
 
-    const { scope, reason, priority, timeout: duration } = blocker.config;
+    const { scope, reason, priority, timeout: duration } = config;
 
     emit({
       ...event("timeout", id),
+      registration,
       config: { scope, reason, priority, timeout: duration },
     });
 
@@ -194,7 +197,10 @@ export function createBlockingLifecycle(): BlockingLifecycle {
       cancelTimeout(previous);
     }
 
-    const blocker: ActiveBlocker = { config: normalizeBlocker(id, config) };
+    const blocker: ActiveBlocker = {
+      config: normalizeBlocker(id, config),
+      registration: Object.freeze({}),
+    };
 
     blockers.set(id, blocker);
 
@@ -202,6 +208,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     publish({
       ...event("add", id),
+      registration: blocker.registration,
       config: {
         scope: config.scope,
         reason: config.reason,
@@ -250,7 +257,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     if (timeoutChanged) {
       cancelTimeout(previous);
-      blocker = { config: nextConfig };
+      blocker = { config: nextConfig, registration: previous.registration };
     } else {
       blocker.config = nextConfig;
     }
@@ -263,6 +270,7 @@ export function createBlockingLifecycle(): BlockingLifecycle {
 
     publish({
       ...event("update", id),
+      registration: blocker.registration,
       config: publicConfig(nextConfig),
       prevState: publicConfig(oldConfig),
     });
@@ -288,7 +296,12 @@ export function createBlockingLifecycle(): BlockingLifecycle {
     if (previous) {
       const config = publicConfig(previous.config);
 
-      publish({ ...event("remove", id), config, prevState: config });
+      publish({
+        ...event("remove", id),
+        registration: previous.registration,
+        config,
+        prevState: config,
+      });
     } else {
       publish();
     }

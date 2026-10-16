@@ -209,6 +209,99 @@ describe("Observation session participation", () => {
     participant.release();
   });
 
+  it("should preserve a replacement added by the timeout callback", () => {
+    vi.useFakeTimers();
+
+    const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+      .current;
+    const session = resolveDevtoolsObservationSession(store);
+    const participant = session.participate();
+    const { addBlocker, removeBlocker, observeBlockingEvents, isBlocked } = store.getState();
+    const onSlowBlock = vi.fn();
+    const releasePerformance = observeBlockingEvents(
+      createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+    );
+
+    addBlocker("reentrant", {
+      scope: "old",
+      timeout: 100,
+      onTimeout: () => {
+        addBlocker("reentrant", { scope: "replacement" });
+      },
+    });
+
+    vi.advanceTimersByTime(100);
+
+    expect(isBlocked("replacement")).toBe(true);
+    expect(onSlowBlock.mock.calls).toEqual([["reentrant", 100]]);
+    expect(eventsOf(session).find((event) => event.action === "timeout")?.duration).toBe(100);
+
+    vi.advanceTimersByTime(75);
+
+    removeBlocker("reentrant");
+
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["reentrant", 100],
+      ["reentrant", 75],
+    ]);
+    expect(eventsOf(session)[0].duration).toBe(75);
+
+    releasePerformance();
+    participant.release();
+  });
+
+  it.each(["remove", "clear", "clear_scope"])(
+    "should not finalize an already %s lifetime again after callback replacement",
+    (cleanup) => {
+      vi.useFakeTimers();
+
+      const store = renderHook(() => useUIBlockingContext(), { wrapper: UIBlockingProvider }).result
+        .current;
+      const session = resolveDevtoolsObservationSession(store);
+      const participant = session.participate();
+      const {
+        addBlocker,
+        removeBlocker,
+        clearAllBlockers,
+        clearBlockersForScope,
+        observeBlockingEvents,
+      } = store.getState();
+      const onSlowBlock = vi.fn();
+      const releasePerformance = observeBlockingEvents(
+        createPerformanceMiddleware({ slowBlockThreshold: 0, onSlowBlock })
+      );
+
+      addBlocker("reentrant", {
+        scope: "old",
+        timeout: 100,
+        onTimeout: () => {
+          if (cleanup === "remove") {
+            removeBlocker("reentrant");
+          } else if (cleanup === "clear") {
+            clearAllBlockers();
+          } else {
+            clearBlockersForScope("old");
+          }
+          addBlocker("reentrant", { scope: "replacement" });
+        },
+      });
+      vi.advanceTimersByTime(100);
+      expect(onSlowBlock.mock.calls).toEqual([["reentrant", 100]]);
+      expect(
+        eventsOf(session).find((event) => event.action === "timeout")?.duration
+      ).toBeUndefined();
+      vi.advanceTimersByTime(75);
+      removeBlocker("reentrant");
+      expect(onSlowBlock.mock.calls).toEqual([
+        ["reentrant", 100],
+        ["reentrant", 75],
+      ]);
+      expect(eventsOf(session)[0].duration).toBe(75);
+      releasePerformance();
+      participant.release();
+    }
+  );
+
   it("should share one history and observer across participants", () => {
     const session = resolveDevtoolsObservationSession();
     const first = session.participate({ defaultOpen: true, maxEvents: 10 });

@@ -6,6 +6,7 @@ export interface PerformanceConfig {
 }
 
 export interface TrackedPerformanceBlock {
+  registration?: object;
   timestamp: number;
   scope: Scope;
 }

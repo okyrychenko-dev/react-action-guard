@@ -16,11 +16,19 @@ export function createPerformanceMiddleware(config: PerformanceConfig = {}): Mid
   const { slowBlockThreshold = DEFAULT_SLOW_BLOCK_THRESHOLD, onSlowBlock } = config;
   const trackedBlocks = new Map<string, TrackedPerformanceBlock>();
 
+  const registrations = new WeakMap<object, TrackedPerformanceBlock>();
+
   return (context) => {
-    const { action, blockerId, timestamp, config: blockerConfig, scope } = context;
+    const { action, blockerId, timestamp, config: blockerConfig, scope, registration } = context;
 
     if (action === "add") {
-      trackedBlocks.set(blockerId, { timestamp, scope: blockerConfig?.scope ?? DEFAULT_SCOPE });
+      const tracked = { timestamp, scope: blockerConfig?.scope ?? DEFAULT_SCOPE, registration };
+
+      trackedBlocks.set(blockerId, tracked);
+
+      if (isDefined(registration)) {
+        registrations.set(registration, tracked);
+      }
     } else if (action === "update") {
       const tracked = trackedBlocks.get(blockerId);
 
@@ -31,11 +39,17 @@ export function createPerformanceMiddleware(config: PerformanceConfig = {}): Mid
       const endedBlocks = new Map<string, TrackedPerformanceBlock>();
 
       if (action === "remove" || action === "timeout") {
-        const tracked = trackedBlocks.get(blockerId);
+        let tracked = trackedBlocks.get(blockerId);
+
+        if (isDefined(registration)) {
+          tracked = registrations.get(registration);
+        }
 
         if (isDefined(tracked)) {
           endedBlocks.set(blockerId, tracked);
-          trackedBlocks.delete(blockerId);
+          if (trackedBlocks.get(blockerId) === tracked) {
+            trackedBlocks.delete(blockerId);
+          }
         }
       } else {
         for (const [id, tracked] of trackedBlocks) {
@@ -46,6 +60,14 @@ export function createPerformanceMiddleware(config: PerformanceConfig = {}): Mid
             endedBlocks.set(id, tracked);
             trackedBlocks.delete(id);
           }
+        }
+      }
+
+      for (const tracked of endedBlocks.values()) {
+        const { registration: trackedRegistration } = tracked;
+
+        if (isDefined(trackedRegistration)) {
+          registrations.delete(trackedRegistration);
         }
       }
 

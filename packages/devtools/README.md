@@ -536,3 +536,7 @@ and do not synthesize remove events. Timeout records the duration and consumes t
 the following remove event has no duration. Reused IDs start a fresh lifetime.
 Observation history remains local to its store and resets when the final observer detaches.
 These durations describe blocking lifetimes, not operation success.
+
+A replacement added inside `onTimeout` retains its own timing: the old registration's
+later timeout event records only the expired lifetime. Live lifecycle registration
+identities distinguish these lifetimes even when IDs or timestamps are equal.

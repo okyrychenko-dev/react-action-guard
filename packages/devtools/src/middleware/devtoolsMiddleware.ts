@@ -5,6 +5,7 @@ import type { Middleware, MiddlewareContext } from "@okyrychenko-dev/react-actio
 import type { DevtoolsStoreApi } from "../store";
 
 interface TrackedBlocker {
+  registration?: object;
   timestamp: number;
   scope?: string | ReadonlyArray<string>;
 }
@@ -23,22 +24,37 @@ export function createDevtoolsMiddlewareForStore(
   // Track add timestamps for duration calculation
   const activeBlockers = new Map<string, TrackedBlocker>();
 
+  const registrations = new WeakMap<object, TrackedBlocker>();
+
   const getDuration = (
     action: MiddlewareContext["action"],
     blockerId: string,
-    timestamp: number
+    timestamp: number,
+    registration?: object
   ): Optional<number> => {
     if (!TERMINAL_ACTIONS.has(action)) {
       return undefined;
     }
 
-    const trackedBlocker = activeBlockers.get(blockerId);
+    let trackedBlocker = activeBlockers.get(blockerId);
+
+    if (isDefined(registration)) {
+      trackedBlocker = registrations.get(registration);
+    }
 
     if (isUndefined(trackedBlocker)) {
       return undefined;
     }
 
-    activeBlockers.delete(blockerId);
+    if (activeBlockers.get(blockerId) === trackedBlocker) {
+      activeBlockers.delete(blockerId);
+    }
+
+    const { registration: trackedRegistration } = trackedBlocker;
+
+    if (isDefined(trackedRegistration)) {
+      registrations.delete(trackedRegistration);
+    }
 
     return timestamp - trackedBlocker.timestamp;
   };
@@ -47,6 +63,12 @@ export function createDevtoolsMiddlewareForStore(
     for (const [blockerId, trackedBlocker] of activeBlockers.entries()) {
       if (scopeMatchesTarget(trackedBlocker.scope ?? DEFAULT_SCOPE, scope)) {
         activeBlockers.delete(blockerId);
+
+        const { registration: trackedRegistration } = trackedBlocker;
+
+        if (isDefined(trackedRegistration)) {
+          registrations.delete(trackedRegistration);
+        }
       }
     }
   };
@@ -54,6 +76,13 @@ export function createDevtoolsMiddlewareForStore(
   const clearTrackedBlockers = (context: MiddlewareContext): void => {
     switch (context.action) {
       case "clear":
+        for (const tracked of activeBlockers.values()) {
+          const { registration: trackedRegistration } = tracked;
+
+          if (isDefined(trackedRegistration)) {
+            registrations.delete(trackedRegistration);
+          }
+        }
         activeBlockers.clear();
         break;
       case "clear_scope":
@@ -68,14 +97,16 @@ export function createDevtoolsMiddlewareForStore(
 
   return (context: MiddlewareContext): void => {
     const { addEvent } = targetDevtoolsStore.getState();
-    const { action, blockerId, config, timestamp, prevState, scope, count } = context;
+    const { action, blockerId, config, timestamp, prevState, scope, count, registration } = context;
 
     // Track when blockers are added
     if (action === "add") {
-      activeBlockers.set(blockerId, {
-        timestamp,
-        scope: config?.scope,
-      });
+      const tracked = { timestamp, scope: config?.scope, registration };
+
+      activeBlockers.set(blockerId, tracked);
+      if (isDefined(registration)) {
+        registrations.set(registration, tracked);
+      }
     }
 
     if (action === "update") {
@@ -87,7 +118,7 @@ export function createDevtoolsMiddlewareForStore(
     }
 
     // Calculate duration for terminal events
-    const duration = getDuration(action, blockerId, timestamp);
+    const duration = getDuration(action, blockerId, timestamp, registration);
 
     clearTrackedBlockers(context);
 
