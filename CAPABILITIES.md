@@ -1,6 +1,6 @@
 # Capabilities and compatibility evidence
 
-See the [planned release handoff](RELEASE-HANDOFF.md) for source/manifests,
+See the [release handoff](RELEASE-HANDOFF.md) for source/manifests,
 disposable Changesets tarballs, migration and the separate publication follow-up.
 The packed/publication and selected Next production/browser records were refreshed
 on **2026-10-16** (Next 15.5.23, Chrome 155.0.8059.84) for the corrected cohort from
@@ -10,7 +10,9 @@ remain historical evaluations, not additional checks performed by this refresh.
 
 The planned cohort remains Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query
 adapter **0.4.0** and Router **1.0.0**. Actual pending Changesets were applied in
-a disposable workspace; source versions remain unchanged. These artifacts do not
+a disposable workspace for the recorded verification. The version PR applies
+versions to source, consumes Changesets and regenerates API references; inspect
+the checked-out manifests and changelogs for its current state. These artifacts do not
 establish registry availability or arbitrary peer/browser compatibility.
 
 Evidence kinds follow the sibling modal-manager format:

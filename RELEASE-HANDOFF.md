@@ -1,4 +1,4 @@
-# Planned release cohort handoff
+# Release cohort handoff
 
 The latest tested candidate is `9c5150769aebb5ceb96eee5affa2d770a60928c9`,
 including the Router README correction. The final artifact refresh below records
@@ -8,7 +8,10 @@ registry publication and release merge require separate authorization.
 
 ## Version provenance
 
-Source package manifests and pending Changesets remain unchanged by verification.
+Read the checked-out package manifests, changelogs and remaining `.changeset/*.md`
+files for the current source release state. Verification itself does not apply
+versions in the checkout. The version PR applies accumulated Changesets, consumes
+them and regenerates API references through `pnpm version-packages`.
 The existing [cohort preparation](scripts/compatibility/cohort.utils.mjs) copies
 built artifacts, applies `changeset version` in a disposable workspace and packs
 that resulting cohort. Package checks and fresh consumers inspect those tarballs,
@@ -16,12 +19,14 @@ not source aliases. Strict peer installation checks the rewritten internal Core
 peer ranges together with the selected external peers.
 
 The planned cohort is Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query adapter
-**0.4.0**, and Router adapter **1.0.0**. These version numbers describe the planned
-tarballs only. No npm registry version or dist-tag has been inspected or changed
+**0.4.0**, and Router adapter **1.0.0**. These are the evaluated release versions; inspect the checked-out manifests to
+determine whether the version PR has applied them to source. No npm registry version or dist-tag has been inspected or changed
 by this task. Registry availability must be established after authorized publication.
 
-Source manifests currently declare Core 1.0.5, UI 0.1.5, Devtools 0.3.0,
-Query 0.3.5 and Router 0.2.4. These are workspace metadata, not an npm lookup.
+At the pre-version verification baseline, source manifests declared Core 1.0.5,
+UI 0.1.5, Devtools 0.3.0, Query 0.3.5 and Router 0.2.4. These historical
+versions do not describe a checkout after the version PR has applied versions.
+Source manifest versions alone do not establish npm availability.
 In the disposable versioned cohort, Devtools/Query/Router require Core `^2.0.0`;
 UI's `workspace:^` is resolved by packing against Core 2.0.0.
 
@@ -69,8 +74,9 @@ CI must rerun verification for the final release commit.
 
 ## Authorized release follow-up
 
-Keep all pending Changesets until the existing release pipeline applies them in
-its version PR. Review generated changelogs, versions and peer ranges together;
+Before versioning, retain pending Changesets for the release pipeline. Applying
+the version PR consumes those files; their absence afterwards is expected.
+Review generated changelogs, versions, peer ranges and API headings together;
 do not manually overwrite versions or discard accumulated changesets.
 The [Release workflow](.github/workflows/release.yml) validates packages before
 the Changesets action creates a version PR or publishes. Release merge and npm
@@ -81,7 +87,7 @@ upgrading planned capability statements to published guarantees.
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
 
-## Package documentation follow-up
+## Historical package documentation follow-up
 
 The release documentation fixes on `fix/13-release-feedback` are based on
 `63543da72f0761bf235f78c9b26a5b8ad07d788c`. They correct Core peer requirements,
@@ -93,8 +99,9 @@ The release version command now advances changelog links and regenerates the
 Core, Devtools and Query TypeDoc references after updating manifests. A disposable
 copy executed the real version command, confirmed API headings for 2.0.0/1.0.0/0.4.0
 and all five changelog links, then repeated it without duplicating release links.
-Source reference headings retain source-manifest versions until the version PR
-regenerates them; they are not statements of registry publication. Existing TypeDoc
+At that pre-version baseline, source reference headings retained the old manifest
+versions. The version PR regenerates them for its updated manifests; inspect the
+checked-out references when reviewing it. Neither state establishes registry publication. Existing TypeDoc
 internal-reference warnings remain, with no generation errors.
 
 The refreshed publication evidence includes checks of README relative destinations
