@@ -9,7 +9,9 @@ interface ConfirmationRouteProps {
   onResolver: (resolve: (confirmed: boolean) => void) => void;
 }
 
-export function ConfirmationRoute({ onResolver }: ConfirmationRouteProps): ReactElement {
+export function ConfirmationRoute(props: ConfirmationRouteProps): ReactElement {
+  const { onResolver } = props;
+
   useEnterpriseBlocker("dirty", { scope: "navigation" }, true);
   const { dialogState, confirm } = useDialogState();
   useNavigationBlocker({ scope: "navigation", message: "Discard edits?", onConfirm: confirm });
@@ -18,15 +20,19 @@ export function ConfirmationRoute({ onResolver }: ConfirmationRouteProps): React
       onResolver(dialogState.resolve);
     }
   }, [dialogState, onResolver]);
+  const handleConfirmNavigation: VoidFunction = () => {
+    dialogState?.resolve(true);
+  };
+
+  const handleCancelNavigation: VoidFunction = () => {
+    dialogState?.resolve(false);
+  };
+
   return (
     <NavigationBlockModal
       isOpen={dialogState?.isOpen ?? false}
-      onConfirm={() => {
-        dialogState?.resolve(true);
-      }}
-      onCancel={() => {
-        dialogState?.resolve(false);
-      }}
+      onConfirm={handleConfirmNavigation}
+      onCancel={handleCancelNavigation}
     />
   );
 }

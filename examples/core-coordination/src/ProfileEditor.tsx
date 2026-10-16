@@ -10,10 +10,10 @@ export function ProfileEditor(): ReactElement {
       <h2 id="profile-heading">Profile editor</h2>
       <label htmlFor="display-name">Display name</label>
       <input
+        aria-describedby="profile-reason"
         id="display-name"
         defaultValue="Alex"
         disabled={blockers.length > 0}
-        aria-describedby="profile-reason"
       />
       <p id="profile-reason" role="status">
         {reason}

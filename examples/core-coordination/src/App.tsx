@@ -5,10 +5,14 @@ import { HelpControl } from "./HelpControl";
 import { NavigationControl } from "./NavigationControl";
 import { ProfileEditor } from "./ProfileEditor";
 import { SavePanel } from "./SavePanel";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function App(): ReactElement {
   const [showSaveControls, setShowSaveControls] = useState(true);
+
+  const handleShowSaveControlsChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setShowSaveControls(event.target.checked);
+  };
 
   return (
     <UIBlockingProvider>
@@ -25,9 +29,7 @@ export function App(): ReactElement {
           <input
             type="checkbox"
             checked={showSaveControls}
-            onChange={(event) => {
-              setShowSaveControls(event.target.checked);
-            }}
+            onChange={handleShowSaveControlsChange}
           />
           Show save controls
         </label>

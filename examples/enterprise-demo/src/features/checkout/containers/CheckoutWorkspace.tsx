@@ -14,7 +14,7 @@ import {
   useCheckoutBlockers,
   useCheckoutState,
 } from "../hooks";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function CheckoutWorkspace(): ReactElement {
   const state = useCheckoutState();
@@ -53,6 +53,10 @@ export function CheckoutWorkspace(): ReactElement {
     headerChipLabel = "Guarded";
   }
 
+  const handleAutosaveChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setAutosaveEnabled(event.target.checked);
+  };
+
   return (
     <Card aria-label="Checkout workspace">
       <Card.Header className="flex items-center justify-between gap-4">
@@ -70,13 +74,7 @@ export function CheckoutWorkspace(): ReactElement {
       </Card.Header>
       <Card.Content className="flex flex-col gap-4">
         <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={autosaveEnabled}
-            onChange={(event) => {
-              setAutosaveEnabled(event.target.checked);
-            }}
-          />
+          <input type="checkbox" checked={autosaveEnabled} onChange={handleAutosaveChange} />
           Autosave checkout
         </label>
         <p className="text-sm text-slate-600">

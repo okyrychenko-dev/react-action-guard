@@ -13,13 +13,15 @@ interface AuditLogProps {
 export function AuditLog(props: AuditLogProps): ReactElement {
   const { events, onClear } = props;
 
+  const handleExport: VoidFunction = () => {
+    exportEvents(events);
+  };
+
   return (
     <>
       <AuditLogHeader
         isExportDisabled={events.length === 0}
-        onExport={() => {
-          exportEvents(events);
-        }}
+        onExport={handleExport}
         onClear={onClear}
       />
 

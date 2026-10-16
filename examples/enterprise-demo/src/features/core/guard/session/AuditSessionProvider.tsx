@@ -6,7 +6,9 @@ interface AuditSessionProviderProps {
   children: ReactNode;
 }
 
-export function AuditSessionProvider({ children }: AuditSessionProviderProps): ReactElement {
+export function AuditSessionProvider(props: AuditSessionProviderProps): ReactElement {
+  const { children } = props;
+
   const audit = useAuditLog();
   return <AuditSessionContext value={audit}>{children}</AuditSessionContext>;
 }

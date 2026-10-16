@@ -1,11 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, type RenderOptions } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import { useState } from "react";
-import type { ReactNode } from "react";
-
-export interface RenderWithProvidersOptions extends RenderOptions {
-  children?: ReactNode;
-}
+import type { PropsWithChildren, ReactNode } from "react";
+import type { RenderWithProvidersOptions } from "./renderWithProviders.types";
 
 export function createTestQueryClient(): QueryClient {
   return new QueryClient({
@@ -16,7 +13,9 @@ export function createTestQueryClient(): QueryClient {
   });
 }
 
-export function TestProviders({ children }: { children: ReactNode }): ReactNode {
+export function TestProviders(props: PropsWithChildren): ReactNode {
+  const { children } = props;
+
   const [queryClient] = useState(createTestQueryClient);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
@@ -28,7 +27,9 @@ export function renderWithProviders(
 ): ReturnType<typeof render> & { queryClient: QueryClient } {
   const queryClient = createTestQueryClient();
 
-  function Wrapper({ children: wrapperChildren }: { children: ReactNode }): ReactNode {
+  function Wrapper(props: PropsWithChildren): ReactNode {
+    const { children: wrapperChildren } = props;
+
     return (
       <QueryClientProvider client={queryClient}>{children ?? wrapperChildren}</QueryClientProvider>
     );
@@ -39,3 +40,5 @@ export function renderWithProviders(
     ...render(ui, { wrapper: Wrapper, ...options }),
   };
 }
+
+export type { RenderWithProvidersOptions } from "./renderWithProviders.types";

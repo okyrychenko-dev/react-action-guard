@@ -1,8 +1,14 @@
 import { useActionBlocker } from "@okyrychenko-dev/react-action-guard";
 import { useState } from "react";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
-export function DraftOwner({ ownerId }: { ownerId: string }): ReactElement {
+interface DraftOwnerProps {
+  ownerId: string;
+}
+
+export function DraftOwner(props: DraftOwnerProps): ReactElement {
+  const { ownerId } = props;
+
   const [dirty, setDirty] = useState(false);
 
   useActionBlocker(
@@ -11,15 +17,13 @@ export function DraftOwner({ ownerId }: { ownerId: string }): ReactElement {
     dirty
   );
 
+  const handleDirtyChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setDirty(event.target.checked);
+  };
+
   return (
     <label>
-      <input
-        type="checkbox"
-        checked={dirty}
-        onChange={(event) => {
-          setDirty(event.target.checked);
-        }}
-      />
+      <input type="checkbox" checked={dirty} onChange={handleDirtyChange} />
       Keep editor {ownerId} draft
     </label>
   );

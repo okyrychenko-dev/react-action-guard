@@ -13,12 +13,22 @@ export function CheckoutPage(): ReactElement {
   const copy = getCheckoutNavigationCopy(blockers);
   const { dialogState, confirm } = useDialogState<CheckoutNavigationCopy>();
 
+  const requestNavigationConfirmation = (): Promise<boolean> => confirm(copy);
+
   useNavigationBlocker({
     scope: "navigation",
     blockBrowserUnload: true,
     message: copy.message,
-    onConfirm: () => confirm(copy),
+    onConfirm: requestNavigationConfirmation,
   });
+
+  const handleConfirmNavigation: VoidFunction = () => {
+    dialogState?.resolve(true);
+  };
+
+  const handleCancelNavigation: VoidFunction = () => {
+    dialogState?.resolve(false);
+  };
 
   return (
     <>
@@ -29,12 +39,8 @@ export function CheckoutPage(): ReactElement {
         message={dialogState?.message.message}
         cancelLabel={dialogState?.message.cancelLabel}
         isOpen={dialogState?.isOpen ?? false}
-        onConfirm={() => {
-          dialogState?.resolve(true);
-        }}
-        onCancel={() => {
-          dialogState?.resolve(false);
-        }}
+        onConfirm={handleConfirmNavigation}
+        onCancel={handleCancelNavigation}
       />
     </>
   );

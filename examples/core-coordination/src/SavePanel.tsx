@@ -6,7 +6,7 @@ import {
 import { isError } from "@okyrychenko-dev/type-utils";
 import { useState } from "react";
 import { simulateSave } from "./save.utils";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function SavePanel(): ReactElement {
   const store = useUIBlockingContext();
@@ -27,14 +27,23 @@ export function SavePanel(): ReactElement {
 
     setStatus("Saving profile…");
     setError("");
+
     try {
       await runSave(() => simulateSave(shouldFail));
       setStatus("Profile saved.");
-    } catch (cause) {
+    } catch (error) {
       setStatus("Save finished with an error.");
-      setError(isError(cause) ? cause.message : "Save failed. Try again.");
+      setError(isError(error) ? error.message : "Save failed. Try again.");
     }
   }
+
+  const handleFailureChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setShouldFail(event.target.checked);
+  };
+
+  const handleSaveClick: VoidFunction = () => {
+    void handleSave();
+  };
 
   return (
     <section aria-labelledby="save-heading">
@@ -45,27 +54,14 @@ export function SavePanel(): ReactElement {
           type="checkbox"
           checked={shouldFail}
           disabled={blocked}
-          onChange={(event) => {
-            setShouldFail(event.target.checked);
-          }}
+          onChange={handleFailureChange}
         />
         Simulate save failure
       </label>
-      <button
-        disabled={blocked}
-        onClick={() => {
-          void handleSave();
-        }}
-      >
+      <button disabled={blocked} onClick={handleSaveClick}>
         Save profile
       </button>
-      <button
-        onClick={() => {
-          void handleSave();
-        }}
-      >
-        Invoke save command
-      </button>
+      <button onClick={handleSaveClick}>Invoke save command</button>
       <p>This enabled entry point calls the same guarded command as the disabled save button.</p>
       <p role="status">{status}</p>
       {error && <p role="alert">{error}</p>}

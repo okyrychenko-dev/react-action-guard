@@ -8,6 +8,7 @@ interface SaveButtonProps {
 
 export function SaveButton(props: SaveButtonProps): ReactElement {
   const { onSave } = props;
+
   const { buttonState } = useGuardedButton({ scope: "checkout" });
 
   return (

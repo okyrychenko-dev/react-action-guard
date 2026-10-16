@@ -9,6 +9,7 @@ interface AuditLogHeaderProps {
 
 export function AuditLogHeader(props: AuditLogHeaderProps): ReactElement {
   const { isExportDisabled, onExport, onClear } = props;
+
   return (
     <div className="flex items-center justify-between gap-4">
       <div>

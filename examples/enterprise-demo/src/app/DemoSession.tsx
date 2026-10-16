@@ -10,7 +10,9 @@ interface DemoSessionProps extends AppProvidersRenderProps {
   children: (props: AppProvidersRenderProps) => ReactNode;
 }
 
-export function DemoSession({ children, demoKey, onReset }: DemoSessionProps): ReactElement {
+export function DemoSession(props: DemoSessionProps): ReactElement {
+  const { children, demoKey, onReset } = props;
+
   const store = useResolvedStoreApi();
   const [queryClient] = useState(
     () =>

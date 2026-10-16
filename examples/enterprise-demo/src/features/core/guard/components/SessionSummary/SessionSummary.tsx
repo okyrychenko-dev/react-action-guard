@@ -1,7 +1,14 @@
 import { Card } from "@heroui/react";
 import { getSessionSummaryMetrics } from "./SessionSummary.utils";
 import type { ReactElement } from "react";
-import type { SessionSummaryProps } from "./SessionSummary.types";
+import type { ActionRejectionCounts } from "../../../sessionEvents.types";
+import type { AuditEvent } from "../../audit.types";
+
+interface SessionSummaryProps {
+  events: ReadonlyArray<AuditEvent>;
+  rejections: ActionRejectionCounts;
+  totalTimeouts: number;
+}
 
 export function SessionSummary(props: SessionSummaryProps): ReactElement {
   const { events, rejections, totalTimeouts } = props;
