@@ -37,6 +37,36 @@ describe("createPerformanceMiddleware", () => {
     expect(onSlowBlock).toHaveBeenCalledTimes(2);
   });
 
+  it("should preserve the original lifetime and use updated scopes for targeted cleanup", () => {
+    const lifecycle = createBlockingLifecycle();
+    const onSlowBlock = vi.fn();
+
+    lifecycle.observe(createPerformanceMiddleware({ slowBlockThreshold: 100, onSlowBlock }));
+    lifecycle.add("moved", { scope: "a" });
+    lifecycle.add("cleared", { scope: ["a", "c"] });
+    lifecycle.add("global");
+    vi.advanceTimersByTime(100);
+    lifecycle.update("moved", { scope: "b" });
+    vi.advanceTimersByTime(50);
+    lifecycle.clearScope("a");
+    expect(onSlowBlock.mock.calls).toEqual([["cleared", 150]]);
+    expect(lifecycle.getSnapshot().map(({ id }) => id)).toEqual(["moved", "global"]);
+    vi.advanceTimersByTime(50);
+    lifecycle.remove("moved");
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["cleared", 150],
+      ["moved", 200],
+    ]);
+    lifecycle.clearScope("global");
+    vi.advanceTimersByTime(50);
+    lifecycle.remove("global");
+    expect(onSlowBlock.mock.calls).toEqual([
+      ["cleared", 150],
+      ["moved", 200],
+      ["global", 250],
+    ]);
+  });
+
   it("should track block duration", () => {
     const onSlowBlock = vi.fn();
     const middleware = createPerformanceMiddleware({
