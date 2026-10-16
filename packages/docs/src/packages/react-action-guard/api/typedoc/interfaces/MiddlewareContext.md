@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -10,11 +10,19 @@ Defined in: [middleware/middleware.types.ts:7](https://github.com/okyrychenko-de
 
 ## Properties
 
+### registration?
+
+> `optional` **registration?**: `object`
+
+Defined in: [middleware/middleware.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L8)
+
+***
+
 ### action
 
 > **action**: [`BlockingAction`](../type-aliases/BlockingAction.md)
 
-Defined in: [middleware/middleware.types.ts:8](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L8)
+Defined in: [middleware/middleware.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L9)
 
 ***
 
@@ -22,7 +30,7 @@ Defined in: [middleware/middleware.types.ts:8](https://github.com/okyrychenko-de
 
 > **blockerId**: `string`
 
-Defined in: [middleware/middleware.types.ts:9](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L9)
+Defined in: [middleware/middleware.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L10)
 
 ***
 
@@ -30,7 +38,7 @@ Defined in: [middleware/middleware.types.ts:9](https://github.com/okyrychenko-de
 
 > `optional` **config?**: [`BlockerConfig`](BlockerConfig.md)
 
-Defined in: [middleware/middleware.types.ts:10](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L10)
+Defined in: [middleware/middleware.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L11)
 
 ***
 
@@ -38,7 +46,7 @@ Defined in: [middleware/middleware.types.ts:10](https://github.com/okyrychenko-d
 
 > **timestamp**: `number`
 
-Defined in: [middleware/middleware.types.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L11)
+Defined in: [middleware/middleware.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L12)
 
 ***
 
@@ -46,7 +54,7 @@ Defined in: [middleware/middleware.types.ts:11](https://github.com/okyrychenko-d
 
 > `optional` **prevState?**: [`BlockerConfig`](BlockerConfig.md)
 
-Defined in: [middleware/middleware.types.ts:12](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L12)
+Defined in: [middleware/middleware.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L13)
 
 ***
 
@@ -54,7 +62,7 @@ Defined in: [middleware/middleware.types.ts:12](https://github.com/okyrychenko-d
 
 > `optional` **scope?**: `string`
 
-Defined in: [middleware/middleware.types.ts:13](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L13)
+Defined in: [middleware/middleware.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L14)
 
 ***
 
@@ -62,4 +70,4 @@ Defined in: [middleware/middleware.types.ts:13](https://github.com/okyrychenko-d
 
 > `optional` **count?**: `number`
 
-Defined in: [middleware/middleware.types.ts:14](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L14)
+Defined in: [middleware/middleware.types.ts:15](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/middleware/middleware.types.ts#L15)

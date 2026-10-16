@@ -1,5 +1,78 @@
 # Changelog
 
+## 1.0.0
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-devtools@1.0.0)
+
+### Major Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+
+### Minor Changes
+
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools subscribe to those snapshots. The final release cohort is Core 2.0 and Devtools 1.0 with a Core ^2.0.0 peer requirement. Node.js 20 or newer is required; prior intermediate version proposals are superseded by this cohort.
+- 1587a9d: Explain blocker age and unavailable provenance, and visualize actual blocker-to-scope protection with an accessible text table. Add optional panel-local scope/action declarations without changing blocking policy or observation-session ownership. Record telemetry ownership and retain existing Core analytics compatibility.
+
+### Patch Changes
+
+- 6a08414: Finalize performance lifetimes on timeout and bulk cleanup, preserve timing through scope updates, and isolate slow-block callback failures. Keep Devtools history durations accurate after scope changes and preserve global registrations during targeted cleanup.
+
+  Preserve replacement registrations created inside timeout callbacks using opaque lifecycle registration identities; stale timeout events finalize only the expired lifetime.
+
+  Snapshot tracked scopes in performance and Devtools diagnostics so caller-owned array mutations cannot prevent scoped cleanup.
+
+  Read timeout metadata after the timeout callback so scope, reason and priority updates are reflected in the emitted event while preserving registration identity.
+
+- 5d403d8: Migrate the Core and Devtools store integrations to `@okyrychenko-dev/react-zustand-toolkit` 1.0.0 while preserving React Action Guard's public store and provider APIs.
+- 3f63533: Preserve scoped CSS Module class mappings in packed Devtools and keep its panel within narrow viewports. Use one full-height scroll area for active blockers and scope protection so the table can reach the bottom of the panel without nested scrolling or unused space. Document the runnable enterprise showcase using store-local Devtools, checkout autosave and shared user/agent revision protection, including explicit scope/action declarations and application-owned execution responsibilities.
+
+  Include both checkout and navigation in the showcase's save-cart inspection mapping so scope protection matches the guarded action.
+
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- 94547ea: Isolate Devtools event history and runtime viewing state per observed blocking store, share one observation session between Devtools instances attached to the same store, and expose custom sessions to advanced hook consumers through `ActionGuardDevtoolsProvider`.
+- 26cc31e: Align packaged README requirements with the Core ^2.0.0 release cohort and use durable repository URLs for migration, observability and Next runtime evidence. Declare the Query adapter's existing Node.js >=20 requirement inherited from type-utils. Reconcile superseded intermediate compatibility descriptions in pending release notes.
+
+  Include CHANGELOG.md in every package so the packaged README changelog links resolve. Generate versioned API references and advance changelog links as part of the Changesets version command.
+
+- 4363609: Expose anonymous, ownership-safe lifecycle event observation through global and provider-scoped stores. Provider middleware and automatic Devtools observation use release leases without registry names. Core 2.0 removes the intermediate named middleware and direct runMiddlewares compatibility APIs; use observeBlockingEvents and release its lease to detach.
+
+  Observers registered while an event is being delivered begin receiving events with the next delivery. Observers released before their turn are skipped. Observer delivery remains ordered and error-isolated without awaiting earlier observers.
+
+  Manual Devtools observation is additive and store-local. Releasing an observation lease does not remove another owner's observer.
+
+- 5d03641: Manage Devtools observation through store-specific participation leases. Panels and providers observing the same blocking store share one event history and automatic observer; configuration ownership transfers deterministically without reapplying `defaultOpen`, and the final release detaches observation and clears runtime viewing state. Manual Devtools middleware remains compatible.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+- Updated dependencies [6a08414]
+- Updated dependencies [39fb3de]
+- Updated dependencies [32264e4]
+- Updated dependencies [5d403d8]
+- Updated dependencies [3db526a]
+- Updated dependencies [64145c9]
+- Updated dependencies [0d3c1f7]
+- Updated dependencies [083a5b7]
+- Updated dependencies [690a3a9]
+- Updated dependencies [a1b83db]
+- Updated dependencies [d07b65a]
+- Updated dependencies [bd1dc3b]
+- Updated dependencies [6513e1e]
+- Updated dependencies [6d59289]
+- Updated dependencies [26cc31e]
+- Updated dependencies [b987ed1]
+- Updated dependencies [743c6f4]
+- Updated dependencies [303abc3]
+- Updated dependencies [eefba30]
+- Updated dependencies [4363609]
+- Updated dependencies [40e8420]
+- Updated dependencies [6230733]
+  - @okyrychenko-dev/react-action-guard@2.0.0
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
@@ -179,7 +252,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Source maps included
 - Comprehensive JSDoc documentation
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-devtools@1.0.0...HEAD
 [0.3.0]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.2.2...v0.2.3
@@ -190,3 +263,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.2]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/okyrychenko-dev/react-action-guard-devtools/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-devtools/releases/tag/v0.1.0
+[1.0.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-devtools@1.0.0

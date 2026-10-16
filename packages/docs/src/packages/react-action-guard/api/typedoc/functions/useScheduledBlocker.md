@@ -1,4 +1,4 @@
-[**React Action Guard API v1.0.5**](../README.md)
+[**React Action Guard API v2.0.0**](../README.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > **useScheduledBlocker**(`blockerId`, `config`): `void`
 
-Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.ts:25](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.ts#L25)
+Defined in: [hooks/useScheduledBlocker/useScheduledBlocker.ts:24](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useScheduledBlocker/useScheduledBlocker.ts#L24)
 
 Schedules UI blocking for a specific time period (e.g., maintenance windows).
 

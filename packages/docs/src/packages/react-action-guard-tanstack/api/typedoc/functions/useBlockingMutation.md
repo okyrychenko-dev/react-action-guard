@@ -1,4 +1,4 @@
-[**React Action Guard TanStack API v0.3.5**](../README.md)
+[**React Action Guard TanStack API v0.4.0**](../README.md)
 
 ***
 
@@ -8,7 +8,7 @@
 
 > **useBlockingMutation**\<`TData`, `TError`, `TVariables`, `TOnMutateResult`\>(`options`, `queryClient?`): `UseMutationResult`\<`TData`, `TError`, `TVariables`, `TOnMutateResult`\>
 
-Defined in: [packages/tanstack/src/hooks/useBlockingMutation.ts:11](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingMutation.ts#L11)
+Defined in: [packages/tanstack/src/hooks/useBlockingMutation.ts:28](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/src/hooks/useBlockingMutation.ts#L28)
 
 Wraps TanStack Mutation with UI blocking.
 

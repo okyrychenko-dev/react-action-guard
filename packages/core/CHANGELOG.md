@@ -1,5 +1,73 @@
 # Changelog
 
+## 2.0.0
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...@okyrychenko-dev/react-action-guard@2.0.0)
+
+### Major Changes
+
+- 0d3c1f7: Complete the Blocking lifecycle architecture migration. Remove mutable blocker and middleware maps,
+  named middleware registration, direct event dispatch, and compatibility restore contracts. Observe
+  lifecycle transitions through ownership-safe anonymous leases and read readonly BlockerInfo snapshots.
+  Devtools sessions release only their observations; manual observation is now additive on every store.
+  Centralize guarded-control state and accessible reasons while retaining public hooks, state mappers,
+  state utilities, and distinct link behavior. Consolidate shared TanStack coverage at its coordination
+  interface and document migration from removed interfaces. Retain react-zustand-toolkit as the state
+  management base.
+
+### Minor Changes
+
+- 39fb3de: Introduce a public Blocking lifecycle interface that owns blocker transitions, timers, immutable reads, and isolated observation while preserving the existing Zustand store interface through a compatibility adapter.
+- 3db526a: Publish immutable Blocking lifecycle snapshots through global and provider-scoped stores. React hooks, guarded UI controls, and Devtools subscribe to those snapshots. The final release cohort is Core 2.0 and Devtools 1.0 with a Core ^2.0.0 peer requirement. Node.js 20 or newer is required; prior intermediate version proposals are superseded by this cohort.
+- 4363609: Expose anonymous, ownership-safe lifecycle event observation through global and provider-scoped stores. Provider middleware and automatic Devtools observation use release leases without registry names. Core 2.0 removes the intermediate named middleware and direct runMiddlewares compatibility APIs; use observeBlockingEvents and release its lease to detach.
+
+  Observers registered while an event is being delivered begin receiving events with the next delivery. Observers released before their turn are skipped. Observer delivery remains ordered and error-isolated without awaiting earlier observers.
+
+  Manual Devtools observation is additive and store-local. Releasing an observation lease does not remove another owner's observer.
+
+### Patch Changes
+
+- 6a08414: Finalize performance lifetimes on timeout and bulk cleanup, preserve timing through scope updates, and isolate slow-block callback failures. Keep Devtools history durations accurate after scope changes and preserve global registrations during targeted cleanup.
+
+  Preserve replacement registrations created inside timeout callbacks using opaque lifecycle registration identities; stale timeout events finalize only the expired lifetime.
+
+  Snapshot tracked scopes in performance and Devtools diagnostics so caller-owned array mutations cannot prevent scoped cleanup.
+
+  Read timeout metadata after the timeout callback so scope, reason and priority updates are reflected in the emitted event while preserving registration identity.
+
+- 32264e4: Centralize scope normalization, inheritance, observation, and targeted-clear semantics in the core package, preserve empty observed scopes, and migrate guarded UI controls to use the shared behavior. The UI package now requires the core release that exports these helpers.
+- 5d403d8: Migrate the Core and Devtools store integrations to `@okyrychenko-dev/react-zustand-toolkit` 1.0.0 while preserving React Action Guard's public store and provider APIs.
+- 64145c9: Keep conditional blocker configuration current while the condition remains true, including scope, reason, priority, timestamp and timeout options. Preserve unchanged timeout deadlines and use the latest timeout callback. A timeout ends the current registration episode until a polled false-to-true condition transition or a new ID or Provider attachment starts another episode.
+- 083a5b7: Warn in development when active useActionBlocker hooks share an ID in the same store. Track registrations through cleanup and Strict Mode without warning for equal IDs in isolated stores. Shared IDs still require consumer correction; production registration and cleanup behavior is unchanged.
+- 690a3a9: Validate every supplied scheduled-window bound, preserve epoch-zero ends, and treat zero duration as an empty window instead of indefinite blocking. Invalid bounds cancel hook-owned work with a development warning. Support distant finite starts using bounded timer chunks, matching end deadlines. Omit duration and end explicitly when indefinite blocking is intended.
+
+  Empty future windows do not retain start timers or repeatedly wake for distant deadlines.
+
+- a1b83db: Freeze normalized scope arrays so JavaScript mutation cannot corrupt cached results shared by other consumers. Stable identity, sorting, deduplication, default and empty scope semantics, and bounded cache eviction are preserved.
+- d07b65a: Treat array-form global blocker scopes consistently across store scope queries and targeted clears.
+- bd1dc3b: Publish format-specific ESM and CommonJS declarations so NodeNext CommonJS consumers can use the supported public imports. Correct Core's legacy main/module paths and resolve Next's router.js entry so native Node ESM can load the Next adapter. Require React Router DOM >=6.19.0 within v6 or v7 because earlier v6 releases do not export the stable useBlocker API. This excludes previously declared unsupported versions and releases the pre-1.0 router package as a minor change. Consumers on older v6 must upgrade before adopting this release; no new runtime dependency is added. Publish evidence-labelled capabilities and packed peer/provider checks, and clarify App Router and application-owned payment cancellation limits.
+- 6513e1e: Apply current reactive blocker configuration in core and TanStack hooks. Removed
+  scope, reason and priority values return to defaults; omitted timeout and callback
+  values clear. Metadata changes preserve unchanged deadlines and registration
+  timestamps, while changed timeouts restart and removed timeouts cancel timers.
+  Imperative updateBlocker patch behavior remains compatible. Consumers relying on
+  retained hook options must keep those options in the current configuration.
+  The released TanStack adapter requires Core ^2.0.0, including configuration replacement support.
+- 6d59289: Skip scheduled windows that have already elapsed when a delayed start timer runs, and retain long windows without overflowing their end timers. Share router protection scope keys, remove unused internal confirmation handling, and correct the documented public router types.
+- 26cc31e: Align packaged README requirements with the Core ^2.0.0 release cohort and use durable repository URLs for migration, observability and Next runtime evidence. Declare the Query adapter's existing Node.js >=20 requirement inherited from type-utils. Reconcile superseded intermediate compatibility descriptions in pending release notes.
+
+  Include CHANGELOG.md in every package so the packaged README changelog links resolve. Generate versioned API references and advance changelog links as part of the Changesets version command.
+
+- b987ed1: Honor long finite blocker timeouts with bounded timer chunks that credit each completed wait even when the monotonic clock pauses during system suspension. System clock adjustments do not change the delay. Reject nonfinite timeouts and unrepresentable deadlines with RangeError before changing registrations or existing timers. Omitted, zero and finite negative timeouts continue to disable expiration; replace infinity/NaN sentinels with an omitted timeout or zero.
+- 743c6f4: Guarantee scheduled blocker completion when start or end notifications throw. Schedule the end before notifying start, and always release protection after the end notification. Cancel scheduled notifications and release protection when an immediate start notification prevents effect setup. Notification errors remain observable.
+- 303abc3: Keep scheduled blocker configuration current during active windows and honor timeout options without restarting unchanged deadlines. Preserve scheduled end notifications after blocker timeout.
+- eefba30: Prevent repeated confirmation calls from executing the same action more than once per hook
+  instance. Concurrent callers share its outcome; reopening and cancellation are ignored while
+  execution is pending. Success and failure both allow retry. Existing timeout and unmount
+  behavior remains unchanged.
+- 40e8420: Keep scoped metadata and guarded controls stable when unrelated blockers change, while observing all relevant metadata and preserving immutable priority-ordered results. Core `useBlockingInfo` now also accepts readonly scope arrays so UI consumers share the same projection and matching rules; `createTypedHooks` accepts the same arrays while rejecting unknown scope names. Delegate resolved subscriptions and selection retention to react-zustand-toolkit, with optional custom equality on `useResolvedValue`. Cover scope representation changes and stable metadata when observation expands. Retain production/development scale and rapid-registration benchmark evidence refreshed after the typed-hook fix, with installed-tarball declaration checks and pinned source provenance.
+- 6230733: Adopt `@okyrychenko-dev/type-utils` 0.1.2 for internal type guards, assertions, and utility types, replacing equivalent hand-rolled checks, a duplicated `assertNever` helper, and inline nullable/optional unions. Runtime behavior is unchanged; some public function signatures now show the package's equivalent utility types. Adds `@okyrychenko-dev/type-utils` as a new dependency and explicitly requires Node.js 20 or newer; Node.js 18 is EOL and unsupported.
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
@@ -360,7 +428,7 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard@2.0.0...HEAD
 [1.0.5]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...v1.0.3
@@ -380,3 +448,4 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 [0.2.2]: https://github.com/okyrychenko/react-action-guard/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/okyrychenko/react-action-guard/releases/tag/v0.1.0
+[2.0.0]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...@okyrychenko-dev/react-action-guard@2.0.0
