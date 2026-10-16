@@ -46,6 +46,11 @@ jobs:
       - name: Verify publication and strict packed compatibility
         run: pnpm run package:check && pnpm run test:packed
 
+      - name: Consume empty changesets before release decision
+        run: |
+          pnpm exec changeset status --output="$RUNNER_TEMP/changeset-release-status.json"
+          node scripts/consume-empty-changesets.mjs "$RUNNER_TEMP/changeset-release-status.json"
+
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
         with:

@@ -89,6 +89,12 @@ and the external workflow pilot are not release gates for this cohort.
 
 ## Publication authentication and build ownership
 
+Release infrastructure changes can carry an empty changeset to satisfy the PR
+check without bumping package versions. Before the release action decides between
+versioning and publication, the workflow consumes only changesets whose parsed
+release list is empty. Non-empty changesets remain for the normal version PR.
+This prevents empty notes from suppressing publication of already-versioned packages.
+
 The release workflow uses Node 24 and npm Trusted Publishing through GitHub Actions
 OIDC, matching the sibling React libraries. Configure a trusted publisher on each
 of the five npm packages for owner `okyrychenko-dev`, repository `react-action-guard`
