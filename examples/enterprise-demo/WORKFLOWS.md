@@ -1,4 +1,4 @@
-# Evaluated enterprise workflows (local tickets 12–14)
+# Evaluated enterprise workflows
 
 This demo uses one isolated `UIBlockingProvider` and one QueryClient per session.
 Nested consumers, presets, admin clear actions, audit observation and order metrics
@@ -69,7 +69,7 @@ remains pending until explicitly settled; unmount/reset discards it.
 
 The pending-operation gate prevents duplicate starts in this demonstration.
 Permission, idempotency, backend exclusion and actual request cancellation remain
-application responsibilities; this is not production adoption evidence for ticket 25.
+application responsibilities; this is not production adoption evidence.
 
 ## Query policy
 

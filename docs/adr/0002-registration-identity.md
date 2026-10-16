@@ -1,6 +1,6 @@
 # Preserve explicit registration identity and separate operation labels
 
-Accepted on 2026-10-12 for ticket 27. Defer automatic identity for manual hooks; retain explicit store-local IDs and existing diagnostics. A logical operation label describes work (for example, saving); a registration ID identifies one tracked lifetime. They must not become interchangeable through an automatic migration.
+Accepted on 2026-10-12. Defer automatic identity for manual hooks; retain explicit store-local IDs and existing diagnostics. A logical operation label describes work (for example, saving); a registration ID identifies one tracked lifetime. They must not become interchangeable through an automatic migration.
 
 ## Evidence and options
 

@@ -1,6 +1,6 @@
 # Efficiency assessment — 2026-10-06
 
-**Recommendation:** retain both dependencies. Investigate scoped metadata recomputation as a separate performance follow-up; keep the current boolean subscription behavior. No runtime implementation, scope index, dependency removal or public API change is included in these measurement tickets.
+**Recommendation:** retain both dependencies. Investigate scoped metadata recomputation as a separate performance follow-up; keep the current boolean subscription behavior. No runtime implementation, scope index, dependency removal or public API change is included in this measurement effort.
 
 ## Evidence and environment
 

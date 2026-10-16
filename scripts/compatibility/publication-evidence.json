@@ -363,7 +363,7 @@
   ],
   "sourceBase": "9246f46abdb689a1f8a96060af456fbf3ac6ba8f",
   "packageSourceDiffSha256": "70faec0156711001703e70c9bdad90a41b55bbcbd04b52249665dcc50622ef46",
-  "scope": "Corrected cohort after full-review tickets 01\u201305 and release-review corrections. Planned Changesets tarballs only; npm registry state not inspected or changed.",
+  "scope": "Corrected cohort after Router, lifecycle, schedule, diagnostics and Query stabilization and release-review corrections. Planned Changesets tarballs only; npm registry state not inspected or changed.",
   "toolchain": {
     "node": "22.20.0",
     "pnpm": "11.21.0",

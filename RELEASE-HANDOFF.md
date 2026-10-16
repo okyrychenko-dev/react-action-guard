@@ -81,7 +81,7 @@ upgrading planned capability statements to published guarantees.
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
 
-## PR 13 documentation follow-up
+## Package documentation follow-up
 
 The release documentation fixes on `fix/13-release-feedback` are based on
 `63543da72f0761bf235f78c9b26a5b8ad07d788c`. They correct Core peer requirements,
@@ -199,7 +199,7 @@ capability matrix. In particular, Next App Router remains unload-only. No regist
 publication, release merge, manifest version override or dependency removal was
 performed.
 
-## Corrected cohort — full review ticket 07
+## Corrected stabilization cohort
 
 The tested source is `9246f46abdb689a1f8a96060af456fbf3ac6ba8f` plus the
 migration-guide updates and empty release-evidence changeset on
@@ -238,7 +238,7 @@ evidence. Historical records above are not substituted for fresh verification.
 
 Migration guidance now covers atomic rejection of invalid lifecycle timeouts,
 no-timer sentinels, bounded long waits, empty/invalid scheduled windows and render-time
-Router predicates. Registry state remains uninspected. Ticket 08 publication and
+Router predicates. Registry state remains uninspected. Publication and
 registry-installed verification require separate release authorization; no release
 merge, hosting deployment or npm publication was performed.
 

@@ -1,4 +1,4 @@
-# Scoped metadata follow-up — feedback tickets 18 + 19
+# Scoped metadata follow-up
 
 ## Implementation and ownership
 
@@ -70,4 +70,4 @@ The retained medium synthetic p95 improves by more than 50% and is below 16 ms i
 
 Happy DOM on Node measures synthetic wall time through `flushSync` React commits, not native browser frames, paint or input latency. Development Strict Mode is reported separately from production. Warmups, 20 raw samples, validation outside the timer and matching workload boundaries are retained. Historical/follow-up comparisons are observations from separate runs and package bases, not an isolated causal experiment or cross-machine guarantee. The added scale/churn scenarios have no historical timing baseline.
 
-The prior decision threshold remains: investigate unwanted unrelated renders or unrelated p95 above 16 ms at about 100 blockers / 100 controls per kind in an application's representative workload. A future optimization should show at least 50% lower unrelated p95 on the same target browser/hardware while preserving semantic checks. This follow-up's synthetic comparison does not establish a browser frame budget. Filtering still scales with blockers and consumers; there is no constant-time matching claim. Repeat the application workload on its real browser/hardware before deciding whether any further indexing or shared caching is justified. Dependency removal and browser performance guarantees remain outside these tickets.
+The prior decision threshold remains: investigate unwanted unrelated renders or unrelated p95 above 16 ms at about 100 blockers / 100 controls per kind in an application's representative workload. A future optimization should show at least 50% lower unrelated p95 on the same target browser/hardware while preserving semantic checks. This follow-up's synthetic comparison does not establish a browser frame budget. Filtering still scales with blockers and consumers; there is no constant-time matching claim. Repeat the application workload on its real browser/hardware before deciding whether any further indexing or shared caching is justified. Dependency removal and browser performance guarantees remain outside this assessment.
