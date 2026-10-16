@@ -97,3 +97,29 @@ introduced. Run application typechecking and consumer tests for provider isolati
 timeouts, reasons and failure cleanup. Consult the [contract](./contract) and
 [architecture migration record](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/MIGRATION.md)
 for the preserved architecture details.
+
+## Corrected finite timeouts and scheduled windows
+
+These contracts apply to the planned Core 2.0 cohort; source verification does not
+establish registry publication.
+
+Lifecycle timeouts omitted, zero or finite negative values intentionally install no
+timer. Positive finite timeouts use bounded native timer chunks, including delays
+above 2,147,483,647 ms. NaN, infinity and unrepresentable deadlines throw RangeError
+before registration, replacement or update changes state. Validate dynamic timeout
+inputs before calling the lifecycle API; an invalid update preserves existing protection.
+
+Schedules use half-open `[start, end)` windows. Omit both duration and end for an
+indefinite window. Replace `duration: 0` with omitted bounds if indefinite protection
+was intended: zero duration and equal bounds now mean empty windows without notifications.
+All supplied bounds are validated even when duration takes precedence over end.
+Invalid dates, negative/nonfinite durations, reversed bounds and overflowing calculated
+ends cancel hook-owned work and warn in development without synthesizing completion.
+Epoch-zero dates are real bounds. Distant start/end deadlines use bounded timer chunks;
+a window already elapsed when its start callback runs never activates. Empty
+reconfiguration also releases only hook-owned protection without completion. Keep
+registration IDs unique among owners in the same store.
+
+Keep stable Router predicates pure: they run on each render. Mutating a ref alone
+still does not trigger a render or refresh navigation protection. Diagnostics retain
+original registration lifetimes through scope updates and finalize actual bulk removal.

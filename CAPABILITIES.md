@@ -2,12 +2,16 @@
 
 See the [planned release handoff](RELEASE-HANDOFF.md) for source/manifests,
 disposable Changesets tarballs, migration and the separate publication follow-up.
-The full packed/publication matrix and selected Next production fixtures were
-refreshed on **2026-10-12** from `63543da` with the PR #13 documentation fixes; the linked records identify tested
-versions, tarball hashes and scope. Older dates in the tables describe prior
-evaluations, not additional checks executed in this refresh.
+The packed/publication and selected Next production/browser records were refreshed
+on **2026-10-16** (Next 15.5.23, Chrome 155.0.8059.84) for the corrected cohort from
+`9246f46` plus the release-preparation input hashes. See the corrected-cohort
+section in the handoff for executed checks and limits. Earlier dates in the tables
+remain historical evaluations, not additional checks performed by this refresh.
 
-Evaluated **2026-10-12** for the Changesets-versioned release cohort based on `63543da` plus the source/input hashes in publication evidence: Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query adapter **0.4.0** and Router adapter **1.0.0**. These are the actual planned versions packed in a disposable workspace; source manifests remain unchanged. The pending lifecycle and internal peer updates determine these versions. A manifest alone establishes neither application runtime compatibility nor adoption of a sibling library.
+The planned cohort remains Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query
+adapter **0.4.0** and Router **1.0.0**. Actual pending Changesets were applied in
+a disposable workspace; source versions remain unchanged. These artifacts do not
+establish registry availability or arbitrary peer/browser compatibility.
 
 Evidence kinds follow the sibling modal-manager format:
 

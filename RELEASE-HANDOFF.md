@@ -1,10 +1,10 @@
 # Planned release cohort handoff
 
-The latest candidate is source baseline `743c6f4f004c59ea507ae5c465cff7cb1f34e596`
-plus the release audit changes on `chore/release-stability-audit`. The final audit
-section identifies its inputs and evidence. Earlier verification sections retain
-historical context. This is release preparation, not a registry publication record
-or a statement that the Release workflow has run.
+The corrected candidate starts at `9246f46abdb689a1f8a96060af456fbf3ac6ba8f`
+plus the release-preparation changes on `chore/07-refresh-release-evidence`.
+The corrected-cohort section below records fresh results and their inputs. Earlier
+sections are historical evidence. This is release preparation; registry publication
+and release merge require separate authorization.
 
 ## Version provenance
 
@@ -198,3 +198,57 @@ job. Selected Chrome and memory-router scenarios do not extend the existing
 capability matrix. In particular, Next App Router remains unload-only. No registry
 publication, release merge, manifest version override or dependency removal was
 performed.
+
+## Corrected cohort — full review ticket 07
+
+The tested source is `9246f46abdb689a1f8a96060af456fbf3ac6ba8f` plus the
+migration-guide updates and empty release-evidence changeset on
+`chore/07-refresh-release-evidence`. There are no runtime implementation changes
+in this preparation. The unrelated user edit to `.gitignore` is excluded. The
+JSON records inventory all 59 pending changesets and hash the lockfile and changed
+migration inputs. No accumulated package changeset was discarded; the planned
+Core 2.0.0 / UI, Devtools and Router 1.0.0 / Query 0.4.0 cohort remains unchanged.
+
+Fresh `pnpm run release:check` passed build (including docs/demo), 25 canonical
+examples, 21 reference imports, 2 application snippets, 217 links, lint, typecheck,
+**904 tests**, formatting, publication validation and all **13 packed targets**.
+The tests comprise 35 configuration, 347 Core, 201 Router, 117 Query, 154 Devtools,
+45 UI and 5 coordination-example tests. No source or packed scenario was skipped.
+Packed ESM/CJS loading, NodeNext types, strict peer installation and the existing
+Provider, mutation and navigation fixtures passed within their documented scope.
+
+Fresh publication evidence records SHA-256 for all five tarballs, installed Core
+peers, declaration profiles and bundle measurements. Compatibility evidence now
+also identifies its own five tarball hashes and every selected installed peer.
+Both exercise type-utils 0.1.2 and Toolkit 1.0.0 in fresh consumers. No TypeScript
+implementation change was needed. Source manifests and public exports are preserved.
+
+Local tooling: Node 22.20.0, pnpm 11.21.0, npm 11.19.0, TypeScript 5.6.3 and
+Vitest 4.1.10. The release workflow uses Node 22 and pnpm 12.6.0; this local run
+does not establish that CI toolchain result. Rerun CI for the final release commit.
+Raw successful publication/packed reports and locks remain locally at
+`/tmp/action-guard-publication-8W1Kxy` and
+`/tmp/action-guard-compatibility-WGD2Zv`. Committed JSON is the durable result;
+temporary consumer paths are inspection aids.
+
+The initial sandbox release run failed during the docs build (`spawnSync git EPERM`);
+the successful release run used expanded permissions. The initial Next consumer
+installation timed out (`spawnSync npm ETIMEDOUT`); it supplies no browser success
+evidence. Historical records above are not substituted for fresh verification.
+
+Migration guidance now covers atomic rejection of invalid lifecycle timeouts,
+no-timer sentinels, bounded long waits, empty/invalid scheduled windows and render-time
+Router predicates. Registry state remains uninspected. Ticket 08 publication and
+registry-installed verification require separate release authorization; no release
+merge, hosting deployment or npm publication was performed.
+
+Fresh `pnpm run test:next-runtime` passed Next 15.5.23 production build,
+consumer typecheck and **7 Chrome 155.0.8059.84 scenarios**, with zero
+skips or failures. Pages cancellation/confirmation, latest-attempt handling,
+detach/reattach and subsequent Link protection passed; App same-document navigation
+remained unintercepted; Pages and App native reload prompts and cleanup passed.
+The Next record identifies its independent Core/Router artifact hashes, fixture
+hash and exact peers. Raw reports/locks: `/tmp/action-guard-next-runtime-dMzU3n`.
+Selected Chrome/Next results preserve the documented limits for other browsers,
+Pages history/options and arbitrary RSC compositions. Router browser-history and
+enterprise-demo suites were not rerun for this preparation and remain historical.
