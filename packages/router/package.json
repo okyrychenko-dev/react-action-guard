@@ -62,7 +62,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "clean": "rm -rf dist",
-    "prepublishOnly": "pnpm run clean && pnpm run build",
+    "prepublishOnly": "node ../../scripts/check-publish-artifacts.mjs",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint src browser --ext .ts,.tsx",
     "lint:fix": "eslint src browser --ext .ts,.tsx --fix",
