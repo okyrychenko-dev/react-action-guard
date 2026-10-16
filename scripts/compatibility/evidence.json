@@ -1,12 +1,413 @@
 {
-  "sourceBase": "743c6f4f004c59ea507ae5c465cff7cb1f34e596",
-  "reviewBase": "v1.0.5",
-  "packageSourceDiffSha256": "2727f00e92a8588b8f35a442ff2d74868e352ad430ef5eb92adeaa154e2580b8",
-  "scope": "Release stability audit. Full 13-target planned Changesets cohort; strict peers, ESM/CJS loading and NodeNext declarations. Behavioral checks only as documented in scripts/compatibility/README.md. No publication.",
+  "sourceBase": "9c5150769aebb5ceb96eee5affa2d770a60928c9",
+  "packageSourceDiffSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "packageSourceDiffCommand": "git diff 9c5150769aebb5ceb96eee5affa2d770a60928c9 -- packages .changeset pnpm-lock.yaml",
+  "scope": "Final candidate including the packed Router README correction. Planned Changesets tarballs only; npm registry state not inspected or changed.",
+  "toolchain": {
+    "node": "22.20.0",
+    "pnpm": "11.21.0",
+    "npm": "11.19.0",
+    "typescript": "5.6.3",
+    "vitest": "4.1.10"
+  },
+  "workingTree": {
+    "packageChanges": [],
+    "runtimeChanges": [],
+    "excludedUserChanges": [".gitignore"]
+  },
+  "pendingChangesets": [
+    {
+      "file": "accurate-lifecycle-diagnostics.md",
+      "sha256": "0c49025bf19470ab75444232291b7ad4b487b3751b8f3d2090672c09aa18c1f7"
+    },
+    {
+      "file": "active-query-work.md",
+      "sha256": "43a19ca407d6b406bdadce30da37c940518f07f9b0aeb557510bc715b0aea6bc"
+    },
+    {
+      "file": "async-execution-onboarding.md",
+      "sha256": "0888b28fb110ca5a3931fbc39c356b4dabd7aafecae5dabe3090b498e01e553d"
+    },
+    {
+      "file": "bold-beers-accept.md",
+      "sha256": "d487269d2de0655a9ed127c83b0d1006d724e600385b32f4f4b39893c1e0164b"
+    },
+    {
+      "file": "bright-blockers-live.md",
+      "sha256": "5cf9a6d2cc7c3d73ed461de9b4e31a92da805e70301c425920fa5d1bae5922c1"
+    },
+    {
+      "file": "bright-scopes-align.md",
+      "sha256": "77cde14b33a99ba03422b92c5ac4d345895a22b9028825aad6394df3e61bfaa2"
+    },
+    {
+      "file": "browser-history-verification.md",
+      "sha256": "f27d34b4438a0ae49964c46bf9a74845a1f95c81d226e4af63f96c8b06caf864"
+    },
+    {
+      "file": "calm-tools-migrate.md",
+      "sha256": "5b30387b270e4f21b996fcf17ba6272c43d204e6244d0a5aed7729564807eb8a"
+    },
+    {
+      "file": "canonical-guides-core-contract.md",
+      "sha256": "7d779e5737eacaf2d733ca4167c3fb6e38350d79163e9dd215cd29e050c8c043"
+    },
+    {
+      "file": "checked-coordination-onboarding.md",
+      "sha256": "174ddc5b93fb3be8bce2b97808743f2919eef6cccbb420ce4f0d3103494d9383"
+    },
+    {
+      "file": "clean-blockers-publish.md",
+      "sha256": "e72e0962c0b812bb9ba1fd9c6a8b31778044237af4e99037c92a75d18652686c"
+    },
+    {
+      "file": "core-coordination-onboarding.md",
+      "sha256": "07b902009f162aa340f6aa683c9a24e9102181c69a5e9482754f9fafd6f6bbc0"
+    },
+    {
+      "file": "current-conditional-registration.md",
+      "sha256": "c790be61224ff77679b32f5759616c051aa8fe7d6ed2a78e7187259466f43efd"
+    },
+    {
+      "file": "current-react-router-confirmation.md",
+      "sha256": "5b038c617346abdae032bc7d37d388777d4a97d31794d0f79a8b988503dd8075"
+    },
+    {
+      "file": "deep-guards-contract.md",
+      "sha256": "cd7c051dd4366b0c3aee4ba938daa4c6a7dd0107147fc1360081f9cdf82d3887"
+    },
+    {
+      "file": "duplicate-hook-diagnostics.md",
+      "sha256": "16ccd2b0447ae2175939a7ea8562f0705084fb78c52da8cd854501a51fbfe01f"
+    },
+    {
+      "file": "empty-peer-install-config.md",
+      "sha256": "64be445b218283d2acfc228792980a140cb73c9e3fb5f3610a581fe0416f1eb6"
+    },
+    {
+      "file": "evidence-gated-evolution.md",
+      "sha256": "03130da37e0a14426c978ff571243377e45a001360ee3a112c4e122d6e0e1658"
+    },
+    {
+      "file": "explain-observed-protection.md",
+      "sha256": "8ea0ca6d66bc2eac95452b03ce229230aadf6831a972002fb28dc25a18bdf2fe"
+    },
+    {
+      "file": "explanatory-workflow-showcase.md",
+      "sha256": "bdf1554774f8147cce432e2464c8471604261cd76a538b922732c16de9142370"
+    },
+    {
+      "file": "explicit-scheduled-windows.md",
+      "sha256": "6156e832a528764f53a09f8e9775793a823df1634fece39052161e68f6a07436"
+    },
+    {
+      "file": "four-lands-smash.md",
+      "sha256": "7c56ae5a251cadfbb289fdb21feef59d96ce3c88e4b64345f38482e3bd146f3e"
+    },
+    {
+      "file": "fresh-router-render-conditions.md",
+      "sha256": "76c1ff6f5e56009891d5090ae3612599608396c4a4b39c05bc3c8ab68232a5ef"
+    },
+    {
+      "file": "frozen-normalized-scopes.md",
+      "sha256": "e013d80f73440d33e581e16c365c198bb969de66aca30c2f9ade6554030ae730"
+    },
+    {
+      "file": "fuzzy-dingos-match.md",
+      "sha256": "794a1c9a551e175ab38beef4250a1b28db56493606027c8c025476b09ea47c28"
+    },
+    {
+      "file": "gentle-stores-resolve.md",
+      "sha256": "69d85dff389b45863c684022152cc0168064cba66018a936be1f74bb5141f5f2"
+    },
+    {
+      "file": "mutation-execution-contract.md",
+      "sha256": "b73d3c12cbd3ff35b16cace081ab68eaff43f55e800efb4802d3a449a2d419b6"
+    },
+    {
+      "file": "native-tanstack-navigation.md",
+      "sha256": "5dd10f1195ecd2764ddc01eae0df48bee0bfe77cef92c9e63562c0cf073d73a1"
+    },
+    {
+      "file": "owned-mutation-executions.md",
+      "sha256": "0d61db7d430a6f01a5e4fce96a4c42c0b3f30c852c36c5a851c069e92e8a2299"
+    },
+    {
+      "file": "packed-next-runtime-verification.md",
+      "sha256": "9e063b5cd6aea6fd88b8badc9f96dc6f3dfea460ccfef070a012258b4d7db158"
+    },
+    {
+      "file": "packed-public-compatibility.md",
+      "sha256": "f1a1cd579dfac6f6fa4274f1210244b6bf0886d60ce4763bca1bbbe34384c451"
+    },
+    {
+      "file": "pages-confirmation-ownership.md",
+      "sha256": "8b246e76c1f0ab4ece617870153129debe228c20655af7cbd7f75905fb037bf8"
+    },
+    {
+      "file": "publication-evidence-parity.md",
+      "sha256": "680acb80b7813f814bb2273be090c598ae89ff1becd1fc83c428de637b95d85a"
+    },
+    {
+      "file": "query-differential-contract.md",
+      "sha256": "b2f1c318b1390d377bc8779310cc38d8b064f9053f97f8ef4496482420c5e809"
+    },
+    {
+      "file": "query-registration-ownership.md",
+      "sha256": "1e66bd74c52ddffca333bd372d9e3f9461993f6e9d9cb382886ad7be877cde76"
+    },
+    {
+      "file": "quiet-queries-coordinate.md",
+      "sha256": "9e1c51bd50e076d76a31298c23e16ebbad0098de1c8670a6f6ed39ea58f2692e"
+    },
+    {
+      "file": "quiet-tools-observe.md",
+      "sha256": "9f0014e339013ae3aae26ac9669a9c2cbf6c1b397b4df663e0a673673a537828"
+    },
+    {
+      "file": "reactive-blocker-config.md",
+      "sha256": "a21df009f561a3bd8ef6281fe482e6530bf45c7095b091b3250618902bb89508"
+    },
+    {
+      "file": "real-dogs-jog.md",
+      "sha256": "ad72a57b19648e03c48a4ac0b9ac03413e5d8c74a784970f2003092884219406"
+    },
+    {
+      "file": "refreshed-stabilization-evidence.md",
+      "sha256": "80f7e1423297d6c7e43895f7c21972ceb4febd84e9d03debec8a1a197e2b2914"
+    },
+    {
+      "file": "release-audit-scheduling.md",
+      "sha256": "5f031580af71adc896ff573d577e99ce5d1d81506fcf55dcb046f6faf80478a5"
+    },
+    {
+      "file": "release-documentation-consistency.md",
+      "sha256": "3fb375818919482a9a1f9da66d647fa248b672fb794b813ee85af07082463857"
+    },
+    {
+      "file": "safe-lifecycle-timeout.md",
+      "sha256": "43fbcd3603a9419d59a30dc38d995ffa3cc1f2efa8e9519d99ada042545476f0"
+    },
+    {
+      "file": "scheduled-notification-cleanup.md",
+      "sha256": "42a464f8aacf30f96c1bc1431984735e0a97b177b928a205e435c90273f5283c"
+    },
+    {
+      "file": "scheduled-registration-ownership.md",
+      "sha256": "b85f337227ba7045a1601ead7de4eb67843e7c48f85292d1cec6f5c29ea3e1bb"
+    },
+    {
+      "file": "settled-custom-dialogs.md",
+      "sha256": "24c1b0bc8c19a6768801c93a4f4ae63c2ebc31e0efc66bf41754b09fcefcd2e2"
+    },
+    {
+      "file": "single-flight-confirmation.md",
+      "sha256": "c549f7866bc257ac1eb6572fae0890a5ae7286819142098c38ad043dbbde78c9"
+    },
+    {
+      "file": "slick-eggs-mix.md",
+      "sha256": "d487269d2de0655a9ed127c83b0d1006d724e600385b32f4f4b39893c1e0164b"
+    },
+    {
+      "file": "small-dogs-observe.md",
+      "sha256": "bf715e1b219fce1552241456a811e0a20572ed2c74a4a62120cce4b0d6ef9cce"
+    },
+    {
+      "file": "stable-scoped-metadata.md",
+      "sha256": "51457fcf09d6b8201a3b696477c4ffbfc256df00bc52e1c973f0e53740c5ad17"
+    },
+    {
+      "file": "steady-sessions-observe.md",
+      "sha256": "3da5cfa7bec64c8a72e0175da6ac7262f469f1e34a6aa668a14c59a04779aba5"
+    },
+    {
+      "file": "supported-store-cleanup-docs.md",
+      "sha256": "7414d092b9677b2bcce373e8db0cb799e83a509e9848c80755f038e9ae74a3e0"
+    },
+    {
+      "file": "tame-lions-sneeze.md",
+      "sha256": "2a6293319345cd0c558070db268d51e839786159598e6740d382ba6bd50a21d0"
+    },
+    {
+      "file": "tanstack-confirmation-compatibility.md",
+      "sha256": "aeb4812c6775160524f7bc7e6983126a108cce2242f8243d7458e329830f20c7"
+    },
+    {
+      "file": "tidy-wombats-listen.md",
+      "sha256": "478fdc8e1d489b5f1acb038babae542891338faea7a552da3cc42ada4c326b52"
+    },
+    {
+      "file": "truthful-docs-and-root-license.md",
+      "sha256": "4af6c8d9d019b86e1402d32d2eb49979091eb8b60ff6d6db6ac19ee78abdbdb6"
+    },
+    {
+      "file": "verified-release-handoff.md",
+      "sha256": "1687f6fd01f9021f50361da0811c67373ab21b18778284887d35ce80c2e68772"
+    },
+    {
+      "file": "version-pr-ci-check.md",
+      "sha256": "340a6eba3ad62622cea11fb38ea972acc168c2e1d9e01efeb8613f9d7f8f4fd8"
+    },
+    {
+      "file": "workflow-pilot-learning-materials.md",
+      "sha256": "8e363da3217a64c4102ae07c7571b81045924864443fdf7225462dc7dc5f8ce0"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "path": "pnpm-lock.yaml",
+      "sha256": "fa26eabaa388faf5ca55d84b2fa4fa6342420646ac41da1d3a8d8715c1a9da91"
+    },
+    {
+      "path": "scripts/compatibility/cohort.utils.mjs",
+      "sha256": "f320d26758dec8309f6e0b49780dd19baf6af81701e8cc9c42ac8976eb36bbe7"
+    },
+    {
+      "path": "scripts/release/version.utils.mjs",
+      "sha256": "e51d28e1cb3444400a4f09020149cb86b5947e9a0d2dee83170d6e0ef302da3f"
+    },
+    {
+      "path": "packages/core/package.json",
+      "sha256": "2f854477d784a074d3aed9f9265130e40483537b46266cc6fb4168b466c50df4"
+    },
+    {
+      "path": "packages/core/README.md",
+      "sha256": "2c69a0a4ae042a622b08c9e8910139d465a7aa9fde4bf911549c01b988bfeff9"
+    },
+    {
+      "path": "packages/core/CHANGELOG.md",
+      "sha256": "31cbcde7b98a03cd13304c978f3c9ed43a13e3bec6a557b556127e1f9b268208"
+    },
+    {
+      "path": "packages/core/LICENSE",
+      "sha256": "c6b83095bdd32696e5c84f3e63a662373bd5e70dc2a3747087ec125f6f491566"
+    },
+    {
+      "path": "packages/ui/package.json",
+      "sha256": "30fca2ae774c05775831a37bf0d1e6ef73c16981f56892b4874931dd3dc70b99"
+    },
+    {
+      "path": "packages/ui/README.md",
+      "sha256": "43126473be2459bdaef5bf35bfb955e915ec065dd590cfc47d939e731e272109"
+    },
+    {
+      "path": "packages/ui/CHANGELOG.md",
+      "sha256": "2dceaaab794854703dbdefa1e2b2045dff6e6752b94739ef5c5297bb050f0bf7"
+    },
+    {
+      "path": "packages/ui/LICENSE",
+      "sha256": "c6b83095bdd32696e5c84f3e63a662373bd5e70dc2a3747087ec125f6f491566"
+    },
+    {
+      "path": "packages/router/package.json",
+      "sha256": "f4e1cb041916aac8351660b28e3b1f596ac207882631f13121d75b7223998df2"
+    },
+    {
+      "path": "packages/router/README.md",
+      "sha256": "82d1443b178c67c43dbcfb1bc02a0b2cfb6bc0686a4671bd5d6572bd2f85f645"
+    },
+    {
+      "path": "packages/router/CHANGELOG.md",
+      "sha256": "9cb861a6d3ad0b4efde537580c77cb0fc950ce9d514dd401d197cfffaea96434"
+    },
+    {
+      "path": "packages/router/LICENSE",
+      "sha256": "c6b83095bdd32696e5c84f3e63a662373bd5e70dc2a3747087ec125f6f491566"
+    },
+    {
+      "path": "packages/tanstack/package.json",
+      "sha256": "1b3e4aaa009934d1d4db528a2e59bb5fd2ecc1fa88465b66446e471b0965556f"
+    },
+    {
+      "path": "packages/tanstack/README.md",
+      "sha256": "7e5caf802d8a8eef1aeda45571a45202106b6380cf028056d977ee5c3f54a9dd"
+    },
+    {
+      "path": "packages/tanstack/CHANGELOG.md",
+      "sha256": "3cd188c33e81198493a61cf335445164575bdc1a0ecb8a9d4ef847300906356d"
+    },
+    {
+      "path": "packages/tanstack/LICENSE",
+      "sha256": "c6b83095bdd32696e5c84f3e63a662373bd5e70dc2a3747087ec125f6f491566"
+    },
+    {
+      "path": "packages/devtools/package.json",
+      "sha256": "7aa1362e20e6d7c4c7f75123a0e19856d7356867797655ab4234dac7f8128034"
+    },
+    {
+      "path": "packages/devtools/README.md",
+      "sha256": "21a46df50e04d8ca134dfd6238356c98ddc80398961b1a2cac0113c8fb58c6f6"
+    },
+    {
+      "path": "packages/devtools/CHANGELOG.md",
+      "sha256": "88f3f81ee224322bc57202ea15bc84cb92b596397fa8680f6653914018eca281"
+    },
+    {
+      "path": "packages/devtools/LICENSE",
+      "sha256": "c6b83095bdd32696e5c84f3e63a662373bd5e70dc2a3747087ec125f6f491566"
+    }
+  ],
+  "packages": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0",
+      "sha256": "8e6141f7f9a490320d2191811e28193912e6da5c55175273a1998deb0dcf96f7",
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0"
+      },
+      "readmeSha256": "2c69a0a4ae042a622b08c9e8910139d465a7aa9fde4bf911549c01b988bfeff9"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-devtools",
+      "version": "1.0.0",
+      "sha256": "fc5ba765a49d530d1240bb9e256e34311d5abeef047f2fa2425704e1bc14b2ea",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0"
+      },
+      "readmeSha256": "21a46df50e04d8ca134dfd6238356c98ddc80398961b1a2cac0113c8fb58c6f6"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "sha256": "07f9d19ee8dae9f02e097107c13d3cb74ff7cbc6da735c139dd2d32ca4f3c073",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "@tanstack/react-router": "^1.170.41",
+        "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-router-dom": "^6.19.0 || ^7.0.0"
+      },
+      "readmeSha256": "82d1443b178c67c43dbcfb1bc02a0b2cfb6bc0686a4671bd5d6572bd2f85f645"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-tanstack",
+      "version": "0.4.0",
+      "sha256": "523cd3a2fcd9f3035fa56314fc9da51723782a54821d5664f7898402d8832408",
+      "peerDependencies": {
+        "@okyrychenko-dev/react-action-guard": "^2.0.0",
+        "@tanstack/react-query": "^5.90.10",
+        "react": "^18.0.0 || ^19.0.0"
+      },
+      "readmeSha256": "7e5caf802d8a8eef1aeda45571a45202106b6380cf028056d977ee5c3f54a9dd"
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "version": "1.0.0",
+      "sha256": "e2a143e686758c2217a5815dcad2193451d67af5cd3f77c301eb23968183ebca",
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      },
+      "readmeSha256": "43126473be2459bdaef5bf35bfb955e915ec065dd590cfc47d939e731e272109"
+    }
+  ],
   "results": [
     {
       "target": "next-13-floor",
-      "date": "2026-10-12T17:54:09.269Z",
+      "date": "2026-10-16T15:13:20.233Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -28,7 +429,7 @@
     },
     {
       "target": "next-14-floor",
-      "date": "2026-10-12T17:54:28.317Z",
+      "date": "2026-10-16T15:13:29.260Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -50,7 +451,7 @@
     },
     {
       "target": "next-15-floor",
-      "date": "2026-10-12T17:54:51.063Z",
+      "date": "2026-10-16T15:13:39.424Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -72,7 +473,7 @@
     },
     {
       "target": "next-current",
-      "date": "2026-10-12T17:55:30.652Z",
+      "date": "2026-10-16T15:13:49.557Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -94,7 +495,7 @@
     },
     {
       "target": "query-current",
-      "date": "2026-10-12T17:55:47.170Z",
+      "date": "2026-10-16T15:14:03.370Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -117,7 +518,7 @@
     },
     {
       "target": "query-floor",
-      "date": "2026-10-12T17:55:38.443Z",
+      "date": "2026-10-16T15:13:56.683Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -140,7 +541,7 @@
     },
     {
       "target": "react-18",
-      "date": "2026-10-12T17:52:56.818Z",
+      "date": "2026-10-16T15:12:26.307Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -161,7 +562,7 @@
     },
     {
       "target": "react-19",
-      "date": "2026-10-12T17:53:13.386Z",
+      "date": "2026-10-16T15:12:40.254Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -182,7 +583,7 @@
     },
     {
       "target": "react-19-floor",
-      "date": "2026-10-12T17:53:04.985Z",
+      "date": "2026-10-16T15:12:33.700Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -203,7 +604,7 @@
     },
     {
       "target": "react-router-7-floor",
-      "date": "2026-10-12T17:53:34.263Z",
+      "date": "2026-10-16T15:12:55.901Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -225,7 +626,7 @@
     },
     {
       "target": "react-router-current",
-      "date": "2026-10-12T17:53:42.955Z",
+      "date": "2026-10-16T15:13:03.149Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -247,7 +648,7 @@
     },
     {
       "target": "react-router-floor",
-      "date": "2026-10-12T17:53:24.236Z",
+      "date": "2026-10-16T15:12:48.409Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {
@@ -269,7 +670,7 @@
     },
     {
       "target": "tanstack-router-floor",
-      "date": "2026-10-12T17:53:51.932Z",
+      "date": "2026-10-16T15:13:11.620Z",
       "node": "v22.20.0",
       "strictPeers": true,
       "evaluated": {

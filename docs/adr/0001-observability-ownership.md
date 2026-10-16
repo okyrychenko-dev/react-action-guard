@@ -1,6 +1,6 @@
 # Keep telemetry consumers on Blocking lifecycle observation
 
-Accepted on 2026-10-12 for feedback tickets 20–22. Use application-owned telemetry recipes over the existing Blocking lifecycle observation interface. Retain all existing Core analytics exports and defer their removal: repository consumers demonstrate a need for store-local diagnostics, but provide no evidence that a new package or subpath would justify a public import migration.
+Accepted on 2026-10-12. Use application-owned telemetry recipes over the existing Blocking lifecycle observation interface. Retain all existing Core analytics exports and defer their removal: repository consumers demonstrate a need for store-local diagnostics, but provide no evidence that a new package or subpath would justify a public import migration.
 
 ## Available events and producers
 
@@ -25,7 +25,7 @@ Event timestamps describe transitions. Blocker timestamps in immutable snapshots
 - The enterprise demo's [audit log](../../examples/enterprise-demo/src/features/core/guard/hooks/useAuditLog/useAuditLog.ts) and [session metrics](../../examples/enterprise-demo/src/features/dashboard/session/useSessionMetrics.ts) already use store-local observation. The demo's [action rejection and order-placement events](../../examples/enterprise-demo/src/features/core/sessionEvents.ts) are application workflow events with actual application producers, not Core lifecycle events.
 - Router confirmation callbacks and Core confirmable callbacks are local effects, not shared lifecycle event producers. Attempt, rejection, approval and cancellation telemetry would require a separately chosen producer at the action/confirmation boundary. Blocker removal cannot reconstruct those facts.
 
-These are repository consumer observations, not measured external adoption or vendor demand. Existing lifecycle, analytics, observation-session and inspector suites provide executable contract evidence; exact commands/results are recorded in the local ticket handoff.
+These are repository consumer observations, not measured external adoption or vendor demand. Existing lifecycle, analytics, observation-session and inspector suites provide executable contract evidence; exact commands/results are recorded in the release handoff.
 
 ## Options and decision
 

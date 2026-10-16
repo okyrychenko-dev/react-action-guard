@@ -64,21 +64,28 @@ supported responsibilities from future identity, factory, headless-entry and tel
 These describe current source and planned Core 2.0 stabilization; registry publication and
 release-cohort verification remain separate work.
 
-## Scheduled window validation
+## Corrected finite timeouts and scheduled windows
 
-Scheduled windows are half-open `[start, end)`. Omit both `duration` and `end` to
-request indefinite blocking. A zero duration or equal start/end is empty and emits
-neither start nor end notifications; an epoch-zero end is a real bound.
+These contracts apply to the planned Core 2.0 cohort; source verification does not
+establish registry publication.
 
-A supplied duration takes precedence over a supplied end, but every supplied field
-is validated. Negative or nonfinite duration, invalid dates, end before start, and
-calculated ends outside the JavaScript Date range cancel the schedule and warn in
-development. Invalid or empty reconfiguration cancels timers and releases only the
-hook-owned registration without emitting completion. Keep registration IDs unique
-among owners in the same store. Long finite starts and ends use bounded timer chunks;
-a window already elapsed when its start callback runs never activates.
+Lifecycle timeouts omitted, zero or finite negative values intentionally install no
+timer. Positive finite timeouts use bounded native timer chunks, including delays
+above 2,147,483,647 ms. NaN, infinity and unrepresentable deadlines throw RangeError
+before registration, replacement or update changes state. Validate dynamic timeout
+inputs before calling the lifecycle API; an invalid update preserves existing protection.
 
-Replace `duration: 0` with omitted duration and end when indefinite blocking is intended.
-Correct invalid bounds rather than relying on them to become indefinite. Distant future
-starts now activate at their configured time instead of being ignored. These changes
-apply to the planned source cohort; they do not establish npm publication.
+Schedules use half-open `[start, end)` windows. Omit both duration and end for an
+indefinite window. Replace `duration: 0` with omitted bounds if indefinite protection
+was intended: zero duration and equal bounds now mean empty windows without notifications.
+All supplied bounds are validated even when duration takes precedence over end.
+Invalid dates, negative/nonfinite durations, reversed bounds and overflowing calculated
+ends cancel hook-owned work and warn in development without synthesizing completion.
+Epoch-zero dates are real bounds. Distant start/end deadlines use bounded timer chunks;
+a window already elapsed when its start callback runs never activates. Empty
+reconfiguration also releases only hook-owned protection without completion. Keep
+registration IDs unique among owners in the same store.
+
+Keep stable Router predicates pure: they run on each render. Mutating a ref alone
+still does not trigger a render or refresh navigation protection. Diagnostics retain
+original registration lifetimes through scope updates and finalize actual bulk removal.

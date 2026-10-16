@@ -1,10 +1,10 @@
 # Planned release cohort handoff
 
-The latest candidate is source baseline `743c6f4f004c59ea507ae5c465cff7cb1f34e596`
-plus the release audit changes on `chore/release-stability-audit`. The final audit
-section identifies its inputs and evidence. Earlier verification sections retain
-historical context. This is release preparation, not a registry publication record
-or a statement that the Release workflow has run.
+The latest tested candidate is `9c5150769aebb5ceb96eee5affa2d770a60928c9`,
+including the Router README correction. The final artifact refresh below records
+fresh publication, packed compatibility and Next production/browser checks.
+Earlier verification sections are historical. This is release preparation;
+registry publication and release merge require separate authorization.
 
 ## Version provenance
 
@@ -81,7 +81,7 @@ upgrading planned capability statements to published guarantees.
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
 
-## PR 13 documentation follow-up
+## Package documentation follow-up
 
 The release documentation fixes on `fix/13-release-feedback` are based on
 `63543da72f0761bf235f78c9b26a5b8ad07d788c`. They correct Core peer requirements,
@@ -198,3 +198,91 @@ job. Selected Chrome and memory-router scenarios do not extend the existing
 capability matrix. In particular, Next App Router remains unload-only. No registry
 publication, release merge, manifest version override or dependency removal was
 performed.
+
+## Earlier corrected stabilization cohort
+
+The tested source is `9246f46abdb689a1f8a96060af456fbf3ac6ba8f` plus the
+migration-guide updates and empty release-evidence changeset on
+`chore/refresh-release-evidence`. There are no runtime implementation changes
+in this preparation. The unrelated user edit to `.gitignore` is excluded. The
+JSON records inventory all 59 pending changesets and hash the lockfile and changed
+migration inputs. No accumulated package changeset was discarded; the planned
+Core 2.0.0 / UI, Devtools and Router 1.0.0 / Query 0.4.0 cohort remains unchanged.
+
+Fresh `pnpm run release:check` passed build (including docs/demo), 25 canonical
+examples, 21 reference imports, 2 application snippets, 217 links, lint, typecheck,
+**904 tests**, formatting, publication validation and all **13 packed targets**.
+The tests comprise 35 configuration, 347 Core, 201 Router, 117 Query, 154 Devtools,
+45 UI and 5 coordination-example tests. No source or packed scenario was skipped.
+Packed ESM/CJS loading, NodeNext types, strict peer installation and the existing
+Provider, mutation and navigation fixtures passed within their documented scope.
+
+Fresh publication evidence records SHA-256 for all five tarballs, installed Core
+peers, declaration profiles and bundle measurements. Compatibility evidence now
+also identifies its own five tarball hashes and every selected installed peer.
+Both exercise type-utils 0.1.2 and Toolkit 1.0.0 in fresh consumers. No TypeScript
+implementation change was needed. Source manifests and public exports are preserved.
+
+Local tooling: Node 22.20.0, pnpm 11.21.0, npm 11.19.0, TypeScript 5.6.3 and
+Vitest 4.1.10. The release workflow uses Node 22 and pnpm 12.6.0; this local run
+does not establish that CI toolchain result. Rerun CI for the final release commit.
+Raw successful publication/packed reports and locks remain locally at
+`/tmp/action-guard-publication-8W1Kxy` and
+`/tmp/action-guard-compatibility-WGD2Zv`. Committed JSON is the durable result;
+temporary consumer paths are inspection aids.
+
+The initial sandbox release run failed during the docs build (`spawnSync git EPERM`);
+the successful release run used expanded permissions. The initial Next consumer
+installation timed out (`spawnSync npm ETIMEDOUT`); it supplies no browser success
+evidence. Historical records above are not substituted for fresh verification.
+
+Migration guidance now covers atomic rejection of invalid lifecycle timeouts,
+no-timer sentinels, bounded long waits, empty/invalid scheduled windows and render-time
+Router predicates. Registry state remains uninspected. Publication and
+registry-installed verification require separate release authorization; no release
+merge, hosting deployment or npm publication was performed.
+
+Fresh `pnpm run test:next-runtime` passed Next 15.5.23 production build,
+consumer typecheck and **7 Chrome 155.0.8059.84 scenarios**, with zero
+skips or failures. Pages cancellation/confirmation, latest-attempt handling,
+detach/reattach and subsequent Link protection passed; App same-document navigation
+remained unintercepted; Pages and App native reload prompts and cleanup passed.
+The Next record identifies its independent Core/Router artifact hashes, fixture
+hash and exact peers. Raw reports/locks: `/tmp/action-guard-next-runtime-dMzU3n`.
+Selected Chrome/Next results preserve the documented limits for other browsers,
+Pages history/options and arbitrary RSC compositions. Router browser-history and
+enterprise-demo suites were not rerun for this preparation and remain historical.
+
+## Final artifact refresh
+
+The Router README wording change is included in source commit
+`9c5150769aebb5ceb96eee5affa2d770a60928c9`. Fresh publication, compatibility and
+Next runs use that commit with no package working-tree changes. The unrelated
+`.gitignore` edit is excluded. Documentation and evidence updates produced after
+the runs do not alter packed package inputs.
+
+The refreshed records supersede the earlier artifact hashes. They inventory
+package manifests, READMEs, changelogs, licenses, the lockfile and all 59 pending
+changesets. Each artifact record reads peer dependencies from the tarball manifest,
+checks them against an installed consumer, and records the packed README SHA-256.
+All packed READMEs match the current source bytes; UI's published Core peer is
+`^2.0.0`. Source package versions and the planned cohort remain unchanged.
+
+`pnpm run package:check` passed publint, declaration analysis, installed README
+links/peers, bundle measurements and import probes for all five packages.
+`pnpm run test:packed` passed all 13 strict-peer targets with ESM/CJS loading,
+NodeNext types and the existing public behavior fixtures.
+`pnpm run test:next-runtime` passed the production build, consumer typecheck and
+all 7 Chrome scenarios without skips. Exact peers, browser version and artifact
+hashes are recorded in the refreshed JSON. Raw consumers and reports are at
+`/tmp/action-guard-publication-hm8q6H`,
+`/tmp/action-guard-compatibility-YBtjkM` and
+`/tmp/action-guard-next-runtime-aEqnDd`.
+
+The source suite was not rerun for this metadata refresh; its 904-test result above
+remains separately dated evidence. The local toolchain remains Node 22.20.0,
+pnpm 11.21.0 and npm 11.19.0. Legacy Next floor installations emit existing npm
+security/deprecation warnings; testing those floors is not a deployment recommendation.
+Selected peers and Chrome scenarios retain the existing capability limits.
+No registry publication or release merge was performed; CI must verify the final
+release commit using its configured toolchain.

@@ -1,6 +1,6 @@
 # Evaluate guard instances and headless distribution independently
 
-Accepted on 2026-10-12 for ticket 28. Defer an application guard-instance factory and independently defer a standalone headless entry/package. Current repository consumers use React Providers or the public Core lifecycle; no actual external non-React consumer was supplied.
+Accepted on 2026-10-12. Defer an application guard-instance factory and independently defer a standalone headless entry/package. Current repository consumers use React Providers or the public Core lifecycle; no actual external non-React consumer was supplied.
 
 ## Application guard instance
 
