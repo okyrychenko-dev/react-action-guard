@@ -7,15 +7,17 @@ export function NavigationControl(): ReactElement {
   const reason = blockers[0]?.reason ?? "Navigation is available.";
   const [destination, setDestination] = useState("Profile page");
 
+  const handleOpenDashboard: VoidFunction = () => {
+    setDestination("Dashboard opened");
+  };
+
   return (
     <section aria-labelledby="navigation-heading">
       <h2 id="navigation-heading">Navigation</h2>
       <button
         disabled={blockers.length > 0}
         aria-describedby="navigation-reason"
-        onClick={() => {
-          setDestination("Dashboard opened");
-        }}
+        onClick={handleOpenDashboard}
       >
         Open dashboard
       </button>

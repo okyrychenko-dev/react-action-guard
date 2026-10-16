@@ -10,17 +10,18 @@ interface AppProvidersProps {
   children: (props: AppProvidersRenderProps) => ReactNode;
 }
 
-export function AppProviders({ children }: AppProvidersProps): ReactElement {
+export function AppProviders(props: AppProvidersProps): ReactElement {
+  const { children } = props;
+
   const [demoKey, setDemoKey] = useState(0);
+
+  const handleReset: VoidFunction = () => {
+    setDemoKey((key) => key + 1);
+  };
 
   return (
     <UIBlockingProvider key={demoKey}>
-      <DemoSession
-        demoKey={demoKey}
-        onReset={() => {
-          setDemoKey((key) => key + 1);
-        }}
-      >
+      <DemoSession demoKey={demoKey} onReset={handleReset}>
         {children}
       </DemoSession>
     </UIBlockingProvider>

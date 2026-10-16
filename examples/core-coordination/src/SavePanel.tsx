@@ -1,9 +1,15 @@
-import { useAsyncAction, useIsBlocked } from "@okyrychenko-dev/react-action-guard";
+import {
+  useAsyncAction,
+  useIsBlocked,
+  useUIBlockingContext,
+} from "@okyrychenko-dev/react-action-guard";
+import { isError } from "@okyrychenko-dev/type-utils";
 import { useState } from "react";
 import { simulateSave } from "./save.utils";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function SavePanel(): ReactElement {
+  const store = useUIBlockingContext();
   const runSave = useAsyncAction("save-profile", ["profile", "navigation"]);
   const blocked = useIsBlocked("profile");
   const [status, setStatus] = useState("Ready to save.");
@@ -11,16 +17,33 @@ export function SavePanel(): ReactElement {
   const [error, setError] = useState("");
 
   async function handleSave(): Promise<void> {
+    const { isBlocked } = store.getState();
+
+    if (isBlocked("profile")) {
+      setStatus("Save command blocked: profile is busy.");
+
+      return;
+    }
+
     setStatus("Saving profile…");
     setError("");
+
     try {
       await runSave(() => simulateSave(shouldFail));
       setStatus("Profile saved.");
-    } catch {
+    } catch (error) {
       setStatus("Save finished with an error.");
-      setError("Save failed. Try again.");
+      setError(isError(error) ? error.message : "Save failed. Try again.");
     }
   }
+
+  const handleFailureChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setShouldFail(event.target.checked);
+  };
+
+  const handleSaveClick: VoidFunction = () => {
+    void handleSave();
+  };
 
   return (
     <section aria-labelledby="save-heading">
@@ -31,20 +54,15 @@ export function SavePanel(): ReactElement {
           type="checkbox"
           checked={shouldFail}
           disabled={blocked}
-          onChange={(event) => {
-            setShouldFail(event.target.checked);
-          }}
+          onChange={handleFailureChange}
         />
         Simulate save failure
       </label>
-      <button
-        disabled={blocked}
-        onClick={() => {
-          void handleSave();
-        }}
-      >
+      <button disabled={blocked} onClick={handleSaveClick}>
         Save profile
       </button>
+      <button onClick={handleSaveClick}>Invoke save command</button>
+      <p>This enabled entry point calls the same guarded command as the disabled save button.</p>
       <p role="status">{status}</p>
       {error && <p role="alert">{error}</p>}
     </section>

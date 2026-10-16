@@ -1,13 +1,18 @@
 import { UIBlockingProvider } from "@okyrychenko-dev/react-action-guard";
 import { useState } from "react";
+import { DraftOwner } from "./DraftOwner";
 import { HelpControl } from "./HelpControl";
 import { NavigationControl } from "./NavigationControl";
 import { ProfileEditor } from "./ProfileEditor";
 import { SavePanel } from "./SavePanel";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function App(): ReactElement {
   const [showSaveControls, setShowSaveControls] = useState(true);
+
+  const handleShowSaveControlsChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    setShowSaveControls(event.target.checked);
+  };
 
   return (
     <UIBlockingProvider>
@@ -24,9 +29,7 @@ export function App(): ReactElement {
           <input
             type="checkbox"
             checked={showSaveControls}
-            onChange={(event) => {
-              setShowSaveControls(event.target.checked);
-            }}
+            onChange={handleShowSaveControlsChange}
           />
           Show save controls
         </label>
@@ -38,6 +41,14 @@ export function App(): ReactElement {
           <ProfileEditor />
           <NavigationControl />
         </div>
+        <section aria-labelledby="owners-heading">
+          <h2 id="owners-heading">Repeated editor owners</h2>
+          <p>
+            Each draft owns a distinct registration ID. Clear both drafts to release navigation.
+          </p>
+          <DraftOwner ownerId="A" />
+          <DraftOwner ownerId="B" />
+        </section>
         <HelpControl />
         <footer>
           Scopes match explicit names; dots do not create a hierarchy. This navigation button is a

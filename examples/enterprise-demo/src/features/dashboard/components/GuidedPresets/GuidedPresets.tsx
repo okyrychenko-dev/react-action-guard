@@ -3,7 +3,13 @@ import { SectionTitle } from "@shared/components";
 import { GUIDED_PRESETS } from "./GuidedPresets.constants";
 import { PresetCard } from "./PresetCard";
 import type { ReactElement } from "react";
-import type { GuidedPresetsProps } from "./GuidedPresets.types";
+import type { GuidedPreset } from "../../hooks/useGuidedPresets";
+
+interface GuidedPresetsProps {
+  activePresetId: string | null;
+  onApplyPreset: (preset: GuidedPreset) => void;
+  onClearPresets: VoidFunction;
+}
 
 export function GuidedPresets(props: GuidedPresetsProps): ReactElement {
   const { activePresetId, onApplyPreset, onClearPresets } = props;

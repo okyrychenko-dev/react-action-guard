@@ -2,6 +2,7 @@ import { fileURLToPath } from "node:url";
 import { createVitestConfig } from "../../config/vitest/config.ts";
 
 export default createVitestConfig({
+  base: "./",
   test: {
     setupFiles: ["./src/test/setup.ts"],
     alias: {

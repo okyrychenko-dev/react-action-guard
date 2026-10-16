@@ -3,7 +3,7 @@ import { isDefined } from "@okyrychenko-dev/type-utils";
 import { useState } from "react";
 import { COORDINATION_SCOPES } from "./coordination.constants";
 import { useCoordinationWorkflow } from "./useCoordinationWorkflow";
-import type { ReactElement } from "react";
+import type { ChangeEventHandler, ReactElement } from "react";
 
 export function CoordinationWorkspace(): ReactElement {
   const {
@@ -25,6 +25,22 @@ export function CoordinationWorkspace(): ReactElement {
   const [helpOpen, setHelpOpen] = useState(false);
   const running = isDefined(pending);
   const controlsDisabled = running || buttonState.disabled;
+  const handleValueChange: ChangeEventHandler<HTMLInputElement> = (event) => {
+    edit(event.target.value);
+  };
+
+  const handleStartAgent: VoidFunction = () => {
+    start("agent");
+  };
+
+  const handleStartRecalculation: VoidFunction = () => {
+    start("user");
+  };
+
+  const handleToggleHelp: VoidFunction = () => {
+    setHelpOpen((current) => !current);
+  };
+
   return (
     <section
       aria-label="User and agent coordination"
@@ -41,9 +57,7 @@ export function CoordinationWorkspace(): ReactElement {
           className="w-full rounded border p-2"
           value={value}
           disabled={running || fieldState.disabled}
-          onChange={(event) => {
-            edit(event.target.value);
-          }}
+          onChange={handleValueChange}
         />
       </label>
       <p>Revision: {revision}</p>
@@ -52,18 +66,14 @@ export function CoordinationWorkspace(): ReactElement {
         <button
           className="rounded border px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={controlsDisabled}
-          onClick={() => {
-            start("agent");
-          }}
+          onClick={handleStartAgent}
         >
           Start agent edit
         </button>
         <button
           className="rounded border px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={controlsDisabled}
-          onClick={() => {
-            start("user");
-          }}
+          onClick={handleStartRecalculation}
         >
           Recalculate manually
         </button>
@@ -101,9 +111,7 @@ export function CoordinationWorkspace(): ReactElement {
           className="rounded border px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={helpState.disabled}
           aria-expanded={helpOpen}
-          onClick={() => {
-            setHelpOpen((current) => !current);
-          }}
+          onClick={handleToggleHelp}
         >
           Help and chat
         </button>

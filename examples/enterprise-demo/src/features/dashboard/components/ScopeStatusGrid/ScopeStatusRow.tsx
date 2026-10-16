@@ -9,6 +9,7 @@ interface ScopeStatusRowProps {
 
 export function ScopeStatusRow(props: ScopeStatusRowProps): ReactElement {
   const { scope } = props;
+
   const blockers = useEnterpriseBlockingInfo(scope);
   const isBlocked = blockers.length > 0;
 

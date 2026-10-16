@@ -5,8 +5,8 @@
   "description": "Documentation for React Action Guard - Elegant UI blocking management for React applications",
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev",
-    "build": "vitepress build",
+    "dev": "pnpm run build:demo && vitepress dev",
+    "build": "pnpm run build:demo && vitepress build",
     "preview": "vitepress preview",
     "typedoc": "pnpm run typedoc:core && pnpm run typedoc:devtools && pnpm run typedoc:tanstack && pnpm run typedoc:zustand",
     "typedoc:core": "typedoc --options src/typedoc.core.json",
@@ -16,7 +16,8 @@
     "typedoc:watch": "typedoc --options src/typedoc.core.json --watch",
     "typedoc:watch:devtools": "typedoc --options src/typedoc.devtools.json --watch",
     "typedoc:watch:tanstack": "typedoc --options src/typedoc.tanstack.json --watch",
-    "typedoc:watch:zustand": "typedoc --options src/typedoc.zustand.json --watch"
+    "typedoc:watch:zustand": "typedoc --options src/typedoc.zustand.json --watch",
+    "build:demo": "node ../../scripts/build-docs-demo.mjs"
   },
   "repository": {
     "type": "git",
@@ -35,6 +36,7 @@
   "license": "MIT",
   "devDependencies": {
     "mermaid": "^11.12.2",
+    "react-action-guard-core-example": "workspace:*",
     "typedoc": "^0.28.0",
     "typedoc-plugin-markdown": "^4.0.0",
     "vitepress": "^1.0.0",

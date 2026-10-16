@@ -1,7 +1,7 @@
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
-import { App } from "./App";
+import { App } from "../App";
 
 describe("core coordination example", () => {
   it("should protect two independent consumers while keeping help available and release on success", async () => {
@@ -81,5 +81,36 @@ describe("core coordination example", () => {
     expect(screen.queryAllByText("Executing save-profile")).toHaveLength(0);
     await user.click(screen.getByRole("button", { name: "Open dashboard" }));
     expect(screen.getByText("Dashboard opened")).toBeVisible();
+  });
+  it("should guard a direct save command while an execution is pending", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getByRole("button", { name: "Save profile" }));
+    await user.click(screen.getByRole("button", { name: "Invoke save command" }));
+
+    expect(screen.getByText("Save command blocked: profile is busy.")).toBeVisible();
+    expect(await screen.findByText("Profile saved.", {}, { timeout: 2500 })).toBeVisible();
+    expect(screen.getByRole("button", { name: "Save profile" })).toBeEnabled();
+  });
+
+  it("should keep navigation protected until both distinct draft owners release it", async () => {
+    const user = userEvent.setup();
+
+    render(<App />);
+
+    await user.click(screen.getByRole("checkbox", { name: "Keep editor A draft" }));
+    await user.click(screen.getByRole("checkbox", { name: "Keep editor B draft" }));
+    await user.click(screen.getByRole("checkbox", { name: "Keep editor A draft" }));
+
+    expect(screen.getByRole("button", { name: "Open dashboard" })).toBeDisabled();
+    expect(screen.getByText("Editor B has unsaved changes.")).toBeVisible();
+    expect(screen.getByRole("button", { name: "Save profile" })).toBeEnabled();
+    await user.click(screen.getByRole("button", { name: "Show help" }));
+    expect(screen.getByText("Help stays available while your profile saves.")).toBeVisible();
+
+    await user.click(screen.getByRole("checkbox", { name: "Keep editor B draft" }));
+    expect(screen.getByRole("button", { name: "Open dashboard" })).toBeEnabled();
   });
 });

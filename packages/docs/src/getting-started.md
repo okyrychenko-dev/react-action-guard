@@ -64,6 +64,9 @@ caller unmounts; protection does not exclude concurrent calls or cancel work. Ad
 to your UI; the [forms guide](/guides/forms) shows visible errors. The `navigation` label affects
 navigation only after a consumer such as a router hook is attached.
 
+Try the [interactive coordination example](/onboarding) for guarded commands, independent help
+and repeated registration owners. Check [versions and migration](/versions) before installing.
+
 ## Run a complete example
 
 From a repository checkout:

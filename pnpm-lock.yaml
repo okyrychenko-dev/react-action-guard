@@ -82,6 +82,9 @@ importers:
       '@okyrychenko-dev/react-action-guard':
         specifier: workspace:*
         version: link:../../packages/core
+      '@okyrychenko-dev/type-utils':
+        specifier: ^0.1.2
+        version: 0.1.2
       react:
         specifier: ^19.2.0
         version: 19.2.8
@@ -238,6 +241,9 @@ importers:
       mermaid:
         specifier: ^11.12.2
         version: 11.16.1
+      react-action-guard-core-example:
+        specifier: workspace:*
+        version: link:../../examples/core-coordination
       typedoc:
         specifier: ^0.28.0
         version: 0.28.20(typescript@5.9.3)

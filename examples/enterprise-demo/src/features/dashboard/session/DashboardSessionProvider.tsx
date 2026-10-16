@@ -8,9 +8,9 @@ interface DashboardSessionProviderProps {
   children: ReactNode;
 }
 
-export function DashboardSessionProvider({
-  children,
-}: DashboardSessionProviderProps): ReactElement {
+export function DashboardSessionProvider(props: DashboardSessionProviderProps): ReactElement {
+  const { children } = props;
+
   const metrics = useSessionMetrics();
   const presets = useGuidedPresets({ presets: GUIDED_PRESETS });
 

@@ -2,9 +2,16 @@ import { Button, Card, Link as HeroLink, buttonVariants } from "@heroui/react";
 import { Link } from "react-router-dom";
 import { DEMO_STEPS } from "./DemoGuide.constants";
 import type { ReactElement } from "react";
-import type { DemoGuideProps } from "./DemoGuide.types";
 
-export function DemoGuide({ isHighRiskActive, onStart, onClear }: DemoGuideProps): ReactElement {
+interface DemoGuideProps {
+  isHighRiskActive: boolean;
+  onStart: VoidFunction;
+  onClear: VoidFunction;
+}
+
+export function DemoGuide(props: DemoGuideProps): ReactElement {
+  const { isHighRiskActive, onStart, onClear } = props;
+
   return (
     <section aria-labelledby="demo-guide-title">
       <Card className="gap-0 overflow-hidden p-0">
