@@ -15,18 +15,18 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6.1.0
         with:
           version: 12.6.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: pnpm
+          node-version: 24
+          package-manager-cache: false
           registry-url: https://registry.npmjs.org
 
       - run: pnpm install --frozen-lockfile
@@ -46,6 +46,11 @@ jobs:
       - name: Verify publication and strict packed compatibility
         run: pnpm run package:check && pnpm run test:packed
 
+      - name: Consume empty changesets before release decision
+        run: |
+          pnpm exec changeset status --output="$RUNNER_TEMP/changeset-release-status.json"
+          node scripts/consume-empty-changesets.mjs "$RUNNER_TEMP/changeset-release-status.json"
+
       - name: Create release PR or publish to npm
         uses: changesets/action@v1
         with:
@@ -53,4 +58,3 @@ jobs:
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

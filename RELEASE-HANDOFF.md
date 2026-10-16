@@ -87,6 +87,33 @@ upgrading planned capability statements to published guarantees.
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
 
+## Publication authentication and build ownership
+
+Release infrastructure changes can carry an empty changeset to satisfy the PR
+check without bumping package versions. Before the release action decides between
+versioning and publication, the workflow consumes only changesets whose parsed
+release list is empty. Non-empty changesets remain for the normal version PR.
+This prevents empty notes from suppressing publication of already-versioned packages.
+
+The release workflow installs pnpm 12.6.0 with `pnpm/action-setup@v6.1.0`,
+which adds pnpm 12 support. It uses Node 24 and npm Trusted Publishing through GitHub Actions
+OIDC, matching the sibling React libraries. Configure a trusted publisher on each
+of the five npm packages for owner `okyrychenko-dev`, repository `react-action-guard`
+and workflow `release.yml`. The workflow grants `id-token: write` and does not pass
+`NPM_TOKEN` or request an interactive OTP. Package settings must permit trusted
+publication; workflow configuration alone does not establish that npm is configured.
+
+`pnpm release` builds the workspace in dependency order before Changesets publishes
+packages concurrently. Each package's `prepublishOnly` validates its exported build
+artifacts without cleaning or rebuilding them. Concurrent lifecycle rebuilds can
+otherwise remove Core declarations while dependent packages are generating types.
+For manual publication, build from the repository root first.
+
+After a failed attempt, inspect all five exact registry versions before retrying.
+Changesets skips versions already published; retain the intended source versions
+and verify the complete cohort after recovery. A successful CI check or GitHub
+release alone does not establish registry publication.
+
 ## Historical package documentation follow-up
 
 The release documentation fixes on `fix/13-release-feedback` are based on
