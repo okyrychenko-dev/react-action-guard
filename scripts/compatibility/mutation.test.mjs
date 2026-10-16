@@ -12,7 +12,7 @@ for (const key of ["window", "document", "navigator", "HTMLElement", "Node"]) {
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const { act, createElement: h } = await import("react");
 const { createRoot } = await import("react-dom/client");
-const { QueryClient } = await import("@tanstack/react-query");
+const { QueryClient, useMutation } = await import("@tanstack/react-query");
 const { useBlockingMutation } = await import("@okyrychenko-dev/react-action-guard-tanstack");
 const { uiBlockingStoreApi } = await import("@okyrychenko-dev/react-action-guard");
 const roots = new Set();
@@ -29,7 +29,8 @@ function deferred() {
 }
 function mount(
   options,
-  client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } })
+  client = new QueryClient({ defaultOptions: { mutations: { gcTime: Infinity } } }),
+  useMutationHook = useBlockingMutation
 ) {
   clients.add(client);
   const container = document.createElement("div");
@@ -38,7 +39,7 @@ function mount(
   roots.add(root);
   let mutation;
   function Probe() {
-    mutation = useBlockingMutation(options, client);
+    mutation = useMutationHook(options, client);
     return null;
   }
   act(() => root.render(h(Probe)));
@@ -225,4 +226,69 @@ for (const method of ["mutate", "mutateAsync"]) {
     });
     assert.equal(blockers().length, 0);
   });
+}
+
+// Run the same public scenario against the installed native and packed hooks.
+for (const method of ["mutate", "mutateAsync"]) {
+  for (const outcome of ["success", "failure"]) {
+    it(`should match native callbacks, reset and latest result through packed ${method} (${outcome})`, async () => {
+      const transcripts = [];
+      for (const useMutationHook of [useMutation, useBlockingMutation]) {
+        const a = deferred();
+        const b = deferred();
+        const failure = new Error("B failed");
+        const events = [];
+        const hook = mount(
+          {
+            mutationFn: (name) => (name === "A" ? a.promise : b.promise),
+            onSuccess: (data, name) => events.push(`success ${name} ${data}`),
+            onError: (error, name) => events.push(`error ${name} ${error.message}`),
+            onSettled: (_data, _error, name) => events.push(`settled ${name}`),
+            blockingConfig: { scope: "packed-mutation", onError: true },
+          },
+          undefined,
+          useMutationHook
+        );
+        let first;
+        let second;
+        act(() => {
+          first = hook.current()[method]("A", { onSettled: () => events.push("call A") });
+          const promise = hook.current()[method]("B", { onSettled: () => events.push("call B") });
+          second = promise?.catch((error) => error);
+        });
+        await act(async () => {
+          if (outcome === "success") b.resolve("B result");
+          else b.reject(failure);
+          await second;
+        });
+        await waitForMutationResult(
+          () => hook.current().status === (outcome === "success" ? "success" : "error")
+        );
+        assert.equal(hook.current().variables, "B");
+        assert.equal(hook.current().data, outcome === "success" ? "B result" : undefined);
+        assert.equal(hook.current().error, outcome === "success" ? null : failure);
+        const expectedBlockers = useMutationHook === useBlockingMutation ? 1 : 0;
+        assert.equal(blockers().length, expectedBlockers);
+        await act(async () => hook.current().reset());
+        await waitForMutationResult(() => hook.current().isIdle);
+        assert.equal(blockers().length, expectedBlockers);
+        hook.unmount();
+        await act(async () => {
+          a.resolve("A result");
+          await first;
+        });
+        await waitForMutationResult(() => events.includes("settled A"));
+        assert.equal(blockers().length, 0);
+        assert.deepEqual(events, [
+          outcome === "success" ? "success B B result" : "error B B failed",
+          "settled B",
+          "call B",
+          "success A A result",
+          "settled A",
+        ]);
+        transcripts.push(events);
+      }
+      assert.deepEqual(transcripts[1], transcripts[0]);
+    });
+  }
 }

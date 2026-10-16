@@ -159,6 +159,27 @@ A timeout bounds a **registration episode**, not an operation. Additional calls,
 
 Pending work can retain protection indefinitely after unmount without a timeout. An expired episode can admit more work without protection until its coverage clears. See the [execution lifetime decision](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/tanstack/docs/adr/0001-mutation-execution-lifetime.md) for the full contract and compatibility boundaries.
 
+### Native mutation compatibility checks
+
+Differential tests run the same overlapping A/B calls through native `useMutation`
+and `useBlockingMutation`: hook/per-call success and error callbacks, latest-result
+selection, reset and error boundaries. Reset and detach suppress per-call callbacks
+according to native observation; hook callbacks still complete. Error boundaries can
+unmount the observer while an older owned call keeps protection until settlement.
+
+The selected packed-consumer versions are Query **5.90.10** (declared peer floor)
+and **5.104.1** (repository comparison target), with React/DOM **19.2.8**.
+These are selected compatibility points, not proof of every version in `^5.90.10`
+or a claim about the latest registry release. Fresh tarball checks use native and
+adapter hooks for both `mutate` and `mutateAsync`, including reversed completion,
+success/failure callbacks and reset while older work remains pending.
+
+The intentional addition is coordination for all owned executions: native result
+observation may already show B's result or idle after reset while A still protects
+its originating store. Neither invocation deduplication nor cancellation is added.
+See the [compatibility matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/README.md)
+for commands, selected versions and the limits of packed checks.
+
 ## Tree Shaking
 
 The library is fully tree-shakeable. Import only the hooks you need to keep your bundle size small:
