@@ -95,7 +95,8 @@ versioning and publication, the workflow consumes only changesets whose parsed
 release list is empty. Non-empty changesets remain for the normal version PR.
 This prevents empty notes from suppressing publication of already-versioned packages.
 
-The release workflow uses Node 24 and npm Trusted Publishing through GitHub Actions
+The release workflow installs pnpm 12.6.0 with `pnpm/action-setup@v6.1.0`,
+which adds pnpm 12 support. It uses Node 24 and npm Trusted Publishing through GitHub Actions
 OIDC, matching the sibling React libraries. Configure a trusted publisher on each
 of the five npm packages for owner `okyrychenko-dev`, repository `react-action-guard`
 and workflow `release.yml`. The workflow grants `id-token: write` and does not pass
