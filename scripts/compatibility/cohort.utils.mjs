@@ -1,7 +1,59 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, symlinkSync } from "node:fs";
-import { join } from "node:path";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  readFileSync,
+  readdirSync,
+  rmSync,
+  symlinkSync,
+} from "node:fs";
+import { join, resolve } from "node:path";
+import { readCohortArtifact, writeCohortArtifact } from "./artifact.utils.mjs";
 import { applyReleaseVersions } from "../release/version.utils.mjs";
+
+export function sourceCommit(repository) {
+  return execFileSync("git", ["rev-parse", "HEAD"], { cwd: repository, encoding: "utf8" }).trim();
+}
+
+export function packageIdentities(repository) {
+  const packages = {};
+  for (const id of readdirSync(join(repository, "packages"))) {
+    const path = join(repository, "packages", id, "package.json");
+    if (!existsSync(path)) continue;
+    const { name, private: isPrivate } = JSON.parse(readFileSync(path, "utf8"));
+    if (!isPrivate) packages[id] = name;
+  }
+  return packages;
+}
+
+export function consumePackedCohort(repository, temporary) {
+  const artifact = process.env.ACTION_GUARD_COHORT;
+  if (artifact)
+    return readCohortArtifact(
+      resolve(artifact),
+      sourceCommit(repository),
+      packageIdentities(repository)
+    );
+  // Standalone checks retain their own dependency-ordered package preparation.
+  execFileSync("pnpm", ["run", "build:packages"], { cwd: repository, stdio: "inherit" });
+  return preparePackedCohort(repository, temporary);
+}
+
+export function restorePackageBuilds(repository, artifact) {
+  const result = readCohortArtifact(
+    artifact,
+    sourceCommit(repository),
+    packageIdentities(repository)
+  );
+  for (const id of Object.keys(result.tarballs)) {
+    rmSync(join(repository, "packages", id, "dist"), { recursive: true, force: true });
+    cpSync(join(artifact, "builds", id), join(repository, "packages", id, "dist"), {
+      recursive: true,
+    });
+  }
+  return result;
+}
 
 // Apply the actual pending Changesets in a disposable workspace. Source manifests
 // stay untouched; only this versioned cohort is packed and installed by consumers.
@@ -60,7 +112,17 @@ export function preparePackedCohort(repository, temporary) {
       stdio: "inherit",
       timeout: 60_000,
     });
-    tarballs[id] = { name: manifest.name, version: manifest.version, directory, tarball };
+    tarballs[id] = { name: manifest.name, version: manifest.version, tarball };
   }
-  return { cohort, tarballs };
+  const identities = {};
+  for (const [id, { name, version }] of Object.entries(tarballs)) {
+    identities[id] = { name, version, tarball: `${id}.tgz` };
+    cpSync(join(repository, "packages", id, "dist"), join(temporary, "builds", id), {
+      recursive: true,
+    });
+  }
+  // The versioned workspace is preparation-only; transport immutable files only.
+  rmSync(cohort, { recursive: true, force: true });
+  const metadata = writeCohortArtifact(temporary, sourceCommit(repository), identities);
+  return { tarballs, metadata };
 }

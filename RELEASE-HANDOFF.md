@@ -414,3 +414,78 @@ security/deprecation warnings; testing those floors is not a deployment recommen
 Selected peers and Chrome scenarios retain the existing capability limits.
 No registry publication or release merge was performed; CI must verify the final
 release commit using its configured toolchain.
+
+## Verification and publication gate
+
+PRs enter the reusable `Verification` workflow through `CI`; main pushes enter the
+same graph through `Release`. Release remains the npm Trusted Publisher workflow
+identity (`.github/workflows/release.yml`). Only its release job has repository
+write, pull-request write and OIDC permissions. PR verification has read access.
+Both callers select pnpm through `package.json` with pnpm/action-setup v6.1.0.
+
+Package preparation builds the five publishable packages in dependency order,
+without the documentation site, and applies pending Changesets in a disposable
+workspace. The `verified-cohort` artifact contains tarballs, original build outputs
+and `cohort.json`: source commit, package names/versions and SHA-256 for every
+transported file. Consumers reject another commit, missing files, unexpected files
+and changed hashes. Publication, all thirteen compatibility targets and production
+Next checks download that artifact; their evidence includes its metadata even when
+later checks fail. Static checks run independently. Typechecks, documentation,
+Node 22/24 tests and navigation browser checks restore the same package builds;
+coverage runs on Node 22 only. Each job owns its workspace and temporary outputs.
+
+The final gate uses `always()` and requires every expected job to report `success`;
+failure, cancellation, missing results or unexpected skips fail it. Release requires
+a successful reusable workflow and its exact commit output, on a main push. It
+consumes empty Changesets and preserves the Changesets Version PR decision. A
+candidate with unapplied versions cannot reach verified publication: source package
+versions must match, and a fresh pack of restored source must have exactly the same
+file contents as the verified tarballs. Archive timestamps/compression do not affect
+this content comparison. `pnpm release:verified` performs no build; the standalone
+`pnpm release` command still builds before publishing.
+
+After partial publication, rerun Release for the same commit. Changesets skips
+existing registry versions. After successful publication, the command checks every
+expected registry version, creates missing current-version tags and explicitly
+pushes those tags, including tags from an earlier interrupted run. Conflicting
+remote tags fail rather than being overwritten. Never bump versions to retry.
+Run `pnpm release:verified --dry-run` only with the cohort and exact main-push
+context to verify inputs without contacting the publish endpoint.
+
+### Required checks and rollout
+
+Before merging, migrate branch protection from `Verify (Node 22)` and
+`Verify (Node 24)` to the aggregate reusable `Verification gate` check under the
+PR `verification` job, and retain `Changeset check`. Confirm GitHub's displayed
+check names on the first PR run before removing old requirements. The gate covers
+all matrix children and every required browser/documentation/consumer job.
+Keep main publication serialized; do not introduce a second independent publisher.
+
+Local contract tests exercise artifact transport and each gate failure state.
+A real PR run must still confirm Actions scheduling, displayed check names and
+failure propagation. Record baseline and new wall-clock duration, job durations,
+package build counts and total runner minutes, including queue/cache differences;
+no measured speedup is claimed by local execution. Actual npm provenance, release
+tags and partial-publication recovery require the next authorized release.
+
+### Local verification evidence
+
+Validated on Node 22.20.0 with the locally installed pnpm 11.21.0; the configured
+Actions toolchain remains the packageManager-pinned pnpm 12.6.0 on Node 22/24.
+The pinned Actions toolchain and Node 24 execution still need the first hosted run.
+
+- Built one five-package cohort, restored it, and reused it across all thirteen
+  compatibility targets, strict publication checks (publint/ATTW), and seven
+  production Next browser scenarios. All passed. Navigation browser checks: 2 passed.
+- Four contract tests passed, covering artifact transport, hash/file/commit/package
+  rejection, each required gate failure state, exact main-push context, and real
+  package-content correspondence with a rejected source modification.
+- Package and example typechecks, all workspace lints/format checks, documentation
+  compilation/link checks and the production documentation/demo build passed.
+  actionlint 1.7.7 accepted all three workflows.
+- Independent Standards and Spec reviews reported no remaining findings.
+
+Evidence is retained locally at `/tmp/action-guard-shared-cohort-retry`,
+`/tmp/action-guard-compatibility-3r9lYR`, `/tmp/action-guard-publication-S0Rnuy`, and
+`/tmp/action-guard-next-runtime-NCOxR7`. Temporary paths are local evidence,
+not release assets or hosted CI results. No npm publish endpoint was contacted.

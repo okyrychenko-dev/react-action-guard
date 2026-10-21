@@ -1,7 +1,7 @@
 # Packed compatibility checks
 
-Run `pnpm run build` then `pnpm run test:packed` (all targets), or
-`pnpm run test:packed react-18` (one target). Requires Node 22+, pnpm, npm, and registry access. CI selects pnpm 12.6.0. The recorded local evaluation used Node 22.20.0, pnpm 11.21.0 and npm 11.19.0. CI runs each target independently.
+Run `pnpm run test:packed` (all targets), or
+`pnpm run test:packed react-18` (one target). Requires Node 22+, pnpm, npm, and registry access. CI selects the pnpm version pinned in package.json. The recorded local evaluation used Node 22.20.0, pnpm 11.21.0 and npm 11.19.0. CI runs each target independently.
 
 The runner copies built artifacts and package manifests into a disposable workspace, applies the actual pending Changesets there, then packs all five publishable packages with pnpm and installs tarballs into
 fresh temporary npm consumers, and executes Node ESM and CommonJS imports plus
@@ -73,3 +73,15 @@ Next floor checks establish loading and declarations only. The existing browser
 suite separately establishes Chrome same-document TanStack history behavior.
 
 Memory-router tests use Node’s `development` export condition with Happy DOM browser globals; native Node loading uses default conditions. This distinction is necessary for TanStack’s server/client conditional exports and is not evidence of a native browser run.
+
+## Shared CI cohort
+
+`pnpm run cohort:prepare <empty-directory>` builds packages once and creates a
+transportable cohort, without building the documentation site. Set
+`ACTION_GUARD_COHORT` to the downloaded directory for `package:check`, `test:packed`
+and `test:next-runtime`. The commands validate commit, package identities and every
+content hash before installing consumers. A supplied invalid cohort fails without
+fallback. Without the variable, each command builds and prepares its own cohort.
+`pnpm run cohort:restore` validates the artifact and restores package dist outputs
+for source tests/typechecks. See the root release handoff for publication ownership
+and branch-protection rollout.

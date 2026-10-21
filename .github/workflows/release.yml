@@ -1,64 +1,63 @@
 name: Release
 
-env:
-  # Release commits and tag pushes must not start competing verification builds.
-  HUSKY: "0"
-
 on:
   push:
     branches: [main]
 
-concurrency: ${{ github.workflow }}-${{ github.ref }}
+concurrency:
+  group: release-main
+  cancel-in-progress: false
 
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write # required for npm provenance
+  contents: read
+
+env:
+  HUSKY: "0"
 
 jobs:
+  verification:
+    uses: ./.github/workflows/verification.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   release:
+    needs: verification
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.verification.result == 'success' && needs.verification.outputs.commit == github.sha
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+      VERIFIED_COMMIT: ${{ needs.verification.outputs.commit }}
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ github.sha }}
           fetch-depth: 0
-
       - uses: pnpm/action-setup@v6.1.0
-        with:
-          version: 12.6.0
-
       - uses: actions/setup-node@v6
         with:
           node-version: 24
           package-manager-cache: false
           registry-url: https://registry.npmjs.org
-
       - run: pnpm install --frozen-lockfile
-
-      - name: Typecheck
-        run: pnpm run typecheck
-
-      - name: Lint
-        run: pnpm run lint
-
-      - name: Build
-        run: pnpm run build
-
-      - name: Test
-        run: pnpm run test:run
-
-      - name: Verify publication and strict packed compatibility
-        run: pnpm run package:check && pnpm run test:packed
-
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
       - name: Consume empty changesets before release decision
         run: |
           pnpm exec changeset status --output="$RUNNER_TEMP/changeset-release-status.json"
           node scripts/consume-empty-changesets.mjs "$RUNNER_TEMP/changeset-release-status.json"
-
-      - name: Create release PR or publish to npm
+      - name: Create release PR or publish verified packages
         uses: changesets/action@v1
         with:
-          publish: pnpm release
+          publish: pnpm release:verified
           version: pnpm version-packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

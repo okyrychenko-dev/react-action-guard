@@ -5,12 +5,13 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSyn
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
+import { consumePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-next-runtime-"));
 console.log(`Next runtime consumer and evidence: ${temporary}`);
-const { tarballs } = preparePackedCohort(repository, temporary);
+const { tarballs, metadata: cohortMetadata } = consumePackedCohort(repository, temporary);
+writeFileSync(join(temporary, "cohort.json"), JSON.stringify(cohortMetadata, null, 2));
 const consumer = join(temporary, "consumer");
 mkdirSync(consumer);
 cpSync(join(repository, "scripts/next-runtime/fixture"), consumer, { recursive: true });

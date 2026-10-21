@@ -6,11 +6,12 @@ import { join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
 import { build } from "esbuild";
-import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
+import { consumePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-publication-"));
-const { tarballs } = preparePackedCohort(repository, temporary);
+const { tarballs, metadata: cohortMetadata } = consumePackedCohort(repository, temporary);
+writeFileSync(join(temporary, "cohort.json"), JSON.stringify(cohortMetadata, null, 2));
 const checks = [];
 for (const [id, { name, version, tarball }] of Object.entries(tarballs)) {
   execFileSync(join(repository, "node_modules/.bin/publint"), [tarball, "--strict"], {
