@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createRequire } from "node:module";
-import { preparePackedCohort } from "./compatibility/cohort.utils.mjs";
+import { consumePackedCohort } from "./compatibility/cohort.utils.mjs";
 
 const repository = fileURLToPath(new URL("../", import.meta.url));
 const temporary = mkdtempSync(join(tmpdir(), "action-guard-compatibility-"));
@@ -36,7 +36,8 @@ for (const name of cases)
 function run(command, args, cwd = repository) {
   return execFileSync(command, args, { cwd, stdio: "inherit", timeout: 240_000 });
 }
-const { tarballs } = preparePackedCohort(repository, temporary);
+const { tarballs, metadata: cohortMetadata } = consumePackedCohort(repository, temporary);
+writeFileSync(join(temporary, "cohort.json"), JSON.stringify(cohortMetadata, null, 2));
 for (const name of cases) {
   console.log(`\nChecking packed consumer: ${name}`);
   const consumer = join(temporary, name);

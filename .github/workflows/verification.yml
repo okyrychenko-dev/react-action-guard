@@ -1,0 +1,354 @@
+name: Verification
+
+on:
+  workflow_call:
+    secrets:
+      CODECOV_TOKEN:
+        required: false
+    outputs:
+      commit:
+        description: Exact commit whose required verification succeeded
+        value: ${{ jobs.gate.outputs.commit }}
+
+permissions:
+  contents: read
+
+env:
+  HUSKY: "0"
+
+jobs:
+  prepare:
+    name: Prepare package cohort
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Check pinned package manager
+        run: test "$(pnpm --version)" = "$(node -p "require('./package.json').packageManager.split('@')[1]")"
+      - run: pnpm run cohort:prepare .cache/verified-cohort
+      - uses: actions/upload-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+          include-hidden-files: true
+          if-no-files-found: error
+
+  static:
+    name: Static (${{ matrix.check }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        check: ["format:check", "check:toolkit-version"]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run ${{ matrix.check }}
+
+  lint:
+    name: Lint
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - run: pnpm run lint
+
+  types:
+    name: Typecheck
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - run: pnpm --filter "./packages/*" -r run typecheck
+      - run: pnpm --filter react-action-guard-core-example exec tsc --noEmit
+
+  runtime:
+    name: Runtime (Node ${{ matrix.node }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - run: pnpm run test:config
+      - name: Test with coverage
+        if: matrix.node == 22
+        run: pnpm -r run test:coverage
+      - name: Test
+        if: matrix.node == 24
+        run: pnpm -r run test:run
+      - name: Upload coverage
+        if: always() && matrix.node == 22
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-results
+          path: packages/*/coverage
+          if-no-files-found: ignore
+      - uses: codecov/codecov-action@v4
+        if: matrix.node == 22
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  documentation:
+    name: Documentation
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - run: pnpm run docs:check
+      - run: pnpm --filter @okyrychenko-dev/react-action-guard-docs run build
+
+  navigation:
+    name: Navigation browser
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - name: Install Chrome (up to three attempts)
+        run: |
+          for attempt in 1 2 3; do
+            echo "Chrome installation attempt $attempt"
+            pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome && exit 0
+          done
+          exit 1
+      - run: pnpm --filter @okyrychenko-dev/react-action-guard-router test:browser
+        timeout-minutes: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: navigation-browser-results
+          path: packages/router/.cache/browser-history
+          include-hidden-files: true
+          if-no-files-found: ignore
+
+  publication:
+    name: Packed publication checks
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run package:check
+      - name: Upload publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publication-results
+          path: |
+            /tmp/action-guard-publication-*/cohort.json
+            /tmp/action-guard-publication-*/publication.json
+            /tmp/action-guard-publication-*/*-attw.json
+            /tmp/action-guard-publication-*/consumer/package-lock.json
+          if-no-files-found: ignore
+
+  packed-compatibility:
+    name: Packed compatibility (${{ matrix.target }})
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          [
+            react-18,
+            react-19,
+            react-19-floor,
+            react-router-floor,
+            react-router-7-floor,
+            react-router-current,
+            tanstack-router-floor,
+            next-13-floor,
+            next-14-floor,
+            next-15-floor,
+            next-current,
+            query-floor,
+            query-current,
+          ]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run test:packed ${{ matrix.target }}
+      - name: Upload isolated consumer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: packed-${{ matrix.target }}
+          path: |
+            /tmp/action-guard-compatibility-*/cohort.json
+            /tmp/action-guard-compatibility-*/${{ matrix.target }}/result.json
+            /tmp/action-guard-compatibility-*/${{ matrix.target }}/package-lock.json
+          if-no-files-found: ignore
+
+  next-runtime:
+    name: Packed Next Pages and App runtime
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - name: Install Chrome (up to three attempts)
+        run: |
+          for attempt in 1 2 3; do
+            echo "Chrome installation attempt $attempt"
+            pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome && exit 0
+          done
+          exit 1
+      - run: pnpm run test:next-runtime
+      - name: Upload production Next evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-runtime-results
+          path: |
+            /tmp/action-guard-next-runtime-*/cohort.json
+            /tmp/action-guard-next-runtime-*/result.json
+            /tmp/action-guard-next-runtime-*/core.tgz
+            /tmp/action-guard-next-runtime-*/router.tgz
+            /tmp/action-guard-next-runtime-*/consumer/package-lock.json
+            /tmp/action-guard-next-runtime-*/consumer/browser-results.json
+            /tmp/action-guard-next-runtime-*/consumer/artifacts
+          if-no-files-found: ignore
+
+  gate:
+    name: Verification gate
+    if: always()
+    needs:
+      [
+        prepare,
+        static,
+        lint,
+        types,
+        runtime,
+        documentation,
+        publication,
+        packed-compatibility,
+        next-runtime,
+        navigation,
+      ]
+    runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.gate.outputs.commit }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - id: gate
+        env:
+          VERIFICATION_RESULTS: ${{ toJSON(needs) }}
+        run: node scripts/release/verify-gate.mjs
