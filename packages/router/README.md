@@ -535,12 +535,19 @@ Tree-shakeable by router adapter. Import only what you need:
 import { useNavigationBlocker } from "@okyrychenko-dev/react-action-guard-router/react-router";
 ```
 
-**Approximate sizes (minified):**
+Use the [publication report](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/publication-evidence.json)
+for dated, per-entry-point measurements and the exact evaluated cohort. It records
+raw and gzip byte counts for distributed files and minimal consumer bundles,
+including separate React Router, TanStack Router and Next.js entry points.
 
-- Core utilities: ~2 KB
-- React Router adapter: ~2.5 KB
-- TanStack Router adapter: ~2.5 KB
-- Next.js adapter: ~3 KB
+Reproduce the report with `pnpm run package:check` from the repository root.
+The [measurement script](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/check-packed-publication.mjs)
+uses the recorded esbuild version, browser ESM output and minification for minimal
+consumer bundles. React, React DOM, TanStack Query and router framework imports are
+externalized as listed in each report entry. Distributed file sizes are reported
+separately from consumer bundles. These profiles measure adapter code under those
+exclusions, not the total dependency cost in your application; measure your own
+production build when evaluating that cost.
 
 ---
 
