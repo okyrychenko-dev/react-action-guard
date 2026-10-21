@@ -1,9 +1,23 @@
 # Migrate to the stabilized architecture
 
-This guide describes current source and the planned Core 2.0 contract; it does not assert registry
-publication. Review the [capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md),
-package manifests and pending Changesets, then install a mutually compatible published cohort.
-Do not assume the current workspace can be installed using an unpublished version number.
+Core **2.0.0** is published. The compatible cohort verified against npm on
+**2026-10-21** is Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query adapter
+**0.4.0** and Router **1.0.0**. See the
+[release handoff](https://github.com/okyrychenko-dev/react-action-guard/blob/main/RELEASE-HANDOFF.md)
+and [registry evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/registry-evidence.json)
+for exact peers, artifact integrity and installed-consumer checks. Those checks cover
+one dependency set; published source provenance and browser behavior were not verified
+by the registry inspection. Review the
+[capability matrix](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md)
+for the scope of historical runtime evidence and remaining limitations.
+
+This site follows current source and can include unreleased behavior despite matching
+manifest versions. Per-invocation `useAsyncAction` result inference,
+`UseAsyncActionReturn`, and async `reason`/`priority` options are pending release;
+they are absent from published Core 2.0.0. With that release, use an explicit result
+generic and the existing timeout options. Use the installed README and declarations
+for the published API; pending Changesets describe future releases. Router warning
+and packaged README corrections are also pending release.
 
 ## Supported names and ownership
 
@@ -100,8 +114,10 @@ for the preserved architecture details.
 
 ## Corrected finite timeouts and scheduled windows
 
-These contracts apply to the planned Core 2.0 cohort; source verification does not
-establish registry publication.
+These migration contracts describe the stabilized Core 2.0 API. Core 2.0.0 is
+published; the historical source and disposable-artifact tests linked in the
+capability matrix retain their recorded scope and do not establish published source
+provenance. The pending async additions listed above are separate from these contracts.
 
 Lifecycle timeouts omitted, zero or finite negative values intentionally install no
 timer. Positive finite timeouts use bounded native timer chunks, including delays

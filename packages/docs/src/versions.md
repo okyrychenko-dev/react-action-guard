@@ -6,20 +6,33 @@ This site and its [interactive example](/onboarding) document the workspace sour
 site build. The demo's linked provenance records its exact Git revision, working-tree differences
 and Core manifest version. A source manifest version does not prove that these changes are in npm.
 
-## Planned stable cohort
+## Published cohort
 
-The current release handoff plans Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query **0.4.0**
-and Router **1.0.0**. These are planned tarball versions, not verified registry availability.
-Read the [release handoff](https://github.com/okyrychenko-dev/react-action-guard/blob/main/RELEASE-HANDOFF.md)
-for candidate evidence and release prerequisites.
+The stable cohort was verified against npm on **2026-10-21**. See the
+[release handoff](https://github.com/okyrychenko-dev/react-action-guard/blob/main/RELEASE-HANDOFF.md)
+for its version table and the
+[registry verification record](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/registry-evidence.json)
+for exact versions, peers, artifact integrity and installed ESM/CJS/type checks.
+These checks cover one selected dependency set; provenance signatures, live CI and
+browser behavior were not verified by that inspection.
 
-## Published releases
+Use the README and declarations shipped with the installed release. There is no
+archived documentation selector for a registry cohort yet; this site documents
+current source, which can contain unreleased changes even when its manifest
+version equals a published version.
 
-No registry cohort was verified as part of this documentation build. Review the
-[published Core versions](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard?activeTab=versions)
-and each adapter's peer requirements before installing. There is no archived documentation selector
-for a registry cohort yet; this navigation distinguishes current source from planned and published
-artifacts rather than presenting source docs as a released version.
+## Pending source changes
+
+The current source adds per-invocation `useAsyncAction` result inference,
+`UseAsyncActionReturn`, and configurable `reason`/`priority`. These additions are
+not in the inspected published Core 2.0.0 declarations. That release supports an
+explicit result generic and its existing timeout options. Source Router warning
+and packaged README corrections are also pending release.
+
+Pending Changesets describe the next release inputs. The version PR will apply
+them and determine the next cohort; a disposable versioned test cohort does not
+establish npm publication. Review each installed package's `peerDependencies`
+before adopting its adapters.
 
 ## Migration path
 

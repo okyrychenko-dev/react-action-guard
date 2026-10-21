@@ -1,0 +1,233 @@
+{
+  "checkedAt": "2026-10-21T16:36:03Z",
+  "sourceBase": "e33af5269aeb0222fb4a943e0e20bfbd2210b190",
+  "registry": "https://registry.npmjs.org",
+  "scope": "Published cohort metadata, independent SHA-512 verification, strict-peer installation, installed artifact identity and eight public ESM/CJS entry points with NodeNext consumer types.",
+  "sourceCommitProvenance": "Unverified. Registry advertises attestations; their contents and signatures were not validated. sourceBase identifies this documentation checkout, not the published artifacts.",
+  "toolchain": {
+    "node": "v22.20.0",
+    "npm": "11.19.0",
+    "typescript": "5.6.3"
+  },
+  "packages": [
+    {
+      "name": "@okyrychenko-dev/react-action-guard",
+      "version": "2.0.0",
+      "distTags": {
+        "latest": "2.0.0"
+      },
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "tarball": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard/-/react-action-guard-2.0.0.tgz",
+      "integrity": "sha512-bd79RkvLF4H5I4NrUFL9alrNtMPiMyN5d/TcaswW76bNIMSj6yzF+/b2kCQlpBmbCkolPRmD44rROW04lZRD0Q==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@okyrychenko-dev%2freact-action-guard@2.0.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "downloadedSha512MatchesRegistry": true
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-ui",
+      "version": "1.0.0",
+      "distTags": {
+        "latest": "1.0.0"
+      },
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "tarball": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard-ui/-/react-action-guard-ui-1.0.0.tgz",
+      "integrity": "sha512-OGvcVgIIas4NawYXJUgVg39tPf0MJDfcygAQf0ZTIjZ9caEZLZHOOod/aSn8SV5/j66SeWB3pdfBRpNXi7j3fw==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@okyrychenko-dev%2freact-action-guard-ui@1.0.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "downloadedSha512MatchesRegistry": true
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-devtools",
+      "version": "1.0.0",
+      "distTags": {
+        "latest": "1.0.0"
+      },
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "zustand": "^5.0.0",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "tarball": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard-devtools/-/react-action-guard-devtools-1.0.0.tgz",
+      "integrity": "sha512-2m0E/YLY1j/Aa4t/KY0ydmBmI1N4qCFgLmyT6neUzgs7CxcjKyUz3i6XZPSdZGLPMOWPTvUld8VpGkjYIBs2ZA==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@okyrychenko-dev%2freact-action-guard-devtools@1.0.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "downloadedSha512MatchesRegistry": true
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-tanstack",
+      "version": "0.4.0",
+      "distTags": {
+        "latest": "0.4.0"
+      },
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {
+        "react": "^18.0.0 || ^19.0.0",
+        "@tanstack/react-query": "^5.90.10",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      },
+      "peerDependenciesMeta": {},
+      "tarball": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard-tanstack/-/react-action-guard-tanstack-0.4.0.tgz",
+      "integrity": "sha512-8SZ4qVRnr9AC+57FldeQHFQDTD8BDoxuBlQXDyj6V9qBbrtP1OcZsLsCAb81/8zA/qZiLQRlJ/I80A34nteeHA==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@okyrychenko-dev%2freact-action-guard-tanstack@0.4.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "downloadedSha512MatchesRegistry": true
+    },
+    {
+      "name": "@okyrychenko-dev/react-action-guard-router",
+      "version": "1.0.0",
+      "distTags": {
+        "latest": "1.0.0"
+      },
+      "engines": {
+        "node": ">=20"
+      },
+      "peerDependencies": {
+        "next": "^13.4.0 || ^14.0.0 || ^15.0.0",
+        "react": "^18.0.0 || ^19.0.0",
+        "react-router-dom": "^6.19.0 || ^7.0.0",
+        "@tanstack/react-router": "^1.170.41",
+        "@okyrychenko-dev/react-action-guard": "^2.0.0"
+      },
+      "peerDependenciesMeta": {
+        "next": {
+          "optional": true
+        },
+        "react-router-dom": {
+          "optional": true
+        },
+        "@tanstack/react-router": {
+          "optional": true
+        }
+      },
+      "tarball": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard-router/-/react-action-guard-router-1.0.0.tgz",
+      "integrity": "sha512-FGI3t378m+8SV/Za2vOcFjd6WpBCaPck9qfxWvsrRFrMNerAUQtRxO22ndm9y5h9A31GfguNQJIXfiUv4BMo7A==",
+      "attestations": {
+        "url": "https://registry.npmjs.org/-/npm/v1/attestations/@okyrychenko-dev%2freact-action-guard-router@1.0.0",
+        "provenance": {
+          "predicateType": "https://slsa.dev/provenance/v1"
+        }
+      },
+      "downloadedSha512MatchesRegistry": true
+    }
+  ],
+  "installation": {
+    "result": "passed",
+    "scripts": "disabled",
+    "strictPeerDependencies": true,
+    "npmLsAll": "passed",
+    "selectedDependencies": {
+      "@okyrychenko-dev/react-action-guard-devtools": "1.0.0",
+      "@okyrychenko-dev/react-action-guard-router": "1.0.0",
+      "@okyrychenko-dev/react-action-guard-tanstack": "0.4.0",
+      "@okyrychenko-dev/react-action-guard-ui": "1.0.0",
+      "@okyrychenko-dev/react-action-guard": "2.0.0",
+      "@tanstack/react-query": "5.90.10",
+      "@tanstack/react-router": "1.170.41",
+      "@types/react": "19.2.18",
+      "next": "15.5.23",
+      "react-dom": "19.2.8",
+      "react-router-dom": "7.14.2",
+      "react": "19.2.8",
+      "typescript": "5.6.3",
+      "zustand": "5.0.15"
+    },
+    "installedDistMatchesDownloadedTarballs": true,
+    "resolvedRuntimeDependencies": {
+      "@okyrychenko-dev/type-utils": "0.1.2",
+      "@okyrychenko-dev/react-zustand-toolkit": "1.0.0"
+    }
+  },
+  "consumers": {
+    "esm": "passed",
+    "cjs": "passed",
+    "nodeNextMtsAndCts": "passed",
+    "skipLibCheck": true,
+    "entryPoints": [
+      {
+        "path": "@okyrychenko-dev/react-action-guard",
+        "exports": ["createBlockingLifecycle", "UIBlockingProvider", "useAsyncAction"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-ui",
+        "exports": ["useGuardedButton"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-devtools",
+        "exports": ["ActionGuardDevtools", "ActionGuardDevtoolsProvider"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-tanstack",
+        "exports": ["useBlockingQuery", "useBlockingMutation"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-router",
+        "exports": ["useDialogState"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-router/react-router",
+        "exports": ["useNavigationBlocker"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-router/tanstack-router",
+        "exports": ["useNavigationBlocker"]
+      },
+      {
+        "path": "@okyrychenko-dev/react-action-guard-router/nextjs",
+        "exports": ["usePagesRouterBlocker", "useAppRouterBlocker"]
+      }
+    ],
+    "fixtures": "Existing consumer smoke and public-type fixtures from a879832, used against installed registry artifacts; no workspace package links. Fixtures use the released API, not unreleased source-only types.",
+    "warnings": [
+      "The import probes emitted a circular-dependency warning about replaceRouteChunk; export assertions passed."
+    ],
+    "limits": [
+      "One selected peer set; not the full compatibility matrix.",
+      "No browser navigation, production Next application, hosting or real-application pilot checks.",
+      "No live GitHub Actions run or publication performed."
+    ]
+  },
+  "commands": [
+    "npm view <package>@<version> name version dist-tags peerDependencies peerDependenciesMeta dist.tarball dist.integrity dist.attestations engines --json",
+    "npm pack <five exact release specifications> --ignore-scripts --json --pack-destination <temporary-directory>/tarballs",
+    "npm install --prefix <isolated-consumer> --strict-peer-deps --ignore-scripts --omit=optional --no-audit --no-fund",
+    "npm ls --prefix <isolated-consumer> --all --json",
+    "node consumer.mjs",
+    "node_modules/.bin/tsc --noEmit --strict --skipLibCheck --module NodeNext --moduleResolution NodeNext --target ES2022 consumer.mts consumer.cts"
+  ]
+}
