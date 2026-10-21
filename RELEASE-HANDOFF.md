@@ -7,13 +7,13 @@ The published cohort below was verified directly against npm. Each package's
 the same version numbers, but source changes have accumulated since publication;
 matching manifest versions do not identify identical artifacts.
 
-| Package | Verified npm version |
-| --- | --- |
-| Core | 2.0.0 |
-| UI | 1.0.0 |
-| Devtools | 1.0.0 |
-| Query adapter | 0.4.0 |
-| Router adapter | 1.0.0 |
+| Package        | Verified npm version |
+| -------------- | -------------------- |
+| Core           | 2.0.0                |
+| UI             | 1.0.0                |
+| Devtools       | 1.0.0                |
+| Query adapter  | 0.4.0                |
+| Router adapter | 1.0.0                |
 
 [Dated registry evidence](scripts/compatibility/registry-evidence.json) records
 exact peer ranges, dist-tags, tarball URLs, SHA-512 integrity and the selected
@@ -61,13 +61,13 @@ performed during this documentation task.
 The following references are local tracker fields for the maintainer checkout;
 the Git-ignored tracker is not shipped with this document.
 
-| Work | Local tracker reference |
-| --- | --- |
+| Work                                        | Local tracker reference                                                                                       |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | Hosted onboarding and public browser checks | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/06-hosted-coordination-onboarding.md) |
-| Stable publication evidence | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/08-publish-stable-cohort.md) |
-| Real application baseline | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/09-pilot-baseline.md) |
-| Measured pilot | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/10-measured-pilot.md) |
-| Parallel CI and publication gate | [Task graph](.scratch/12-ready-parallel-ci-gated-release/README.md) |
+| Stable publication evidence                 | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/08-publish-stable-cohort.md)          |
+| Real application baseline                   | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/09-pilot-baseline.md)                 |
+| Measured pilot                              | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/10-measured-pilot.md)                 |
+| Parallel CI and publication gate            | [Task graph](.scratch/12-ready-parallel-ci-gated-release/README.md)                                           |
 
 ## Historical release-preparation records
 
@@ -185,6 +185,24 @@ packages concurrently. Each package's `prepublishOnly` validates its exported bu
 artifacts without cleaning or rebuilding them. Concurrent lifecycle rebuilds can
 otherwise remove Core declarations while dependent packages are generating types.
 For manual publication, build from the repository root first.
+
+CI and Release set `HUSKY=0` at workflow scope, before dependency installation.
+This skips hook installation and suppresses existing Husky hooks during release
+commits and tag pushes. Explicit workflow verification steps remain responsible
+for checks; developer hooks remain enabled outside these workflows. This hook
+isolation does not yet make Release depend on the complete CI result for its commit.
+
+The local hook baseline at source `17fd3b809394b7bfa79b801e2e7f395dec6758a0`
+invokes `pnpm run typecheck`, `pnpm run lint`, `pnpm run test:run` and
+`pnpm run build` for each pre-push invocation. A disposable harness ran the
+installed Husky dispatcher with the repository's unchanged pre-push script and a
+recording pnpm substitute: all four commands ran without `HUSKY=0`, none ran with
+either workflow's environment, and all four still ran in the developer environment.
+The Husky installation entry point also skipped installation with that environment.
+No package was published and no tag was pushed. This establishes command suppression,
+not elapsed-time savings. Historical Actions timings were unavailable locally
+because GitHub CLI was unauthenticated; capture comparable Actions durations and
+confirm release tag behavior during the next authorized release.
 
 After a failed attempt, inspect all five exact registry versions before retrying.
 Changesets skips versions already published; retain the intended source versions

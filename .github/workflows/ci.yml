@@ -1,5 +1,9 @@
 name: CI
 
+env:
+  # Explicit workflow checks own verification; Git hooks remain local to developers.
+  HUSKY: "0"
+
 on:
   push:
     branches: [main]
