@@ -31,6 +31,7 @@
 
 ## Type Aliases
 
+- [UseAsyncActionReturn](type-aliases/UseAsyncActionReturn.md)
 - [AnalyticsEventData](type-aliases/AnalyticsEventData.md)
 - [AnalyticsProvider](type-aliases/AnalyticsProvider.md)
 - [AnalyticsConfig](type-aliases/AnalyticsConfig.md)

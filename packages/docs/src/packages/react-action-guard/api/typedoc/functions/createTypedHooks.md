@@ -8,7 +8,7 @@
 
 > **createTypedHooks**\<`TScope`\>(): [`TypedHooks`](../interfaces/TypedHooks.md)\<`TScope`\>
 
-Defined in: [createTypedHooks.ts:65](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L65)
+Defined in: [createTypedHooks.ts:69](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/createTypedHooks.ts#L69)
 
 Creates type-safe versions of all blocking hooks with your custom scope types
 
