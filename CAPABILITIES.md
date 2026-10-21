@@ -1,19 +1,28 @@
 # Capabilities and compatibility evidence
 
-See the [release handoff](RELEASE-HANDOFF.md) for source/manifests,
-disposable Changesets tarballs, migration and the separate publication follow-up.
-The packed/publication and selected Next production/browser records were refreshed
-on **2026-10-16** (Next 15.5.23, Chrome 155.0.8059.84) for the corrected cohort from
-`9c51507`, including the Router README correction. See the corrected-cohort
-and final artifact refresh sections in the handoff for executed checks and limits. Earlier dates in the tables
-remain historical evaluations, not additional checks performed by this refresh.
+The published cohort was verified against npm on **2026-10-21**: Core **2.0.0**,
+UI **1.0.0**, Devtools **1.0.0**, Query adapter **0.4.0** and Router **1.0.0**.
+The [registry evidence](scripts/compatibility/registry-evidence.json) records exact
+versions and peers, verified archive integrity, strict peer installation and
+installed ESM/CJS/NodeNext consumer checks for one selected dependency set.
+Published source provenance, arbitrary peer combinations and browser behavior were
+not verified by that registry inspection.
 
-The planned cohort remains Core **2.0.0**, UI **1.0.0**, Devtools **1.0.0**, Query
-adapter **0.4.0** and Router **1.0.0**. Actual pending Changesets were applied in
-a disposable workspace for the recorded verification. The version PR applies
-versions to source, consumes Changesets and regenerates API references; inspect
-the checked-out manifests and changelogs for its current state. These artifacts do not
-establish registry availability or arbitrary peer/browser compatibility.
+See the [release handoff](RELEASE-HANDOFF.md) for current publication evidence,
+pending source changes and historical release preparation. Source manifests still
+carry the published version numbers, but newer source behavior is pending release:
+per-invocation `useAsyncAction` inference, `UseAsyncActionReturn`, configurable
+`reason`/`priority`, Router warning corrections and packaged README corrections.
+Published Core 2.0.0 supports an explicit async result generic and timeout options;
+use the README and declarations shipped with the installed version for its contract.
+Pending Changesets describe future release inputs, not already published behavior.
+
+The packed/publication and selected Next production/browser records were refreshed
+on **2026-10-16** (Next 15.5.23, Chrome 155.0.8059.84) for the corrected candidate
+from `9c51507`, including the Router README correction. Those disposable Changesets
+artifacts and the historical evaluations below are separate from the registry
+inspection; their behavior checks were not rerun against the installed npm cohort.
+See the handoff for executed checks and limits.
 
 Evidence kinds follow the sibling modal-manager format:
 
@@ -43,7 +52,7 @@ from browser-like memory-router behavior. Publication checks additionally run `p
 | Global fallback                  | Provider-free hooks use a module-level default store; provider state does not leak into it                                                | Source observation plus verified provider isolation                | [Core resolver](packages/core/src/context/useResolvedStore.ts), provider fixture above; 2026-10-04. Use a provider for each request; the global fallback is not request isolation                                                   |
 | React support                    | React `^18.0.0 \|\| ^19.0.0`; selected tests are finite samples                                                                           | Declared contract                                                  | [Core manifest](packages/core/package.json), 2026-10-04; intervening React versions and other renderers unverified                                                                                                                  |
 | Runtime dependencies             | Toolkit 1.0.0 and type-utils 0.1.2 participate in these packed checks; Zustand 5.0.0 and current 5.0.15 are selected                      | Verified loading/selected behavior; declared ranges beyond samples | [runner](scripts/check-packed-compatibility.mjs), 2026-10-04; toolkit/type-utils are required dependencies, not optional integrations                                                                                               |
-| Release resolution               | Internal Core and external peers install strictly in fresh consumers after applying the real pending Changesets in a disposable workspace | Verified installation for the evaluated cohort                     | [cohort preparation](scripts/compatibility/cohort.utils.mjs), [packed-check guide](scripts/compatibility/README.md), 2026-10-04; older published cohorts and registry publication are not established                               |
+| Release resolution               | Internal Core and external peers install strictly in fresh consumers after applying the real pending Changesets in a disposable workspace | Verified installation for the evaluated cohort                     | [cohort preparation](scripts/compatibility/cohort.utils.mjs), [packed-check guide](scripts/compatibility/README.md), 2026-10-04; historical disposable-artifact check; see the dated registry evidence above for the published cohort                               |
 | RSC and Next application runtime | Selected packed production App layout/client-provider boundary and Pages app build/start                                                  | Verified selected fixture behavior                                 | Next 15.5.23, React/DOM 19.2.8, Chrome 155.0.8059.39, 2026-10-10; [runtime guide](scripts/next-runtime/README.md) and [evidence](scripts/next-runtime/evidence.json). Arbitrary RSC compositions and other peers remain unverified. |
 
 ## Module and navigation evidence
@@ -100,4 +109,8 @@ is inferred from a manifest or example.
 All five packages now publish format-specific declarations for ESM and CommonJS.
 Core's legacy `main`/`module` paths point to existing artifacts, and the Next adapter resolves `next/router.js` for native ESM loading. Public root and
 per-router import paths remain the same. React Router users on v6 below **6.19.0**
-must upgrade; the adapter requires stable `useBlocker` and a data router. The peer-floor repair has a minor Changeset and declaration repairs have patch Changesets. The complete pending lifecycle cohort also updates internal Core peers, so Changesets currently plans Core 2.0.0, UI/Devtools/Router 1.0.0 and Query 0.4.0; these broader releases are not introduced by the publication checks. No optional sibling becomes a required dependency.
+must upgrade; the adapter requires stable `useBlocker` and a data router. The published cohort listed above includes these migration changes and updated
+internal Core peers. Historical disposable-artifact checks remain evidence of their
+recorded candidates, rather than proof of published source identity. New pending
+Changesets describe subsequent source changes; the next version PR determines their
+release versions. No optional sibling becomes a required dependency.
