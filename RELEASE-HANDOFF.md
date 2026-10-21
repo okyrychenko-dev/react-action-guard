@@ -430,8 +430,8 @@ and `cohort.json`: source commit, package names/versions and SHA-256 for every
 transported file. Consumers reject another commit, missing files, unexpected files
 and changed hashes. Publication, all thirteen compatibility targets and production
 Next checks download that artifact; their evidence includes its metadata even when
-later checks fail. Static checks run independently. Typechecks, documentation,
-Node 22/24 tests and navigation browser checks restore the same package builds;
+later checks fail. Formatting and dependency-policy checks run independently.
+Lint, typechecks, documentation, Node 22/24 tests and navigation browser checks restore the same package builds;
 coverage runs on Node 22 only. Each job owns its workspace and temporary outputs.
 
 The final gate uses `always()` and requires every expected job to report `success`;

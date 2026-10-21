@@ -43,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        check: [lint, "format:check", "check:toolkit-version"]
+        check: ["format:check", "check:toolkit-version"]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6.1.0
@@ -53,6 +53,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm run ${{ matrix.check }}
+
+  lint:
+    name: Lint
+    needs: prepare
+    runs-on: ubuntu-latest
+    env:
+      ACTION_GUARD_COHORT: ${{ github.workspace }}/.cache/verified-cohort
+    steps:
+      - uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v6.1.0
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: verified-cohort
+          path: .cache/verified-cohort
+      - run: pnpm run cohort:restore
+      - run: pnpm run lint
 
   types:
     name: Typecheck
@@ -160,7 +181,13 @@ jobs:
           name: verified-cohort
           path: .cache/verified-cohort
       - run: pnpm run cohort:restore
-      - run: pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome
+      - name: Install Chrome (up to three attempts)
+        run: |
+          for attempt in 1 2 3; do
+            echo "Chrome installation attempt $attempt"
+            pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome && exit 0
+          done
+          exit 1
       - run: pnpm --filter @okyrychenko-dev/react-action-guard-router test:browser
         timeout-minutes: 3
       - uses: actions/upload-artifact@v4
@@ -270,7 +297,13 @@ jobs:
         with:
           name: verified-cohort
           path: .cache/verified-cohort
-      - run: pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome
+      - name: Install Chrome (up to three attempts)
+        run: |
+          for attempt in 1 2 3; do
+            echo "Chrome installation attempt $attempt"
+            pnpm --filter @okyrychenko-dev/react-action-guard-router exec playwright install --with-deps chrome && exit 0
+          done
+          exit 1
       - run: pnpm run test:next-runtime
       - name: Upload production Next evidence
         if: always()
@@ -294,6 +327,7 @@ jobs:
       [
         prepare,
         static,
+        lint,
         types,
         runtime,
         documentation,

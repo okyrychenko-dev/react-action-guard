@@ -4,6 +4,7 @@ import { isPlainObject, isString } from "@okyrychenko-dev/type-utils";
 export const requiredJobs = [
   "prepare",
   "static",
+  "lint",
   "types",
   "runtime",
   "documentation",
