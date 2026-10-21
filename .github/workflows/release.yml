@@ -1,5 +1,9 @@
 name: Release
 
+env:
+  # Release commits and tag pushes must not start competing verification builds.
+  HUSKY: "0"
+
 on:
   push:
     branches: [main]
