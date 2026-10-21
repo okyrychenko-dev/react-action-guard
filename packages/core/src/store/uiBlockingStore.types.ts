@@ -53,7 +53,14 @@ export interface UIBlockingStoreState {
 export interface UIBlockingStoreActions {
   addBlocker: (id: string, config?: BlockerConfig) => void;
   updateBlocker: (id: string, config?: Partial<BlockerConfig>) => void;
-  /** @internal Apply current reactive configuration, clearing omitted optional fields. */
+  /**
+   * Advanced supported action: replace configuration for one owned registration.
+   * Omitted scope/reason/priority use defaults; omitted timeout/onTimeout clear them.
+   * Existing registration identity and timestamp remain unless timestamp is supplied.
+   * Unchanged timeout preserves its deadline; changed timeout restarts or cancels it.
+   * A missing ID is added. Does not transfer ownership or provide collision safety.
+   * @public
+   */
   replaceBlocker: (id: string, config: BlockerConfig) => void;
   removeBlocker: (id: string) => void;
   isBlocked: (scope?: string | ReadonlyArray<string>) => boolean;

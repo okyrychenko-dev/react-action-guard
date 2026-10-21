@@ -18,6 +18,38 @@ provider/context APIs and existing logger/performance/analytics helpers. Stabili
 remove those specialized helpers or add new primitives. The deprecated `useBlocker` alias remains
 supported while current examples use `useActionBlocker`.
 
+## Choose an API level
+
+Start with `UIBlockingProvider` for ownership, `useAsyncAction` for async execution,
+`useActionBlocker` for existing boolean state, and `useIsBlocked` for availability.
+Use `useBlockingInfo` when consumers need ordered reasons; `createTypedHooks` constrains
+scope vocabulary without changing ownership. Scheduled, conditional and confirmable hooks
+compose these policies for specialized workflows.
+
+Store actions, `createBlockingLifecycle`, middleware and observation leases are supported
+advanced extension interfaces. Choose them when building an integration or diagnostics tool,
+with explicit registration ownership and cleanup. This grouping removes no exports or aliases.
+
+### Replacing owned configuration
+
+`replaceBlocker` is a supported advanced store action, not an internal-only API. Unlike
+`updateBlocker` (a partial patch), it applies complete current configuration: omitted
+scope/reason/priority return to defaults and omitted timeout/onTimeout are cleared. Existing
+registration identity and timestamp are preserved unless a timestamp is supplied. An unchanged
+timeout keeps its deadline with the current callback; a changed timeout restarts or cancels it.
+A missing ID is added. Replacement does not transfer ownership or prevent same-ID collisions;
+manual registration IDs must remain unique among owners in one store.
+
+```ts
+import { uiBlockingStoreApi } from "@okyrychenko-dev/react-action-guard";
+
+const { addBlocker, updateBlocker, replaceBlocker, removeBlocker } = uiBlockingStoreApi.getState();
+addBlocker("owned-import", { scope: "import", timeout: 1000, reason: "Importing" });
+updateBlocker("owned-import", { priority: 20 }); // Keep timeout and reason.
+replaceBlocker("owned-import", { scope: "import", reason: "Validating" }); // Clear timeout.
+removeBlocker("owned-import"); // The application owner releases its registration.
+```
+
 ## Preserved guarantees
 
 - Exact-label matching, explicit multi-scope registration and global observation semantics; dotted

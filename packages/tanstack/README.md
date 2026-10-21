@@ -11,6 +11,15 @@ to see one operation affect two independent controls. Add this package when you 
 integration. [Canonical documentation and local instructions](https://github.com/okyrychenko-dev/react-action-guard/tree/main/packages/docs)
 provide the next learning step.
 
+## When to add the adapter
+
+For mounted latest-mutation observation, native `useMutation` plus Core `useActionBlocker`
+may be enough. Add `useBlockingMutation` when all calls from one hook must remain protected
+through overlapping completion, reset and producer detachment. The result still describes
+native latest-call observation; execution protection is separate. See the
+[checked examples and upstream update procedure](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/guides/mutations.md)
+for both approaches, callback/error-boundary limits and selected compatibility evidence.
+
 ## Features
 
 - 🔄 Automatic UI blocking based on query and mutation states
@@ -38,7 +47,7 @@ pnpm add @okyrychenko-dev/react-action-guard-tanstack @okyrychenko-dev/react-act
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) ^2.0.0 - The core UI blocking library
+- [@okyrychenko-dev/react-action-guard](https://www.npmjs.com/package/@okyrychenko-dev/react-action-guard) - See [`peerDependencies`](./package.json) for compatible Core versions.
 - [@tanstack/react-query](https://tanstack.com/query) ^5.90.10 - TanStack Query for data fetching
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) - State management (peer dependency of react-action-guard)

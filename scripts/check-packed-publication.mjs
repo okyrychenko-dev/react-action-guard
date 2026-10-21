@@ -95,12 +95,6 @@ for (const { name } of Object.values(tarballs)) {
     checkedLinks++;
   }
   const corePeer = manifest.peerDependencies?.["@okyrychenko-dev/react-action-guard"];
-  if (corePeer) {
-    const requirement = readme
-      .split("\n")
-      .find((line) => line.startsWith("- [@okyrychenko-dev/react-action-guard]"));
-    assert.ok(requirement?.includes(corePeer), `${name} README must document Core ${corePeer}`);
-  }
   documentationChecks.push({ name, checkedLinks, corePeer, node: manifest.engines.node });
 }
 const measuredEntries = [

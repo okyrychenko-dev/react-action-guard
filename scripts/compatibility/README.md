@@ -36,9 +36,11 @@ Both packed runners version the cohort using the same Changesets CLI/configurati
 
 ## Publication checks
 
-The installed-tarball publication check also validates declared Node >=20,
-the documented Core peer range, and every relative Markdown link in packaged
-READMEs. Relative targets must exist inside the same installed package; guides
+The installed-tarball publication check also validates declared Node >=20
+and every relative Markdown link in packaged READMEs. Core version requirements
+are declared in each package's `peerDependencies`; packaged READMEs link to that
+manifest, and strict peer installation validates the versioned cohort. Relative
+targets must exist inside the same installed package; guides
 outside a tarball use durable repository URLs. All five packages include their
 referenced CHANGELOG.md.
 

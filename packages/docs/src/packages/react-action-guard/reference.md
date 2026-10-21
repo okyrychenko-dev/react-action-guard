@@ -15,6 +15,11 @@ Import `createShallowStore`, `createStoreToolkit`, `createStoreProvider` and
 
 ## API Reference
 
+Start with `UIBlockingProvider`, `useAsyncAction`, `useActionBlocker` and `useIsBlocked`.
+Add `useBlockingInfo` for reasons and `createTypedHooks` for typed scopes. Store, lifecycle,
+middleware and observation APIs are supported advanced extension interfaces; see the
+[API levels and replacement contract](./contract#choose-an-api-level).
+
 ### Hooks
 
 #### Core hooks
@@ -527,6 +532,12 @@ Direct access to the Zustand store for advanced use cases (requires a selector).
 - `clearAllBlockers()` - Remove all blockers (emits `"clear"` middleware event)
 - `clearBlockersForScope(scope)` - Remove blockers for specific scope (emits `"clear_scope"` middleware event)
 - `observeBlockingEvents(observer)` - Observe lifecycle events; returns an ownership-safe, idempotent release function.
+
+`replaceBlocker(id, config)` is a supported advanced action for complete configuration
+replacement. Omitted scope/reason/priority return to defaults; omitted timeout/onTimeout clear
+those values. It preserves existing registration identity and timestamp unless supplied,
+adds a missing ID, and does not change ownership. An unchanged timeout preserves its deadline;
+a changed timeout restarts or cancels it. Prefer `updateBlocker` for partial patches.
 
 **Note about `updateBlocker` and timeouts:**
 
