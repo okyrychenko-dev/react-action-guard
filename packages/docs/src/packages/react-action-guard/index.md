@@ -160,31 +160,26 @@ console.log(topBlocker.reason);
 
 ## API Overview
 
-### Hooks
+### Recommended starting APIs
 
-- **[useActionBlocker](/packages/react-action-guard/api/hooks#useactionblocker)** - Automatically add/remove blocker
-- **[useIsBlocked](/packages/react-action-guard/api/hooks#useisblocked)** - Check if scope is blocked
-- **[useBlockingInfo](/packages/react-action-guard/api/hooks#useblockinginfo)** - Get detailed blocker information
-- **[useAsyncAction](/packages/react-action-guard/api/hooks#useasyncaction)** - Wrap async function with blocking
-- **[useConfirmableBlocker](/packages/react-action-guard/api/hooks#useconfirmableblocker)** - Block with confirmation dialog
-- **[useScheduledBlocker](/packages/react-action-guard/api/hooks#usescheduledblocker)** - Block during time window
-- **[useConditionalBlocker](/packages/react-action-guard/api/hooks#useconditionalBlocker)** - Block based on condition
+- **[UIBlockingProvider](/packages/react-action-guard/guides/provider-pattern)** — explicit store ownership and request isolation.
+- **[useAsyncAction](/packages/react-action-guard/api/hooks#useasyncaction)** — track each async execution.
+- **[useActionBlocker](/packages/react-action-guard/api/hooks#useactionblocker)** — publish existing boolean state.
+- **[useIsBlocked](/packages/react-action-guard/api/hooks#useisblocked)** — observe availability.
 
-### Components
+### Reasons and typed scopes
 
-- **[UIBlockingProvider](/packages/react-action-guard/guides/provider-pattern)** - Isolated store instance
+Use **[useBlockingInfo](/packages/react-action-guard/api/hooks#useblockinginfo)** for ordered
+reasons and `createTypedHooks` for a shared scope vocabulary. Specialized conditional,
+scheduled and confirmable hooks remain supported.
 
-### Store
+### Advanced extension interfaces
 
-- **[useUIBlockingStore](/packages/react-action-guard/api/store)** - Direct store access
-- **[uiBlockingStoreApi](/packages/react-action-guard/api/store)** - Non-hook store access
-
-### Middleware
-
-- **[configureMiddleware](/packages/react-action-guard/api/middleware)** - Register middleware
-- **[loggerMiddleware](/packages/react-action-guard/api/middleware#logger)** - Console logging
-- **[createAnalyticsMiddleware](/packages/react-action-guard/api/middleware#analytics)** - Analytics tracking
-- **[createPerformanceMiddleware](/packages/react-action-guard/api/middleware#performance)** - Performance monitoring
+[Store actions](/packages/react-action-guard/api/store), public lifecycle creation,
+[middleware](/packages/react-action-guard/api/middleware) and observation leases support custom
+integrations and diagnostics. They require explicit ownership and cleanup. See the
+[Core support contract](./contract#choose-an-api-level), including `replaceBlocker` semantics.
+These API levels preserve existing public imports and the deprecated `useBlocker` alias.
 
 ## Architecture
 

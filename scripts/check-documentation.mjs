@@ -64,6 +64,10 @@ async function checkDestination(from, destination) {
 // Resolve only entries declared by package exports, against their built public declarations.
 // These paths are compiler validation inputs, not application aliases or private source imports.
 const paths = {};
+// Resolve the native Query example through its installed public export declaration.
+const queryRoot = join(root, "packages/tanstack/node_modules/@tanstack/react-query");
+const queryManifest = JSON.parse(await readFile(join(queryRoot, "package.json"), "utf8"));
+paths[queryManifest.name] = [resolve(queryRoot, queryManifest.exports["."].import.types)];
 for (const directory of await readdir(join(root, "packages"))) {
   const packageRoot = join(root, "packages", directory);
   const manifest = JSON.parse(await readFile(join(packageRoot, "package.json"), "utf8"));
