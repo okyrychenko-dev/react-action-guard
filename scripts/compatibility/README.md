@@ -42,8 +42,9 @@ READMEs. Relative targets must exist inside the same installed package; guides
 outside a tarball use durable repository URLs. All five packages include their
 referenced CHANGELOG.md.
 
-`pnpm version-packages` applies Changesets, advances `[Unreleased]` links using
-Changesets' monorepo package tags, and regenerates Core/Devtools/Query TypeDoc
+`pnpm version-packages` applies Changesets, synchronizes packaged README Core
+requirements with the resulting peer ranges (including packed `workspace:^` ranges),
+advances `[Unreleased]` links using Changesets' monorepo package tags, and regenerates Core/Devtools/Query TypeDoc
 references after manifest versions change. The release action includes those
 generated references in its version PR. Plain version headings are retained for
 the [action v1 release-note parser](https://github.com/changesets/action/blob/maintenance/v1/src/utils.ts). For adapters moving from separate repositories,
