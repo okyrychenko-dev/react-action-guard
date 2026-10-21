@@ -19,7 +19,8 @@ export function useNavigationBlocker(
     if (process.env.NODE_ENV === "development" && shouldBlock) {
       console.warn(
         "[react-action-guard-router] App Router has limited blocking support. " +
-          "Link clicks cannot be blocked. Use Pages Router for full support."
+          "Link clicks and same-document back/forward cannot be blocked. " +
+          "Pages Router also has limitations; see the Router capability matrix."
       );
     }
   }, [shouldBlock]);

@@ -236,7 +236,9 @@ describe("useNavigationBlocker (Next.js App Router)", () => {
       );
 
       expect(consoleWarnSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Link clicks cannot be blocked. Use Pages Router for full support.")
+        expect.stringContaining(
+          "Link clicks and same-document back/forward cannot be blocked. Pages Router also has limitations; see the Router capability matrix."
+        )
       );
 
       process.env.NODE_ENV = originalEnv;
