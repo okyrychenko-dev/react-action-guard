@@ -1,12 +1,89 @@
 # Release cohort handoff
 
+## Current release state — 2026-10-21
+
+The published cohort below was verified directly against npm. Each package's
+`latest` tag points to the listed version. The current source manifests carry
+the same version numbers, but source changes have accumulated since publication;
+matching manifest versions do not identify identical artifacts.
+
+| Package | Verified npm version |
+| --- | --- |
+| Core | 2.0.0 |
+| UI | 1.0.0 |
+| Devtools | 1.0.0 |
+| Query adapter | 0.4.0 |
+| Router adapter | 1.0.0 |
+
+[Dated registry evidence](scripts/compatibility/registry-evidence.json) records
+exact peer ranges, dist-tags, tarball URLs, SHA-512 integrity and the selected
+consumer dependencies. All five archives matched registry integrity, and all
+installed `dist` files matched their downloaded archive contents. A fresh isolated
+installation with `--strict-peer-deps --ignore-scripts` and all selected optional
+Router peers passed, as did `npm ls --all`, ESM/CJS imports for eight public entry
+points and NodeNext `.mts`/`.cts` consumer compilation. Consumer compilation used
+`--skipLibCheck`; this is one selected peer set, not the full compatibility matrix.
+The import probes emitted a circular-dependency warning about
+`replaceRouteChunk`; export assertions and type checks passed.
+
+Registry metadata advertises provenance attestations. Their contents, signatures
+and the exact published source commit were **not verified**. The source revision
+in the evidence identifies this documentation checkout, not the npm artifacts.
+No live GitHub Actions, browser navigation or production Next application checks
+were run for this summary. Historical fixture results below retain their original
+scope and date.
+
+### Pending source changes
+
+Pending Changesets have not yet been applied to the source manifests. Current
+source documentation includes per-invocation `useAsyncAction` result inference,
+`UseAsyncActionReturn`, and `reason`/`priority` options that are absent from the
+published Core 2.0.0 declarations. Core 2.0.0 supports an explicit result generic
+and the existing timeout options. Router warning corrections and the packaged
+README links to manifest peer requirements are also pending release.
+
+The next version PR determines the next cohort; this summary does not assign
+versions or claim those changes are published. Use the [versions page](packages/docs/src/versions.md),
+[Core migration guide](packages/docs/src/packages/react-action-guard/migration.md),
+[capability matrix](CAPABILITIES.md), and the README/declarations shipped with the
+installed package. The documentation site follows its source revision; an archived
+site for the registry cohort is not available.
+
+### Outstanding evidence and external work
+
+Public documentation hosting and browser verification still need a selected
+hosting destination/access. A real application must be selected before its pilot
+baseline and measured integration. Publication evidence reconciliation and the
+parallel verification/publication gate remain open; registry availability alone
+does not close their acceptance criteria. No publication or deployment was
+performed during this documentation task.
+
+The following references are local tracker fields for the maintainer checkout;
+the Git-ignored tracker is not shipped with this document.
+
+| Work | Local tracker reference |
+| --- | --- |
+| Hosted onboarding and public browser checks | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/06-hosted-coordination-onboarding.md) |
+| Stable publication evidence | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/08-publish-stable-cohort.md) |
+| Real application baseline | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/09-pilot-baseline.md) |
+| Measured pilot | [Tracker](.scratch/11-in-progress-release-hosting-workflow-pilot/issues/10-measured-pilot.md) |
+| Parallel CI and publication gate | [Task graph](.scratch/12-ready-parallel-ci-gated-release/README.md) |
+
+## Historical release-preparation records
+
+Everything below records earlier release preparation. Statements about a planned
+cohort, uninspected registry or pending initial publication describe those earlier
+snapshots, not the current registry inspection above. Original command outcomes,
+source revisions and evidence links are preserved. A tested candidate revision is
+not proof of the source commit of today's inspected npm artifacts.
+
 The latest tested candidate is `9c5150769aebb5ceb96eee5affa2d770a60928c9`,
 including the Router README correction. The final artifact refresh below records
 fresh publication, packed compatibility and Next production/browser checks.
 Earlier verification sections are historical. This is release preparation;
 registry publication and release merge require separate authorization.
 
-## Version provenance
+### Version provenance
 
 Read the checked-out package manifests, changelogs and remaining `.changeset/*.md`
 files for the current source release state. Verification itself does not apply
@@ -30,7 +107,7 @@ Source manifest versions alone do not establish npm availability.
 In the disposable versioned cohort, Devtools/Query/Router require Core `^2.0.0`;
 UI's `workspace:^` is resolved by packing against Core 2.0.0.
 
-## Migration and behavior
+### Migration and behavior
 
 Read the [Core migration guide](packages/docs/src/packages/react-action-guard/migration.md)
 and [capability matrix](CAPABILITIES.md) before selecting a compatible cohort.
@@ -44,7 +121,7 @@ and production browser behavior. Selected peers and Chrome fixtures do not estab
 every supported version combination, arbitrary RSC composition, Pages history/options,
 or other browsers. UI blocking does not cancel work or replace server authorization.
 
-## Verification records
+### Verification records
 
 Executed records and exact selected dependency versions are retained in
 [packed evidence](scripts/compatibility/evidence.json),
@@ -72,7 +149,7 @@ and `/tmp/action-guard-next-runtime-4XJSpS`;
 these local temporary paths are inspection aids, not durable published artifacts.
 CI must rerun verification for the final release commit.
 
-## Authorized release follow-up
+### Authorized release follow-up
 
 Before versioning, retain pending Changesets for the release pipeline. Applying
 the version PR consumes those files; their absence afterwards is expected.
@@ -87,7 +164,7 @@ upgrading planned capability statements to published guarantees.
 Optional features, speculative identity/factory decisions, marketing distribution
 and the external workflow pilot are not release gates for this cohort.
 
-## Publication authentication and build ownership
+### Publication authentication and build ownership
 
 Release infrastructure changes can carry an empty changeset to satisfy the PR
 check without bumping package versions. Before the release action decides between
@@ -114,9 +191,9 @@ Changesets skips versions already published; retain the intended source versions
 and verify the complete cohort after recovery. A successful CI check or GitHub
 release alone does not establish registry publication.
 
-## Historical package documentation follow-up
+### Historical package documentation follow-up
 
-The release documentation fixes on `fix/13-release-feedback` are based on
+The release documentation fixes are based on
 `63543da72f0761bf235f78c9b26a5b8ad07d788c`. They correct Core peer requirements,
 packaged guide links and the Query adapter's Node >=20 declaration. Every tarball
 now includes CHANGELOG.md. Pending changeset descriptions reflect the final cohort
@@ -146,7 +223,7 @@ and `/tmp/action-guard-next-runtime-uHSCHu`. Package versions in the planned coh
 remain unchanged from the earlier handoff. The earlier interrupted verification
 attempts are not used as success evidence.
 
-## Release stability audit
+### Release stability audit
 
 The review compares local release tag `v1.0.5`
 (`212f3e268b76cde12719e93037cb329124692f89`) with baseline
@@ -155,7 +232,7 @@ The monorepo diff includes imported adapter history; the review considered the
 current shipped implementations, local specifications and accepted ADRs rather
 than treating imported commits as newly introduced behavior.
 
-### Standards
+#### Standards
 
 - Shared the repeated scope identity calculation across React Router, TanStack
   Router and Next Pages. Sorting and duplicate elimination remain unchanged.
@@ -171,7 +248,7 @@ than treating imported commits as newly introduced behavior.
 Separate adapter navigation behavior and independently built Storybook examples
 remain separate. Pending Changesets are retained for the existing release pipeline.
 
-### Spec and runtime findings
+#### Spec and runtime findings
 
 Two inherited scheduling defects were reproduced before correction: a delayed
 start callback delivered after the entire window could leave protection active
@@ -186,7 +263,7 @@ match the accepted specifications. No additional blocking violation was confirme
 in those runtime paths. This assessment is bounded by the executed tests and
 documented capability limits; it is not certification of every peer combination.
 
-### Final candidate verification
+#### Final candidate verification
 
 On 2026-10-12, `pnpm run release:check` passed build, documentation validation,
 lint, typecheck, all **849 tests**, formatting, publication validation for all five
@@ -233,12 +310,11 @@ capability matrix. In particular, Next App Router remains unload-only. No regist
 publication, release merge, manifest version override or dependency removal was
 performed.
 
-## Earlier corrected stabilization cohort
+### Earlier corrected stabilization cohort
 
 The tested source is `9246f46abdb689a1f8a96060af456fbf3ac6ba8f` plus the
-migration-guide updates and empty release-evidence changeset on
-`chore/refresh-release-evidence`. There are no runtime implementation changes
-in this preparation. The unrelated user edit to `.gitignore` is excluded. The
+migration-guide updates and empty release-evidence changeset. There are no runtime
+implementation changes in this preparation. The unrelated user edit to `.gitignore` is excluded. The
 JSON records inventory all 59 pending changesets and hash the lockfile and changed
 migration inputs. No accumulated package changeset was discarded; the planned
 Core 2.0.0 / UI, Devtools and Router 1.0.0 / Query 0.4.0 cohort remains unchanged.
@@ -287,7 +363,7 @@ Selected Chrome/Next results preserve the documented limits for other browsers,
 Pages history/options and arbitrary RSC compositions. Router browser-history and
 enterprise-demo suites were not rerun for this preparation and remain historical.
 
-## Final artifact refresh
+### Final artifact refresh
 
 The Router README wording change is included in source commit
 `9c5150769aebb5ceb96eee5affa2d770a60928c9`. Fresh publication, compatibility and
