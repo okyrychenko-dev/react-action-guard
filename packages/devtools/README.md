@@ -47,7 +47,7 @@ pnpm add @okyrychenko-dev/react-action-guard-devtools
 
 This package requires the following peer dependencies:
 
-- [@okyrychenko-dev/react-action-guard](https://github.com/okyrychenko-dev/react-action-guard) ^2.0.0
+- [@okyrychenko-dev/react-action-guard](https://github.com/okyrychenko-dev/react-action-guard) - See [`peerDependencies`](./package.json) for compatible Core versions.
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0
 

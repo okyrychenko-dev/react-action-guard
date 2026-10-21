@@ -36,15 +36,16 @@ Both packed runners version the cohort using the same Changesets CLI/configurati
 
 ## Publication checks
 
-The installed-tarball publication check also validates declared Node >=20,
-the documented Core peer range, and every relative Markdown link in packaged
-READMEs. Relative targets must exist inside the same installed package; guides
+The installed-tarball publication check also validates declared Node >=20
+and every relative Markdown link in packaged READMEs. Core version requirements
+are declared in each package's `peerDependencies`; packaged READMEs link to that
+manifest, and strict peer installation validates the versioned cohort. Relative
+targets must exist inside the same installed package; guides
 outside a tarball use durable repository URLs. All five packages include their
 referenced CHANGELOG.md.
 
-`pnpm version-packages` applies Changesets, synchronizes packaged README Core
-requirements with the resulting peer ranges (including packed `workspace:^` ranges),
-advances `[Unreleased]` links using Changesets' monorepo package tags, and regenerates Core/Devtools/Query TypeDoc
+`pnpm version-packages` applies Changesets, advances `[Unreleased]` links using
+Changesets' monorepo package tags, and regenerates Core/Devtools/Query TypeDoc
 references after manifest versions change. The release action includes those
 generated references in its version PR. Plain version headings are retained for
 the [action v1 release-note parser](https://github.com/changesets/action/blob/maintenance/v1/src/utils.ts). For adapters moving from separate repositories,

@@ -4,19 +4,6 @@ import { join } from "node:path";
 
 const repositoryUrl = "https://github.com/okyrychenko-dev/react-action-guard";
 
-function updateCoreRequirement(directory, peerRange, coreVersion) {
-  let publishedRange = peerRange.replace(/^workspace:/, "");
-  if (publishedRange === "^") publishedRange = `^${coreVersion}`;
-
-  const readmePath = join(directory, "README.md");
-  const readme = readFileSync(readmePath, "utf8");
-  const updated = readme.replace(
-    /^(- \[@okyrychenko-dev\/react-action-guard\]\([^)]+\)[ \t]+)\S+/m,
-    (_match, prefix) => prefix + publishedRange
-  );
-  if (updated !== readme) writeFileSync(readmePath, updated);
-}
-
 // Shared by the release command and disposable packed-cohort verification.
 export function applyReleaseVersions(repository) {
   const packages = [];
@@ -32,7 +19,7 @@ export function applyReleaseVersions(repository) {
       const changelog = readFileSync(changelogPath, "utf8");
       previousComparison = changelog.match(/^\[Unreleased\]: (.+)$/m)?.[1];
     }
-    packages.push({ directory, name, version, manifestPath, changelogPath, previousComparison });
+    packages.push({ name, version, manifestPath, changelogPath, previousComparison });
   }
 
   execFileSync(
@@ -45,22 +32,8 @@ export function applyReleaseVersions(repository) {
     }
   );
 
-  const { version: coreVersion } = JSON.parse(
-    readFileSync(join(repository, "packages/core/package.json"), "utf8")
-  );
-  for (const {
-    directory,
-    name,
-    version,
-    manifestPath,
-    changelogPath,
-    previousComparison,
-  } of packages) {
-    const { version: releasedVersion, peerDependencies } = JSON.parse(
-      readFileSync(manifestPath, "utf8")
-    );
-    const corePeer = peerDependencies?.["@okyrychenko-dev/react-action-guard"];
-    if (corePeer) updateCoreRequirement(directory, corePeer, coreVersion);
+  for (const { name, version, manifestPath, changelogPath, previousComparison } of packages) {
+    const { version: releasedVersion } = JSON.parse(readFileSync(manifestPath, "utf8"));
     if (version === releasedVersion) continue;
     const tag = `${name}@${releasedVersion}`;
     let versionUrl = `${repositoryUrl}/releases/tag/${tag}`;
