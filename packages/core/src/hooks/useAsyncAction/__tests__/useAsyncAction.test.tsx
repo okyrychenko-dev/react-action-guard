@@ -1,14 +1,48 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { type ReactNode } from "react";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, expectTypeOf, it, vi } from "vitest";
 import { UIBlockingProvider, useResolvedStoreApi } from "../../../context";
+import { createTypedHooks } from "../../../createTypedHooks";
 import { ASYNC_ACTION_PRIORITY, uiBlockingStoreApi } from "../../../store";
 import { actAsync } from "../../__tests__/test.utils";
 import { useAsyncAction } from "../useAsyncAction";
 
 describe("useAsyncAction", () => {
   beforeEach(() => {
-    uiBlockingStoreApi.getState().clearAllBlockers();
+    const { clearAllBlockers } = uiBlockingStoreApi.getState();
+
+    clearAllBlockers();
+  });
+
+  it("should infer each invocation result independently", async () => {
+    const { result } = renderHook(() => useAsyncAction("save"));
+    const text = result.current(async () => "saved");
+    const count = result.current(async () => 42);
+    const empty = result.current(async () => undefined);
+
+    expectTypeOf(text).toEqualTypeOf<Promise<string>>();
+    expectTypeOf(count).toEqualTypeOf<Promise<number>>();
+    expectTypeOf(empty).toEqualTypeOf<Promise<undefined>>();
+    await expect(Promise.all([text, count, empty])).resolves.toEqual(["saved", 42, undefined]);
+  });
+
+  it("should retain inference and explicit bounds in typed hooks", async () => {
+    const { useAsyncAction: useTypedAsyncAction } = createTypedHooks<"form">();
+    const { result } = renderHook(() => ({
+      execute: useTypedAsyncAction("save", "form"),
+      bounded: useTypedAsyncAction<string>("name", "form"),
+    }));
+    const text = result.current.execute(async () => "saved");
+    const count = result.current.execute(async () => 42);
+    const bounded = result.current.bounded(async (): Promise<string> => "name");
+
+    expectTypeOf(text).toEqualTypeOf<Promise<string>>();
+    expectTypeOf(count).toEqualTypeOf<Promise<number>>();
+    expectTypeOf(bounded).toEqualTypeOf<Promise<string>>();
+    expectTypeOf<() => Promise<number>>().not.toExtend<
+      Parameters<typeof result.current.bounded>[0]
+    >();
+    await expect(Promise.all([text, count, bounded])).resolves.toEqual(["saved", 42, "name"]);
   });
 
   it("should return a function", () => {
@@ -239,7 +273,8 @@ describe("useAsyncAction", () => {
     const firstPromise = first.result.current(firstAsyncFn);
     const secondPromise = second.result.current(secondAsyncFn);
 
-    const info = uiBlockingStoreApi.getState().getBlockingInfo("test-scope");
+    const { getBlockingInfo } = uiBlockingStoreApi.getState();
+    const info = getBlockingInfo("test-scope");
 
     expect(info).toHaveLength(2);
     expect(info[0]?.id).not.toBe(info[1]?.id);
@@ -288,12 +323,11 @@ describe("useAsyncAction", () => {
         })
     );
 
-    expect(first.result.current.store.getState().getBlockingInfo("test-scope")[0]?.id).toBe(
-      "test-action-1"
-    );
-    expect(second.result.current.store.getState().getBlockingInfo("test-scope")[0]?.id).toBe(
-      "test-action-1"
-    );
+    const { getBlockingInfo: getFirstInfo } = first.result.current.store.getState();
+    const { getBlockingInfo: getSecondInfo } = second.result.current.store.getState();
+
+    expect(getFirstInfo("test-scope")[0]?.id).toBe("test-action-1");
+    expect(getSecondInfo("test-scope")[0]?.id).toBe("test-action-1");
 
     resolveFirst();
     resolveSecond();
@@ -314,7 +348,9 @@ describe("useAsyncAction", () => {
       { wrapper }
     );
 
-    result.current.store.getState().addBlocker("test-action-1", { scope: "test-scope" });
+    const { addBlocker, getBlockingInfo } = result.current.store.getState();
+
+    addBlocker("test-action-1", { scope: "test-scope" });
 
     let resolveAction: VoidFunction = () => undefined;
 
@@ -325,10 +361,7 @@ describe("useAsyncAction", () => {
         })
     );
 
-    const blockerIds = result.current.store
-      .getState()
-      .getBlockingInfo("test-scope")
-      .map((blocker) => blocker.id);
+    const blockerIds = getBlockingInfo("test-scope").map((blocker) => blocker.id);
 
     expect(blockerIds).toEqual(expect.arrayContaining(["test-action-1", "test-action-2"]));
 

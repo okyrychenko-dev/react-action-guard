@@ -341,10 +341,28 @@ Tracks async work with automatic blocking/unblocking. Concurrent calls receive s
 ```typescript
 function useAsyncAction<T = unknown>(
   actionId: string,
-  scope?: string | string[],
+  scope?: string | ReadonlyArray<string>,
   options?: UseAsyncActionOptions
-): (asyncFn: () => Promise<T>) => Promise<T>
+): <TResult extends T>(asyncFn: () => Promise<TResult>) => Promise<TResult>
 ```
+
+Each invocation infers its callback result independently. An explicit hook generic constrains
+accepted results; `createTypedHooks` preserves the same behavior. The exported
+`UseAsyncActionReturn<T>` names this executor contract.
+
+```typescript
+const execute = useAsyncAction("save", "form", {
+  reason: "Зберігаємо зміни…",
+  priority: 30,
+});
+const saved = await execute(async () => ({ id: "profile" })); // { id: string }
+```
+
+`reason` defaults to `Executing ${actionId}` and `priority` to `ASYNC_ACTION_PRIORITY` (20).
+An empty reason and priority `0` are preserved. Core validates priority (minimum 0).
+Higher priorities order reasons; every matching blocker continues to protect its scope.
+Options are captured when each invocation starts; rerendering affects future calls only.
+Timeout releases protection without cancelling work; cleanup still targets the captured store.
 
 **Parameters:**
 
@@ -358,6 +376,8 @@ function useAsyncAction<T = unknown>(
 
 ```typescript
 interface UseAsyncActionOptions {
+  reason?: string;                // Default: Executing ${actionId}
+  priority?: number;              // Default: 20; minimum 0
   timeout?: number;                // Auto-remove after N milliseconds
   onTimeout?: (actionId: string) => void; // Callback when timed out
 }

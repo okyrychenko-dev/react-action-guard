@@ -29,6 +29,7 @@ export type {
   ConfirmDialogConfig,
   ScheduledBlockerConfig,
   UseAsyncActionOptions,
+  UseAsyncActionReturn,
   UseConfirmableBlockerReturn,
 } from "./hooks";
 

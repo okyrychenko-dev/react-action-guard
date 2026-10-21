@@ -6,9 +6,9 @@
 
 # Function: useAsyncAction()
 
-> **useAsyncAction**\<`T`\>(`actionId`, `scope?`, `options?`): (`asyncFn`) => `Promise`\<`T`\>
+> **useAsyncAction**\<`T`\>(`actionId`, `scope?`, `options?`): [`UseAsyncActionReturn`](../type-aliases/UseAsyncActionReturn.md)\<`T`\>
 
-Defined in: [hooks/useAsyncAction/useAsyncAction.ts:27](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useAsyncAction/useAsyncAction.ts#L27)
+Defined in: [hooks/useAsyncAction/useAsyncAction.ts:32](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/core/src/hooks/useAsyncAction/useAsyncAction.ts#L32)
 
 Wraps async functions with UI blocking. Concurrent calls get unique blocker IDs;
 each blocker is removed in finally on success or failure, even after caller unmount.
@@ -36,7 +36,7 @@ Tracking does not exclude concurrent execution. Timeout releases only the blocke
 
 ## Returns
 
-(`asyncFn`) => `Promise`\<`T`\>
+[`UseAsyncActionReturn`](../type-aliases/UseAsyncActionReturn.md)\<`T`\>
 
 ## Since
 

@@ -27,7 +27,7 @@ useAsyncAction<T = unknown>(
   actionId: string,
   scope?: string | ReadonlyArray<string>,
   options?: UseAsyncActionOptions
-): (asyncFn: () => Promise<T>) => Promise<T>
+): <TResult extends T>(asyncFn: () => Promise<TResult>) => Promise<TResult>
 ```
 
 ### Parameters
@@ -36,7 +36,33 @@ useAsyncAction<T = unknown>(
 | ---------- | ----------------------- | -------- | ---------- | ----------------------------------------------------------------- |
 | `actionId` | `string`                | ✅       | -          | Unique identifier for this action. Used in blocker ID generation. |
 | `scope`    | `string \| string[]`    | ❌       | `'global'` | Scope(s) to block during execution.                               |
-| `options`  | `UseAsyncActionOptions` | ❌       | -          | Optional timeout settings (`timeout`, `onTimeout`).               |
+| `options`  | `UseAsyncActionOptions` | ❌       | -          | Optional reason, priority and timeout settings.               |
+
+### Result inference
+
+```typescript
+const execute = useAsyncAction("load", "data");
+const name = await execute(async () => "Ada"); // string
+const count = await execute(async () => 42); // number
+```
+
+Each invocation infers its callback result independently. An explicit hook generic constrains
+accepted results; `createTypedHooks` preserves the same behavior. The exported
+`UseAsyncActionReturn<T>` names this executor contract.
+
+```typescript
+const execute = useAsyncAction("save", "form", {
+  reason: "Зберігаємо зміни…",
+  priority: 30,
+});
+const saved = await execute(async () => ({ id: "profile" })); // { id: string }
+```
+
+`reason` defaults to `Executing ${actionId}` and `priority` to `ASYNC_ACTION_PRIORITY` (20).
+An empty reason and priority `0` are preserved. Core validates priority (minimum 0).
+Higher priorities order reasons; every matching blocker continues to protect its scope.
+Options are captured when each invocation starts; rerendering affects future calls only.
+Timeout releases protection without cancelling work; cleanup still targets the captured store.
 
 ### Return Value
 
@@ -389,7 +415,7 @@ Use blocker timeout or application-owned cancellation/cleanup for hung work.
 
 For TypeScript users:
 
-1. Specify the generic type parameter: `useAsyncAction<YourType>(...)`
+1. Results are inferred independently from each callback. Use `useAsyncAction<YourType>(...)` to constrain accepted callback results.
 2. Ensure your async function returns the correct type
 3. Use `void` for operations that don't return values
 

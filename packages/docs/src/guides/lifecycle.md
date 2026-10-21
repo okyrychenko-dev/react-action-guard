@@ -16,6 +16,39 @@ configuration change can register again while active. Explicit deactivation then
 a new registration. Query registrations follow that same replacement policy while retaining their
 own query activation and reason policy.
 
+## Async execution metadata and result types
+
+Each `useAsyncAction` invocation owns a separate registration and infers its callback result.
+Provide a product-facing reason and priority without managing a registration manually:
+
+```tsx
+import { useAsyncAction } from "@okyrychenko-dev/react-action-guard";
+
+export function useProfileCommands() {
+  const execute = useAsyncAction("profile", ["editor", "navigation"], {
+    reason: "Зберігаємо зміни…",
+    priority: 30,
+  });
+
+  async function save(): Promise<{ id: string }> {
+    return execute(async () => ({ id: "profile" }));
+  }
+
+  async function count(): Promise<number> {
+    return execute(async () => 42);
+  }
+
+  return { save, count };
+}
+```
+
+Omitting reason and priority keeps `Executing ${actionId}` and priority 20; an empty reason
+and priority 0 remain valid. Higher priorities order reasons, while every matching blocker
+retains protection. Rerenders affect future invocations; running registrations retain their
+captured metadata and store until settlement or timeout. Timeout releases protection without
+cancelling the operation. Explicit hook result generics remain supported as constraints;
+`createTypedHooks` preserves the same per-call inference.
+
 ## Conditional and scheduled helpers
 
 ```tsx

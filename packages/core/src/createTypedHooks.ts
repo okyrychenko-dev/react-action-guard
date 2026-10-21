@@ -1,5 +1,9 @@
 import { useActionBlocker } from "./hooks/useActionBlocker";
-import { type UseAsyncActionOptions, useAsyncAction } from "./hooks/useAsyncAction";
+import {
+  type UseAsyncActionOptions,
+  type UseAsyncActionReturn,
+  useAsyncAction,
+} from "./hooks/useAsyncAction";
 import { useBlockingInfo } from "./hooks/useBlockingInfo";
 import { useIsBlocked } from "./hooks/useIsBlocked";
 import type { BlockerConfigTyped, ScopeValue } from "./types";
@@ -35,7 +39,7 @@ export interface TypedHooks<TScope extends string> {
     actionId: string,
     scope?: ScopeValue<TScope>,
     options?: UseAsyncActionOptions
-  ) => (asyncFn: () => Promise<T>) => Promise<T>;
+  ) => UseAsyncActionReturn<T>;
 
   /**
    * Type-safe version of useBlockingInfo hook
@@ -87,7 +91,7 @@ export function createTypedHooks<TScope extends string>(): TypedHooks<TScope> {
       actionId: string,
       scope?: ScopeValue<TScope>,
       options?: UseAsyncActionOptions
-    ) => {
+    ): UseAsyncActionReturn<T> => {
       return useAsyncAction<T>(actionId, scope, options);
     },
 
