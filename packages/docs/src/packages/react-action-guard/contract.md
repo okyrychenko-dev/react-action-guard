@@ -1,9 +1,10 @@
 # Stable Core responsibilities
 
-This is the bounded contract for the **planned Core 2.0 stabilization** represented by current source.
-It is not a claim that Core 2.0 is published. Check manifests, pending Changesets and the
-[versioned capability evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/CAPABILITIES.md)
-when selecting a release. Applying the release cohort and registry publication are separate work.
+Core **2.0.0** is published. This page explains Core responsibilities in current source;
+the canonical [versions and migration](../../versions) page separates the inspected published
+cohort, source-built site/demo and pending release changes. Begin with the
+[published-version quickstart](../../getting-started) when installing from npm. Source manifest
+versions and disposable release checks do not establish that pending changes are published.
 
 ## Boundaries
 
@@ -75,6 +76,8 @@ and end per call on settlement, clearing or timeout. Query registration follows 
 and mounted ownership. Mutation protection accounts for all owned unsettled calls while preserving
 native latest-result observation; reset/key changes/detach do not discard pending ownership.
 See the [mutation lifetime guide](../../guides/mutations) for callback and expired-episode behavior.
+The [producer lifetime comparison](../../guides/lifecycle#choose-a-producer-by-lifetime) also
+distinguishes confirmable callbacks from registration ownership after unmount.
 Timeouts release protection without cancelling work. Tracking does not exclude concurrent calls.
 
 ## Decisions outside this contract

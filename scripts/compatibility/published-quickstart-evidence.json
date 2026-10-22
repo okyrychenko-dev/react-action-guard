@@ -1,0 +1,64 @@
+{
+  "checkedAt": "2026-10-22T15:25:48.977986+00:00",
+  "scope": "Compilation of the first TSX block from Getting started and the Core README against installed published declarations, without workspace links.",
+  "toolchain": {
+    "node": "v22.20.0",
+    "npm": "11.19.0"
+  },
+  "dependencies": {
+    "@okyrychenko-dev/react-action-guard": "2.0.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.3"
+  },
+  "resolvedRuntimeDependencies": {
+    "@okyrychenko-dev/type-utils": "0.1.2",
+    "@okyrychenko-dev/react-zustand-toolkit": "1.0.0"
+  },
+  "coreArtifact": {
+    "version": "2.0.0",
+    "resolved": "https://registry.npmjs.org/@okyrychenko-dev/react-action-guard/-/react-action-guard-2.0.0.tgz",
+    "integrity": "sha512-bd79RkvLF4H5I4NrUFL9alrNtMPiMyN5d/TcaswW76bNIMSj6yzF+/b2kCQlpBmbCkolPRmD44rROW04lZRD0Q=="
+  },
+  "compilerOptions": {
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": false,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "types": ["react"]
+  },
+  "snippets": [
+    {
+      "source": "packages/docs/src/getting-started.md",
+      "block": "first tsx block",
+      "sha256": "5724ab5af9ffcc6e623e8b17bf05d8b0a579e4214fbf2f1a811dd0dce5f43318"
+    },
+    {
+      "source": "packages/core/README.md",
+      "block": "first tsx block",
+      "sha256": "bb5f3522c0be32341f5afa5eceadbe04fb15209f6690ed5c5cfa5ec3209f2fae"
+    }
+  ],
+  "installation": {
+    "strictPeerDependencies": true,
+    "ignoreScripts": true,
+    "npmLsAll": "passed",
+    "workspaceLinks": false
+  },
+  "compilation": "passed",
+  "sourceContractInspection": "Core 2.0.0 useAsyncAction<T> returns a fixed Promise<T> executor; its options contain timeout/onTimeout, and UseAsyncActionReturn is not exported.",
+  "limits": [
+    "One selected dependency set; does not verify all declared peer versions.",
+    "Compilation only; no new browser runtime or public hosting verification.",
+    "No registry publication, source-tag mapping or provenance verification.",
+    "Historical full-cohort evidence remains in registry-evidence.json."
+  ]
+}

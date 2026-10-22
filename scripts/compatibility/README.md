@@ -85,3 +85,60 @@ fallback. Without the variable, each command builds and prepares its own cohort.
 `pnpm run cohort:restore` validates the artifact and restores package dist outputs
 for source tests/typechecks. See the root release handoff for publication ownership
 and branch-protection rollout.
+
+## Published first example
+
+The dated [quickstart record](./published-quickstart-evidence.json) covers the first TSX block
+in `packages/docs/src/getting-started.md` and `packages/core/README.md`. It is separate from the
+source/tarball matrix and the historical five-package [registry inspection](./registry-evidence.json).
+Run from the repository root, with a fresh directory outside the workspace:
+
+```bash
+QUICKSTART_CONSUMER=$(mktemp -d /tmp/action-guard-published-quickstart-XXXXXX)
+node --input-type=module - "$QUICKSTART_CONSUMER" <<'NODE'
+import { readFile, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+const destination = process.argv[2];
+await writeFile(join(destination, "package.json"), JSON.stringify({
+  private: true,
+  type: "module",
+  dependencies: {
+    "@okyrychenko-dev/react-action-guard": "2.0.0",
+    react: "19.2.8",
+    "react-dom": "19.2.8",
+    zustand: "5.0.15"
+  },
+  devDependencies: {
+    typescript: "5.9.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.3"
+  }
+}, null, 2));
+for (const [name, source] of [
+  ["getting-started", "packages/docs/src/getting-started.md"],
+  ["core-readme", "packages/core/README.md"]
+]) {
+  const markdown = await readFile(source, "utf8");
+  const match = /```tsx\n([\s\S]*?)```/.exec(markdown);
+  if (!match) throw new Error(`No first TSX example in ${source}`);
+  await writeFile(join(destination, `${name}.tsx`), match[1]);
+}
+await writeFile(join(destination, "tsconfig.json"), JSON.stringify({
+  compilerOptions: {
+    noEmit: true, strict: true, skipLibCheck: false,
+    module: "NodeNext", moduleResolution: "NodeNext",
+    target: "ES2022", jsx: "react-jsx", types: ["react"]
+  },
+  include: ["*.tsx"]
+}, null, 2));
+NODE
+npm install --prefix "$QUICKSTART_CONSUMER" --strict-peer-deps --ignore-scripts --no-audit --no-fund
+npm ls --prefix "$QUICKSTART_CONSUMER" --all
+"$QUICKSTART_CONSUMER/node_modules/.bin/tsc" -p "$QUICKSTART_CONSUMER/tsconfig.json"
+```
+
+The lockfile in that directory records exact transitive versions and registry integrity. The
+checked source block hashes are in the evidence record. This checks the copied examples and
+installed declarations with library checking enabled; it does not establish browser behavior,
+all compatible peer versions, release-tag provenance or a new publication. No package is published
+by these commands. The source demo remains a separate workspace build.

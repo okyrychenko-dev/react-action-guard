@@ -60,5 +60,8 @@ concurrent work does not serialize calls. Applications own cancellation, exclusi
 idempotency. Explicit registration IDs must be unique within a store: duplicate warnings do
 not prevent overwrites or another hook's cleanup.
 
+See the [producer lifetime comparison](./guides/lifecycle#choose-a-producer-by-lifetime) for
+confirmable callbacks that continue after unmount and mutation pending versus error-only protection.
+
 Read [lifecycle and registration](./guides/lifecycle), [workflow design](./guides/workflows)
 and the [Core contract](./packages/react-action-guard/contract) next.

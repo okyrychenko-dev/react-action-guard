@@ -16,17 +16,21 @@ ordered reasons and lifecycle cleanup rather than requiring you to build that mo
 ## Installation
 
 ```bash
-npm install @okyrychenko-dev/react-action-guard zustand
+npm install --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
 # or
-yarn add @okyrychenko-dev/react-action-guard zustand
+yarn add --exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
 # or
-pnpm add @okyrychenko-dev/react-action-guard zustand
+pnpm add --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
 ```
 
 This package requires the following peer dependencies:
 
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
+
+The installation and first example target published **Core 2.0.0**. See
+[versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
+for exact checked peers and the distinction between installed packages and this source checkout.
 
 ## Quick Start
 
@@ -43,7 +47,7 @@ import {
 import { useState, type ReactElement } from "react";
 
 function SaveButton(): ReactElement {
-  const runSave = useAsyncAction("save-profile", ["profile", "navigation"]);
+  const runSave = useAsyncAction<void>("save-profile", ["profile", "navigation"]);
   const blocked = useIsBlocked("profile");
   const [status, setStatus] = useState("Ready");
 
@@ -122,7 +126,10 @@ permissions. The navigation control above changes local UI; it does not intercep
 
 Prefer `UIBlockingProvider` for explicit ownership and SSR, using fresh state per request.
 Without a Provider, hooks use a shared global fallback that does not isolate server requests.
-For existing boolean state, register it with `useActionBlocker` instead.
+For existing boolean state, register it with `useActionBlocker` instead. Compare
+[producer lifetimes](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/guides/lifecycle.md#choose-a-producer-by-lifetime)
+before choosing protection that must survive unmount: mounted confirmable registrations release
+on unmount even when their callback continues.
 
 ## Run the complete example
 
@@ -233,7 +240,8 @@ Follow [concepts](https://github.com/okyrychenko-dev/react-action-guard/blob/mai
 and [advanced ownership](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/advanced/ownership.md).
 The [Core contract](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/contract.md)
 and [migration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md)
-describe current source and planned stabilization, rather than asserting registry publication.
+describe current source. The canonical [versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
+page distinguishes published Core 2.0.0 from pending source changes and links dated artifact checks.
 
 ## Scheduled windows
 
