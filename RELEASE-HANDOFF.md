@@ -189,8 +189,8 @@ For manual publication, build from the repository root first.
 CI and Release set `HUSKY=0` at workflow scope, before dependency installation.
 This skips hook installation and suppresses existing Husky hooks during release
 commits and tag pushes. Explicit workflow verification steps remain responsible
-for checks; developer hooks remain enabled outside these workflows. This hook
-isolation does not yet make Release depend on the complete CI result for its commit.
+for checks; developer hooks remain enabled outside these workflows. The shared
+verification graph described below gates Release for its exact commit.
 
 The local hook baseline at source `17fd3b809394b7bfa79b801e2e7f395dec6758a0`
 invokes `pnpm run typecheck`, `pnpm run lint`, `pnpm run test:run` and
@@ -462,17 +462,55 @@ all matrix children and every required browser/documentation/consumer job.
 Keep main publication serialized; do not introduce a second independent publisher.
 
 Local contract tests exercise artifact transport and each gate failure state.
-A real PR run must still confirm Actions scheduling, displayed check names and
-failure propagation. Record baseline and new wall-clock duration, job durations,
-package build counts and total runner minutes, including queue/cache differences;
-no measured speedup is claimed by local execution. Actual npm provenance, release
-tags and partial-publication recovery require the next authorized release.
+Hosted PR verification has confirmed scheduling and the displayed check name
+`verification / Verification gate`. A failed PR run also demonstrated that failed
+lint/navigation prerequisites reject the gate. Branch-protection settings have
+not been inspected or changed. Actual npm provenance, release tags and
+partial-publication recovery require the next authorized release.
+
+### Hosted verification evidence
+
+Observed on 2026-10-22; raw workflow identities and per-job timestamps are in
+[`scripts/release/ci-evidence.json`](scripts/release/ci-evidence.json).
+
+| Run                                                                                                          | Result                                     | Workflow elapsed | Summed job minutes |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------ | ---------------- | ------------------ |
+| [Previous PR CI](https://github.com/okyrychenko-dev/react-action-guard/actions/runs/39646590281)             | Success                                    | 3m 37s           | 23.77              |
+| [Shared-cohort PR CI](https://github.com/okyrychenko-dev/react-action-guard/actions/runs/39653100941)        | Success                                    | 3m 14s           | 16.82              |
+| [Previous main CI](https://github.com/okyrychenko-dev/react-action-guard/actions/runs/39647162962)           | Success                                    | 3m 02s           | 21.00              |
+| [Previous main Release](https://github.com/okyrychenko-dev/react-action-guard/actions/runs/39647162959)      | Success                                    | 3m 42s           | 3.63               |
+| [Shared-cohort main Release](https://github.com/okyrychenko-dev/react-action-guard/actions/runs/39653708312) | Verification success; release setup failed | 2m 47s           | 17.07              |
+
+Workflow elapsed includes scheduling and finalization; summed job minutes exclude
+skipped jobs and are elapsed runner durations, without billing rounding. The PR
+sample reduced elapsed time by 23 seconds and summed job time by 6.95 minutes
+(29.2%). These adjacent runs use different commits, independent runner/cache
+states and variable network downloads. Their timings are observational, not a
+controlled benchmark or a fixed speedup guarantee. Main's new run stopped before
+the Changesets decision, so it cannot establish end-to-end release improvement.
+
+The previous PR graph explicitly launched 17 full workspace builds: publication,
+13 compatibility targets, Next runtime and both Node jobs, with additional builds
+inside standalone consumer/coverage commands. The new graph prepares one
+five-package cohort; consumer jobs restore it and documentation builds separately.
+Successful hosted steps confirm artifact reuse, both Node versions, pinned pnpm
+12.6.0, all thirteen compatibility targets and both browser jobs.
+
+On main commit `373b0ad7ea1fb09663f5af95a05db8da1cb6359e`, all 25 verification jobs
+passed and the release job received that exact verified commit and restored its
+artifact. `changeset status` then failed because SHA checkout left detached HEAD
+without a local `main` branch. No publication step ran. Release now attaches the
+verified SHA to local `main` before running Changesets; it does not follow a newer
+remote tip. A local isolated checkout reproduced the failure and passed after
+attachment while retaining the exact SHA. The corrected hosted release path
+remains to be verified after merge.
 
 ### Local verification evidence
 
 Validated on Node 22.20.0 with the locally installed pnpm 11.21.0; the configured
 Actions toolchain remains the packageManager-pinned pnpm 12.6.0 on Node 22/24.
-The pinned Actions toolchain and Node 24 execution still need the first hosted run.
+Hosted PR and main verification subsequently passed with pinned pnpm 12.6.0 and
+Node 22/24, as recorded above.
 
 - Built one five-package cohort, restored it, and reused it across all thirteen
   compatibility targets, strict publication checks (publint/ATTW), and seven

@@ -38,6 +38,8 @@ jobs:
         with:
           ref: ${{ github.sha }}
           fetch-depth: 0
+      - name: Attach the verified commit to the local release branch
+        run: git switch --force-create main "$GITHUB_SHA"
       - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v6
         with:
