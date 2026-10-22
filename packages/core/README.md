@@ -16,11 +16,11 @@ ordered reasons and lifecycle cleanup rather than requiring you to build that mo
 ## Installation
 
 ```bash
-npm install --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
+npm install @okyrychenko-dev/react-action-guard zustand
 # or
-yarn add --exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
+yarn add @okyrychenko-dev/react-action-guard zustand
 # or
-pnpm add --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
+pnpm add @okyrychenko-dev/react-action-guard zustand
 ```
 
 This package requires the following peer dependencies:
@@ -28,7 +28,9 @@ This package requires the following peer dependencies:
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
 
-The installation and first example target published **Core 2.0.0**. See
+The commands above install the latest published release. The first example was also checked
+against Core 2.0.0 with exact dependencies recorded in the
+[published quickstart evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/published-quickstart-evidence.json). See
 [versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
 for exact checked peers and the distinction between installed packages and this source checkout.
 
@@ -241,7 +243,7 @@ and [advanced ownership](https://github.com/okyrychenko-dev/react-action-guard/b
 The [Core contract](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/contract.md)
 and [migration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md)
 describe current source. The canonical [versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
-page distinguishes published Core 2.0.0 from pending source changes and links dated artifact checks.
+page distinguishes the verified published cohort from pending source changes and links dated artifact checks.
 
 ## Scheduled windows
 

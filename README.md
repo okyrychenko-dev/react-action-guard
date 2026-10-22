@@ -20,7 +20,7 @@ UIBlockingProvider
 In an existing React 18/19 application, install core and its Zustand peer:
 
 ```bash
-npm install --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
+npm install @okyrychenko-dev/react-action-guard zustand
 ```
 
 No UI, Query, Router or Devtools adapter is needed. Follow the
