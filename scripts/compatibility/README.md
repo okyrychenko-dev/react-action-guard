@@ -93,7 +93,7 @@ in `packages/docs/src/getting-started.md` and `packages/core/README.md`. It is s
 source/tarball matrix and the historical five-package [registry inspection](./registry-evidence.json).
 Run from the repository root, with a fresh directory outside the workspace:
 
-```bash
+````bash
 QUICKSTART_CONSUMER=$(mktemp -d /tmp/action-guard-published-quickstart-XXXXXX)
 node --input-type=module - "$QUICKSTART_CONSUMER" <<'NODE'
 import { readFile, writeFile } from "node:fs/promises";
@@ -135,7 +135,7 @@ NODE
 npm install --prefix "$QUICKSTART_CONSUMER" --strict-peer-deps --ignore-scripts --no-audit --no-fund
 npm ls --prefix "$QUICKSTART_CONSUMER" --all
 "$QUICKSTART_CONSUMER/node_modules/.bin/tsc" -p "$QUICKSTART_CONSUMER/tsconfig.json"
-```
+````
 
 The lockfile in that directory records exact transitive versions and registry integrity. The
 checked source block hashes are in the evidence record. This checks the copied examples and
