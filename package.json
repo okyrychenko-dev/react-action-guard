@@ -30,11 +30,11 @@
     "package:check": "node scripts/check-packed-publication.mjs",
     "measure:efficiency": "node scripts/measure-efficiency.mjs",
     "release:check": "pnpm run check && pnpm run format:check && pnpm run package:check && pnpm run test:packed",
-    "docs:check": "node scripts/check-documentation.mjs",
+    "docs:check": "node scripts/check-release-state.mjs && node scripts/check-documentation.mjs",
     "build:packages": "pnpm --filter \"./packages/*\" --filter \"!@okyrychenko-dev/react-action-guard-docs\" -r run build",
     "cohort:prepare": "node scripts/cohort.mjs prepare",
     "cohort:restore": "node scripts/cohort.mjs restore",
-    "test:cohort": "node --test scripts/compatibility/artifact.test.mjs scripts/release/gate.test.mjs scripts/release/publication.test.mjs",
+    "test:cohort": "node --test scripts/compatibility/artifact.test.mjs scripts/release/gate.test.mjs scripts/release/publication.test.mjs scripts/release/version.test.mjs",
     "release:verified": "node scripts/release/publish-verified.mjs"
   },
   "devDependencies": {

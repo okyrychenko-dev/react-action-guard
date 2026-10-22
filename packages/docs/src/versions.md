@@ -45,7 +45,26 @@ version equals a published version.
 The npm version links above identify package artifacts. A matching repository tag or source commit
 has not been verified for this cohort; those links do not claim release-to-source provenance.
 
-## Pending source changes
+<!-- release-source-state:start -->
+
+## Source release state
+
+Generated from workspace manifests and remaining Changesets. These are source versions,
+not evidence of npm publication. Dated registry evidence remains historical.
+
+| Package | Source manifest version |
+| --- | --- |
+| Core | 2.0.0 |
+| UI | 1.0.0 |
+| Devtools | 1.0.0 |
+| Query adapter | 0.4.0 |
+| Router adapter | 1.0.0 |
+
+7 pending package Changesets remain; the next versioning run may change these versions.
+
+<!-- release-source-state:end -->
+
+## Source changes since the inspected registry cohort
 
 The current source adds per-invocation `useAsyncAction` result inference,
 `UseAsyncActionReturn`, and configurable `reason`/`priority`. These additions are
@@ -53,9 +72,9 @@ not in the inspected published Core 2.0.0 declarations. That release supports an
 explicit result generic and its existing timeout options. Source Router warning
 and packaged README corrections are also pending release.
 
-Pending Changesets describe the next release inputs. The version PR will apply
-them and determine the next cohort; a disposable versioned test cohort does not
-establish npm publication. Review each installed package's `peerDependencies`
+The generated source state above records manifest versions and remaining package
+Changesets. Applying versions or testing a disposable cohort does not establish
+npm publication. Review each installed package's `peerDependencies`
 before adopting its adapters.
 
 ## Migration path
