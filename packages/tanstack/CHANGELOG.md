@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.1
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-tanstack@0.4.0...@okyrychenko-dev/react-action-guard-tanstack@0.4.1)
+
+### Patch Changes
+
+- a61c220: Link Core compatibility requirements to each package's peerDependencies instead of duplicating version ranges in the README.
+
 ## 0.4.0
 
 [Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-tanstack@0.4.0)
@@ -271,7 +279,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - 🔍 TypeScript type definitions with detailed annotations
 - ✅ 41 unit tests with 95%+ coverage
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-tanstack@0.4.0...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-tanstack@0.4.1...HEAD
 [0.3.5]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.4...v0.3.5
 [0.3.4]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.3...v0.3.4
 [0.3.3]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.3.2...v0.3.3
@@ -284,3 +292,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.0]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-tanstack/releases/tag/v0.1.0
 [0.4.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-tanstack@0.4.0
+[0.4.1]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-tanstack@0.4.0...@okyrychenko-dev/react-action-guard-tanstack@0.4.1

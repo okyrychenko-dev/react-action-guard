@@ -54,13 +54,13 @@ not evidence of npm publication. Dated registry evidence remains historical.
 
 | Package | Source manifest version |
 | --- | --- |
-| Core | 2.0.0 |
-| UI | 1.0.0 |
-| Devtools | 1.0.0 |
-| Query adapter | 0.4.0 |
-| Router adapter | 1.0.0 |
+| Core | 2.1.0 |
+| UI | 1.0.1 |
+| Devtools | 1.0.1 |
+| Query adapter | 0.4.1 |
+| Router adapter | 1.0.1 |
 
-7 pending package Changesets remain; the next versioning run may change these versions.
+No pending package Changesets remain; source versions have been applied.
 
 <!-- release-source-state:end -->
 

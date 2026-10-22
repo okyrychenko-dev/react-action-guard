@@ -1,4 +1,4 @@
-[**React Action Guard API v2.0.0**](../README.md)
+[**React Action Guard API v2.1.0**](../README.md)
 
 ***
 

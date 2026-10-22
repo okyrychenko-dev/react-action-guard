@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard-router",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Navigation blocking adapters for React Action Guard across React Router, TanStack Router, and Next.js",
   "engines": {

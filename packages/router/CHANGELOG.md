@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-router@1.0.0...@okyrychenko-dev/react-action-guard-router@1.0.1)
+
+### Patch Changes
+
+- cd51c85: Correct the App Router development warning to describe unload-only protection and acknowledge Pages Router limitations. Replace unprofiled size estimates with reproducible, dated publication measurements.
+- a61c220: Link Core compatibility requirements to each package's peerDependencies instead of duplicating version ranges in the README.
+
 ## 1.0.0
 
 [Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-router@1.0.0)
@@ -218,7 +227,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `react` ^18.0.0 || ^19.0.0
   - One of: `react-router-dom` ^6.0.0, `@tanstack/react-router` ^1.0.0, or `next` ^13.4.0
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-router@1.0.0...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-router@1.0.1...HEAD
 [0.2.4]: https://github.com/okyrychenko-dev/react-action-guard-router/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/okyrychenko-dev/react-action-guard-router/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/okyrychenko-dev/react-action-guard-router/compare/v0.2.1...v0.2.2
@@ -226,3 +235,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.2.0]: https://github.com/okyrychenko-dev/react-action-guard-router/releases/tag/v0.2.0
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-router/releases/tag/v0.1.0
 [1.0.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-router@1.0.0
+[1.0.1]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-router@1.0.0...@okyrychenko-dev/react-action-guard-router@1.0.1
