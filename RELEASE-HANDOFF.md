@@ -3,9 +3,8 @@
 ## Current release state — 2026-10-21
 
 The published cohort below was verified directly against npm. Each package's
-`latest` tag points to the listed version. The current source manifests carry
-the same version numbers, but source changes have accumulated since publication;
-matching manifest versions do not identify identical artifacts.
+`latest` tag points to the listed version. Source versions and pending package Changesets are listed below.
+Matching source and registry versions do not identify identical artifacts.
 
 | Package        | Verified npm version |
 | -------------- | -------------------- |
@@ -33,17 +32,35 @@ No live GitHub Actions, browser navigation or production Next application checks
 were run for this summary. Historical fixture results below retain their original
 scope and date.
 
-### Pending source changes
+<!-- release-source-state:start -->
 
-Pending Changesets have not yet been applied to the source manifests. Current
-source documentation includes per-invocation `useAsyncAction` result inference,
+## Source release state
+
+Generated from workspace manifests and remaining Changesets. These are source versions,
+not evidence of npm publication. Dated registry evidence remains historical.
+
+| Package | Source manifest version |
+| --- | --- |
+| Core | 2.0.0 |
+| UI | 1.0.0 |
+| Devtools | 1.0.0 |
+| Query adapter | 0.4.0 |
+| Router adapter | 1.0.0 |
+
+7 pending package Changesets remain; the next versioning run may change these versions.
+
+<!-- release-source-state:end -->
+
+### Source changes since the inspected registry cohort
+
+Current source documentation includes per-invocation `useAsyncAction` result inference,
 `UseAsyncActionReturn`, and `reason`/`priority` options that are absent from the
 published Core 2.0.0 declarations. Core 2.0.0 supports an explicit result generic
 and the existing timeout options. Router warning corrections and the packaged
 README links to manifest peer requirements are also pending release.
 
-The next version PR determines the next cohort; this summary does not assign
-versions or claim those changes are published. Use the [versions page](packages/docs/src/versions.md),
+The generated source state above follows versioning; it does not establish npm
+publication. Use the [versions page](packages/docs/src/versions.md),
 [Core migration guide](packages/docs/src/packages/react-action-guard/migration.md),
 [capability matrix](CAPABILITIES.md), and the README/declarations shipped with the
 installed package. The documentation site follows its source revision; an archived

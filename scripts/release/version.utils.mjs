@@ -2,6 +2,8 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { syncReleaseState } from "./state.utils.mjs";
+
 const repositoryUrl = "https://github.com/okyrychenko-dev/react-action-guard";
 
 // Shared by the release command and disposable packed-cohort verification.
@@ -53,4 +55,5 @@ export function applyReleaseVersions(repository) {
     changelog += `[${releasedVersion}]: ${versionUrl}\n`;
     writeFileSync(changelogPath, changelog);
   }
+  syncReleaseState(repository);
 }
