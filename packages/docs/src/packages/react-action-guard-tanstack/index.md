@@ -518,4 +518,5 @@ MIT © Oleksii Kyrychenko
 Read [concepts](/concepts), [guides](/guides/workflows), [mutation lifetimes](/guides/mutations),
 [ownership](/advanced/ownership), [SSR](/advanced/ssr) and [observability](/advanced/observability).
 See the [Core contract](/packages/react-action-guard/contract) and [migration](/packages/react-action-guard/migration)
-for current source versus planned stabilization.
+for current source responsibilities. See [versions and migration](/versions) for the published
+cohort and pending source changes.

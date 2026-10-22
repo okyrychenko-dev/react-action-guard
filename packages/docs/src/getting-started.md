@@ -6,11 +6,16 @@ Use local pending state if one component already owns the whole interaction.
 
 ## Install core
 
+The first example targets published **Core 2.0.0**, with Zustand **5.0.15** in an
+existing React 18/19 application. Use these exact versions to reproduce its checked contract:
+
 ```bash
-npm install @okyrychenko-dev/react-action-guard zustand
+npm install --save-exact @okyrychenko-dev/react-action-guard@2.0.0 zustand@5.0.15
 ```
 
-Install compatible React/React DOM peers for your application. Start with a `UIBlockingProvider`:
+See [versions and migration](/versions#published-cohort) for the dated artifact check,
+selected React/compiler versions and pending source features. Install compatible React/React DOM
+peers for your application. Start with a `UIBlockingProvider`:
 
 ```tsx
 import {
@@ -64,12 +69,17 @@ caller unmounts; protection does not exclude concurrent calls or cancel work. Ad
 to your UI; the [forms guide](/guides/forms) shows visible errors. The `navigation` label affects
 navigation only after a consumer such as a router hook is attached.
 
+The explicit `useAsyncAction<void>` result generic works with published Core 2.0.0.
+Per-call result inference and custom async `reason`/`priority` options shown in the source
+reference are pending release. Compare [producer lifetimes](/guides/lifecycle#choose-a-producer-by-lifetime)
+before choosing a mounted registration for work that can outlive its component.
+
 Try the [interactive coordination example](/onboarding) for guarded commands, independent help
 and repeated registration owners. Check [versions and migration](/versions) before installing.
 
 ## Run a complete example
 
-From a repository checkout:
+From a repository checkout (this runs current source, including pending changes):
 
 ```bash
 pnpm install

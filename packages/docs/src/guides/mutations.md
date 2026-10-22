@@ -78,6 +78,9 @@ then the configured/default fallback. Query collections own one registration; an
 collection does not block. Configuration replacement and unmount cleanup follow
 [registration ownership](./lifecycle).
 
+Compare [producer lifetimes](./lifecycle#choose-a-producer-by-lifetime) when choosing mounted
+observation or protection that survives detach.
+
 ## Mutation policy
 
 One mutation hook protects all unsettled calls started through its `mutate` / `mutateAsync`,

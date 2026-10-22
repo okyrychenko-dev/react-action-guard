@@ -7,7 +7,9 @@ import { withBase } from 'vitepress'
 This demo runs the **current workspace source**, through Core's public entry point.
 It is the same checked React application as `examples/core-coordination`, embedded here rather
 than rewritten for the documentation. No request leaves your browser.
-[Versions and migration](/versions) separates source, planned tarballs and registry releases.
+[Versions and migration](/versions) separates the published cohort, this source build and pending
+changes. The [published-version quickstart](/getting-started) is checked against installed npm
+declarations; this demo is not an archived build of that release.
 
 <a :href="withBase('/demo/coordination/index.html')">Open the demo on its own</a> ·
 <a :href="withBase('/demo/coordination/provenance.json')">Exact build revision and source manifest</a>
@@ -63,6 +65,9 @@ exclude calls; the command above implements the example's repeat-submit policy. 
 protection without cancelling work. Pending promises retain protection after producer unmount.
 Mounted draft registrations, in contrast, release on detach. See [ownership](/advanced/ownership)
 and [lifecycle](/guides/lifecycle).
+
+The [producer lifetime comparison](/guides/lifecycle#choose-a-producer-by-lifetime) explains why
+pending async protection survives here while mounted confirmable protection ends on unmount.
 
 ## When local state is enough
 

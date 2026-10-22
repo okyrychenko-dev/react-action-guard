@@ -142,4 +142,5 @@ Follow [concepts](https://github.com/okyrychenko-dev/react-action-guard/blob/mai
 and [advanced ownership](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/advanced/ownership.md).
 The [Core contract](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/contract.md)
 and [migration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md)
-describe current source and planned stabilization, rather than asserting registry publication.
+describe current source. The canonical [versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
+page distinguishes published Core 2.0.0 from pending source changes and links dated artifact checks.

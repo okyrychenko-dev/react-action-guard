@@ -5,7 +5,8 @@ README. Reference fragments assume the application's helpers and state; complete
 compiled examples are in [forms](/guides/forms), [workflows](/guides/workflows),
 [registration](/guides/lifecycle), [ownership](/advanced/ownership) and [migration](./migration).
 See [generated types](./api/typedoc/README) for the full public declaration surface and the
-[Core contract](./contract) for planned stabilization versus published versions.
+[Core contract](./contract) for responsibilities and [versions and migration](/versions) for
+the published cohort versus pending source additions.
 
 ## 1.0 Migration
 

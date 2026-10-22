@@ -28,6 +28,12 @@ This package requires the following peer dependencies:
 - [React](https://react.dev/) ^18.0.0 || ^19.0.0
 - [Zustand](https://zustand-demo.pmnd.rs/) ^5.0.0 - State management library
 
+The commands above install the latest published release. The first example was also checked
+against Core 2.0.0 with exact dependencies recorded in the
+[published quickstart evidence](https://github.com/okyrychenko-dev/react-action-guard/blob/main/scripts/compatibility/published-quickstart-evidence.json). See
+[versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
+for exact checked peers and the distinction between installed packages and this source checkout.
+
 ## Quick Start
 
 One producer, two independent consumers, one real Provider. Paste this into a React application's
@@ -43,7 +49,7 @@ import {
 import { useState, type ReactElement } from "react";
 
 function SaveButton(): ReactElement {
-  const runSave = useAsyncAction("save-profile", ["profile", "navigation"]);
+  const runSave = useAsyncAction<void>("save-profile", ["profile", "navigation"]);
   const blocked = useIsBlocked("profile");
   const [status, setStatus] = useState("Ready");
 
@@ -122,7 +128,10 @@ permissions. The navigation control above changes local UI; it does not intercep
 
 Prefer `UIBlockingProvider` for explicit ownership and SSR, using fresh state per request.
 Without a Provider, hooks use a shared global fallback that does not isolate server requests.
-For existing boolean state, register it with `useActionBlocker` instead.
+For existing boolean state, register it with `useActionBlocker` instead. Compare
+[producer lifetimes](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/guides/lifecycle.md#choose-a-producer-by-lifetime)
+before choosing protection that must survive unmount: mounted confirmable registrations release
+on unmount even when their callback continues.
 
 ## Run the complete example
 
@@ -233,7 +242,8 @@ Follow [concepts](https://github.com/okyrychenko-dev/react-action-guard/blob/mai
 and [advanced ownership](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/advanced/ownership.md).
 The [Core contract](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/contract.md)
 and [migration guide](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/packages/react-action-guard/migration.md)
-describe current source and planned stabilization, rather than asserting registry publication.
+describe current source. The canonical [versions and migration](https://github.com/okyrychenko-dev/react-action-guard/blob/main/packages/docs/src/versions.md)
+page distinguishes the verified published cohort from pending source changes and links dated artifact checks.
 
 ## Scheduled windows
 

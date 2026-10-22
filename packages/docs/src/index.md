@@ -59,7 +59,8 @@ features:
 Start with [concepts](/concepts), then choose [workflow guides](/guides/workflows), optional
 [UI](/packages/react-action-guard-ui/) or [Router](/packages/react-action-guard-router/) integrations,
 and [advanced ownership](/advanced/ownership). The [Core contract](/packages/react-action-guard/contract)
-and [migration guide](/packages/react-action-guard/migration) distinguish current source from planned releases.
+and [migration guide](/packages/react-action-guard/migration) explain supported responsibilities.
+[Versions and migration](/versions) distinguishes the published cohort from pending source changes.
 
 This documentation covers core and optional integrations:
 
@@ -71,7 +72,7 @@ The core library providing UI blocking management with priorities, scopes, and a
 
 - Priority-based blocking system
 - Scoped blocking (global, specific areas, multiple scopes)
-- Automatic cleanup on unmount
+- Mounted registration cleanup; pending async protection survives producer unmount
 - Timeout mechanism with callbacks
 - Provider pattern for isolated stores
 - Advanced hooks (confirmable, scheduled, conditional blockers)

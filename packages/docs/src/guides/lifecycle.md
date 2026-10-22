@@ -3,6 +3,40 @@
 The Blocking lifecycle owns registration, metadata replacement, immutable projections, ordered
 observation and generation-safe timeouts. Hooks add activation policy and React ownership.
 
+## Choose a producer by lifetime
+
+Unmount ends a mounted registration, but application work can keep running. Choose the producer
+whose protection lifetime matches that work:
+
+| Producer | Registration owner | After producer unmount | Protection ends |
+| --- | --- | --- | --- |
+| `useActionBlocker` | Mounted hook with an explicit store-local ID | Registration is removed, even if the application operation continues. | Deactivation, unmount, timeout or explicit clearing. |
+| `useAsyncAction` | Each invocation, in the store captured when it starts | Every pending invocation retains its own registration in that store. | That invocation settles, times out or is explicitly cleared. |
+| `useConfirmableBlocker` | Mounted hook, active while its dialog is open or callback executes | Registration is removed. An already started `onConfirm` callback may continue; unmount does not cancel it. | Dialog cancellation, callback settlement, unmount, timeout or explicit clearing. |
+| Query adapter `useBlockingMutation` | Hook instance's owned execution episode in its originating store | Owned pending calls retain protection. Error-only protection ends on detach. | All covered pending/error state clears, or the episode times out; explicit clearing removes the current registration. |
+
+`useConfirmableBlocker` shares a pending confirmation execution within that hook; this does not
+give it the detached execution ownership of `useAsyncAction`. If protection must survive unmount,
+select an execution owner deliberately rather than assuming all async helpers retain it.
+
+For mutations, native `mutation.isPending` describes the latest observed result. Native
+`useMutation` plus a mounted `useActionBlocker` therefore releases registration on unmount.
+The adapter covers every unsettled call started through that hook, including an older call when
+a newer result finishes first. Reset and key changes retain pending ownership; reset clears
+error-only protection, and detach ends it. See [mutation policy](./mutations#mutation-policy)
+for awaited callbacks, timeout episodes and work outside that owner.
+
+Timeout and explicit clearing release protection; they do not cancel application work or settle
+its promise. Hook policies can register again according to their own activation rules; clearing is
+not cancellation or a permanent opt-out. Tracking overlapping calls does not exclude execution.
+Applications own command guards, cancellation and backend idempotency.
+
+Explicit mounted registration IDs must be unique among owners in one store. Duplicate diagnostics
+do not prevent one owner from updating or removing another owner's registration. See
+[ownership](../advanced/ownership) for repeated instances and Provider isolation.
+The [published-version quickstart](../getting-started) uses the released async signature;
+[versions and migration](../versions) identifies pending source additions.
+
 ## Current registration configuration
 
 `useActionBlocker` uses current committed scope, reason, priority, timestamp, timeout and callback.
@@ -17,6 +51,10 @@ a new registration. Query registrations follow that same replacement policy whil
 own query activation and reason policy.
 
 ## Async execution metadata and result types
+
+This section describes current source. Per-invocation result inference, `UseAsyncActionReturn`
+and configurable async reason/priority are absent from the inspected Core 2.0.0 declarations;
+see [pending source changes](../versions#pending-source-changes).
 
 Each `useAsyncAction` invocation owns a separate registration and infers its callback result.
 Provide a product-facing reason and priority without managing a registration manually:
