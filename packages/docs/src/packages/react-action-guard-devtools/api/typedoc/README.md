@@ -1,8 +1,8 @@
-**React Action Guard DevTools API v1.0.0**
+**React Action Guard DevTools API v1.0.1**
 
 ***
 
-# React Action Guard DevTools API v1.0.0
+# React Action Guard DevTools API v1.0.1
 
 ## Interfaces
 

@@ -1,6 +1,6 @@
 {
   "name": "@okyrychenko-dev/react-action-guard-devtools",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Developer tools for @okyrychenko-dev/react-action-guard",
   "engines": {

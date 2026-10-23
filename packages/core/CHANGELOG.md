@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.1.0
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard@2.0.0...@okyrychenko-dev/react-action-guard@2.1.0)
+
+### Minor Changes
+
+- e33af52: Allow useAsyncAction callers to configure a localized blocking reason and priority per invocation while preserving existing defaults and independent concurrent lifetimes.
+
+### Patch Changes
+
+- e33af52: Infer each useAsyncAction callback result independently, including executors returned by createTypedHooks. Explicit hook generics remain supported as result constraints. Export UseAsyncActionReturn to name the executor contract.
+- 3e0b32a: Align installation and the first example with the inspected published Core version, distinguish pending source additions, and link producer lifetime guidance for protection after unmount.
+- a61c220: Document replaceBlocker as a supported advanced store action, including complete configuration replacement, timer behavior and registration ownership.
+
 ## 2.0.0
 
 [Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...@okyrychenko-dev/react-action-guard@2.0.0)
@@ -428,7 +442,7 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 - Comprehensive test suite
 - MIT License
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard@2.0.0...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard@2.1.0...HEAD
 [1.0.5]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.4...v1.0.5
 [1.0.4]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.3...v1.0.4
 [1.0.3]: https://github.com/okyrychenko/react-action-guard/compare/v1.0.2...v1.0.3
@@ -449,3 +463,4 @@ uiBlockingStoreApi.getState().addBlocker("id", config);
 [0.2.1]: https://github.com/okyrychenko/react-action-guard/compare/v0.1.0...v0.2.1
 [0.1.0]: https://github.com/okyrychenko/react-action-guard/releases/tag/v0.1.0
 [2.0.0]: https://github.com/okyrychenko-dev/react-action-guard/compare/v1.0.5...@okyrychenko-dev/react-action-guard@2.0.0
+[2.1.0]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard@2.0.0...@okyrychenko-dev/react-action-guard@2.1.0

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.1
+
+[Release history](https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-ui@1.0.0...@okyrychenko-dev/react-action-guard-ui@1.0.1)
+
+### Patch Changes
+
+- a61c220: Link Core compatibility requirements to each package's peerDependencies instead of duplicating version ranges in the README.
+- dd8d8b8: Keep the Core peer requirement at ^2.0.0 for compatible Core updates instead of raising the minimum version during packaging.
+
 ## 1.0.0
 
 [Release history](https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-ui@1.0.0)
@@ -128,7 +137,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `@okyrychenko-dev/react-action-guard` ^1.0.4
   - `react` ^18.0.0 || ^19.0.0
 
-[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-ui@1.0.0...HEAD
+[Unreleased]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-ui@1.0.1...HEAD
 [0.1.5]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.2...v0.1.3
@@ -136,3 +145,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 [0.1.1]: https://github.com/okyrychenko-dev/react-action-guard-ui/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/okyrychenko-dev/react-action-guard-ui/releases/tag/v0.1.0
 [1.0.0]: https://github.com/okyrychenko-dev/react-action-guard/releases/tag/@okyrychenko-dev/react-action-guard-ui@1.0.0
+[1.0.1]: https://github.com/okyrychenko-dev/react-action-guard/compare/@okyrychenko-dev/react-action-guard-ui@1.0.0...@okyrychenko-dev/react-action-guard-ui@1.0.1
